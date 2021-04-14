@@ -14,4 +14,14 @@ class Leased extends Model
     public $timestamps = true;
     protected $fillable = ["id", "name", "email", "phone", "address"];
 
+
+    public function drivers()
+    {
+        return $this->belongsToMany(
+            'App\Models\Driver',
+            'driver_leased',
+            'leased_id',
+            'driver_id'
+        )->where('is_active', 1);
+    }
 }

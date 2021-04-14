@@ -19,7 +19,8 @@ class CreateChassisTable extends Migration
             $table->string('trailer_plate',11);
             $table->string('trailer_type',50);
             $table->string('picture_url',255);
-            $table->date('registration_expires_at')->nullable();
+            $table->enum('status',['available', 'repairing', 'rented']);
+            $table->date('registration_expiration_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

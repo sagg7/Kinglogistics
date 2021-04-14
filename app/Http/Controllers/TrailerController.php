@@ -34,31 +34,6 @@ class TrailerController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function createInspection(Request $request)
-    {
-        $inspection_categories = InspectionCategory::select([
-            'id',
-            'inspection_category_name',
-            'inspection_category_options',
-            'position',
-        ])
-            ->whereNull('deleted_at')
-            ->orderBy('position')
-            ->get();
-        $leased_id = $request->id;
-        $leased = Leased::find($leased_id);
-        $params['inspection_categories'] = $inspection_categories;
-        $params['leased'] = $leased;
-
-        return view('chassis.inspection.create', $params);
-
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

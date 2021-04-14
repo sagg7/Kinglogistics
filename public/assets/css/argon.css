@@ -1,4 +1,4 @@
-@charset 'UTF-8';
+@charset  "UTF-8";
 /*!
 
 =========================================================
@@ -39,11 +39,11 @@
     --info: #11cdef;
     --warning: #fb6340;
     --danger: #f5365c;
-    --light: #adb5bd;
+    --light-2: #adb5bd;
     --dark: #212529;
     --default: #172b4d;
     --white: #fff;
-    --neutral: #fff;
+    --neutral: #eeeeee;
     --darker: black;
     --breakpoint-xs: 0;
     --breakpoint-sm: 576px;
@@ -52,6 +52,24 @@
     --breakpoint-xl: 1200px;
     --font-family-sans-serif: Open Sans, sans-serif;
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+    /* Transitions */
+    --main-t: all 0.3s ease-out;
+    /* font sizes */
+    --fs-xs: 12px;
+    --fs-sm: 14px;
+    --fs-rl: 16px;
+    --fs-md: 18px;
+    --fs-lg: 20px;
+    --fs-xl: 24px;
+    --fs-xx: 30px;
+    --fs-big: 50px;
+    /* thick sizes */
+    --fw-thin: 300;
+    --fw-light: 400;
+    --fw-regular: 600;
+    --fw-bold: 700;
+    --fw-black: 800;
 }
 
 *,
@@ -142,6 +160,180 @@ abbr[data-original-title]
     text-decoration-skip-ink: none;
 }
 
+/* Customize the label (the container) */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+/* Checkbox */
+.k-checkbox-normalize {
+    margin: 0 !important;
+}
+
+.k-checkbox {
+    display: inline-block !important;
+    width: auto;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.k-checkbox > input {
+    display: none;
+}
+
+.k-checkbox > div {
+    transition: var(--main-t);
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-color: var(--light);
+    border: 2px solid var(--lighter);
+    position: relative;
+}
+
+.k-checkbox:hover > div {
+    border: 2px solid var(--default);
+    background-color: var(--primary);
+}
+
+.k-checkbox > div > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: var(--fs-xs);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: var(--main-t);
+    opacity: 0;
+    overflow: hidden;
+}
+
+.k-checkbox > input:checked ~ div {
+    background-color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.k-checkbox > input:checked ~ div > span {
+    opacity: 1;
+}
+
+.k-checkbox > input:checked ~ div > span > i {
+    animation: oos-checkbox-animation 0.6s;
+}
+
+.k-checkbox-circle {
+    border-radius: 50%;
+}
+
+.k-checkbox-circle > div {
+    border-radius: 50%;
+}
+
+.k-checkbox-circle > div > span > i {
+    width: 50%;
+    height: 50%;
+    position: relative;
+    border-radius: 50%;
+    background-color: white;
+    transform: scale(0);
+    transition: var(--main-t);
+}
+
+.k-checkbox-circle > div > span > i:before {
+    display: none;
+}
+
+.k-checkbox-circle > input:checked ~ div > span > i {
+    transform: scale(1);
+    animation: none;
+}
+
+.k-checkbox-circle > input:checked ~ div > span > i:before {
+    display: none;
+}
+
+.k-checkbox-text {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    flex-flow: row wrap;
+}
+
+.k-checkbox-text > span {
+    display: inline-block;
+    color: black;
+    font-weight: var(--fw-regular);
+    font-size: var(--fs-rl);
+    margin-left: 10px;
+}
+
+
 .condition-buttons {
     text-align: center;
     margin: 20px auto;
@@ -207,12 +399,12 @@ abbr[data-original-title]
 }
 
 @media (min-width: 1350px) {
-    #vehicleInspection {
+   /* #vehicleInspection {
         max-width: 50%;
         margin: auto;
         width: 50%;
         padding: 10px;
-    }
+    }*/
 }
 #vehicleInspection .panel-heading {
     background-color: var(--primary); !important;
@@ -5319,6 +5511,10 @@ input[type='button'].btn-block
     content: '';
 
     background: no-repeat 50% / 50% 50%;
+}
+
+.container.checkbox  {
+    height: calc(1.5em + 1.25rem + 5px);
 }
 
 .custom-checkbox .custom-control-label::before
@@ -20581,7 +20777,7 @@ textarea[resize='horizontal']
 }
 .icon-xs + .icon-text
 {
-    width: calc(100% - $icon-size-xs - 1);
+    width: calc(100% - icon-size-xs - 1);
 }
 
 .icon-shape
@@ -21788,7 +21984,6 @@ textarea[resize='horizontal']
     .navbar-vertical.navbar-expand-sm > [class*='container']
     {
         height: 100%;
-        min-height: none;
     }
 }
 @media (min-width: 576px)
@@ -21907,7 +22102,6 @@ textarea[resize='horizontal']
     .navbar-vertical.navbar-expand-md > [class*='container']
     {
         height: 100%;
-        min-height: none;
     }
 }
 @media (min-width: 768px)
@@ -22026,7 +22220,6 @@ textarea[resize='horizontal']
     .navbar-vertical.navbar-expand-lg > [class*='container']
     {
         height: 100%;
-        min-height: none;
     }
 }
 @media (min-width: 992px)
@@ -22145,7 +22338,6 @@ textarea[resize='horizontal']
     .navbar-vertical.navbar-expand-xl > [class*='container']
     {
         height: 100%;
-        min-height: none;
     }
 }
 @media (min-width: 1200px)
@@ -27184,7 +27376,7 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle
 {
     padding-left: 25px;
 
-    transform: translate(0, -50%, 0);
+    transform: translate(0, -50);
 }
 
 .noUi-rtl .noUi-value-vertical
@@ -28987,7 +29179,7 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle
     display: block;
 
     width: 100%;
-    height: calc(1.5em + 1.25rem + 2px);
+    height: calc(1.5em + 1.25rem + 2px)!important;
     padding: .625rem .75rem;
 
     transition: all .15s cubic-bezier(.68, -.55, .265, 1.55);

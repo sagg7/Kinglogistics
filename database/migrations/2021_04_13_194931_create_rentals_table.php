@@ -22,7 +22,19 @@ class CreateRentalsTable extends Migration
             $table->string('address',200);
             $table->tinyInteger('has_pec')->default(0);
             $table->tinyInteger('has_h2s')->default(0);
-            $table->date('cdl_valid_until')->nullable();
+            $table->date('cdl_expiration_date')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('trucks', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('truck_number',11);
+            $table->string('plate',11);
+            $table->string('trailer_type',50);
+            $table->string('insurance',50);
+            $table->string('DOT',50);
+            $table->date('insurance_expiration_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -35,9 +47,11 @@ class CreateRentalsTable extends Migration
             $table->tinyInteger('is_paid')->default(0);
             $table->enum('periodicity',['weekly', 'annual',]);
             $table->date('valid_until')->nullable();
+            $table->string('pickup_location',255);
             $table->unsignedInteger('trailer_id');
             $table->unsignedInteger('leased_id');
             $table->unsignedInteger('driver_id');
+            $table->unsignedInteger('tuck_id');
             $table->timestamps();
             $table->softDeletes();
 

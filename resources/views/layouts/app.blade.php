@@ -19,6 +19,7 @@
         <link href="{{ asset('assets') }}/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
         <!-- Argon CSS -->
         <link type="text/css" href="{{ asset('assets') }}/css/argon.css?v=1.2.0" rel="stylesheet">
+        @stack('css')
     </head>
     <body class="{{ $class ?? '' }}">
         @auth()

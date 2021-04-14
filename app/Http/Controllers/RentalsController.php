@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chassis;
+use App\Models\Driver;
 use App\Models\InspectionCategory;
 use App\Models\Leased;
-use App\Models\Order;
+use App\Models\Rental;
+use App\Models\Trailer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -26,19 +29,9 @@ class RentalsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function createInspection(Request $request)
+    public function create(Request $request)
     {
         $inspection_categories = InspectionCategory::select([
             'id',
@@ -51,10 +44,16 @@ class RentalsController extends Controller
             ->get();
         $leased_id = $request->id;
         $leased = Leased::find($leased_id);
+        $leased->drivers();
+        $trailers = Trailer::pluck( 'trailer_number','id')->toArray();
+        $drivers = $leased->drivers()->select(DB::raw('concat(name, " ", last_name) as name'), 'id')
+            ->pluck('name', 'id')->toArray();
         $params['inspection_categories'] = $inspection_categories;
         $params['leased'] = $leased;
+        $params['trailers'] = $trailers;
+        $params['drivers'] = $drivers;
 
-        return view('chassis.inspection.create', $params);
+        return view('chassis.rentals.create', $params);
 
     }
 
@@ -62,13 +61,24 @@ class RentalsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function inspectionStore(Request $request)
+    public function Store(Request $request)
     {
-//        dd($request);
-        if (isset(session()->get('modules')[3])) {
-            $id = $request->leasedId;
+            $rental = new Rental();
+            $rental->rental_date = Carbon::now();
+            $rental->cost = $request->input('cost', 0);
+            $rental->deposit_amount = $request->input('deposit_amount', 0);
+            $rental->is_paid = $request->input('is_paid', 0);
+            $rental->periodicity = $request->input('periodicity', 'weekly');
+           // $rental->valid_until = $request->input('periodicity', 'weekly');
+            $rental->trailer_id = $request->input('trailer_id');
+            $rental->leased_id = $request->input('leased_id');
+            $rental->driver_id = $request->input('driver_id');
+            $rental->updated_at = Carbon::now();
+            $rental->updated_at = Carbon::now();
+            $rental->save();
+
             $inspection_items = [];
             $categories = $this->getInspectionCategories();
             foreach ($categories as $category) {
@@ -105,19 +115,19 @@ class RentalsController extends Controller
             $conditionData = json_encode($dataArray);
             if ($conditionData != null) {
                 // THE INTERNAL ITEM ID OF THE CAR CONDITION DATA IS 39
-                $inspection_items[42] = ['option_value' => $conditionData,'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
+                $inspection_items[38] = ['option_value' => $conditionData,'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
             }
 
-            $signature_client = $request->input('signature-7');
+            $signature_client = $request->input('signature-8');
 
             if (!empty($signature_client)) {
                 list($type, $signature_client) = explode(';', $signature_client);
                 list(, $signature_client) = explode(',', $signature_client);
                 $signature_client = base64_decode($signature_client);
 
-                $path = 'photos/shopper_' . $shop->shop_id;
+                $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id;
                 Storage::makeDirectory($path);
-                $file_name = 'signature_' . $id;
+                $file_name = 'signature_' . $rental->id;
                 $extension = '.png';
                 $path_file = storage_path('app/' . $path . '/');
                 file_put_contents($path_file . '/' . $file_name . $extension, $signature_client);
@@ -129,7 +139,7 @@ class RentalsController extends Controller
                 $img->resizeCanvas(538, 302, 'center', false, [255, 255, 255, 0]);
                 $img->save($path_file . $file_name . $extension, 100);
 
-                $disk = Storage::disk(env('STORAGE_S3', 's3-test'));
+                /*$disk = Storage::disk(env('STORAGE_S3', 's3-test'));
 
                 try {
                     $disk->put(
@@ -151,40 +161,40 @@ class RentalsController extends Controller
                     throw $exception;
                 }
 
-                Storage::delete($path . '/' . $file_name . $extension);
+                Storage::delete($path . '/' . $file_name . $extension);*/
             }
 
-            $signature_shop = $request->input('signature-10');
+            $signature_shop = $request->input('signature-7');
 
             if (!empty($signature_shop)) {
                 list($type, $signature_shop) = explode(';', $signature_shop);
                 list(, $signature_shop) = explode(',', $signature_shop);
                 $signature_shop = base64_decode($signature_shop);
 
-                $path = 'photos/shopper_' . $shop->shop_id;
+                $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id;
                 Storage::makeDirectory($path);
-                $file_name_10 = 'signature_shop_' . $id;
+                $file_name_7 = 'signature_inspector_' . $rental->id;
                 $extension = '.png';
                 $path_file = storage_path('app/' . $path . '/');
-                file_put_contents($path_file . '/' . $file_name_10 . $extension, $signature_shop);
+                file_put_contents($path_file . '/' . $file_name_7 . $extension, $signature_shop);
 
-                $img = Image::make($path_file . $file_name_10 . $extension);
+                $img = Image::make($path_file . $file_name_7 . $extension);
                 $img->resize(538, 302, function ($constraint) {
                     $constraint->aspectRatio();
                 });
                 $img->resizeCanvas(538, 302, 'center', false, [255, 255, 255, 0]);
-                $img->save($path_file . $file_name_10 . $extension, 100);
+                $img->save($path_file . $file_name_7 . $extension, 100);
 
-                $disk = Storage::disk(env('STORAGE_S3', 's3-test'));
+                /*$disk = Storage::disk(env('STORAGE_S3', 's3-test'));
 
                 try {
                     $disk->put(
-                        'shops_app/' . $path . '/order_' . $id . '/' . $file_name_10 . $extension,
-                        (string)file_get_contents($path_file . $file_name_10 . $extension),
+                        'shops_app/' . $path . '/order_' . $id . '/' . $file_name_7 . $extension,
+                        (string)file_get_contents($path_file . $file_name_7 . $extension),
                         'public'
                     );
                     $amazon_path = 'https://' . env('STORAGE_BUCKET', 'kipup-test') .
-                        '.s3.amazonaws.com/shops_app/' . $path . '/order_' . $id . '/' . $file_name_10 . $extension;
+                        '.s3.amazonaws.com/shops_app/' . $path . '/order_' . $id . '/' . $file_name_7 . $extension;
                     // THE INTERNAL ITEM ID OF THE SIGNATURE IS 74
                     $inspection_items[74] = ['option_value' => $amazon_path,'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
                 } catch (S3Exception $exception) {
@@ -197,28 +207,35 @@ class RentalsController extends Controller
                     throw $exception;
                 }
 
-                Storage::delete($path . '/' . $file_name_10 . $extension);
+                Storage::delete($path . '/' . $file_name_7 . $extension);*/
             }
 
             $comment = $request->commentInspection;
 
-            $inspection_items[75] = ['option_value' => $comment, 'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
+            $inspection_items[39] = ['option_value' => $comment, 'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
 
-            $order = Order::find($id);
-            $order->inspectionItems()->sync($inspection_items);
-        }
+            $rental->inspectionItems()->sync($inspection_items);
+            $jsonData = [
+                'success' => false,
+                'msg' => "Rental saved successfully",
+            ];
 
+            return response()->json($jsonData);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function getInspectionCategories()
     {
-        //
+        $inspection_categories = InspectionCategory::select([
+            'id',
+            'inspection_category_name',
+            'inspection_category_options',
+            'position',
+        ])
+            ->whereNull('deleted_at')
+            ->orderBy('position')
+            ->get();
+
+        return $inspection_categories;
     }
 
     /**

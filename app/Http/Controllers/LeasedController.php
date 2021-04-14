@@ -33,11 +33,27 @@ class LeasedController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        $leased = new Leased();
+        $leased["name"] = $request->name;
+        $leased["email"] = $request->email;
+        $leased["phone"] = $request->phone;
+        $leased["address"] = $request->address;
+
+        if ($leased->save()){
+            return response()->json([
+                'success' => true,
+                'msg' => 'Leased created successfully',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'msg' => 'an error occurred, if the problem persists contact support',
+            ]);
+        }
     }
 
     /**

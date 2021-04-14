@@ -40,8 +40,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('trailer/create', function () {return view('chassis.create');})->name('Chassis Create');
     Route::post('leased/store', ['as' => 'leased.store', 'uses' => 'App\Http\Controllers\LeasedController@store']);
     Route::post('trailer/store', ['as' => 'chassis.store', 'uses' => 'App\Http\Controllers\TrailerController@store']);
-    Route::post('inspection/store', ['as' => 'inspection.store', 'uses' => 'App\Http\Controllers\TrailerController@inspectionStore']);
-    Route::get('inspection/create/{id}', ['as' => 'inspection.create', 'uses' => 'App\Http\Controllers\TrailerController@createInspection']);
+    Route::post('rent/store', ['as' => 'rent.store', 'uses' => 'App\Http\Controllers\RentalsController@Store']);
+    Route::get('rent/create/{id}', ['as' => 'rent.create', 'uses' => 'App\Http\Controllers\RentalsController@create']);
     Route::get('getLeased', ['as' => 'getLeased', 'uses' => 'App\Http\Controllers\LeasedController@getLeased']);
 
 });
