@@ -83,7 +83,7 @@
                         <i class="ni ni-tv-2 text-primary"></i> {{ __('Dashboard') }}
                     </a>
                 </li>
-                <li class="nav-item">
+            <!--<li class="nav-item">
                     <a class="nav-link active" href="#navbar-users" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="navbar-users">
                         <i class="ni ni-single-02" style="color: #f4645f;"></i>
                         <span class="nav-link-text" style="color: #f4645f;">{{ __('Users') }}</span>
@@ -103,6 +103,22 @@
                             </li>
                         </ul>
                     </div>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link " href="#navbar-rental" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="navbar-rental">
+                        <i class="fab fa-laravel" style="color: #f4645f;"></i>
+                        <span class="nav-link-text" style="color: #f4645f;">{{ __('Rentals') }}</span>
+                    </a>
+
+                    <div class="collapse show" id="navbar-rental">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('rentals') }}">
+                                    {{ __('Rentals') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link " href="#navbar-leased" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="navbar-leased">
@@ -118,15 +134,35 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url('leased/Chassis') }}">
-                                    {{ __('Chassis') }}
+                                <a class="nav-link" href="{{ url('leased/create') }}">
+                                    {{ __('Create Leased') }}
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
-
                 <li class="nav-item">
+                    <a class="nav-link " href="#navbar-trailers" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="navbar-trailers">
+                        <i class="fab fa-laravel" style="color: #f4645f;"></i>
+                        <span class="nav-link-text" style="color: #f4645f;">{{ __('Trailers') }}</span>
+                    </a>
+
+                    <div class="collapse show" id="navbar-trailers">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('trailers') }}">
+                                    {{ __('Trailers') }}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('trailer/create') }}">
+                                    {{ __('Create Trailer') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            <!--<li class="nav-item">
                     <a class="nav-link" href="{{ route('icons') }}">
                         <i class="ni ni-planet text-blue"></i> {{ __('Icons') }}
                     </a>
@@ -142,7 +178,7 @@
                       <span class="nav-link-text">Tables</span>
                     </a>
                 </li>
-            </ul>
+            </ul>-->
             <!-- Divider -->
             <hr class="my-3">
             <!-- Heading -->

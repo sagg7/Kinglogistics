@@ -1,0 +1,38 @@
+.red {
+    color: #fc3333;
+}
+
+.green {
+    color: #3cb878;
+}
+
+.yellow {
+    color: #FFB910;
+}
+
+a.red:hover {
+    color: #791919;
+}
+
+.bg-yellow {
+    background-color: #ffbe10;
+}
+
+.bg-green {
+    background-color: #3cb878;
+}
+
+.bg-blue {
+    background-color: #11b3ff;
+}
+
+.bg-red {
+    background-color: #fc3333;
+}
+
+.bg-purple {
+    background-color: purple;
+}
+.bg-fiusha {
+    background-color: #ff54ff;
+}

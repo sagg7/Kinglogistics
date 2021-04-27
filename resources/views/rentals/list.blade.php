@@ -8,20 +8,21 @@
             <div class=" col " bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header bg-transparent" bis_skin_checked="1">
-                        <h3 class="mb-0">Leased Contractors</h3>
+                        <h3 class="mb-0">Rentals</h3>
                     </div>
                     <div class="table-responsive">
                         <table class="table align-items-center">
                             <thead class="thead-light">
                             <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Address</th>
+                                <th scope="col"></th>
+                                <th scope="col">Leased Name</th>
+                                <th scope="col">Trailer #</th>
+                                <th scope="col">Driver Name</th>
+                                <th scope="col">Rental date</th>
                                 <th scope="col"></th>
                             </tr>
                             </thead>
-                            <tbody class="table-striped" id="leasedTable">
+                            <tbody class="table-striped" id="rentedTable">
                             </tbody>
                         </table>
 
@@ -35,7 +36,7 @@
     <script>
         function initTable(){
             $.ajax({
-                'url': '{{url('getLeased')}}/',
+                'url': '{{url('getRented')}}/',
                 'type': 'get',
                 'data': {'search': $("#search").val()},
                 'dataType': 'json',
@@ -46,35 +47,43 @@
         }
 
         function fillTable(data, empty) {
-            let table = $("#leasedTable");
+            let table = $("#rentedTable");
             if (empty)
                 table.html("");
             let content = "";
-            let url = "{{url("rental/create")}}";
-            let urlCDriver = "{{url("driver/create")}}";
-            let urlCTruck = "{{url("truck/create")}}";
+            let url = "{{url("inspection/create")}}";
+            let urlend = "{{url("endInspection/create")}}";
             for (let i = 0; i < data.data.length; i++){
+                let color = '';
+                let button = '';
+                if (data.data[i].rental_status == 'Uninspected'){
+                    color = "blue";
+                    button = `<a class="dropdown-item" href="${url}/${data.data[i].id}"><i class="fas fa-clipboard-list"></i></i><span>create Inspection</span></a>`;
+                }
+                if (data.data[i].rental_status == 'Rented'){
+                    color = "green";
+                    button = `<a class="dropdown-item" href="${urlend}/${data.data[i].id}"><i class="fas fa-window-close"></i><span>End Rental</span></a>`;
+                }
                 content += `<tr>`+
                     `<th scope="row">`+
+                        `<div class="status bg-${color}" bis_skin_checked="1"></div>`+
+                    `</th>`+
+                    `<th scope="row">`+
                     `    <div class="media align-items-center">`+
-                    `            <span class="mb-0 text-sm">${data.data[i].name}</span>`+
+                    `            <span class="mb-0 text-sm">${data.data[i].leased_name}</span>`+
                     `    </div>`+
                     `</th>`+
-                    `    <td>${data.data[i].email}</td>`+
-                    `    <td>${data.data[i].phone}</td>`+
-                    `    <td>${data.data[i].address}</td>`+
+                    `    <td>${data.data[i].trailer_number}</td>`+
+                    `    <td>${data.data[i].driver_name}</td>`+
+                    `    <td>${data.data[i].rental_date}</td>`+
                     `    <td class="text-right">`+
                     `    <div class="dropdown">`+
                     `        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">`+
                     `            <i class="fas fa-ellipsis-v"></i>`+
                     `        </a>`+
                     `        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">`+
-                    `            <a class="dropdown-item" href="#"><i class="far fa-eye"></i></i><span>See</span></a>`+
-                    `            <a class="dropdown-item" href="${urlCDriver}"><i class="far fa-eye"></i></i><span>add Driver</span></a>`+
-                    `            <a class="dropdown-item" href="${urlCTruck}"><i class="far fa-eye"></i></i><span>add Truck</span></a>`+
-                    `            <a class="dropdown-item" href="${url}/${data.data[i].id}"><i class="fas fa-trailer"></i></i><span>Rent trailer</span></a>`+
-                    `            <li role="separator" class="divider"></li>`+
-                    `            <a class="dropdown-item" href="#"><i class="fas fa-user-times"></i><span>delete</span></a>`+
+                    `            <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i></i><span>Create Pdf</span></a>`+
+                                 button+
                     `        </div>`+
                     `    </div>`+
                     `</td>`;

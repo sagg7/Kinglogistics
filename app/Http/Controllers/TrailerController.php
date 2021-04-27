@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chassis;
-use App\Models\InspectionCategory;
 use App\Models\Leased;
-use App\Models\Order;
+use App\Models\Trailer;
+use App\Models\TrailerType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -30,7 +30,10 @@ class TrailerController extends Controller
      */
     public function create()
     {
+        $trailerTypes = TrailerType::pluck( 'Name','id')->toArray();
+        $params['trailerTypes'] = $trailerTypes;
 
+        return view('trailers.create', $params);
     }
 
     /**
@@ -189,20 +192,36 @@ class TrailerController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        $trailer = new Trailer();
+        $trailer->trailer_number = $request->input('trailer_number', 0);
+        $trailer->trailer_type = $request->input('trailer_type', 0);
+        $trailer->trailer_plate = $request->input('trailer_plate', 0);
+        $trailer->registration_expiration_date = $request->input('registration_expiration_date');
+        $trailer->status = 'available';
+        $trailer->updated_at = Carbon::now();
+        $trailer->created_at = Carbon::now();
+        $trailer->save();
+
+        $jsonData = [
+            'id' => $trailer->id,
+            'success' => false,
+            'msg' => "Trailer saved successfully",
+        ];
+
+        return response()->json($jsonData);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Chassis  $chassis
+     * @param  \App\Models\Trailer  $trailer
      * @return \Illuminate\Http\Response
      */
-    public function show(Chassis $chassis)
+    public function show(Trailer $trailer)
     {
         //
     }
@@ -210,10 +229,10 @@ class TrailerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Chassis  $chassis
+     * @param  \App\Models\Trailer  $trailer
      * @return \Illuminate\Http\Response
      */
-    public function edit(Chassis $chassis)
+    public function edit(Trailer $trailer)
     {
         //
     }
@@ -222,10 +241,10 @@ class TrailerController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Chassis  $chassis
+     * @param  \App\Models\Trailer  $trailer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Chassis $chassis)
+    public function update(Request $request, Trailer $trailer)
     {
         //
     }
@@ -233,10 +252,10 @@ class TrailerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Chassis  $chassis
+     * @param  \App\Models\Trailer  $trailer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Chassis $chassis)
+    public function destroy(Trailer $trailer)
     {
         //
     }

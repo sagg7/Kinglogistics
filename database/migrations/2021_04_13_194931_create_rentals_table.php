@@ -69,6 +69,5 @@ class CreateRentalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chassis');
     }
 }

@@ -3,8 +3,50 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="44c4bc99-6032-44b0-ad1e-5e2f9e7305c0" name="Default Changelist" comment="" />
+    <list default="true" id="44c4bc99-6032-44b0-ad1e-5e2f9e7305c0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Models/InspectionRentalReturned.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/js/components/common/imageResizer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/drivers/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/drivers/list.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/LeasedController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/LeasedController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RentalsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TrailerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TrailerController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/InspectionItem.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/InspectionItem.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Rental.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Rental.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/inspectionRental.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/InspectionRental.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_04_12_012416_create_chassis_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_04_12_012416_create_chassis_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_04_13_194931_create_rentals_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_04_13_194931_create_rentals_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_04_13_201247_leased_drivers_pivot.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_04_13_201247_leased_drivers_pivot.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_04_14_192641_inspection_photos.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_04_14_192641_inspection_photos.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/argon.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/argon.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chassis/rentals/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rentals/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/navbars/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/navbars/sidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/leased/list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/leased/list.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/users/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/users/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +55,16 @@
   <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -123,6 +175,7 @@
       <path value="$PROJECT_DIR$/vendor/composer" />
       <path value="$PROJECT_DIR$/vendor/laravel/ui" />
       <path value="$PROJECT_DIR$/vendor/laravelcollective/html" />
+      <path value="$PROJECT_DIR$/vendor/intervention/image" />
     </include_path>
   </component>
   <component name="ProjectId" id="1r2Ta3ViJIXjH9mStW66j3RIyYW" />
@@ -133,7 +186,8 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/Http/Controllers" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -143,14 +197,16 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\resources\views" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\resources\views" />
       <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\app\Models" />
-      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\database\migrations" />
-      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\resources\views\leased" />
-      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king" />
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\public\assets\css" />
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\resources\views\rentals" />
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\public\assets\js\components\common" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\storage\app\public" />
+      <recent name="C:\Users\saulg\Documents\kinglogistics\app-king\resources\views" />
     </key>
   </component>
   <component name="RunManager">
@@ -173,57 +229,98 @@
       <workItem from="1618177936903" duration="4425000" />
       <workItem from="1618182490860" duration="27729000" />
       <workItem from="1618323205381" duration="17212000" />
+      <workItem from="1618780100756" duration="17510000" />
+      <workItem from="1619360700445" duration="326000" />
+      <workItem from="1619361147191" duration="35000" />
+      <workItem from="1619361191790" duration="28858000" />
+      <workItem from="1619446273111" duration="13552000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="WindowStateProjectService">
     <state x="770" y="399" key="#Composer" timestamp="1618173341183">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="770" y="399" key="#Composer/0.0.1920.1040@0.0.1920.1040" timestamp="1618173341183" />
-    <state x="-1280" y="48" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1618261837215">
+    <state x="-1280" y="48" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1618868202929">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
-    <state x="-1280" y="48" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618261837215" />
+    <state x="-1280" y="48" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618868202929" />
     <state x="-1175" y="87" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1618343167220">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
     <state x="-1175" y="87" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618343167220" />
     <state x="745" y="295" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618195213994" />
-    <state x="-1230" y="67" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1618337349666">
+    <state x="-1230" y="62" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1618929402467">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
-    <state x="-1230" y="67" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618337349666" />
+    <state x="-1230" y="62" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618929402467" />
+    <state x="-1230" y="67" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1619474178467">
+      <screen x="-1920" y="-208" width="1920" height="1040" />
+    </state>
+    <state x="-1230" y="67" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1619474178467" />
     <state x="690" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618195967644" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1618323242664">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1619361371086">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/-1920.-208.1920.1040@0.0.1920.1040" timestamp="1618323242664" />
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1618182462236" />
-    <state x="794" y="443" key="NewPhpFileDialog" timestamp="1618194759880">
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040/-1920.-208.1920.1040@0.0.1920.1040" timestamp="1619028544773" />
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1619361371086" />
+    <state x="-1126" y="235" key="NewPhpFileDialog" timestamp="1618582534273">
+      <screen x="-1920" y="-208" width="1920" height="1040" />
+    </state>
+    <state x="-1126" y="235" key="NewPhpFileDialog/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618582534273" />
+    <state x="2714" y="443" key="NewPhpFileDialog/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1618430673633" />
+    <state x="794" y="443" key="NewPhpFileDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618493115797" />
+    <state width="498" height="446" key="SwitcherDM" timestamp="1618511329107">
+      <screen x="-1920" y="-208" width="1920" height="1040" />
+    </state>
+    <state width="498" height="446" key="SwitcherDM/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618511329107" />
+    <state x="566" y="130" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1619411132509">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="794" y="443" key="NewPhpFileDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618194759880" />
-    <state x="-1354" y="-78" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1618331468494">
+    <state x="-1354" y="-78" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618843535791" />
+    <state x="566" y="130" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1619411132509" />
+    <state x="-1143" y="229" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1619449492362">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
-    <state x="-1354" y="-78" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618331468494" />
-    <state x="566" y="130" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1618189683169" />
-    <state x="-1259" y="-52" width="698" height="801" key="find.popup" timestamp="1618345137516">
+    <state x="-1143" y="229" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1619449492362" />
+    <state x="-1826" y="-208" width="1328" height="1026" key="dock-window-1" timestamp="1618843407929">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
-    <state x="-1259" y="-52" width="698" height="801" key="find.popup/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618345137516" />
-    <state x="667" y="253" width="655" height="592" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1618198624207" />
-    <state x="-1304" y="136" key="run.anything.popup" timestamp="1618267947508">
+    <state x="-1826" y="-208" width="1328" height="1026" key="dock-window-1/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618843407929" />
+    <state x="-1259" y="-52" width="698" height="801" key="find.popup" timestamp="1619477947932">
       <screen x="-1920" y="-208" width="1920" height="1040" />
     </state>
-    <state x="-1304" y="136" key="run.anything.popup/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618267947508" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1618198810884">
+    <state x="-1259" y="-52" width="698" height="801" key="find.popup/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1619477947932" />
+    <state x="661" y="156" width="698" height="801" key="find.popup/0.0.1920.1040/-1920.-208.1920.1040@0.0.1920.1040" timestamp="1619028978838" />
+    <state x="2581" y="156" width="698" height="801" key="find.popup/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1618431385458" />
+    <state x="667" y="253" width="655" height="592" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1619384948708" />
+    <state x="616" y="344" key="run.anything.popup" timestamp="1619386623134">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1618198810884" />
+    <state x="-1304" y="136" key="run.anything.popup/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1618848156608" />
+    <state x="616" y="344" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1619386623134" />
+    <state x="-1297" y="17" width="672" height="678" key="search.everywhere.popup" timestamp="1619478244248">
+      <screen x="-1920" y="-208" width="1920" height="1040" />
+    </state>
+    <state x="-1297" y="17" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/-1920.-208.1920.1040@-1920.-208.1920.1040" timestamp="1619478244248" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/-1920.-208.1920.1040@0.0.1920.1040" timestamp="1619124230526" />
+    <state x="2543" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1618432069918" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1619384965375" />
   </component>
 </project>

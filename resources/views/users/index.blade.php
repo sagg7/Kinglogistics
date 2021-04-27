@@ -146,8 +146,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('leased/Chassis') }}">
-                                {{ __('Chassis') }}
+                            <a class="nav-link" href="{{ url('rentals') }}">
+                                {{ __('Rentals') }}
                             </a>
                         </li>
                     </ul>

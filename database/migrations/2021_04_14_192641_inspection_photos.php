@@ -19,7 +19,7 @@ class InspectionPhotos extends Migration
             $table->string('picture_name',15);
             $table->string('picture_slider',25);
             $table->string('picture_path',255);
-            $table->string('picture_description',140);
+            $table->string('picture_description',140)->nullable();
             $table->timestamps();
 
             $table->foreign('rental_id')->references('id')->on('rents')   ;

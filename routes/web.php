@@ -33,15 +33,33 @@ Route::group(['middleware' => 'auth'], function () {
 	 Route::get('icons', function () {return view('pages.icons');})->name('icons');
 	 Route::get('table-list', function () {return view('pages.tables');})->name('table');
 	Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'App\Http\Controllers\ProfileController@password']);
-
+//Leased
     Route::get('leased', function () {return view('leased.list');})->name('Leased');
     Route::get('leased/create', function () {return view('leased.create');})->name('Leased Create');
-    Route::get('trailer', function () {return view('chassis.list');})->name('Chassis');
-    Route::get('trailer/create', function () {return view('chassis.create');})->name('Chassis Create');
     Route::post('leased/store', ['as' => 'leased.store', 'uses' => 'App\Http\Controllers\LeasedController@store']);
-    Route::post('trailer/store', ['as' => 'chassis.store', 'uses' => 'App\Http\Controllers\TrailerController@store']);
-    Route::post('rent/store', ['as' => 'rent.store', 'uses' => 'App\Http\Controllers\RentalsController@Store']);
-    Route::get('rent/create/{id}', ['as' => 'rent.create', 'uses' => 'App\Http\Controllers\RentalsController@create']);
     Route::get('getLeased', ['as' => 'getLeased', 'uses' => 'App\Http\Controllers\LeasedController@getLeased']);
+
+//Trailers
+    Route::get('trailers', function () {return view('trailer.list');})->name('Trailers');
+    Route::get('trailer/create', ['as' => 'trailer.create', 'uses' => 'App\Http\Controllers\TrailerController@create']);
+    Route::post('trailer/store', ['as' => 'trailer.store', 'uses' => 'App\Http\Controllers\TrailerController@store']);
+
+//Drivers
+    Route::get('driver/create', ['as' => 'driver.create', 'uses' => 'App\Http\Controllers\LeasedController@createDriver']);
+    Route::post('driver/store', ['as' => 'driver.store', 'uses' => 'App\Http\Controllers\LeasedController@storeDriver']);
+
+//Rentals
+    Route::post('rental/store', ['as' => 'rental.store', 'uses' => 'App\Http\Controllers\RentalsController@store']);
+    Route::get('rental/create/{id}', ['as' => 'rental.create', 'uses' => 'App\Http\Controllers\RentalsController@create']);
+    Route::post('inspection/store', ['as' => 'inspection.store', 'uses' => 'App\Http\Controllers\RentalsController@storeInspection']);
+    Route::get('inspection/create/{id}', ['as' => 'rental.create', 'uses' => 'App\Http\Controllers\RentalsController@createInspection']);
+    Route::post('rental/uploadPhoto', ['as' => 'rental.uploadPhoto', 'uses' => 'App\Http\Controllers\RentalsController@uploadPhoto']);
+    Route::get('rentals', function () {return view('rentals.list');})->name('Rentals');
+    Route::get('getRented', ['as' => 'getRented', 'uses' => 'App\Http\Controllers\RentalsController@getRented']);
+
+    Route::get('endInspection/create/{id}', ['as' => 'rental.createEndRental', 'uses' => 'App\Http\Controllers\RentalsController@createEndRental']);
+    Route::post('endRental', ['as' => 'rental.end', 'uses' => 'App\Http\Controllers\RentalsController@storeEndRental']);
+    Route::post('rental/destroy/{id}', ['as' => 'rental.destroy', 'uses' => 'App\Http\Controllers\RentalsController@destroy']);
+
 
 });

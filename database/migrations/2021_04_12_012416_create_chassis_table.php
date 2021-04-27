@@ -43,14 +43,14 @@ class CreateChassisTable extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('inspection_chassis', function (Blueprint $table) {
-            $table->unsignedInteger('chassis_id');
+        Schema::create('inspection_rental', function (Blueprint $table) {
+            $table->unsignedInteger('rental_id');
             $table->unsignedInteger('inspection_item_id');
             $table->string('option_value', 2000);
             $table->timestamps();
 
             $table->foreign('inspection_item_id')->references('id')->on('inspection_items');
-            $table->foreign('chassis_id')->references('id')->on('chassis');
+            $table->foreign('rental_id')->references('id')->on('rentals');
 
         });
     }
@@ -62,6 +62,5 @@ class CreateChassisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chassis');
     }
 }

@@ -35,6 +35,5 @@ class LeasedDriversPivot extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chassis');
     }
 }

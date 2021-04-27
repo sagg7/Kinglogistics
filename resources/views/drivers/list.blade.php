@@ -51,8 +51,6 @@
                 table.html("");
             let content = "";
             let url = "{{url("rental/create")}}";
-            let urlCDriver = "{{url("driver/create")}}";
-            let urlCTruck = "{{url("truck/create")}}";
             for (let i = 0; i < data.data.length; i++){
                 content += `<tr>`+
                     `<th scope="row">`+
@@ -70,8 +68,6 @@
                     `        </a>`+
                     `        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">`+
                     `            <a class="dropdown-item" href="#"><i class="far fa-eye"></i></i><span>See</span></a>`+
-                    `            <a class="dropdown-item" href="${urlCDriver}"><i class="far fa-eye"></i></i><span>add Driver</span></a>`+
-                    `            <a class="dropdown-item" href="${urlCTruck}"><i class="far fa-eye"></i></i><span>add Truck</span></a>`+
                     `            <a class="dropdown-item" href="${url}/${data.data[i].id}"><i class="fas fa-trailer"></i></i><span>Rent trailer</span></a>`+
                     `            <li role="separator" class="divider"></li>`+
                     `            <a class="dropdown-item" href="#"><i class="fas fa-user-times"></i><span>delete</span></a>`+

@@ -14,9 +14,4 @@ class InspectionItem extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
 
-    public function order($orderId)
-    {
-        return $this->hasOne('App\Models\inspectionRental', 'inspection_item_id', 'id')
-            ->where('inspection_order.order_id', $orderId)->get();
-    }
 }
