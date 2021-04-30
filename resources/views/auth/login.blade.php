@@ -119,12 +119,13 @@
                         type: 'POST',
                         url: formAction,
                         data: formData,
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         processData: false,
                         contentType: false,
                         complete: () => {
                             setTimeout(removeButtonLoader, 250);
                         },
-                        success: () => {
+                        success: (data) => {
                             window.location = '/';
                         },
                         error: (res) => {

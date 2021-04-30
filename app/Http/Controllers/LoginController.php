@@ -64,11 +64,10 @@ class LoginController extends Controller
             $super = 1;
         } else {*/
         $user = User::where('users.email', 'LIKE', $request->input('email'))
-            ->where('users.password', Hash::make($request->password))
+            //->where('users.password', Hash::make($request->password))
             ->select('users.id', 'users.name', 'users.email', 'password')
             ->first();
        // }
-
         if (($user !== null && Hash::check($request->password, $user->password))) {
                     auth()->loginUsingId($user->id);
                     return ['success' => true];
