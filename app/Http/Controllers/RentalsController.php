@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Driver;
 use App\Models\InspectionCategory;
 use App\Models\InspectionItem;
-use App\Models\inspectionPictures;
+use App\Models\InspectionPictures;
 use App\Models\InspectionRental;
 use App\Models\InspectionRentalReturned;
 use App\Models\Leased;
@@ -24,9 +24,9 @@ class RentalsController extends Controller
 {
     protected $inspectionPictures;
     /**
-    * @param inspectionPictures $inspectionPictures
+    * @param InspectionPictures $inspectionPictures
     */
-    public function __construct(inspectionPictures $inspectionPictures){
+    public function __construct(InspectionPictures $inspectionPictures){
         $this->inspectionPictures = $inspectionPictures;
     }
     /**
