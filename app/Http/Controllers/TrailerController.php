@@ -200,7 +200,7 @@ class TrailerController extends Controller
         $trailer->trailer_number = $request->input('trailer_number', 0);
         $trailer->trailer_type = $request->input('trailer_type', 0);
         $trailer->trailer_plate = $request->input('trailer_plate', 0);
-        $trailer->registration_expiration_date = $request->input('registration_expiration_date');
+        $trailer->registration_expiration_date = date("Y-m-d",strtotime($request->input('expiration_date')));
         $trailer->status = 'available';
         $trailer->updated_at = Carbon::now();
         $trailer->created_at = Carbon::now();
@@ -259,4 +259,24 @@ class TrailerController extends Controller
     {
         //
     }
+
+    public function getTrailers(Request $request){
+        $resultsPerPage = $request->input('resultsPerPage', 15);
+        $currentPage = $request->input('page', 0);
+        $skip = $resultsPerPage * $currentPage;
+        $leased = Trailer::select('trailers.id','trailer_number', 'trailer_types.name', 'status')
+            ->join('trailer_types', 'trailer_types.id', '=', 'trailer_type');
+        if (!empty($request->search))
+            $leased->orWhere("trailer_number", "LIKE", "%$request->search%")
+                ->orWhere("trailer_types.name", "LIKE", "%$request->search%")
+                ->orWhere("status", "LIKE", "%$request->search%");
+        $total = $leased->count();
+        $result = $leased->skip(0)->take($resultsPerPage)->get();
+        $data = [
+            'data' => $result,
+            'total' => $total
+        ];
+        return response()->json($data);
+    }
+
 }

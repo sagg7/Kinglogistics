@@ -13,20 +13,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+//  Public web, but avoid access when logged.
+Route::group(['middleware' => ['\App\Http\Middleware\AvoidRoutesLogged', 'throttle:30,2']], function () {
+    //  Login.
+    Route::get('login', ['as' => 'login', 'uses' => 'App\Http\Controllers\LoginController@index']);
+    Route::post('login/validate', ['as' => 'validate', 'uses' => 'App\Http\Controllers\LoginController@verify']);
 });
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Auth::routes();
-
-Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('home');
+//  Logout
+Route::get('logout', ['as' => 'logout', 'uses' => 'App\Http\Controllers\LogoutController@logout', ]);
 
 Route::group(['middleware' => 'auth'], function () {
-	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
-	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'App\Http\Controllers\ProfileController@edit']);
+    Route::get('/', ['as' => 'dashboard', 'uses' => 'App\Http\Controllers\HomeController@index']);
+
+    Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
+    Route::get('profile', ['as' => 'profile.edit', 'uses' => 'App\Http\Controllers\ProfileController@edit']);
 	Route::put('profile', ['as' => 'profile.update', 'uses' => 'App\Http\Controllers\ProfileController@update']);
 	Route::get('upgrade', function () {return view('pages.upgrade');})->name('upgrade');
 	 Route::get('map', function () {return view('pages.maps');})->name('map');
@@ -40,9 +42,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getLeased', ['as' => 'getLeased', 'uses' => 'App\Http\Controllers\LeasedController@getLeased']);
 
 //Trailers
-    Route::get('trailers', function () {return view('trailer.list');})->name('Trailers');
+    Route::get('trailers', function () {return view('trailers.list');})->name('Trailers');
     Route::get('trailer/create', ['as' => 'trailer.create', 'uses' => 'App\Http\Controllers\TrailerController@create']);
     Route::post('trailer/store', ['as' => 'trailer.store', 'uses' => 'App\Http\Controllers\TrailerController@store']);
+    Route::get('getTrailers', ['as' => 'getTrailers', 'uses' => 'App\Http\Controllers\TrailerController@getTrailers']);
 
 //Drivers
     Route::get('driver/create', ['as' => 'driver.create', 'uses' => 'App\Http\Controllers\LeasedController@createDriver']);

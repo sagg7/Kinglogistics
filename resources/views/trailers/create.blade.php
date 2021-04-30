@@ -32,13 +32,13 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
                                             </div>
-                                            <input class="form-control datepicker" placeholder="Registration expiration date" type="text" name="expiration_date">
+                                            <input class="form-control datepicker" placeholder="Registration expiration date" type="text" name="expiration_date" id="expiration_date">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {!! Form::select('trailer_type', $trailerTypes, null, ['class' => 'input-os k-select']) !!}
+                                        {!! Form::select('trailer_type', $trailerTypes, null, ['class' => 'input-os k-select', 'id' => 'trailer_type']) !!}
                                     </div>
                                 </div>
                             </div>
@@ -59,15 +59,16 @@
             $(document).ready(() => {
                 $("#trailer_type").select2({
                     placeholder: "Select the trailer",
-                    allowClear: true
+                    allowClear: false
                 });
+            $("#expiration_date").datepicker("option", "changeYear", true);
 
             });
             $("#save").click(function (){
                 let error = "", trailer_number = $("#trailer_number").val(),
                 trailer_plate = $("#trailer_plate").val(),
                 expiration_date = $("#expiration_date").val(),
-                address = $("#address").val();
+                    trailer_type = $("#trailer_type").val();
                if (trailer_number == "")
                    error += '<div><strong>Warning!</strong> the trailer number is required!</div>'
                if (trailer_plate == "")
@@ -79,10 +80,11 @@
                     $("#warning").html(error).removeClass('hide');
                 } else {
 
-                    let formData ={trailer_number, trailer_plate, expiration_date}
+                    let formData ={trailer_number, trailer_plate, expiration_date, trailer_type}
                     $.ajax({
                         type: 'POST',//    Define the type of HTTP verb we want to use (POST for our form).
                         url: '{{ route('trailer.store') }}',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: formData,
                         success: function (response) {
                             $.confirm({

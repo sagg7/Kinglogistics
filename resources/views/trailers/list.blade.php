@@ -8,16 +8,16 @@
             <div class=" col " bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header bg-transparent" bis_skin_checked="1">
-                        <h3 class="mb-0">Leased Contractors</h3>
+                        <h3 class="mb-0">Trailers</h3>
                     </div>
                     <div class="table-responsive">
                         <table class="table align-items-center">
                             <thead class="thead-light">
                             <tr>
+                                <th scope="col"></th>
                                 <th scope="col">Trailer Number</th>
                                 <th scope="col">Trailer type</th>
-                                <th scope="col">Trailer</th>
-                                <th scope="col">Address</th>
+                                <th scope="col">Status</th>
                                 <th scope="col"></th>
                             </tr>
                             </thead>
@@ -35,7 +35,7 @@
     <script>
         function initTable(){
             $.ajax({
-                'url': '{{url('getLeased')}}/',
+                'url': '{{url('getTrailers')}}/',
                 'type': 'get',
                 'data': {'search': $("#search").val()},
                 'dataType': 'json',
@@ -50,27 +50,33 @@
             if (empty)
                 table.html("");
             let content = "";
-            let url = "{{url("rental/create")}}";
+            let edit = "{{url("trailer/edit")}}";
+            let urlRemove = "{{url("trailer/remove")}}";
             for (let i = 0; i < data.data.length; i++){
+                let color = "green";
+                if (data.data[i].status == "rented")
+                    color = "";
+
                 content += `<tr>`+
                     `<th scope="row">`+
-                    `    <div class="media align-items-center">`+
-                    `            <span class="mb-0 text-sm">${data.data[i].name}</span>`+
+                    `<div class="status bg-${color}"  data-toggle="tooltip" data-placement="top" title="${data.data[i].status}" bis_skin_checked="1"></div>`+
+                    `</th>`+
+                    `<th scope="row">`+
+                    `    <div class="media align-items-center"">`+
+                    `            <span class="mb-0 text-sm">${data.data[i].trailer_number}</span>`+
                     `    </div>`+
                     `</th>`+
-                    `    <td>${data.data[i].email}</td>`+
-                    `    <td>${data.data[i].phone}</td>`+
-                    `    <td>${data.data[i].address}</td>`+
+                    `    <td>${data.data[i].name}</td>`+
+                    `    <td>${data.data[i].status}</td>`+
                     `    <td class="text-right">`+
                     `    <div class="dropdown">`+
                     `        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">`+
                     `            <i class="fas fa-ellipsis-v"></i>`+
                     `        </a>`+
                     `        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">`+
-                    `            <a class="dropdown-item" href="#"><i class="far fa-eye"></i></i><span>See</span></a>`+
-                    `            <a class="dropdown-item" href="${url}/${data.data[i].id}"><i class="fas fa-trailer"></i></i><span>Rent trailer</span></a>`+
+                    `            <a class="dropdown-item" href="${edit}/${data.data[i].id}"><i class="far fa-eye"></i></i><span>Edit</span></a>`+
                     `            <li role="separator" class="divider"></li>`+
-                    `            <a class="dropdown-item" href="#"><i class="fas fa-user-times"></i><span>delete</span></a>`+
+                    `            <a class="dropdown-item" href="${urlRemove}/${data.data[i].id}"><i class="fas fa-user-times"></i><span>delete</span></a>`+
                     `        </div>`+
                     `    </div>`+
                     `</td>`;

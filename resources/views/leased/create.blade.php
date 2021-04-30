@@ -12,6 +12,8 @@
                     </div>
                     <div class="card-body" bis_skin_checked="1">
                         <div class="alert alert-warning hide" id="warning" role="alert"></div>
+                        {!! Form::open(['route' => 'leased.store', 'method' => 'POST', 'role' => 'form','id'=>'leasedForm','name'=>'leasedForm']) !!}
+
                         <div class="" bis_skin_checked="1">
                             <div class="row">
                                 <div class="col-md-6">
@@ -39,6 +41,8 @@
                             </div>
                         </div>
                         <button type="button" id="save" class="btn btn-primary btn-lg btn-block">Save</button>
+                        {!! Form::close()!!}
+
                     </div>
                 </div>
             </div>
@@ -69,7 +73,8 @@
                     let formData ={name, email, phone, address}
                     $.ajax({
                         type: 'POST',//    Define the type of HTTP verb we want to use (POST for our form).
-                        url: {{ route('leased.store') }},
+                        url: '{{ route('leased.store') }}',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: formData,
                         success: function (response) {
                             $.confirm({
@@ -91,7 +96,7 @@
                                     cancel: {
                                         text: 'No',
                                         action: function () {
-                                            window.location = ( {{ url('leased') }} );
+                                            window.location = ( '{{ url('leased') }}' );
                                         }
                                     }
                                 }

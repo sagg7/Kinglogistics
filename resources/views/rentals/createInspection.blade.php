@@ -224,6 +224,8 @@
         <link href="{{ asset('assets') }}/css/select2.min.css" rel="stylesheet">
         <link href="{{ asset('assets') }}/css/owl.theme.default.min.css" rel="stylesheet">
         <link href="{{ asset('assets') }}/css/owl.carousel.min.css" rel="stylesheet">
+        <link href="{{ asset('assets') }}/css/checkbox.css" rel="stylesheet">
+
     @endpush
     @push('js')
         <script src="{{ asset('assets') }}/js/select2.min.js"></script>
