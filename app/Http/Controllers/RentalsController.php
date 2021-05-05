@@ -151,7 +151,7 @@ class RentalsController extends Controller
         return response()->json($jsonData);
     }
 
-    private function createInspectionArray(Request $request, $rental){
+    private function createInspectionArray(Request $request, $rental, $stage="deliver"){
         $inspection_items = [];
         $categories = $this->getInspectionCategories();
         foreach ($categories as $category) {
@@ -198,7 +198,7 @@ class RentalsController extends Controller
             list(, $signature_client) = explode(',', $signature_client);
             $signature_client = base64_decode($signature_client);
 
-            $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id;
+            $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id.'/'.$stage;
             Storage::makeDirectory('public/'.$path);
             $file_name = 'signature_' . $rental->id;
             $extension = '.png';
@@ -246,7 +246,7 @@ class RentalsController extends Controller
             list(, $signature_shop) = explode(',', $signature_shop);
             $signature_shop = base64_decode($signature_shop);
 
-            $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id;
+            $path = 'photos/leased_'.$rental->leased_id.'/rentals/'.$rental->id.'/'.$stage;
             Storage::makeDirectory('public/'.$path);
             $file_name_7 = 'signature_inspector_' . $rental->id;
             $extension = '.png';
@@ -359,6 +359,8 @@ class RentalsController extends Controller
         $pictures = DB::table('inspection_pictures')
             ->where('rental_id', '=', $rental_id)
             ->where('stage', 'return')->get();
+
+        dd($pictures);
         $rental->drivers;
         $rental->trailers;
         $inspectionItems = InspectionRentalReturned::where('rental_id', $rental_id)->pluck( 'option_value','inspection_item_id')->toArray();// add flag to deliver trailer
@@ -385,7 +387,7 @@ class RentalsController extends Controller
     {
         $rental = Rental::find($request->rental_id);
 
-        $inspection_items = $this->createInspectionArray($request, $rental);
+        $inspection_items = $this->createInspectionArray($request, $rental, "return");
         $rental->inspectionItemsReturned()->sync($inspection_items);
         $rental->end_rental_at = Carbon::now();
         $rental->rental_status = 'Ended';
@@ -426,6 +428,7 @@ class RentalsController extends Controller
                 'success' => false
             ]);
         }
+
         $countImg = InspectionPictures::where('rental_id', $request->header('rentalid'))->count();
         $max_photos = 20;
         if ($countImg >= $max_photos) {
@@ -437,7 +440,12 @@ class RentalsController extends Controller
             return response()->json($jsonData);
         }
         $rental = Rental::find($request->header('rentalId'));
-        $path = 'photos/leased_' . $rental->leased_id . '/rentals/' . $rental->id;
+        if ($rental->rental_status == 'Uninspected'){
+            $stage = 'deliver';
+        } else {
+            $stage = 'return';
+        }
+        $path = 'photos/leased_' . $rental->leased_id . '/rentals/' . $rental->id. "/" . $stage;
         $path_file = storage_path('app/public/' . $path . '/');
         Storage::makeDirectory('public/'.$path);
         $cont = $this->getConsecutive($rental->id) + 1;
@@ -494,11 +502,7 @@ class RentalsController extends Controller
             throw $exception;*/
         /*    $success = false;
         }*/
-        if ($rental->rental_status == 'Uninspected'){
-            $stage = 'deliver';
-        } else {
-            $stage = 'return';
-        }
+
         $this->inspectionPictures->rental_id = $request->header('rentalId');
         $this->inspectionPictures->picture_name = $file_name;
         $this->inspectionPictures->picture_slider = $file_name_slider;

@@ -44,10 +44,10 @@
                     reader.onload = function (e) {
                         let html = '<img src="' + e.target.result + '" alt="Logotipo">';
                         if (typeof uploadingmessage != "undefined")
-                            html += "<div class='change-image uploading-msg' data-uploader='" + tgt + "'>Subiendo</div>";
+                            html += "<div class='change-image uploading-msg' data-uploader='" + tgt + "'>Uploading</div>";
                         else
                             html += "<div class='change-image' data-uploader='" + tgt + "'>" +
-                                `<img src='${MyAssets('img/upper-bar/edit-account.png')}'>&nbsp;Cambiar</div>`;
+                                `<img src='${MyAssets('img/upper-bar/edit-account.png')}'>&nbsp;Change</div>`;
                         container.html(html);
                         if (typeof autoSubmit != "undefined") {
                             if (typeof clear != "undefined") $(clear).val('');
