@@ -41,6 +41,11 @@ return [
             'provider' => 'users',
         ],
 
+        'shipper' => [
+            'driver' => 'session',
+            'provider' => 'shippers',
+        ],
+
         'api' => [
             'driver' => 'token',
             'provider' => 'users',
@@ -71,6 +76,11 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        'shippers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Shipper::class,
+        ],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -96,6 +106,13 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'clients' => [
+            'provider' => 'shippers',
+            'table' => 'shipper_password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],

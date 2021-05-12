@@ -1,0 +1,69 @@
+======================================
+
+Archivo .env
+
+Cambiar valor de CACHE_DRIVER a array
+CACHE_DRIVER=array
+
+Agregar las siguientes variables
+ROUTE_BASE=king.test    #Nombre del dominio local
+ROUTE_CLIENTS=shippers  #Subdominio configurado para Shippers
+
+*Configurar los accesos correpondientes a la BD
+
+======================================
+
+Comandos
+composer install
+npm install
+php artisan migrate
+
+#Hasta este punto no hay seeders pero a futuro
+php artisan db:seed
+
+======================================
+
+Ejemplo configuración Nginx
+
+```
+server {
+
+    #Nombres configurados para los subdominios
+    server_name app.king.test shippers.king.test;
+    #Ruta a la carpeta public del proyecto
+    root /var/www/app.king.test/public;
+
+    index index.php index.html index.htm;
+
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+        #try_files $uri $uri/ /index.php$is_args$args;
+        #try_files $uri $uri/ /index.php;
+    }
+
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    access_log off;
+    error_log  /var/log/nginx/app.king.lay-error.log error;
+
+    location ~ \.php$ {
+        try_files $uri /index.php =404;
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock; #Ruta de php fpm de la versión correspondiente
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+```
+
+
+======================================
+Librerias instaladas
+Moment.js (Formato de fechas)
+Lodash (Modificar objetos, arrays, etc, en js de manera avanzada)
+Numeral.js (Formato de monedas)
+AG Grid (Manejo de tablas) ----> Incluídas librerias para llenar los datos de manera rápida (Faltan ejemplos)
+Date Range Picker (Picker de periodos de fechas, usado para filtrar reportes)
