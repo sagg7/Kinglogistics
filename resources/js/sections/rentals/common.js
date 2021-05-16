@@ -1,7 +1,13 @@
 (() => {
-    let carrier = null,
-        driverSel = $('#driver_id'),
-        trailerSel = $('#trailer_id');
+    let carrier = null;
+    const driverSel = $('#driver_id'),
+        trailerSel = $('#trailer_id'),
+        dateInp = $('#date'),
+        date = initPickadate(dateInp).pickadate('picker');
+    date.set('select', dateInp.val(), {format: 'yyyy/mm/dd'});
+    $('#period').select2({
+        placeholder: 'Select',
+    });
     $('#carrier_id').select2({
         ajax: {
             url: '/carrier/selection',

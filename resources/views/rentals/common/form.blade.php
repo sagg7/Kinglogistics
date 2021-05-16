@@ -1,5 +1,3 @@
-<!--<div class="row justify-content-center">
-    <div class="col-xl-8">-->
 <div class="card">
     <div class="card-body">
         <div class="card-content">
@@ -33,7 +31,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     {!! Form::label('date', ucfirst(__('date')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('date', $rental->date ?? null, ['class' => 'form-control pickadate' . ($errors->first('date') ? ' is-invalid' : '')]) !!}
+                    {!! Form::text('date', $rental->date ?? null, ['class' => 'form-control' . ($errors->first('date') ? ' is-invalid' : '')]) !!}
                     @error('date')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
@@ -87,7 +85,7 @@
                             <fieldset>
                                 {!! Form::label('is_paid', ucfirst(__('is paid')), ['class' => 'col-form-label']) !!}
                                 <div class="vs-checkbox-con vs-checkbox-primary">
-                                    {{ Form::checkbox('is_paid', 'paid', $rental->is_paid ?? null) }}
+                                    {{ Form::checkbox('is_paid', 1, $rental->deposit_is_paid ?? null) }}
                                     <span class="vs-checkbox mx-auto">
                                         <span class="vs-checkbox--check">
                                             <i class="vs-icon feather icon-check"></i>
@@ -103,5 +101,3 @@
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->
 </div> <!-- end card -->
-<!--</div>
-</div>-->

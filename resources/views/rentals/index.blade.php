@@ -10,20 +10,46 @@
         <script defer>
             var tbAG = null;
             (() => {
-                let getRole = (params) => {
-                    if (params.data)
-                        return params.data.roles[0].name;
+                const carrierFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return '';
+                };
+                const driverFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return '';
+                };
+                const trailerFormatter = (params) => {
+                    if (params.value)
+                        return params.value.number;
+                    else
+                        return '';
+                };
+                const periodFormatter = (params) => {
+                    if (params.value)
+                        return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
+                    else
+                        return '';
+                };
+                const moneyFormatter = (params) => {
+                    if (params.value)
+                        return numeral(params.value).format('$0,0.00');
+                    else
+                        return '';
                 };
                 tbAG = new tableAG({
                     columns: [
                         //{headerName: 'Fecha', field: 'date'},
                         {headerName: 'Date', field: 'date'},
-                        {headerName: 'Carrier', field: 'carrier'},
-                        {headerName: 'Driver', field: 'driver'},
-                        {headerName: 'Trailer', field: 'trailer'},
-                        {headerName: 'Period', field: 'period'},
-                        {headerName: 'Cost', field: 'cost'},
-                        {headerName: 'Deposit', field: 'deposit'},
+                        {headerName: 'Carrier', field: 'carrier', valueFormatter: carrierFormatter},
+                        {headerName: 'Driver', field: 'driver', valueFormatter: driverFormatter},
+                        {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
+                        {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
+                        {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
+                        {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
                     ],
                     menu: [
                         {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
@@ -32,13 +58,6 @@
                     container: 'myGrid',
                     url: '/rental/search',
                     tableRef: 'tbAG',
-                    successCallback: (res) => {
-                        res.rows.forEach((item) => {
-                            item.carrier = item.carrier.name;
-                            item.driver = item.driver.name;
-                            item.trailer = item.trailer.number;
-                        });
-                    }
                 });
             })();
         </script>

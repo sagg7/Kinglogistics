@@ -7,7 +7,7 @@
     Author URL: hhttp://www.themeforest.net/user/pixinvent
 ==========================================================================================*/
 // Picker Translations
-let initPickadateEs = (e, properties = {}) => {
+const initPickadateEs = (e, properties = {}) => {
     e.pickadate(_.merge({
         // Strings and translations
         formatSubmit: 'yyyy/mm/dd',
@@ -24,6 +24,13 @@ let initPickadateEs = (e, properties = {}) => {
         labelMonthPrev: 'Mes anterior',
         labelMonthSelect: 'Seleccionar mes',
         labelYearSelect: 'Seleccionar año',
+    }, properties));
+
+    return e;
+}, initPickadate = (e, properties = {}) => {
+    e.pickadate(_.merge({
+        // Strings and translations
+        formatSubmit: 'yyyy/mm/dd',
     }, properties));
 
     return e;
@@ -49,10 +56,13 @@ let initPickadateEs = (e, properties = {}) => {
         // Basic date
     let pick = $('.pickadate');
     if (pick.length > 0)
-        pick.pickadate();
+        pick.pickadate({
+            formatSubmit: 'yyyy/mm/dd',
+        });
 
     // Format Date Picker
     $('.format-picker').pickadate({
+        formatSubmit: 'yyyy/mm/dd',
         format: 'mmmm, d, yyyy'
     });
 

@@ -23,8 +23,7 @@ class RentalController extends Controller
             'carrier_id' => ['required', 'exists:carriers,id'],
             'driver_id' => ['required', 'exists:drivers,id'],
             'trailer_id' => ['required', 'exists:trailers,id'],
-            'date' => ['required', 'date'],
-            'period' => ['required', 'digits_between:0,2'],
+            'date_submit' => ['required', 'date'],
             'cost' => ['required', 'numeric'],
             'deposit' => ['required', 'numeric'],
         ]);
@@ -36,7 +35,7 @@ class RentalController extends Controller
     private function createEditParams(): array
     {
         return [
-            'periods' => [null => 'Select', 'Weekly', 'Monthly', 'Annual'],
+            'periods' => [null => '', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'annual' => 'Annual'],
         ];
     }
 
@@ -73,10 +72,10 @@ class RentalController extends Controller
         $rental->trailer_id = $request->trailer_id;
         $rental->carrier_id = $request->carrier_id;
         $rental->driver_id = $request->driver_id;
-        $rental->date = Carbon::parse($request->date);
+        $rental->date = Carbon::parse($request->date_submit);
         $rental->cost = $request->cost;
         $rental->deposit = $request->deposit;
-        $rental->deposit_is_paid = $request->deposit_is_paid ?? null;
+        $rental->deposit_is_paid = $request->is_paid ?? null;
         $rental->period = $request->period;
         $rental->save();
 
@@ -117,7 +116,8 @@ class RentalController extends Controller
      */
     public function edit($id)
     {
-        $rental = Rental::find($id);
+        $rental = Rental::with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
+            ->find($id);
         $params = compact('rental') + $this->createEditParams();
         return view('rentals.edit', $params);
     }
@@ -166,6 +166,9 @@ class RentalController extends Controller
             "rentals.carrier_id",
             "rentals.driver_id",
             "rentals.trailer_id",
+            "rentals.period",
+            "rentals.cost",
+            "rentals.deposit",
         ])
             ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number']);
 
