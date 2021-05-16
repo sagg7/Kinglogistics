@@ -31,6 +31,9 @@ class AuthenticatedSessionController extends Controller
             case env('ROUTE_SHIPPERS'):
                 $guard = 'shipper';
                 break;
+            case env('ROUTE_CARRIERS'):
+                $guard = 'carrier';
+                break;
             default:
                 $guard = 'web';
                 break;

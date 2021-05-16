@@ -1,5 +1,7 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/js/common/master.min.js": "/js/common/master.min.js",
-    "/css/app.css": "/css/app.css"
+    "/css/fontawesome.css": "/css/fontawesome.css",
+    "/css/app.css": "/css/app.css",
+    "/js/modules/aggrid/dynamicFront.min.js": "/js/modules/aggrid/dynamicFront.min.js",
+    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
+    "/js/modules/aggrid/simpleTable.min.js": "/js/modules/aggrid/simpleTable.min.js"
 }

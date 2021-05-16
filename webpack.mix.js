@@ -12,5 +12,15 @@ const mix = require('laravel-mix');
  */
 
 mix.sass('resources/sass/app.scss', 'public/css')
+    .postCss('resources/css/fontawesome.css', 'public/css')
+    /*.postCss('resources/css/app.css', 'public/css/guest', [
+        require('postcss-import'),
+        require('tailwindcss'),
+        require('autoprefixer'),
+    ])
     .js('resources/js/app.js', 'public/js')
-    .js('resources/js/common/master.js', 'public/js/common/master.min.js');
+    .js('resources/js/common/master.js', 'public/js/common/master.min.js')*/
+    // Modules
+    .scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
+    .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
+    .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js');

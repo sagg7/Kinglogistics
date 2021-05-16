@@ -9,7 +9,7 @@
                     <ul class="nav navbar-nav">
                         <li class="nav-item mobile-menu d-xl-none mr-auto">
                             <a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#">
-                                <i class="ficon feather icon-menu"></i>
+                                <i class="ficon fa fa-bars"></i>
                             </a>
                         </li>
                     </ul>
@@ -22,14 +22,14 @@
                         <a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                             <div class="user-nav d-sm-flex d-none">
                                 <span class="user-name text-bold-600">{{-- auth()->user()->getFullName() --}}</span>
-                                <span class="user-status">Disponible</span>
+                                <!--<span class="user-status">Disponible</span>-->
                             </div>
                             <span class="user-pic">
                                 @if(auth()->user()->profile_img ?? false)
                                     <img class="round" src="{{ auth()->user()->profile_img }}" alt="avatar" height="40"
                                          width="40">
                                 @else
-                                    <i class="fa fa-user-circle-o"></i>
+                                    <i class="fas fa-user-circle"></i>
                                 @endif
                             </span>
                         </a>

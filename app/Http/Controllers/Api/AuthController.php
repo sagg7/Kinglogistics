@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Carrier;
+use App\Models\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,7 +16,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
         // Check email
-        $user = Carrier::where('email', $request->email)->first();
+        $user = Driver::where('email', $request->email)->first();
         // Check password
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response(["message" => "Access Denied"], 401);

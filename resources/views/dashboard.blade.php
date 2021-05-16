@@ -1,6 +1,4 @@
 <x-app-layout>
-    <x-slot name="crumb_title">Crumb</x-slot>
-    <x-slot name="crumb_section">DASH</x-slot>
 
     <section id="dashboard-analytics">
         <div class="row">

@@ -3,7 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest:client')->group(function () {
+Route::middleware('guest:shipper')->group(function () {
     Route::get('/', function () {
         return view('auth.login');
     })
@@ -18,9 +18,9 @@ Route::middleware('guest:client')->group(function () {
         ->name('login');
 });
 
-Route::middleware('auth:client')->group(function () {
+Route::middleware('auth:shipper')->group(function () {
     Route::get('/dashboard', function () {
-        return view('subdomains.clients.dashboard');
+        return view('subdomains.shippers.dashboard');
     })
         ->name('dashboard');
 

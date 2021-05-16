@@ -43,25 +43,25 @@
         <!-- BEGIN: Custom CSS-->
         <!--<link rel="stylesheet" href="{{ asset("css/modules/daterangepicker/daterangepicker.css") }}">-->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
         <link rel="stylesheet" href="{{ asset("css/app.css?1.0.0") }}">
         <!-- END: Custom CSS-->
         @yield("head")
     </head>
-    <body class="vertical-layout vertical-menu-modern 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
+    <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
     @include('layouts.header')
     @include('layouts.menu')
     @yield('modals')
     <div class="app-content content">
         <div class="content-wrapper">
-            @isset($crumb_title)
+            @isset($crumb_section)
                 <div class="content-header row">
                     <div class="content-header-left col-md-9 col-12 mb-2">
                         <div class="row breadcrumbs-top">
                             <div class="col-12">
-                                <h2 class="content-header-title float-left mb-0">{{ $crumb_title }}</h2>
-                                <div class="breadcrumb-wrapper col-12">
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                                <div class="breadcrumb-wrapper col-12 pl-0">
+                                    <ol class="breadcrumb border-0">
+                                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                                         <li class="breadcrumb-item">{{ $crumb_section }}</li>
                                         @isset($crumb_subsection)
                                             <li class="breadcrumb-item">{{ $crumb_subsection }}</li>
@@ -81,10 +81,8 @@
         </div>
     </div>
     <footer class="footer footer-static footer-light"></footer>
-    <!--<script src="{{ asset("js/app.js") }}" type="application/javascript"></script>-->
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
-    <!--<script src="{{ asset("app-assets/vendors/js/extensions/moment.min.js") }}" type="application/javascript"></script>-->
     <script src="{{ asset("app-assets/vendors/js/pickers/pickadate/picker.js") }}" type="application/javascript"></script>
     <script src="{{ asset("app-assets/vendors/js/pickers/pickadate/picker.date.js") }}" type="application/javascript"></script>
     <script src="{{ asset("app-assets/vendors/js/pickers/pickadate/picker.time.js") }}" type="application/javascript"></script>
@@ -93,7 +91,6 @@
     <script src="{{ asset("app-assets/vendors/js/forms/select/select2.full.min.js") }}" type="application/javascript"></script>
     <script src="{{ asset("app-assets/vendors/js/extensions/sweetalert2.all.min.js") }}" type="application/javascript"></script>
     <script src="{{ asset("app-assets/vendors/js/extensions/polyfill.min.js") }}" type="application/javascript"></script>
-    <!--<script src="{{ asset("app-assets/vendors/js/forms/validation/jqBootstrapValidation.js") }}" type="application/javascript"></script>-->
     <!-- END: Vendor JS-->
 
     <!-- BEGIN: Core JS-->
@@ -101,7 +98,6 @@
     <script src="{{ asset("app-assets/js/core/app.js") }}" type="application/javascript"></script>
     <!-- END: Core JS-->
 
-    <!--<script src="{{ asset('js/modules/daterangepicker/daterangepicker.min.js') }}"></script>-->
     <script src="{{ asset('js/app.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 

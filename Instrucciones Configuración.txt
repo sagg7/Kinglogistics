@@ -4,10 +4,12 @@ Archivo .env
 
 Cambiar valor de CACHE_DRIVER a array
 CACHE_DRIVER=array
+SESSION_DRIVER=database
 
 Agregar las siguientes variables
 ROUTE_BASE=king.test    #Nombre del dominio local
 ROUTE_CLIENTS=shippers  #Subdominio configurado para Shippers
+ROUTE_CLIENTS=carriers  #Subdominio configurado para Carriers
 
 *Configurar los accesos correpondientes a la BD
 
@@ -18,8 +20,11 @@ composer install
 npm install
 php artisan migrate
 
-#Hasta este punto no hay seeders pero a futuro
+#Para insertar Usuario de prueba, Roles
 php artisan db:seed
+
+#En caso para limpiar la base de datos e insertar seeds
+php artisan migrate:fresh --seed
 
 ======================================
 
@@ -29,7 +34,7 @@ Ejemplo configuración Nginx
 server {
 
     #Nombres configurados para los subdominios
-    server_name app.king.test shippers.king.test;
+    server_name app.king.test shippers.king.test carriers.king.test;
     #Ruta a la carpeta public del proyecto
     root /var/www/app.king.test/public;
 
