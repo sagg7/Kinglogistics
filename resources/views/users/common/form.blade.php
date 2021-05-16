@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     {!! Form::label('role', ucfirst(__('role')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('role', $roles, $user->role ?? null, ['class' => 'form-control' . ($errors->first('role') ? ' is-invalid' : '')]) !!}
+                    {!! Form::select('role', $roles, $user->role ?? null, ['class' => 'form-control select2' . ($errors->first('role') ? ' is-invalid' : '')]) !!}
                     @error('role')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

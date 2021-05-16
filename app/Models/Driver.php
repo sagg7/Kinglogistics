@@ -28,4 +28,28 @@ class Driver extends Model
     {
         return $this->hasMany(Rental::class, 'patient_id');
     }
+
+    /**
+     * @return HasOne
+     */
+    public function trailer(): HasOne
+    {
+        return $this->hasOne(Trailer::class, 'id', 'trailer_id');
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function truck(): HasOne
+    {
+        return $this->hasOne(Truck::class, 'id', 'truck_id');
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function turn(): HasOne
+    {
+        return $this->hasOne(Turn::class, 'id', 'turn_id');
+    }
 }

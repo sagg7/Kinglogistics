@@ -42,7 +42,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     {!! Form::label('period', ucfirst(__('period')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('period', $periods, $rental->period ?? null, ['class' => 'form-control' . ($errors->first('period') ? ' is-invalid' : '')]) !!}
+                    {!! Form::select('period', $periods, $rental->period ?? null, ['class' => 'form-control select2' . ($errors->first('period') ? ' is-invalid' : '')]) !!}
                     @error('period')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

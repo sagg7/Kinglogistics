@@ -26,11 +26,10 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/users.php';
     require __DIR__.'/web/rentals.php';
     require __DIR__.'/web/carriers.php';
-    require __DIR__.'/web/drivers.php';
-    require __DIR__.'/web/trucks.php';
-    require __DIR__.'/web/trailers.php';
     require __DIR__.'/web/incidents.php';
     require __DIR__.'/web/notifications.php';
+    require __DIR__.'/web/drivers.php';
+    require __DIR__.'/web/trailers.php';
 });
 
 require __DIR__.'/auth.php';

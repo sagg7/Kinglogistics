@@ -71,7 +71,7 @@ class CarrierController extends Controller
         $carrier->city = $request->city;
         $carrier->state = $request->state;
         $carrier->zip_code = $request->zip_code;
-        $carrier->inactive = $request->inactive;
+        $carrier->inactive = $request->inactive ?? null;;
         if ($request->password)
             $carrier->password = Hash::make($request->password);
         $carrier->save();

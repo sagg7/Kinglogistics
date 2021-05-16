@@ -171,18 +171,21 @@ class RentalController extends Controller
 
         if ($request->searchable) {
             $searchable = [];
+            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'carrier':
                     case 'driver':
-                        $query->whereHas($item, function ($s) use ($request) {
-                            $s->where('name', 'LIKE', "%$request->search%");
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
                         });
+                        $statement = "orWhereHas";
                         break;
                     case 'trailer':
-                        $query->whereHas($item, function ($s) use ($request) {
-                            $s->where('number', 'LIKE', "%$request->search%");
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('number', 'LIKE', "%$request->search%");
                         });
+                        $statement = "orWhereHas";
                         break;
                     default:
                         $searchable[] = $item;
@@ -192,6 +195,6 @@ class RentalController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request);
+        return $this->simpleSearchData($query, $request, 'orWhere');
     }
 }

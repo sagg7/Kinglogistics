@@ -1,11 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Carriers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Turn;
+use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class TruckController extends Controller
+class TurnController extends Controller
 {
+    use GetSelectionData;
+
     /**
      * Display a listing of the resource.
      *
@@ -40,10 +46,10 @@ class TruckController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Turn  $turn
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Turn $turn)
     {
         //
     }
@@ -51,10 +57,10 @@ class TruckController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Turn  $turn
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Turn $turn)
     {
         //
     }
@@ -63,10 +69,10 @@ class TruckController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Turn  $turn
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Turn $turn)
     {
         //
     }
@@ -74,11 +80,28 @@ class TruckController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Turn  $turn
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Turn $turn)
     {
         //
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function selection(Request $request)
+    {
+        $query = Turn::select([
+            'turns.id',
+            DB::raw("CONCAT(zones.name, ' - ', turns.name) as text"),
+        ])
+            ->join('zones', 'zones.id', '=', 'turns.zone_id')
+            ->where("turns.name", "LIKE", "%$request->name%")
+            ->orWhere("zones.name", "LIKE", "%$request->name%");
+
+        return $this->selectionData($query, $request->take, $request->page);
     }
 }

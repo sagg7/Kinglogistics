@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TruckController;
+use App\Http\Controllers\Carriers\TruckController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('truck')->group(function () {

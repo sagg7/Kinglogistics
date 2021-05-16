@@ -10,9 +10,23 @@
         <script defer>
             var tbAG = null;
             (() => {
+                const trailerFormatter = (params) => {
+                    if (params.value)
+                        return params.value.number;
+                    else
+                        return '';
+                };
+                const truckFormatter = (params) => {
+                    if (params.value)
+                        return params.value.number;
+                    else
+                        return '';
+                };
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Name', field: 'name'},
+                        {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
+                        {headerName: 'Truck', field: 'truck', valueFormatter: truckFormatter},
                     ],
                     menu: [
                         {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},

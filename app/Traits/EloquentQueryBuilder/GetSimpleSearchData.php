@@ -4,7 +4,7 @@ namespace App\Traits\EloquentQueryBuilder;
 
 trait GetSimpleSearchData
 {
-    private function simpleSearchData($query, $request)
+    private function simpleSearchData($query, $request, $mainStatement = 'where')
     {
         // Skip-Take data
         $take = $request->endRow;
@@ -16,13 +16,13 @@ trait GetSimpleSearchData
                 $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
                 $statement = $filterArr['statement'];
 
-                $query->where(function ($q) use ($filterArr, $statement, $key) {
+                $query->$mainStatement(function ($q) use ($filterArr, $statement, $key) {
                     $q->$statement($key, $filterArr['comparative'], $filterArr['string']);
                 });
             }
 
         if ($request->searchable)
-            $query->where(function ($q) use ($request) {
+            $query->$mainStatement(function ($q) use ($request) {
                 foreach ($request->searchable as $i => $item) {
                     ($i == 0) ? $statement = "where" : $statement = "orWhere";
                     $q->$statement($item, 'LIKE', "%$request->search%");

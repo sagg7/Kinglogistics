@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Trailer</x-slot>
+    <x-slot name="crumb_section">Truck</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -10,7 +10,7 @@
         <script defer>
             var tbAG = null;
             (() => {
-                const typeFormatter = (params) => {
+                const driverFormatter = (params) => {
                     if (params.value)
                         return params.value.name;
                     else
@@ -19,17 +19,16 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Number', field: 'number'},
-                        {headerName: 'Type', field: 'trailer_type', valueFormatter: typeFormatter },
+                        {headerName: 'Driver', field: 'driver', valueFormatter: driverFormatter},
                         {headerName: 'Plate', field: 'plate'},
                         {headerName: 'VIN', field: 'vin'},
-                        {headerName: 'Status', field: 'status'},
                     ],
                     menu: [
-                        {text: 'Edit', route: '/trailer/edit', icon: 'feather icon-edit'},
-                        {route: '/trailer/delete', type: 'delete'}
+                        {text: 'Edit', route: '/truck/edit', icon: 'feather icon-edit'},
+                        {route: '/truck/delete', type: 'delete'}
                     ],
                     container: 'myGrid',
-                    url: '/trailer/search',
+                    url: '/truck/search',
                     tableRef: 'tbAG',
                 });
             })();
