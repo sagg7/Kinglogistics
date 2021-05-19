@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Carriers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Turn;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use Illuminate\Http\Request;
@@ -92,7 +91,7 @@ class TurnController extends Controller
      * @param Request $request
      * @return array
      */
-    public function selection(Request $request)
+    /*public function selection(Request $request)
     {
         $query = Turn::select([
             'turns.id',
@@ -103,5 +102,5 @@ class TurnController extends Controller
             ->orWhere("zones.name", "LIKE", "%$request->name%");
 
         return $this->selectionData($query, $request->take, $request->page);
-    }
+    }*/
 }

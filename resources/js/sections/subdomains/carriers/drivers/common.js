@@ -1,7 +1,11 @@
 (() => {
     $('#turn_id').select2({
+        placeholder: 'Select',
+    });
+    $('#zone_id').select2({
+        placeholder: 'Select',
         ajax: {
-            url: '/turn/selection',
+            url: '/zone/selection',
             data: (params) => {
                 return {
                     search: params.term,
@@ -13,6 +17,7 @@
         }
     });
     $('#truck_id').select2({
+        placeholder: 'Select',
         ajax: {
             url: '/truck/selection',
             data: (params) => {
@@ -26,6 +31,7 @@
         }
     });
     $('#trailer_id').select2({
+        placeholder: 'Select',
         ajax: {
             url: '/trailer/selection',
             data: (params) => {

@@ -24,11 +24,13 @@
     })
         .on('select2:select', (res) => {
             carrier = res.params.data.id;
+            driverSel.prop('disabled', false).trigger('change');
         })
         .on('select2:unselect', () => {
             carrier = null;
             driverSel.val('').trigger('change');
             trailerSel.val('').trigger('change');
+            driverSel.prop('disabled', true).trigger('change');
         });
     driverSel.select2({
         ajax: {
@@ -70,4 +72,6 @@
         placeholder: 'Select',
         allowClear: true,
     });
+    if (!driverSel.val())
+        driverSel.prop('disabled', true).trigger('change');
 })();

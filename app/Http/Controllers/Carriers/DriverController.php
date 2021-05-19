@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Carriers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
+use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DriverController extends Controller
 {
-    use GetSimpleSearchData;
+    use GetSimpleSearchData, DriverParams;
     /**
      * @param array $data
      * @param int|null $id
@@ -27,6 +28,14 @@ class DriverController extends Controller
             'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return $this->getTurnsArray();
     }
 
     /**
@@ -46,7 +55,8 @@ class DriverController extends Controller
      */
     public function create()
     {
-        return view('subdomains.carriers.drivers.create');
+        $params = $this->createEditParams();
+        return view('subdomains.carriers.drivers.create', $params);
     }
 
     /**
@@ -110,9 +120,9 @@ class DriverController extends Controller
      */
     public function edit($id)
     {
-        $driver = Driver::with(['turn.zone', 'truck:id,number', 'trailer:id,number'])
+        $driver = Driver::with(['turn', 'truck:id,number', 'trailer:id,number'])
             ->find($id);
-        $params = compact('driver');
+        $params = compact('driver') + $this->createEditParams();
         return view('subdomains.carriers.drivers.edit', $params);
     }
 

@@ -70,6 +70,51 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/trailer/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/trailer/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Trailer Types</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/trailerType/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/trailerType/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-atlas"></i><span class="menu-title" data-i18n="User">Zones</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/zone/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/zone/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="navigation-header">
                 <span>Safety</span>
             </li>
@@ -105,36 +150,21 @@
             </li>
             @endif
             @if(auth()->guard('carrier')->check())
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/trailer/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/trailer/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/truck/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/truck/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/truck/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/truck/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item has-sub">
                     <a href="#"><i class="fas fa-id-card"></i><span class="menu-title" data-i18n="User">Drivers</span></a>
                     <ul class="menu-content">

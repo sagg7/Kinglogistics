@@ -24,6 +24,7 @@ class CreateCarriersTable extends Migration
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('zip_code', 5)->nullable();
+            $table->unsignedTinyInteger('has_trailers')->nullable();
             $table->unsignedTinyInteger('inactive')->nullable();
             $table->rememberToken();
             $table->timestamps();

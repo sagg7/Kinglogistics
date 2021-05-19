@@ -6,10 +6,6 @@
         <script src="{{ asset('js/sections/subdomains/carriers/drivers/common.min.js') }}"></script>
         <script>
             (() => {
-                $("#turn_id")
-                    .html(`<option value="{{ $driver->turn_id }}">{{ $driver->turn->zone->name . " - " . $driver->turn->name }}</option>`)
-                    .val({{ $driver->turn_id }})
-                    .trigger('change');
                 $("#truck_id")
                     .html(`<option value="{{ $driver->truck_id }}">{{ $driver->truck->number }}</option>`)
                     .val({{ $driver->truck_id }})

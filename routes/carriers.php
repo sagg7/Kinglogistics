@@ -23,6 +23,7 @@ Route::middleware('auth:carrier')->group(function () {
     require __DIR__.'/carriers/turns.php';
     require __DIR__.'/carriers/trucks.php';
     require __DIR__.'/carriers/trailers.php';
+    require __DIR__.'/carriers/zones.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.carriers.dashboard');

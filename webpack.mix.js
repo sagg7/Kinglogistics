@@ -26,7 +26,8 @@ mix/*sass('resources/sass/app.scss', 'public/css')
     .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')*/
     // Sections
     .scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
-    .scripts(['resources/js/sections/subdomains/carriers/trailers/common.js'], 'public/js/sections/subdomains/carriers/trailers/common.min.js')
+    .scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
+    // Subdomains
     .scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
     // App Assets
     .scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js');

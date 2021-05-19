@@ -14,19 +14,19 @@ trait crudMessage
     {
         switch ($type) {
             case 1:
-                $message = ucfirst($elementName) . " agregado existosamente";
+                $message = ucfirst($elementName) . " created successfully";
                 break;
             case 2:
-                $message = ucfirst($elementName) . " actualizado existosamente";
+                $message = ucfirst($elementName) . " updated successfully";
                 break;
             case 3:
-                $message = ucfirst($elementName) . " eliminado existosamente";
+                $message = ucfirst($elementName) . " deleted successfully";
                 break;
             case 4:
-                $message = "No se puede eliminar " . strtolower($elementName) . " ya que tiene una asociación con " . strtolower($modifier["constraint"]);
+                $message = "Unable to delete <strong>" . strtolower($elementName) . "</strong> because it has a relationship with <strong>" . strtolower($modifier["constraint"]) . "</strong>";
                 break;
             default:
-                $message = "OCURRIÓ UN ERROR AL PROCESAR TU SOLICITUD";
+                $message = "There was an error processing your request";
                 break;
         }
 
