@@ -150,7 +150,7 @@ class ZoneController extends Controller
             'id',
             'name as text',
         ])
-            ->where("name", "LIKE", "%$request->name%");
+            ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
     }

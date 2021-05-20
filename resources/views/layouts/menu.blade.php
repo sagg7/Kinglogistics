@@ -85,7 +85,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item has-sub">
+            <!--<li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Trailer Types</span></a>
                 <ul class="menu-content">
                     <li>
@@ -99,7 +99,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li>-->
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-atlas"></i><span class="menu-title" data-i18n="User">Zones</span></a>
                 <ul class="menu-content">
@@ -133,6 +133,21 @@
                     </li>
                 </ul>
             </li>
+            <!--<li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Incident Types</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/incidentType/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/incidentType/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>-->
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-envelope-open-text"></i><span class="menu-title" data-i18n="User">Messages</span></a>
                 <ul class="menu-content">

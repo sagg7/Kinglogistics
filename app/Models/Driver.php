@@ -52,4 +52,12 @@ class Driver extends Model
     {
         return $this->hasOne(Turn::class, 'id', 'turn_id');
     }
+
+    /**
+     * @return HasOne
+     */
+    public function zone(): HasOne
+    {
+        return $this->hasOne(Zone::class, 'id', 'zone_id');
+    }
 }

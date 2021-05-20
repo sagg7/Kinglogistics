@@ -16,16 +16,19 @@ class DriverController extends Controller
      */
     public function selection(Request $request): array
     {
-        if (!$request->carrier)
-            abort(404);
-
         $query = Driver::select([
             'id',
             'name as text',
             'drivers.trailer_id'
         ])
-            ->where("name", "LIKE", "%$request->name%")
-            ->where("carrier_id", $request->carrier)
+            ->where("name", "LIKE", "%$request->search%")
+            ->where(function ($q) use ($request) {
+                if ($request->carrier)
+                    $q->where("carrier_id", $request->carrier);
+            })
+            ->whereHas("carrier", function ($q) {
+                $q->whereNull("inactive");
+            })
             ->with('trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);

@@ -21,9 +21,10 @@ class DriverController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'turn_id' => ['required', 'exists:turns,id'],
+            'turn_id' => ['required', 'numeric'],
             'truck_id' => ['required', 'exists:trucks,id'],
-            'trailer_id' => ['required', 'exists:trailers,id'],
+            'zone_id' => ['required', 'exists:zones,id'],
+            'trailer_id' => ['nullable', 'exists:trailers,id'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
@@ -75,6 +76,7 @@ class DriverController extends Controller
 
         $driver->turn_id = $request->turn_id;
         $driver->truck_id = $request->truck_id;
+        $driver->zone_id = $request->zone_id;
         $driver->trailer_id = $request->trailer_id;
         $driver->name = $request->name;
         $driver->email = $request->email;
@@ -98,7 +100,7 @@ class DriverController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('drivers.index');
+        return redirect()->route('driver.index');
     }
 
     /**
@@ -120,7 +122,7 @@ class DriverController extends Controller
      */
     public function edit($id)
     {
-        $driver = Driver::with(['turn', 'truck:id,number', 'trailer:id,number'])
+        $driver = Driver::with(['turn', 'truck:id,number', 'trailer:id,number', 'zone:id,name'])
             ->find($id);
         $params = compact('driver') + $this->createEditParams();
         return view('subdomains.carriers.drivers.edit', $params);
@@ -139,7 +141,7 @@ class DriverController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('drivers.index');
+        return redirect()->route('driver.index');
     }
 
     /**

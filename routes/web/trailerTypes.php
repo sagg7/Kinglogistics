@@ -12,10 +12,12 @@ Route::prefix('trailerType')->group(function () {
         ->name('trailerType.store');
     Route::get('search', [TrailerTypeController::class, 'search'])
         ->name('trailerType.search');
+    Route::get('selection', [TrailerTypeController::class, 'selection'])
+        ->name('trailerType.selection');
     Route::get('edit/{id}', [TrailerTypeController::class, 'edit'])
         ->name('trailerType.edit');
     Route::post('update/{id}', [TrailerTypeController::class, 'update'])
         ->name('trailerType.update');
-    Route::post('delete/{id}', [TrailerTypeController::class, 'destroy'])
+    Route::post('delete/{id?}', [TrailerTypeController::class, 'destroy'])
         ->name('trailerType.delete');
 });

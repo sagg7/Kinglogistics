@@ -11,8 +11,8 @@ const mix = require('laravel-mix');
  |
  */
 
-mix/*sass('resources/sass/app.scss', 'public/css')
-    .postCss('resources/css/fontawesome.css', 'public/css')*/
+mix.sass('resources/sass/app.scss', 'public/css')
+    /*.postCss('resources/css/fontawesome.css', 'public/css')*/
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
         require('tailwindcss'),
@@ -24,9 +24,12 @@ mix/*sass('resources/sass/app.scss', 'public/css')
     /*.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
     .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')*/
+    // Common
+    .js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     // Sections
     .scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     .scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
+    .scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
     // Subdomains
     .scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
     // App Assets

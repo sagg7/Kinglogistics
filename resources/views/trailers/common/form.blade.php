@@ -2,14 +2,19 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
-                <div class="form-group col-md-6">
+                <div class="col-md-6">
                     {!! Form::label('trailer_type_id', ucfirst(__('trailer type')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('trailer_type_id', $trailer_types, $trailer->trailer_type_id ?? null, ['class' => 'form-control select2' . ($errors->first('trailer_type_id') ? ' is-invalid' : '')]) !!}
-                    @error('trailer_type_id')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
+                    <div class="input-group">
+                        {!! Form::select('trailer_type_id', $trailer_types, $trailer->trailer_type_id ?? null, ['class' => 'form-control' . ($errors->first('trailer_type_id') ? ' is-invalid' : '')]) !!}
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#addTrailerType"><i class="fas fa-plus"></i></button>
+                        </div>
+                        @error('trailer_type_id')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
                 </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('number', ucfirst(__('number')), ['class' => 'col-form-label']) !!}

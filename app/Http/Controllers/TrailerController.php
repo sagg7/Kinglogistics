@@ -35,7 +35,7 @@ class TrailerController extends Controller
     private function createEditParams(): array
     {
         return [
-            'trailer_types' => [null => ''] + TrailerType::where('carrier_id', auth()->user()->id)->pluck('name', 'id')->toArray(),
+            'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
             'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
         ];
     }
@@ -178,7 +178,7 @@ class TrailerController extends Controller
             'id',
             'number as text',
         ])
-            ->where("number", "LIKE", "%$request->name%")
+            ->where("number", "LIKE", "%$request->search%")
             ->where("carrier_id", $carrier)
             ->whereNull("inactive");
 

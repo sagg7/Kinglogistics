@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Turn;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TurnController extends Controller
 {
@@ -98,8 +97,8 @@ class TurnController extends Controller
             DB::raw("CONCAT(zones.name, ' - ', turns.name) as text"),
         ])
             ->join('zones', 'zones.id', '=', 'turns.zone_id')
-            ->where("turns.name", "LIKE", "%$request->name%")
-            ->orWhere("zones.name", "LIKE", "%$request->name%");
+            ->where("turns.name", "LIKE", "%$request->search%")
+            ->orWhere("zones.name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
     }*/

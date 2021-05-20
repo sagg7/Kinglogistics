@@ -15,7 +15,7 @@ class CreateTrailersTable extends Migration
     {
         Schema::create('trailers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('carrier_id');
+            $table->unsignedBigInteger('carrier_id')->nullable();
             $table->unsignedBigInteger('trailer_type_id');
             $table->string('number');
             $table->string('plate')->nullable();

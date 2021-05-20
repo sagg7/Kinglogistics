@@ -1,6 +1,9 @@
 {
+    "/js/common/typesModal.min.js": "/js/common/typesModal.min.js",
+    "/css/app.css": "/css/app.css",
     "/js/sections/rentals/common.min.js": "/js/sections/rentals/common.min.js",
     "/js/sections/trailers/common.min.js": "/js/sections/trailers/common.min.js",
+    "/js/sections/incidents/common.min.js": "/js/sections/incidents/common.min.js",
     "/js/sections/subdomains/carriers/drivers/common.min.js": "/js/sections/subdomains/carriers/drivers/common.min.js",
     "/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js": "/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js"
 }

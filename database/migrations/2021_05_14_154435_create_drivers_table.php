@@ -18,8 +18,8 @@ class CreateDriversTable extends Migration
             $table->unsignedBigInteger('carrier_id');
             $table->unsignedBigInteger('turn_id')->comment('Hace referencia al array de turnos dentro de los traits de Drivers');
             $table->unsignedBigInteger('zone_id');
-            $table->unsignedBigInteger('trailer_id');
             $table->unsignedBigInteger('truck_id');
+            $table->unsignedBigInteger('trailer_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');

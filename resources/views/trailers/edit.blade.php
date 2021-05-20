@@ -4,6 +4,12 @@
 
     @section('scripts')
         <script src="{{ asset('js/sections/trailers/common.min.js') }}"></script>
+        <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
+    @endsection
+
+    @section('modals')
+        @include('trailers.common.modals.addTrailerType')
+        @include('trailers.common.modals.deleteTrailerType')
     @endsection
 
     {!! Form::open(['route' => ['trailer.update', $trailer->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}

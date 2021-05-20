@@ -15,7 +15,7 @@ const select2Lang = {
     throwErrorMsg = (error, config = {}) => {
         let optns = {
             title: "Error!",
-            html: error ? error : "Ocurrió un error al procesar la solicitud",
+            html: error ? error : "There was an error processing your request",
             type: "error",
             confirmButtonClass: 'btn btn-primary',
             buttonsStyling: false,
@@ -54,4 +54,10 @@ const select2Lang = {
                     callback.apply(this, [xhr.status]);
             }
         });
+    },
+    deleteHandler = (select, options) => {
+        select.html(options);
+        select.find('option:selected').prop('selected', false);
+        select.find('option:first').remove();
+        select.prepend('<option selected disabled></option>');
     };

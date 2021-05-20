@@ -73,7 +73,10 @@ class TrailerTypeController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        $this->storeUpdate($request);
+        $trailerType = $this->storeUpdate($request);
+
+        if ($request->ajax())
+            return ['success' => true, 'data' => $trailerType];
 
         return redirect()->route('trailerType.index');
     }
@@ -121,11 +124,13 @@ class TrailerTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int|null $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, int $id = null)
     {
+        if (!$id)
+            $id = $request->id;
         $trailerType = TrailerType::find($id);
 
         if ($trailerType) {
@@ -138,6 +143,21 @@ class TrailerTypeController extends Controller
                 return ['success' => $trailerType->delete()];
         } else
             return ['success' => false];
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function selection(Request $request): array
+    {
+        $query = TrailerType::select([
+            'id',
+            'name as text',
+        ])
+            ->where("name", "LIKE", "%$request->search%");
+
+        return $this->selectionData($query, $request->take, $request->page);
     }
 
     /**

@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Carrier;
+use App\Models\IncidentType;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class CarrierController extends Controller
+class IncidentTypeController extends Controller
 {
     use GetSelectionData, GetSimpleSearchData, crudMessage;
+
     /**
      * @param array $data
      * @param int|null $id
@@ -22,13 +23,7 @@ class CarrierController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['string', 'email', 'max:255', "unique:users,email,$id,id"],
-            'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['nullable','string','max:255'],
-            'address' => ['nullable','string','max:255'],
-            'city' => ['nullable','string','max:255'],
-            'state' => ['nullable','string','max:255'],
-            'zip_code' => ['nullable','string','max:255'],
+            'fine' => ['nullable', 'numeric'],
         ]);
     }
 
@@ -39,7 +34,7 @@ class CarrierController extends Controller
      */
     public function index()
     {
-        return view('carriers.index');
+        return view('incidentTypes.index');
     }
 
     /**
@@ -49,49 +44,46 @@ class CarrierController extends Controller
      */
     public function create()
     {
-        return view('carriers.create');
+        return view('incidentTypes.create');
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return Carrier
+     * @return IncidentType
      */
-    private function storeUpdate(Request $request, $id = null): Carrier
+    private function storeUpdate(Request $request, $id = null): IncidentType
     {
         if ($id)
-            $carrier = Carrier::find($id);
+            $incidentType = IncidentType::find($id);
         else
-            $carrier = new Carrier();
+            $incidentType = new IncidentType();
 
-        $carrier->name = $request->name;
-        $carrier->email = $request->email;
-        $carrier->phone = $request->phone;
-        $carrier->address = $request->address;
-        $carrier->city = $request->city;
-        $carrier->state = $request->state;
-        $carrier->zip_code = $request->zip_code;
-        $carrier->inactive = $request->inactive ?? null;;
-        if ($request->password)
-            $carrier->password = Hash::make($request->password);
-        $carrier->save();
+        $incidentType->name = $request->name;
+        $incidentType->fine = $request->fine;
+        //$incidentType->save();
 
-        return $carrier;
+        return $incidentType;
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         $this->validator($request->all())->validate();
 
-        $this->storeUpdate($request);
+        $incidentType = $this->storeUpdate($request);
 
-        return redirect()->route('carrier.index');
+        if ($request->ajax()) {
+            $incidentType->name = $incidentType->fine ? $incidentType->name . ' - $' . number_format($incidentType->fine, 2) : $incidentType->name;
+            return ['success' => true, 'data' => $incidentType];
+        }
+
+        return redirect()->route('incidentType.index');
     }
 
     /**
@@ -113,9 +105,9 @@ class CarrierController extends Controller
      */
     public function edit($id)
     {
-        $carrier = Carrier::findOrFail($id);
-        $params = compact('carrier');
-        return view('carriers.edit', $params);
+        $incidentType = IncidentType::find($id);
+        $params = compact('incidentType');
+        return view('incidentTypes.edit', $params);
     }
 
     /**
@@ -127,31 +119,34 @@ class CarrierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validator($request->all(), $id)->validate();
+        $this->validator($request->all())->validate();
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('carrier.index');
+        return redirect()->route('incidentType.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
+     * @param int|null $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, int $id = null)
     {
-        $carrier = Carrier::find($id);
+        if (!$id)
+            $id = $request->id;
+        $incidentType = IncidentType::find($id);
 
-        if ($carrier) {
+        if ($incidentType) {
             $message = '';
-            if ($carrier->rentals()->first())
-                $message .= "•" . $this->generateCrudMessage(4, 'Carrier', ['constraint' => 'rentals']) . "<br>";
+            if ($incidentType->incidents()->first())
+                $message .= "•" . $this->generateCrudMessage(4, 'Incident Type', ['constraint' => 'incidents']) . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];
             else
-                return ['success' => $carrier->delete()];
+                return ['success' => $incidentType->delete()];
         } else
             return ['success' => false];
     }
@@ -162,12 +157,11 @@ class CarrierController extends Controller
      */
     public function selection(Request $request)
     {
-        $query = Carrier::select([
+        $query = IncidentType::select([
             'id',
-            'name as text',
+            DB::raw("CONCAT(name, ' - ', CONCAT('$', FORMAT(fine, 2))) as text"),
         ])
-            ->where("name", "LIKE", "%$request->search%")
-            ->whereNull("inactive");
+            ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
     }
@@ -178,11 +172,10 @@ class CarrierController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Carrier::select([
-            "carriers.id",
-            "carriers.name",
-            "carriers.email",
-            "carriers.phone",
+        $query = IncidentType::select([
+            "incident_types.id",
+            "incident_types.name",
+            "incident_types.fine",
         ]);
 
         return $this->simpleSearchData($query, $request);
