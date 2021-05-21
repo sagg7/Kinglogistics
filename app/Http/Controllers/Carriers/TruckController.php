@@ -21,6 +21,8 @@ class TruckController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
+            'trailer_id' => ['nullable', 'exists:trailers,id'],
+            'driver_id' => ['nullable', 'exists:drivers,id'],
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
@@ -71,6 +73,8 @@ class TruckController extends Controller
             $truck->carrier_id = auth()->user()->id;
         }
 
+        $truck->trailer_id = $request->trailer_id;
+        $truck->driver_id = $request->driver_id;
         $truck->number = $request->number;
         $truck->plate = $request->plate;
         $truck->vin = $request->vin;
@@ -117,8 +121,8 @@ class TruckController extends Controller
      */
     public function edit($id)
     {
-        $trucks = Truck::find($id);
-        $params = compact('trucks');
+        $truck = Truck::with(['driver:id,name', 'trailer:id,number'])->find($id);
+        $params = compact('truck');
         return view('subdomains.carriers.trucks.edit', $params);
     }
 
@@ -191,8 +195,35 @@ class TruckController extends Controller
             "trucks.number",
             "trucks.plate",
             "trucks.vin",
+            "trucks.trailer_id",
+            "trucks.driver_id",
         ])
-            ->with(['driver:id,name']);
+            ->with(['driver:id,name', 'trailer:id,number']);
+
+        if ($request->searchable) {
+            $searchable = [];
+            $statement = "whereHas";
+            foreach ($request->searchable as $item) {
+                switch ($item) {
+                    case 'driver':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    case 'trailer':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('number', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    default:
+                        $searchable[count($searchable) + 1] = $item;
+                        break;
+                }
+            }
+            $request->searchable = $searchable;
+        }
 
         return $this->simpleSearchData($query, $request);
     }

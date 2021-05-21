@@ -16,6 +16,8 @@ class CreateTrucksTable extends Migration
         Schema::create('trucks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('carrier_id');
+            $table->unsignedBigInteger('trailer_id')->nullable();
+            $table->unsignedBigInteger('driver_id')->nullable();
             $table->string('number');
             $table->string('plate')->nullable();
             $table->string('vin')->nullable();
@@ -27,6 +29,7 @@ class CreateTrucksTable extends Migration
             $table->softDeletes();
 
             $table->foreign('carrier_id')->references('id')->on('carriers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('driver_id')->references('id')->on('drivers')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

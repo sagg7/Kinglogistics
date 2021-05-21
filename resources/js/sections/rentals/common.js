@@ -49,7 +49,7 @@
     })
         .on('select2:select', (res) => {
             const driver = res.params.data,
-                trailer = driver.trailer;
+                trailer = driver.truck.trailer;
             trailerSel.html(`<option value="${trailer.id}">${trailer.number}</option>`)
                 .val(`${trailer.id}`)
                 .trigger('change');

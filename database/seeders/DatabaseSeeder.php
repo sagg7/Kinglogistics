@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $this->call(RolesSeeder::class);
         $this->call(UsersSeeder::class);
-        //$this->call(TrailerType::class);
+        $this->call(TrailerTypesSeeder::class);
+        $this->call(CarrierTestSeeder::class);
     }
 }

@@ -67,6 +67,10 @@ button.btn-remove {
     .select2.select2-container.select2-container--default {
         flex: 1 1 auto;
         width: 1%!important;
+        .select2-selection--single {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
 }
 

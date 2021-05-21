@@ -21,24 +21,6 @@
                     @enderror
                 </div>
                 <div class="form-group col-md-6">
-                    {!! Form::label('truck_id', ucfirst(__('truck')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('truck_id', [], $driver->truck_id ?? null, ['class' => 'form-control' . ($errors->first('truck_id') ? ' is-invalid' : '')]) !!}
-                    @error('truck_id')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
-                </div>
-                <div class="form-group col-md-6">
-                    {!! Form::label('trailer_id', ucfirst(__('trailer')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('trailer_id', [], $driver->trailer_id ?? null, ['class' => 'form-control' . ($errors->first('trailer_id') ? ' is-invalid' : '')]) !!}
-                    @error('trailer_id')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
-                </div>
-                <div class="form-group col-md-6">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('name', $driver->name ?? null, ['class' => 'form-control' . ($errors->first('name') ? ' is-invalid' : '')]) !!}
                     @error('name')

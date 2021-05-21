@@ -18,8 +18,6 @@ class CreateDriversTable extends Migration
             $table->unsignedBigInteger('carrier_id');
             $table->unsignedBigInteger('turn_id')->comment('Hace referencia al array de turnos dentro de los traits de Drivers');
             $table->unsignedBigInteger('zone_id');
-            $table->unsignedBigInteger('truck_id');
-            $table->unsignedBigInteger('trailer_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
@@ -30,8 +28,6 @@ class CreateDriversTable extends Migration
 
             $table->foreign('carrier_id')->references('id')->on('carriers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('zone_id')->references('id')->on('zones')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('trailer_id')->references('id')->on('trailers')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('truck_id')->references('id')->on('trucks')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

@@ -19,7 +19,6 @@ class DriverController extends Controller
         $query = Driver::select([
             'id',
             'name as text',
-            'drivers.trailer_id'
         ])
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
@@ -29,7 +28,7 @@ class DriverController extends Controller
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");
             })
-            ->with('trailer:id,number');
+            ->with('truck.trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);
     }

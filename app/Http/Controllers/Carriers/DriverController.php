@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Carriers;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Traits\Driver\DriverParams;
+use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DriverController extends Controller
 {
-    use GetSimpleSearchData, DriverParams;
+    use GetSelectionData, GetSimpleSearchData, DriverParams;
     /**
      * @param array $data
      * @param int|null $id
@@ -22,9 +23,7 @@ class DriverController extends Controller
     {
         return Validator::make($data, [
             'turn_id' => ['required', 'numeric'],
-            'truck_id' => ['required', 'exists:trucks,id'],
             'zone_id' => ['required', 'exists:zones,id'],
-            'trailer_id' => ['nullable', 'exists:trailers,id'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
@@ -75,9 +74,7 @@ class DriverController extends Controller
         }
 
         $driver->turn_id = $request->turn_id;
-        $driver->truck_id = $request->truck_id;
         $driver->zone_id = $request->zone_id;
-        $driver->trailer_id = $request->trailer_id;
         $driver->name = $request->name;
         $driver->email = $request->email;
         $driver->inactive = $request->inactive ?? null;
@@ -122,7 +119,7 @@ class DriverController extends Controller
      */
     public function edit($id)
     {
-        $driver = Driver::with(['turn', 'truck:id,number', 'trailer:id,number', 'zone:id,name'])
+        $driver = Driver::with(['zone:id,name'])
             ->find($id);
         $params = compact('driver') + $this->createEditParams();
         return view('subdomains.carriers.drivers.edit', $params);
@@ -157,6 +154,24 @@ class DriverController extends Controller
 
     /**
      * @param Request $request
+     * @return array
+     */
+    public function selection(Request $request): array
+    {
+        $query = Driver::select([
+            'drivers.id',
+            'drivers.name as text',
+        ])
+            ->where("name", "LIKE", "%$request->search%")
+            /*->where("carrier_id", auth()->user()->id)
+            ->whereNull("inactive")
+            ->with('truck.trailer:id,number')*/;
+
+        return $this->selectionData($query, $request->take, $request->page);
+    }
+
+    /**
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function search(Request $request)
@@ -164,17 +179,21 @@ class DriverController extends Controller
         $query = Driver::select([
             "drivers.id",
             "drivers.name",
-            "drivers.trailer_id",
-            "drivers.truck_id",
+            "drivers.zone_id",
         ])
-            ->with(['trailer:id,number', 'truck:id,number']);
+            ->with('truck:driver_id,number', 'zone:id,name');
 
         if ($request->searchable) {
             $searchable = [];
             $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
-                    case 'trailer':
+                    case 'zone':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
                     case 'truck':
                         $query->$statement($item, function ($q) use ($request) {
                             $q->where('number', 'LIKE', "%$request->search%");

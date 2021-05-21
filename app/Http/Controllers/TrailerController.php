@@ -170,16 +170,11 @@ class TrailerController extends Controller
      */
     public function selection(Request $request): array
     {
-        $carrier = auth()->guard('carrier')->check() ? auth()->user()->id : $request->carrier;
-        if (!$carrier)
-            abort(404);
-
         $query = Trailer::select([
             'id',
             'number as text',
         ])
             ->where("number", "LIKE", "%$request->search%")
-            ->where("carrier_id", $carrier)
             ->whereNull("inactive");
 
         return $this->selectionData($query, $request->take, $request->page);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,11 +15,11 @@ class Driver extends Model
     use HasFactory, HasApiTokens, SoftDeletes;
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function carrier(): HasOne
+    public function carrier(): BelongsTo
     {
-        return $this->hasOne(Carrier::class, 'id', 'carrier_id');
+        return $this->belongsTo(Carrier::class);
     }
 
     /**
@@ -26,7 +27,7 @@ class Driver extends Model
      */
     public function rentals(): HasMany
     {
-        return $this->hasMany(Rental::class, 'patient_id');
+        return $this->hasMany(Rental::class);
     }
 
     /**
@@ -34,7 +35,7 @@ class Driver extends Model
      */
     public function trailer(): HasOne
     {
-        return $this->hasOne(Trailer::class, 'id', 'trailer_id');
+        return $this->hasOne(Trailer::class);
     }
 
     /**
@@ -42,22 +43,14 @@ class Driver extends Model
      */
     public function truck(): HasOne
     {
-        return $this->hasOne(Truck::class, 'id', 'truck_id');
+        return $this->hasOne(Truck::class);
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function turn(): HasOne
+    public function zone(): BelongsTo
     {
-        return $this->hasOne(Turn::class, 'id', 'turn_id');
-    }
-
-    /**
-     * @return HasOne
-     */
-    public function zone(): HasOne
-    {
-        return $this->hasOne(Zone::class, 'id', 'zone_id');
+        return $this->belongsTo(Zone::class);
     }
 }

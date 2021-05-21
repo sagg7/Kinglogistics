@@ -32,5 +32,6 @@ mix.sass('resources/sass/app.scss', 'public/css')
     .scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
     // Subdomains
     .scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
+    .scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')
     // App Assets
     .scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js');

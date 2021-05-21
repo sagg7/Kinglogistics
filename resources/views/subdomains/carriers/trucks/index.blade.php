@@ -16,10 +16,17 @@
                     else
                         return '';
                 };
+                const trailerFormatter = (params) => {
+                    if (params.value)
+                        return params.value.number;
+                    else
+                        return '';
+                };
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Number', field: 'number'},
                         {headerName: 'Driver', field: 'driver', valueFormatter: driverFormatter},
+                        {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
                         {headerName: 'Plate', field: 'plate'},
                         {headerName: 'VIN', field: 'vin'},
                     ],
