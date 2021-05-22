@@ -72,6 +72,4 @@
         placeholder: 'Select',
         allowClear: true,
     });
-    if (!driverSel.val())
-        driverSel.prop('disabled', true).trigger('change');
 })();

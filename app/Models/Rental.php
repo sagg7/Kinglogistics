@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Rental extends Model
 {
@@ -15,26 +15,26 @@ class Rental extends Model
     ];
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function carrier(): HasOne
+    public function carrier(): BelongsTo
     {
-        return $this->hasOne(Carrier::class, 'id', 'carrier_id');
+        return $this->belongsTo(Carrier::class);
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function driver(): HasOne
+    public function driver(): BelongsTo
     {
-        return $this->hasOne(Driver::class, 'id', 'driver_id');
+        return $this->belongsTo(Driver::class);
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function trailer(): HasOne
+    public function trailer(): BelongsTo
     {
-        return $this->hasOne(Trailer::class, 'id', 'trailer_id');
+        return $this->belongsTo(Trailer::class);
     }
 }

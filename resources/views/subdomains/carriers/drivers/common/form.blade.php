@@ -60,7 +60,7 @@
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}
                         <div class="vs-checkbox-con vs-checkbox-primary">
-                            {{ Form::checkbox('inactive', 'inactive', $driver->inactive ?? null) }}
+                            {{ Form::checkbox('inactive', 1, $driver->inactive ?? null) }}
                             <span class="vs-checkbox">
                                 <span class="vs-checkbox--check">
                                     <i class="vs-icon feather icon-check"></i>

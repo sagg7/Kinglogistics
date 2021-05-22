@@ -175,6 +175,7 @@ class TruckController extends Controller
             'number as text',
         ])
             ->where("number", "LIKE", "%$request->search%")
+            ->where("carrier_id", auth()->user()->id)
             ->whereNull("inactive");
 
         if ($request->type === "drivers") {

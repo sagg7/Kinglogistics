@@ -13,6 +13,7 @@
                 $("#driver_id")
                     .html(`<option value="{{ $rental->driver_id }}">{{ $rental->driver->name }}</option>`)
                     .val({{ $rental->driver_id }})
+                    .prop('disabled', false)
                     .trigger('change');
                 $("#trailer_id")
                     .html(`<option value="{{ $rental->trailer_id }}">{{ $rental->trailer->number }}</option>`)

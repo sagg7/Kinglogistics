@@ -175,6 +175,12 @@ class TrailerController extends Controller
             'number as text',
         ])
             ->where("number", "LIKE", "%$request->search%")
+            /*->whereHas("truck", function ($q) use ($request) {
+                if ($request->driver)
+                    $q->whereHas("driver", function ($s) use ($request) {
+                        $s->where("driver_id", $request->driver);
+                    });
+            })*/
             ->whereNull("inactive");
 
         return $this->selectionData($query, $request->take, $request->page);

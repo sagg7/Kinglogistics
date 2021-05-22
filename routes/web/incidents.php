@@ -16,6 +16,8 @@ Route::prefix('incident')->group(function () {
         ->name('incident.selection');
     Route::get('edit/{id}', [IncidentController::class, 'edit'])
         ->name('incident.edit');
+    Route::get('downloadPDF/{id}', [IncidentController::class, 'downloadPDF'])
+        ->name('incident.downloadPDF');
     Route::post('update/{id}', [IncidentController::class, 'update'])
         ->name('incident.update');
     Route::post('delete/{id}', [IncidentController::class, 'destroy'])

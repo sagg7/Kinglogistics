@@ -61,7 +61,7 @@ class IncidentTypeController extends Controller
 
         $incidentType->name = $request->name;
         $incidentType->fine = $request->fine;
-        //$incidentType->save();
+        $incidentType->save();
 
         return $incidentType;
     }
