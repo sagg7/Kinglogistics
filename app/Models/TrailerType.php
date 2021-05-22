@@ -16,6 +16,6 @@ class TrailerType extends Model
      */
     public function trailers(): HasMany
     {
-        return $this->hasMany(Trailer::class, 'trailer_type_id');
+        return $this->hasMany(Trailer::class);
     }
 }

@@ -17,12 +17,15 @@ class Trailer extends Model
      */
     public function rentals(): HasMany
     {
-        return $this->hasMany(Rental::class, 'patient_id');
+        return $this->hasMany(Rental::class);
     }
 
-    public function trailer_type(): HasOne
+    /**
+     * @return BelongsTo
+     */
+    public function trailer_type(): BelongsTo
     {
-        return $this->hasOne(TrailerType::class, 'id', 'trailer_type_id');
+        return $this->belongsTo(TrailerType::class);
     }
 
     /**

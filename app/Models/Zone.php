@@ -15,6 +15,6 @@ class Zone extends Model
      */
     public function drivers(): HasMany
     {
-        return $this->hasMany(Driver::class, 'zone_id');
+        return $this->hasMany(Driver::class);
     }
 }

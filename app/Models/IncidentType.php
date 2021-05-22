@@ -15,6 +15,6 @@ class IncidentType extends Model
      */
     public function incidents(): HasMany
     {
-        return $this->hasMany(Incident::class, 'incident_type_id');
+        return $this->hasMany(Incident::class);
     }
 }

@@ -17,13 +17,13 @@ class Carrier extends Authenticatable
      */
     public function rentals(): HasMany
     {
-        return $this->hasMany(Rental::class, 'patient_id');
+        return $this->hasMany(Rental::class);
     }
     /**
      * @return HasMany
      */
     public function drivers(): HasMany
     {
-        return $this->hasMany(Driver::class, 'patient_id');
+        return $this->hasMany(Driver::class);
     }
 }
