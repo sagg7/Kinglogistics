@@ -2,34 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Carrier;
-use App\Traits\CRUD\crudMessage;
+use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class CarrierController extends Controller
+class ShipperController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, crudMessage;
+    use GetSelectionData, GetSimpleSearchData;
+
     /**
      * @param array $data
      * @param int|null $id
      * @return \Illuminate\Contracts\Validation\Validator
      */
-
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['string', 'email', 'max:255', "unique:carriers,email,$id,id"],
+            'email' => ['string', 'email', 'max:255', "unique:shippers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['nullable','string','max:255'],
-            'address' => ['nullable','string','max:255'],
-            'city' => ['nullable','string','max:255'],
-            'state' => ['nullable','string','max:255'],
-            'zip_code' => ['nullable','string','max:255'],
+            'invoice_email' => ['nullable', 'string', 'email', 'max:255'],
         ]);
     }
 
@@ -40,7 +35,7 @@ class CarrierController extends Controller
      */
     public function index()
     {
-        return view('carriers.index');
+        return view('shippers.index');
     }
 
     /**
@@ -50,41 +45,36 @@ class CarrierController extends Controller
      */
     public function create()
     {
-        return view('carriers.create');
+        return view('shippers.create');
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return Carrier
+     * @return Shipper
      */
-    private function storeUpdate(Request $request, $id = null): Carrier
+    private function storeUpdate(Request $request, $id = null): Shipper
     {
         if ($id)
-            $carrier = Carrier::find($id);
+            $shipper = Shipper::find($id);
         else
-            $carrier = new Carrier();
+            $shipper = new Shipper();
 
-        $carrier->name = $request->name;
-        $carrier->email = $request->email;
-        $carrier->phone = $request->phone;
-        $carrier->address = $request->address;
-        $carrier->city = $request->city;
-        $carrier->state = $request->state;
-        $carrier->zip_code = $request->zip_code;
-        $carrier->inactive = $request->inactive ?? null;;
+        $shipper->name = $request->name;
+        $shipper->email = $request->email;
+        $shipper->invoice_email = $request->invoice_email;
         if ($request->password)
-            $carrier->password = Hash::make($request->password);
-        $carrier->save();
+            $shipper->password = Hash::make($request->password);
+        $shipper->save();
 
-        return $carrier;
+        return $shipper;
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -92,7 +82,7 @@ class CarrierController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('carrier.index');
+        return redirect()->route('shipper.index');
     }
 
     /**
@@ -114,9 +104,9 @@ class CarrierController extends Controller
      */
     public function edit($id)
     {
-        $carrier = Carrier::findOrFail($id);
-        $params = compact('carrier');
-        return view('carriers.edit', $params);
+        $shipper = Shipper::find($id);
+        $params = compact('shipper');
+        return view('shippers.edit', $params);
     }
 
     /**
@@ -126,13 +116,13 @@ class CarrierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        $this->validator($request->all(), $id)->validate();
+        $this->validator($request->all())->validate();
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('carrier.index');
+        return redirect()->route('shipper.index');
     }
 
     /**
@@ -141,19 +131,13 @@ class CarrierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $carrier = Carrier::find($id);
+        $shipper = Shipper::find($id);
 
-        if ($carrier) {
-            $message = '';
-            if ($carrier->rentals()->first())
-                $message .= "•" . $this->generateCrudMessage(4, 'Carrier', ['constraint' => 'rentals']) . "<br>";
-            if ($message)
-                return ['success' => false, 'msg' => $message];
-            else
-                return ['success' => $carrier->delete()];
-        } else
+        if ($shipper)
+            return ['success' => $shipper->delete()];
+        else
             return ['success' => false];
     }
 
@@ -163,12 +147,11 @@ class CarrierController extends Controller
      */
     public function selection(Request $request)
     {
-        $query = Carrier::select([
+        $query = Shipper::select([
             'id',
             'name as text',
         ])
-            ->where("name", "LIKE", "%$request->search%")
-            ->whereNull("inactive");
+            ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
     }
@@ -179,11 +162,10 @@ class CarrierController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Carrier::select([
-            "carriers.id",
-            "carriers.name",
-            "carriers.email",
-            "carriers.phone",
+        $query = Shipper::select([
+            "shippers.id",
+            "shippers.name",
+            "shippers.email",
         ]);
 
         return $this->simpleSearchData($query, $request);

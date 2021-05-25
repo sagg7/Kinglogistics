@@ -1,3 +1,5 @@
+<!--<div class="row">
+    <div class="col-6">-->
 <div class="card">
     <div class="card-body">
         <div class="card-content">
@@ -103,4 +105,35 @@
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->
+</div>
 </div> <!-- end card -->
+<!--<div class="col-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-content">
+                <div class="form-group">
+                    <button class="btn btn-success" type="button">Add Paperwork</button>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Documento</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Archivo 2223</td>
+                        <td>Safety</td>
+                        <td><a href="http://google.com">url</a></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>-->

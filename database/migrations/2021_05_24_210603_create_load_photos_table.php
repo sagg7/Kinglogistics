@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateIncidentTypesTable extends Migration
+class CreateLoadPhotosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateIncidentTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('incident_types', function (Blueprint $table) {
+        Schema::create('load_photos', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->double('fine')->nullable();
+            $table->unsignedBigInteger('load_id');
+            $table->string('url', 512);
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->foreign('load_id')->references('id')->on('loads')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -29,6 +30,6 @@ class CreateIncidentTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('incident_types');
+        Schema::dropIfExists('load_photos');
     }
 }

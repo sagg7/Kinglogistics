@@ -19,6 +19,8 @@ Route::middleware('guest:shipper')->group(function () {
 });
 
 Route::middleware('auth:shipper')->group(function () {
+    require __DIR__.'/shippers/loads.php';
+
     Route::get('/dashboard', function () {
         return view('subdomains.shippers.dashboard');
     })

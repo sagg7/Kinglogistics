@@ -25,6 +25,7 @@ Route::get('/dashboard', function () {
 Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/users.php';
     require __DIR__.'/web/rentals.php';
+    require __DIR__.'/web/shippers.php';
     require __DIR__.'/web/carriers.php';
     require __DIR__.'/web/incidents.php';
     require __DIR__.'/web/incidentTypes.php';

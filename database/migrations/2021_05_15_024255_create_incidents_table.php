@@ -30,6 +30,7 @@ class CreateIncidentsTable extends Migration
             $table->string('driver_signature', 512)->nullable();
             $table->unsignedTinyInteger('refuse_sign')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('incident_type_id')->references('id')->on('incident_types')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('carrier_id')->references('id')->on('carriers')->onUpdate('cascade')->onDelete('cascade');
