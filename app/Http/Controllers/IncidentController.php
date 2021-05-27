@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\IncidentExport;
 use App\Models\Incident;
 use App\Models\IncidentType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;

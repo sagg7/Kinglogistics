@@ -1,4 +1,19 @@
 <x-guest-layout>
+    @section('scripts')
+        <script defer>
+            (() => {
+                let form = document.getElementsByTagName('form')[0];
+                form.addEventListener("submit", () => {
+                    let input = document.createElement("input");
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", "timezone");
+                    input.setAttribute("value", `${moment.tz.guess()}`);
+                    form.appendChild(input);
+                });
+            })();
+        </script>
+    @endsection
+
     <x-auth-card>
 
         <!-- Session Status -->

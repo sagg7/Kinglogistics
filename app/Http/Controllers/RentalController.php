@@ -6,6 +6,7 @@ use App\Models\Rental;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RentalController extends Controller
@@ -62,24 +63,35 @@ class RentalController extends Controller
 
     private function storeUpdate(Request $request, $id = null): Rental
     {
-        if ($id)
-            $rental = Rental::find($id);
-        else {
-            $rental = new Rental();
-            $rental->status = 'uninspected';
-        }
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $rental = Rental::find($id);
+            else {
+                $rental = new Rental();
+                $rental->status = 'uninspected';
+            }
 
-        $rental->trailer_id = $request->trailer_id;
-        $rental->carrier_id = $request->carrier_id;
-        $rental->driver_id = $request->driver_id;
-        $rental->date = Carbon::parse($request->date_submit);
-        $rental->cost = $request->cost;
-        $rental->deposit = $request->deposit;
-        $rental->deposit_is_paid = $request->is_paid ?? null;
-        $rental->period = $request->period;
-        $rental->save();
+            $rental->trailer_id = $request->trailer_id;
+            $rental->carrier_id = $request->carrier_id;
+            $rental->driver_id = $request->driver_id;
+            $rental->date = Carbon::parse($request->date_submit);
+            $rental->cost = $request->cost;
+            $rental->deposit = $request->deposit;
+            $rental->deposit_is_paid = $request->is_paid ?? null;
+            $rental->period = $request->period;
+            $rental->save();
 
-        return $rental;
+            if ($rental->status !== 'finished') {
+                // Assign trailer to driver's truck
+                $rental->driver->truck->trailer_id = $request->trailer_id;
+                $rental->driver->truck->save();
+                // Assign trailer status to rented
+                $rental->trailer->status = 'rented';
+                $rental->trailer->save();
+            }
+
+            return $rental;
+        });
     }
 
     /**

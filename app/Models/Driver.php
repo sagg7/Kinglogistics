@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +32,14 @@ class Driver extends Model
     }
 
     /**
+     * @return HasMany
+     */
+    public function loads(): HasMany
+    {
+        return $this->hasMany(Load::class);
+    }
+
+    /**
      * @return HasOne
      */
     public function trailer(): HasOne
@@ -52,5 +61,13 @@ class Driver extends Model
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function shippers(): BelongsToMany
+    {
+        return $this->belongsToMany(Shipper::class);
     }
 }

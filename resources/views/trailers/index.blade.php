@@ -10,19 +10,31 @@
         <script defer>
             var tbAG = null;
             (() => {
-                const typeFormatter = (params) => {
+                const nameFormatter = (params) => {
                     if (params.value)
                         return params.value.name;
                     else
                         return '';
                 };
+                const statusFormatter = (params) => {
+                    switch (params.value) {
+                        case 'available':
+                            return 'Available';
+                        case 'rented':
+                            return 'Rented';
+                        case 'oos':
+                            return 'Out of service';
+                        default:
+                            return '';
+                    }
+                };
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Number', field: 'number'},
-                        {headerName: 'Type', field: 'trailer_type', valueFormatter: typeFormatter},
+                        {headerName: 'Type', field: 'trailer_type', valueFormatter: nameFormatter},
                         {headerName: 'Plate', field: 'plate'},
                         {headerName: 'VIN', field: 'vin'},
-                        {headerName: 'Status', field: 'status'},
+                        {headerName: 'Status', field: 'status', valueFormatter: statusFormatter},
                     ],
                     menu: [
                         {text: 'Edit', route: '/trailer/edit', icon: 'feather icon-edit'},

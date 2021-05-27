@@ -19,8 +19,8 @@ mix.sass('resources/sass/app.scss', 'public/css')
         require('autoprefixer'),
     ])
     .js('resources/js/common/master.js', 'public/js/common/master.min.js')*/
-    .js('resources/js/bootstrap.js', 'public/js/')
-    .sass('resources/css/bootstrap.scss', 'public/css/')
+    //.js('resources/js/bootstrap.js', 'public/js/')
+    //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
     /*.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
@@ -29,9 +29,10 @@ mix.sass('resources/sass/app.scss', 'public/css')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     // Sections
-    .scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
+    //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
-    .scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
+    //.scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
+    .scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
     //.scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')

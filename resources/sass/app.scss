@@ -189,3 +189,27 @@ table.total-rows {
         }
     }
 }
+
+.custom-map-control-button {
+    background: none rgb(255, 255, 255);
+    border: 0;
+    margin: 10px;
+    padding: 0;
+    text-transform: none;
+    appearance: none;
+    position: absolute;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 2px;
+    height: 40px;
+    width: 40px;
+    box-shadow: rgb(0 0 0 / 30%) 0 1px 4px -1px;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    z-index: 0;
+    i {
+        color: #666;
+        font-size: 24px;
+    }
+}

@@ -14,4 +14,12 @@ Route::prefix('load')->group(function () {
         ->name('load.store');
     Route::get('search', [LoadController::class, 'search'])
         ->name('load.search');
+    Route::get('selection', [LoadController::class, 'selection'])
+        ->name('load.selection');
+    Route::get('edit/{id}', [LoadController::class, 'edit'])
+        ->name('load.edit');
+    Route::post('update/{id}', [LoadController::class, 'update'])
+        ->name('load.update');
+    Route::post('delete/{id}', [LoadController::class, 'destroy'])
+        ->name('load.delete');
 });

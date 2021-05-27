@@ -28,6 +28,11 @@ class DriverController extends Controller
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");
             })
+            ->where(function ($q) use ($request) {
+                if ($request->rental)
+                    $q->whereDoesntHave("truck")
+                        ->whereDoesntHave("trailer");
+            })
             ->with('truck.trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);

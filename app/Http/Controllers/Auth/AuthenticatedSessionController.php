@@ -54,6 +54,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        session(['timezone' => $request->timezone]);
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

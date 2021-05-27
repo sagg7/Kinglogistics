@@ -7,7 +7,7 @@
                     <div class="input-group">
                         {!! Form::select('incident_type_id', $incident_types, $incident->incident_type_id ?? null, ['class' => 'form-control' . ($errors->first('incident_type_id') ? ' is-invalid' : '')]) !!}
                         <div class="input-group-append">
-                            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#addIncidentType"><i class="fas fa-plus"></i></button>
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addIncidentType"><i class="fas fa-plus"></i></button>
                         </div>
                         @error('incident_type_id')
                         <span class="invalid-feedback" role="alert">

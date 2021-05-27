@@ -17,6 +17,7 @@ class CreateTrailersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('carrier_id')->nullable();
             $table->unsignedBigInteger('trailer_type_id');
+            $table->unsignedBigInteger('shipper_id')->nullable();
             $table->string('number');
             $table->string('plate')->nullable();
             $table->string('vin')->nullable();
@@ -27,6 +28,7 @@ class CreateTrailersTable extends Migration
 
             $table->foreign('trailer_type_id')->references('id')->on('trailer_types')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('carrier_id')->references('id')->on('carriers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('shipper_id')->references('id')->on('shippers')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

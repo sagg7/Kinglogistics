@@ -16,7 +16,7 @@ class CreateLoadsTable extends Migration
         Schema::create('loads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('load_type_id');
-            $table->unsignedBigInteger('driver_id');
+            $table->unsignedBigInteger('driver_id')->nullable();
             $table->unsignedBigInteger('shipper_id');
             $table->date('date');
             $table->string('control_number');
@@ -27,13 +27,12 @@ class CreateLoadsTable extends Migration
             $table->string('customer_name');
             $table->string('customer_po');
             $table->string('customer_reference');
-            $table->string('sand_type')->nullable();
             $table->string('tons')->nullable();
             $table->string('silo_number')->nullable();
             $table->string('container')->nullable();
             $table->double('weight')->nullable();
             $table->double('mileage')->nullable();
-            $table->enum('status', ['sent', 'accepted', 'loading', 'to_location', 'arrived', 'unloading', 'finished']);
+            $table->enum('status', ['unallocated', 'requested', 'accepted', 'loading', 'to_location', 'arrived', 'unloading', 'finished']);
             $table->timestamps();
             $table->softDeletes();
 

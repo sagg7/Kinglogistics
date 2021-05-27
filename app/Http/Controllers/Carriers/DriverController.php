@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Carriers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
+use App\Models\Shipper;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,7 +37,9 @@ class DriverController extends Controller
      */
     private function createEditParams(): array
     {
-        return $this->getTurnsArray();
+        return [
+                'shippers' => Shipper::skip(0)->take(15)->pluck('name', 'id'),
+            ] + $this->getTurnsArray();
     }
 
     /**
@@ -66,23 +70,27 @@ class DriverController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Driver
     {
-        if ($id)
-            $driver = Driver::find($id);
-        else {
-            $driver = new Driver();
-            $driver->carrier_id = auth()->user()->id;
-        }
+        return DB::transaction(function ($q) use ($request, $id) {
+            if ($id)
+                $driver = Driver::find($id);
+            else {
+                $driver = new Driver();
+                $driver->carrier_id = auth()->user()->id;
+            }
 
-        $driver->turn_id = $request->turn_id;
-        $driver->zone_id = $request->zone_id;
-        $driver->name = $request->name;
-        $driver->email = $request->email;
-        $driver->inactive = $request->inactive ?? null;
-        if ($request->password)
-            $driver->password = Hash::make($request->password);
-        $driver->save();
+            $driver->turn_id = $request->turn_id;
+            $driver->zone_id = $request->zone_id;
+            $driver->name = $request->name;
+            $driver->email = $request->email;
+            $driver->inactive = $request->inactive ?? null;
+            if ($request->password)
+                $driver->password = Hash::make($request->password);
+            $driver->save();
 
-        return $driver;
+            $driver->shippers()->sync($request->shippers);
+
+            return $driver;
+        });
     }
 
     /**
@@ -121,6 +129,7 @@ class DriverController extends Controller
     {
         $driver = Driver::with(['zone:id,name'])
             ->find($id);
+        $driver->shippers = $driver->shippers()->pluck('id')->toArray();
         $params = compact('driver') + $this->createEditParams();
         return view('subdomains.carriers.drivers.edit', $params);
     }

@@ -22,10 +22,11 @@ class TrailerController extends Controller
     {
         return Validator::make($data, [
             'trailer_type_id' => ['required', 'exists:trailer_types,id'],
+            'shipper_id' => ['nullable', 'exists:shippers,id'],
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
-            'status' => ['required'],
+            //'status' => ['required'],
         ]);
     }
 
@@ -72,15 +73,16 @@ class TrailerController extends Controller
             $trailer = Trailer::find($id);
         else {
             $trailer = new Trailer();
+            $trailer->status = 'available';
             if (false && auth()->guard('carrier')->check())
                 $trailer->carrier_id = auth()->user()->id;
         }
 
         $trailer->trailer_type_id = $request->trailer_type_id;
+        $trailer->shipper_id = $request->shipper_id;
         $trailer->number = $request->number;
         $trailer->plate = $request->plate;
         $trailer->vin = $request->vin;
-        $trailer->status = $request->status;
         $trailer->inactive = $request->inactive ?? null;;
         $trailer->save();
 
@@ -121,7 +123,8 @@ class TrailerController extends Controller
      */
     public function edit($id)
     {
-        $trailer = Trailer::find($id);
+        $trailer = Trailer::with('shipper:id,name')
+            ->find($id);
         $params = compact('trailer') + $this->createEditParams();
         return view('trailers.edit', $params);
     }
@@ -181,6 +184,10 @@ class TrailerController extends Controller
                         $s->where("driver_id", $request->driver);
                     });
             })*/
+            ->where(function ($q) use ($request) {
+                if ($request->rental)
+                    $q->where('status', 'available');
+            })
             ->whereNull("inactive");
 
         return $this->selectionData($query, $request->take, $request->page);
