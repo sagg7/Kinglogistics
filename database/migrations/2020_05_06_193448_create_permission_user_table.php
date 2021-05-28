@@ -14,7 +14,6 @@ class CreatePermissionUserTable extends Migration
      */
     public function up()
     {
-        DB::statement('SET SESSION sql_require_primary_key=0');
         Schema::create('permission_user', function (Blueprint $table) {
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('permission_id')->unsigned();

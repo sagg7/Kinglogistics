@@ -14,7 +14,6 @@ class CreatePermissionRoleTable extends Migration
      */
     public function up()
     {
-        DB::statement('SET SESSION sql_require_primary_key=0');
         Schema::create('permission_role', function (Blueprint $table) {
             $table->bigInteger('role_id')->unsigned();
             $table->bigInteger('permission_id')->unsigned();
