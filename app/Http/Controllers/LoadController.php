@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AvailableDriver;
 use App\Models\Load;
+use App\Models\LoadLog;
 use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -96,6 +97,12 @@ class LoadController extends Controller
             ->get();
 
         DB::transaction(function () use ($request, $data, $drivers) {
+            $load_log = new LoadLog();
+            $load_log->user_id = auth()->user()->id;
+            $load_log->quantity = $request->load_number;
+            $load_log->type = auth()->guard('shipper')->check() ? 'shipper' : 'user';
+            $load_log->save();
+            $data['load_log_id'] = $load_log->id;
             for ($i = 0; $i < $request->load_number; $i++) {
                 // Assign available drivers to load
                 $data['driver_id'] = $drivers[$i]->id ?? null;

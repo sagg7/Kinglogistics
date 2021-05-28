@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TrailerController;
+use App\Http\Controllers\Carriers\TrailerController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('trailer')->group(function () {

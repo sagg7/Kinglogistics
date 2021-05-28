@@ -172,9 +172,8 @@ class DriverController extends Controller
             'drivers.name as text',
         ])
             ->where("name", "LIKE", "%$request->search%")
-            /*->where("carrier_id", auth()->user()->id)
             ->whereNull("inactive")
-            ->with('truck.trailer:id,number')*/;
+            ->whereDoesntHave("truck");
 
         return $this->selectionData($query, $request->take, $request->page);
     }

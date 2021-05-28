@@ -18,6 +18,7 @@ class CreateLoadsTable extends Migration
             $table->unsignedBigInteger('load_type_id');
             $table->unsignedBigInteger('driver_id')->nullable();
             $table->unsignedBigInteger('shipper_id');
+            $table->unsignedBigInteger('load_log_id')->nullable();
             $table->date('date');
             $table->string('control_number');
             $table->string('origin');
@@ -39,6 +40,7 @@ class CreateLoadsTable extends Migration
             $table->foreign('load_type_id')->references('id')->on('load_types')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('driver_id')->references('id')->on('drivers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('shipper_id')->references('id')->on('shippers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('load_log_id')->references('id')->on('load_logs')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

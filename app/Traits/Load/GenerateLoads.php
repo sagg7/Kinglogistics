@@ -61,7 +61,8 @@ trait GenerateLoads
 
             $load->shipper_id = $data["shipper_id"];
             $load->load_type_id = $data["load_type_id"];
-            $load->driver_id = $data["driver_id"];
+            $load->driver_id = $data["driver_id"] ?? null;
+            $load->load_log_id = $data["load_log_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
             $load->control_number = $data["control_number"];
             $load->origin = $data["origin"];
