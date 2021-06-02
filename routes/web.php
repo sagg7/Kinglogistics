@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/trailers.php';
     require __DIR__.'/web/trailerTypes.php';
     require __DIR__.'/web/zones.php';
+    require __DIR__.'/web/paperwork.php';
 });
 
 require __DIR__.'/auth.php';

@@ -213,3 +213,18 @@ table.total-rows {
         font-size: 24px;
     }
 }
+
+.picker__table {
+    thead {
+        th {
+            padding: 0;
+            border: 0;
+        }
+    }
+    tbody {
+        td {
+            padding: 0;
+            border: 0;
+        }
+    }
+}

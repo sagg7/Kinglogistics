@@ -80,7 +80,7 @@ class IncidentController extends Controller
     private function storeUpdate(Request $request, $id = null): Incident
     {
         if ($id)
-            $incident = Incident::find($id);
+            $incident = Incident::findOrFail($id);
         else {
             $incident = new Incident();
             $incident->user_id = auth()->user()->id;
@@ -148,7 +148,7 @@ class IncidentController extends Controller
      */
     public function edit($id)
     {
-        $incident = Incident::find($id);
+        $incident = Incident::findOrFail($id);
         $params = compact('incident') + $this->createEditParams();
         return view('incidents.edit', $params);
     }
@@ -177,7 +177,7 @@ class IncidentController extends Controller
      */
     public function destroy($id)
     {
-        $incident = Incident::find($id);
+        $incident = Incident::findOrFail($id);
 
         if ($incident)
             return ['success' => $incident->delete()];

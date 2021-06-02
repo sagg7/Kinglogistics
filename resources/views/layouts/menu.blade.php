@@ -130,6 +130,21 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-folder-open"></i></i><span class="menu-title" data-i18n="User">Paperwork</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/paperwork/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/paperwork/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endif
             @if(auth()->guard('web')->check() || auth()->guard('shipper')->check())
                 <li class="nav-item has-sub">

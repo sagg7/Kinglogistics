@@ -168,7 +168,7 @@ class LoadController extends Controller
      */
     public function destroy(int $id)
     {
-        $load = Load::find($id);
+        $load = Load::findOrFail($id);
 
         if ($load)
             return ['success' => $load->delete()];

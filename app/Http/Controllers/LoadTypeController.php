@@ -54,7 +54,7 @@ class LoadTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): LoadType
     {
         if ($id)
-            $loadType = LoadType::find($id);
+            $loadType = LoadType::findOrFail($id);
         else {
             $loadType = new LoadType();
             $loadType->shipper_id = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper;
@@ -103,7 +103,7 @@ class LoadTypeController extends Controller
      */
     public function edit($id)
     {
-        $loadType = LoadType::find($id);
+        $loadType = LoadType::findOrFail($id);
         $params = compact('loadType');
         return view('loadTypes.edit', $params);
     }
@@ -134,7 +134,7 @@ class LoadTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $loadType = LoadType::find($id);
+        $loadType = LoadType::findOrFail($id);
 
         if ($loadType) {
             $message = '';

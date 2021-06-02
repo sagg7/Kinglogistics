@@ -22,8 +22,8 @@ class ShipperController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['string', 'email', 'max:255', "unique:shippers,email,$id,id"],
-            'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'email' => ['nullable', 'email', 'max:255', "unique:shippers,email,$id,id"],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'invoice_email' => ['nullable', 'string', 'email', 'max:255'],
         ]);
     }
@@ -56,7 +56,7 @@ class ShipperController extends Controller
     private function storeUpdate(Request $request, $id = null): Shipper
     {
         if ($id)
-            $shipper = Shipper::find($id);
+            $shipper = Shipper::findOrFail($id);
         else
             $shipper = new Shipper();
 
@@ -104,7 +104,7 @@ class ShipperController extends Controller
      */
     public function edit($id)
     {
-        $shipper = Shipper::find($id);
+        $shipper = Shipper::findOrFail($id);
         $params = compact('shipper');
         return view('shippers.edit', $params);
     }
@@ -133,7 +133,7 @@ class ShipperController extends Controller
      */
     public function destroy(int $id)
     {
-        $shipper = Shipper::find($id);
+        $shipper = Shipper::findOrFail($id);
 
         if ($shipper)
             return ['success' => $shipper->delete()];

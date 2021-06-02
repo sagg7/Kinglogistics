@@ -29,7 +29,7 @@ class NotificationController extends Controller
     private function storeUpdate(Request $request, $id = null): Notification
     {
         if ($id)
-            $notification = Notification::find($id);
+            $notification = Notification::findOrFail($id);
         else
             $notification = new Notification();
 
@@ -90,7 +90,7 @@ class NotificationController extends Controller
      */
     public function edit($id)
     {
-        $notification = Notification::find($id);
+        $notification = Notification::findOrFail($id);
         $params = compact('notification');
         return view('safety.notifications.edit', $params);
     }

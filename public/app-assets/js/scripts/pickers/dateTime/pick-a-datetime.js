@@ -107,9 +107,10 @@ const initPickadateEs = (e, properties = {}) => {
     });
 
     // Month and Year Select Picker
-    initPickadateEs($('.pickadate-months-year'), {
+    $('.pickadate-months-year').pickadate({
         selectYears: 250,
         selectMonths: true,
+        formatSubmit: 'yyyy/mm/dd',
     });
     //$('.pickadate-months-year').pickadate();
 

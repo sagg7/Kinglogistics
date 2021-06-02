@@ -8,6 +8,7 @@ use App\Models\Shipper;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DriverController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, DriverParams;
+    use GetSelectionData, GetSimpleSearchData, DriverParams, PaperworkFilesFunctions;
     /**
      * @param array $data
      * @param int|null $id
@@ -39,7 +40,7 @@ class DriverController extends Controller
     {
         return [
                 'shippers' => Shipper::skip(0)->take(15)->pluck('name', 'id'),
-            ] + $this->getTurnsArray();
+            ] + $this->getTurnsArray() + $this->getPaperworkByType('driver');
     }
 
     /**
@@ -72,7 +73,7 @@ class DriverController extends Controller
     {
         return DB::transaction(function ($q) use ($request, $id) {
             if ($id)
-                $driver = Driver::find($id);
+                $driver = Driver::findOrFail($id);
             else {
                 $driver = new Driver();
                 $driver->carrier_id = auth()->user()->id;
@@ -130,7 +131,10 @@ class DriverController extends Controller
         $driver = Driver::with(['zone:id,name'])
             ->find($id);
         $driver->shippers = $driver->shippers()->pluck('id')->toArray();
-        $params = compact('driver') + $this->createEditParams();
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
+        $params = compact('driver', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('subdomains.carriers.drivers.edit', $params);
     }
 

@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Paperwork;
+use App\Models\PaperworkFile;
+use App\Models\PaperworkTemplate;
 use App\Models\Trailer;
 use App\Models\TrailerType;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TrailerController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
 
     /**
      * @param array $data
@@ -38,7 +42,7 @@ class TrailerController extends Controller
         return [
             'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
             'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
-        ];
+        ] + $this->getPaperworkByType("trailer");
     }
 
     /**
@@ -70,7 +74,7 @@ class TrailerController extends Controller
     private function storeUpdate(Request $request, $id = null): Trailer
     {
         if ($id)
-            $trailer = Trailer::find($id);
+            $trailer = Trailer::findOrFail($id);
         else {
             $trailer = new Trailer();
             $trailer->status = 'available';
@@ -125,7 +129,10 @@ class TrailerController extends Controller
     {
         $trailer = Trailer::with('shipper:id,name')
             ->find($id);
-        $params = compact('trailer') + $this->createEditParams();
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $trailer->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $trailer->id);
+        $params = compact('trailer', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('trailers.edit', $params);
     }
 
@@ -153,7 +160,7 @@ class TrailerController extends Controller
      */
     public function destroy($id)
     {
-        $trailer = Trailer::find($id);
+        $trailer = Trailer::findOrFail($id);
 
         if ($trailer) {
             $message = '';

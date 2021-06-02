@@ -55,7 +55,7 @@ trait GenerateLoads
     {
         return DB::transaction(function () use ($data, $id) {
             if ($id)
-                $load = Load::find($id);
+                $load = Load::findOrFail($id);
             else
                 $load = new Load();
 
@@ -82,7 +82,7 @@ trait GenerateLoads
 
             if ($data["driver_id"]) {
                 // Delete driver from the available driver's lists
-                $availableDriver = AvailableDriver::find($data["driver_id"]);
+                $availableDriver = AvailableDriver::findOrFail($data["driver_id"]);
                 $availableDriver->delete();
             }
 

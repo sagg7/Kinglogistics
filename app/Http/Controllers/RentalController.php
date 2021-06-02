@@ -65,7 +65,7 @@ class RentalController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $rental = Rental::find($id);
+                $rental = Rental::findOrFail($id);
             else {
                 $rental = new Rental();
                 $rental->status = 'uninspected';
@@ -158,7 +158,7 @@ class RentalController extends Controller
      */
     public function destroy($id)
     {
-        $rental = Rental::find($id);
+        $rental = Rental::findOrFail($id);
 
         if ($rental) {
             return ['success' => $rental->delete()];
