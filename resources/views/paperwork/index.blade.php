@@ -17,7 +17,7 @@
                     options = pills.find('.nav-item'),
                     tableProperties = (type) => {
                         const typeFormatter = (params) => {
-                            return  `${params.value.replace(/^\w/, (c) => c.toUpperCase())}s`;
+                            return  params.value ? `${params.value.replace(/^\w/, (c) => c.toUpperCase())}s` : '';
                         };
                         const checkFormatter = (params) => {
                             return  params.value ? 'Yes' : 'No';
