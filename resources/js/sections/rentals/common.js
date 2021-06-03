@@ -29,7 +29,7 @@
         .on('select2:unselect', () => {
             carrier = null;
             driverSel.val('').trigger('change');
-            trailerSel.val('').trigger('change');
+            //trailerSel.val('').trigger('change');
             driverSel.prop('disabled', true).trigger('change');
         });
     driverSel.select2({
@@ -41,6 +41,7 @@
                     page: params.page || 1,
                     take: 15,
                     carrier,
+                    rental: 1,
                 };
             },
         },
@@ -48,14 +49,14 @@
         allowClear: true,
     })
         .on('select2:select', (res) => {
-            const driver = res.params.data,
+            /*const driver = res.params.data,
                 trailer = driver.truck.trailer;
             trailerSel.html(`<option value="${trailer.id}">${trailer.number}</option>`)
                 .val(`${trailer.id}`)
-                .trigger('change');
+                .trigger('change');*/
         })
         .on('select2:unselect', () => {
-            trailerSel.val('').trigger('change');
+            //trailerSel.val('').trigger('change');
         });
     trailerSel.select2({
         ajax: {
@@ -66,10 +67,12 @@
                     page: params.page || 1,
                     take: 15,
                     carrier,
+                    rental: 1,
                 };
             },
         },
         placeholder: 'Select',
         allowClear: true,
     });
+    driverSel.prop('disabled', true);
 })();

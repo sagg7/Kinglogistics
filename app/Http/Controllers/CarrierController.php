@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
+use App\Models\Paperwork;
+use App\Models\PaperworkFile;
+use App\Models\PaperworkTemplate;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class CarrierController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, crudMessage;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions, crudMessage;
     /**
      * @param array $data
      * @param int|null $id
@@ -34,6 +38,14 @@ class CarrierController extends Controller
     }
 
     /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return $this->getPaperworkByType("carrier");
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -50,7 +62,8 @@ class CarrierController extends Controller
      */
     public function create()
     {
-        return view('carriers.create');
+        $params = $this->createEditParams();
+        return view('carriers.create', $params);
     }
 
     /**
@@ -61,7 +74,7 @@ class CarrierController extends Controller
     private function storeUpdate(Request $request, $id = null): Carrier
     {
         if ($id)
-            $carrier = Carrier::find($id);
+            $carrier = Carrier::findOrFail($id);
         else
             $carrier = new Carrier();
 
@@ -115,7 +128,10 @@ class CarrierController extends Controller
     public function edit($id)
     {
         $carrier = Carrier::findOrFail($id);
-        $params = compact('carrier');
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $carrier->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $carrier->id);
+        $params = compact('carrier', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('carriers.edit', $params);
     }
 
@@ -143,7 +159,7 @@ class CarrierController extends Controller
      */
     public function destroy($id)
     {
-        $carrier = Carrier::find($id);
+        $carrier = Carrier::findOrFail($id);
 
         if ($carrier) {
             $message = '';

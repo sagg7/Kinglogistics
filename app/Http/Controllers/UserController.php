@@ -64,7 +64,7 @@ class UserController extends Controller
     private function storeUpdate(Request $request, $id = null): User
     {
         if ($id)
-            $user = User::find($id);
+            $user = User::findOrFail($id);
         else
             $user = new User();
 
@@ -143,7 +143,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
         if ($user) {
             return ['success' => $user->delete()];

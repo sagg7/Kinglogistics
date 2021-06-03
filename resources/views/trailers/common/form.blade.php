@@ -7,7 +7,7 @@
                     <div class="input-group">
                         {!! Form::select('trailer_type_id', $trailer_types, $trailer->trailer_type_id ?? null, ['class' => 'form-control' . ($errors->first('trailer_type_id') ? ' is-invalid' : '')]) !!}
                         <div class="input-group-append">
-                            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#addTrailerType"><i class="fas fa-plus"></i></button>
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addTrailerType"><i class="fas fa-plus"></i></button>
                         </div>
                         @error('trailer_type_id')
                         <span class="invalid-feedback" role="alert">
@@ -15,6 +15,15 @@
                         </span>
                         @enderror
                     </div>
+                </div>
+                <div class="col-md-6">
+                    {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('shipper_id', [], $trailer->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+                    @error('shipper_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
                 </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('number', ucfirst(__('number')), ['class' => 'col-form-label']) !!}
@@ -43,7 +52,7 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-6">
+                <!--<div class="form-group col-md-6">
                     {!! Form::label('status', ucfirst(__('status')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('status', $statuses, $trailer->status ?? null, ['class' => 'form-control select2' . ($errors->first('status') ? ' is-invalid' : '')]) !!}
                     @error('status')
@@ -51,7 +60,7 @@
                         <strong>{{ ucfirst($message) }}</strong>
                     </span>
                     @enderror
-                </div>
+                </div>-->
                 <div class="form-group col-md-6">
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}

@@ -1,4 +1,4 @@
 window._ = require('lodash');
 window.numeral = require('numeral');
-window.moment = require('moment');
+window.moment = require('moment-timezone');
 window.SignaturePad = require('signature_pad').default;

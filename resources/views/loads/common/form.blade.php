@@ -2,12 +2,47 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
+                @if(!isset($load))
+                    <div class="form-group col-md-3">
+                        {!! Form::label('load_number', ucfirst(__('Number of loads')), ['class' => 'col-form-label']) !!}
+                        {!! Form::text('load_number', $load->load_number ?? null, ['class' => 'form-control' . ($errors->first('load_number') ? ' is-invalid' : '')]) !!}
+                        @error('load_number')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                @else
+                    <div class="form-group col-md-3">
+                        {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
+                        {!! Form::text('driver', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
+                        @error('driver')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                @endif
+                @if(auth()->guard('web')->check())
+                <div class="form-group col-md-3">
+                    {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('shipper_id', $shippers, $load->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+                    @error('shipper_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                @endif
+            </div>
+            <hr>
+            <div class="row">
                 <div class="form-group col-md-3">
                     {!! Form::label('load_type_id', ucfirst(__('load type')), ['class' => 'col-form-label']) !!}
                     <div class="input-group">
-                        {!! Form::select('load_type_id', $load_types, $load->load_type_id ?? null, ['class' => 'form-control' . ($errors->first('load_type_id') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('load_type_id', [], $load->load_type_id ?? null, ['class' => 'form-control' . ($errors->first('load_type_id') ? ' is-invalid' : '')]) !!}
                         <div class="input-group-append">
-                            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#addTrailerType"><i class="fas fa-plus"></i></button>
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addLoadType"><i class="fas fa-plus"></i></button>
                         </div>
                         @error('load_type_id')
                         <span class="invalid-feedback" role="alert">
@@ -36,20 +71,42 @@
                 </div>
                 <div class="form-group col-md-3">
                     {!! Form::label('origin', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('origin', $load->origin ?? null, ['class' => 'form-control' . ($errors->first('origin') ? ' is-invalid' : '')]) !!}
-                    @error('origin')
+                    <div class="input-group">
+                        {!! Form::text('origin', $load->origin ?? null, ['class' => 'form-control' . ($errors->first('origin') ? ' is-invalid' : '')]) !!}
+                        <div class="input-group-append">
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addOrigin"><i class="fas fa-map-marker-alt"></i></button>
+                        </div>
+                        @error('origin')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    {!! Form::hidden('origin_coords', $load->origin_coords ?? null, ['class' => 'form-control' . ($errors->first('origin_coords') ? ' is-invalid' : '')]) !!}
+                    @error('origin_coords')
                     <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
                     @enderror
                 </div>
                 <div class="form-group col-md-3">
                     {!! Form::label('destination', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('destination', $load->destination ?? null, ['class' => 'form-control' . ($errors->first('destination') ? ' is-invalid' : '')]) !!}
-                    @error('destination')
+                    <div class="input-group">
+                        {!! Form::text('destination', $load->destination ?? null, ['class' => 'form-control' . ($errors->first('destination') ? ' is-invalid' : '')]) !!}
+                        <div class="input-group-append">
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addDestination"><i class="fas fa-map-marker-alt"></i></button>
+                        </div>
+                        @error('destination')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    {!! Form::hidden('destination_coords', $load->destination_coords ?? null, ['class' => 'form-control' . ($errors->first('destination_coords') ? ' is-invalid' : '')]) !!}
+                    @error('destination_coords')
                     <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
                     @enderror
                 </div>
                 <div class="form-group col-md-3">
@@ -89,17 +146,8 @@
                     @enderror
                 </div>
             </div>
-            <hr>
+            <!--<hr>
             <div class="row">
-                <div class="form-group col-md-3">
-                    {!! Form::label('sand_type', ucfirst(__('sand type')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('sand_type', $load->sand_type ?? null, ['class' => 'form-control' . ($errors->first('sand_type') ? ' is-invalid' : '')]) !!}
-                    @error('sand_type')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
-                </div>
                 <div class="form-group col-md-3">
                     {!! Form::label('weight', ucfirst(__('weight')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('weight', $load->weight ?? null, ['class' => 'form-control' . ($errors->first('weight') ? ' is-invalid' : '')]) !!}
@@ -136,7 +184,7 @@
                     </span>
                     @enderror
                 </div>
-            </div>
+            </div>-->
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->

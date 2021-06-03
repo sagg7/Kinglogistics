@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\IncidentExport;
 use App\Models\Incident;
 use App\Models\IncidentType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -81,7 +80,7 @@ class IncidentController extends Controller
     private function storeUpdate(Request $request, $id = null): Incident
     {
         if ($id)
-            $incident = Incident::find($id);
+            $incident = Incident::findOrFail($id);
         else {
             $incident = new Incident();
             $incident->user_id = auth()->user()->id;
@@ -149,7 +148,7 @@ class IncidentController extends Controller
      */
     public function edit($id)
     {
-        $incident = Incident::find($id);
+        $incident = Incident::findOrFail($id);
         $params = compact('incident') + $this->createEditParams();
         return view('incidents.edit', $params);
     }
@@ -178,7 +177,7 @@ class IncidentController extends Controller
      */
     public function destroy($id)
     {
-        $incident = Incident::find($id);
+        $incident = Incident::findOrFail($id);
 
         if ($incident)
             return ['success' => $incident->delete()];

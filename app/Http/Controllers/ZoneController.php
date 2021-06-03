@@ -53,7 +53,7 @@ class ZoneController extends Controller
     private function storeUpdate(Request $request, $id = null): Zone
     {
         if ($id)
-            $zone = Zone::find($id);
+            $zone = Zone::findOrFail($id);
         else
             $zone = new Zone();
 
@@ -97,7 +97,7 @@ class ZoneController extends Controller
      */
     public function edit($id)
     {
-        $zone = Zone::find($id);
+        $zone = Zone::findOrFail($id);
         $params = compact('zone');
         return view('zones.edit', $params);
     }
@@ -126,7 +126,7 @@ class ZoneController extends Controller
      */
     public function destroy($id)
     {
-        $zone = Zone::find($id);
+        $zone = Zone::findOrFail($id);
 
         if ($zone) {
             $message = '';

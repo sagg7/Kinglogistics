@@ -56,6 +56,19 @@
                     </span>
                     @enderror
                 </div>
+                <hr>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('shippers[]', $shippers, $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
+                    @error('shippers')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 <div class="form-group col-md-6">
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}

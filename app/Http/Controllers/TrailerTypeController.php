@@ -53,7 +53,7 @@ class TrailerTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): TrailerType
     {
         if ($id)
-            $trailerType = TrailerType::find($id);
+            $trailerType = TrailerType::findOrFail($id);
         else
             $trailerType = new TrailerType();
 
@@ -100,7 +100,7 @@ class TrailerTypeController extends Controller
      */
     public function edit($id)
     {
-        $trailerType = TrailerType::find($id);
+        $trailerType = TrailerType::findOrFail($id);
         $params = compact('trailerType');
         return view('trailerTypes.edit', $params);
     }
@@ -131,7 +131,7 @@ class TrailerTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $trailerType = TrailerType::find($id);
+        $trailerType = TrailerType::findOrFail($id);
 
         if ($trailerType) {
             $message = '';

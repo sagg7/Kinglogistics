@@ -2,6 +2,7 @@
 
 namespace App\Traits\Storage;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -51,6 +52,21 @@ trait FileUpload
 
         return "storage/$filepath";
     }
+
+    /**
+     * @param $file
+     * @param string $path
+     * @return string
+     */
+    public function uploadFile($file, string $path): string
+    {
+        $originalPath = $path;
+        $path = "public/$path";
+        $name = $file->getClientOriginalName();
+        Storage::putFileAS($path, $file, $name);
+        return "storage/$originalPath/$name";
+    }
+
 
     private function deleteDirectory(string $path)
     {

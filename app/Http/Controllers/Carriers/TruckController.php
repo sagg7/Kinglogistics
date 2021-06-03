@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Truck;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TruckController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
 
     /**
      * @param array $data
@@ -37,6 +38,7 @@ class TruckController extends Controller
      */
     private function createEditParams(): array
     {
+        return $this->getPaperworkByType('truck');
     }
 
     /**
@@ -67,7 +69,7 @@ class TruckController extends Controller
     private function storeUpdate(Request $request, $id = null): Truck
     {
         if ($id)
-            $truck = Truck::find($id);
+            $truck = Truck::findOrFail($id);
         else {
             $truck = new Truck();
             $truck->carrier_id = auth()->user()->id;
@@ -122,7 +124,10 @@ class TruckController extends Controller
     public function edit($id)
     {
         $truck = Truck::with(['driver:id,name', 'trailer:id,number'])->find($id);
-        $params = compact('truck');
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $truck->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $truck->id);
+        $params = compact('truck', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('subdomains.carriers.trucks.edit', $params);
     }
 
@@ -150,7 +155,7 @@ class TruckController extends Controller
      */
     public function destroy($id)
     {
-        $truck = Truck::find($id);
+        $truck = Truck::findOrFail($id);
 
         if ($truck) {
             $message = '';

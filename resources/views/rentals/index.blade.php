@@ -10,19 +10,13 @@
         <script defer>
             var tbAG = null;
             (() => {
-                const carrierFormatter = (params) => {
+                const nameFormatter = (params) => {
                     if (params.value)
                         return params.value.name;
                     else
                         return '';
                 };
-                const driverFormatter = (params) => {
-                    if (params.value)
-                        return params.value.name;
-                    else
-                        return '';
-                };
-                const trailerFormatter = (params) => {
+                const numberFormatter = (params) => {
                     if (params.value)
                         return params.value.number;
                     else
@@ -44,9 +38,9 @@
                     columns: [
                         //{headerName: 'Fecha', field: 'date'},
                         {headerName: 'Date', field: 'date'},
-                        {headerName: 'Carrier', field: 'carrier', valueFormatter: carrierFormatter},
-                        {headerName: 'Driver', field: 'driver', valueFormatter: driverFormatter},
-                        {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
+                        {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                        {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
+                        {headerName: 'Trailer', field: 'trailer', valueFormatter: numberFormatter},
                         {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
                         {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
                         {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},

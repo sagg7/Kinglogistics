@@ -14,6 +14,8 @@ Route::prefix('shipper')->group(function () {
         ->name('shipper.search');
     Route::get('selection', [ShipperController::class, 'selection'])
         ->name('shipper.selection');
+    Route::get('selection', [ShipperController::class, 'selection'])
+        ->name('shipper.selection');
     Route::get('edit/{id}', [ShipperController::class, 'edit'])
         ->name('shipper.edit');
     Route::post('update/{id}', [ShipperController::class, 'update'])

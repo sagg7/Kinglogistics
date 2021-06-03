@@ -25,159 +25,193 @@
                 </a>
             </li>
             @if(auth()->guard('web')->check())
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-file-alt"></i><span class="menu-title" data-i18n="User">Rentals</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/rental/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/rental/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Users</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/user/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/user/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-shipping-fast"></i><span class="menu-title" data-i18n="User">Shippers</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/shipper/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/shipper/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-dolly-flatbed"></i><span class="menu-title" data-i18n="User">Carriers</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/carrier/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/carrier/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/trailer/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/trailer/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <!--<li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Trailer Types</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/trailerType/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/trailerType/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>-->
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-atlas"></i><span class="menu-title" data-i18n="User">Zones</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/zone/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/zone/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="navigation-header">
-                <span>Safety</span>
-            </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/incident/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/incident/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <!--<li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Incident Types</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/incidentType/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/incidentType/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>-->
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-envelope-open-text"></i><span class="menu-title" data-i18n="User">Messages</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/notification/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/notification/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-file-alt"></i><span class="menu-title" data-i18n="User">Rentals</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/rental/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/rental/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Users</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/user/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/user/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-shipping-fast"></i><span class="menu-title" data-i18n="User">Shippers</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/shipper/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/shipper/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-dolly-flatbed"></i><span class="menu-title" data-i18n="User">Carriers</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/carrier/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/carrier/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/trailer/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/trailer/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!--<li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Trailer Types</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/trailerType/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/trailerType/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>-->
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-atlas"></i><span class="menu-title" data-i18n="User">Zones</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/zone/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/zone/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-folder-open"></i></i><span class="menu-title" data-i18n="User">Paperwork</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/paperwork/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/paperwork/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+            @if(auth()->guard('web')->check() || auth()->guard('shipper')->check())
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title" data-i18n="User">Loads</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/load/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/load/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+            @if(auth()->guard('web')->check())
+                <li class="navigation-header">
+                    <span>Safety</span>
+                </li>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/incident/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/incident/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!--<li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Incident Types</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/incidentType/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/incidentType/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>-->
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-envelope-open-text"></i><span class="menu-title" data-i18n="User">Messages</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/notification/create">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/notification/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endif
             @if(auth()->guard('carrier')->check())
                 <li class="nav-item has-sub">
@@ -205,23 +239,6 @@
                         </li>
                         <li>
                             <a href="/driver/index">
-                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            @endif
-            @if(auth()->guard('web')->check() || auth()->guard('shipper')->check())
-                <li class="nav-item has-sub">
-                    <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title" data-i18n="User">Loads</span></a>
-                    <ul class="menu-content">
-                        <li>
-                            <a href="/load/create">
-                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/load/index">
                                 <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                             </a>
                         </li>

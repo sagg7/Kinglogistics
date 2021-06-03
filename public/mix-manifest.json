@@ -1,7 +1,4 @@
 {
-    "/js/bootstrap.js": "/js/bootstrap.js",
-    "/css/bootstrap.css": "/css/bootstrap.css",
     "/css/app.css": "/css/app.css",
-    "/js/sections/rentals/common.min.js": "/js/sections/rentals/common.min.js",
-    "/js/sections/incidents/common.min.js": "/js/sections/incidents/common.min.js"
+    "/js/sections/paperwork/common.min.js": "/js/sections/paperwork/common.min.js"
 }

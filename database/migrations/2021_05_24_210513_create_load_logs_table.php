@@ -15,13 +15,10 @@ class CreateLoadLogsTable extends Migration
     {
         Schema::create('load_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('load_id');
             $table->unsignedBigInteger('user_id')->comment('Referencia al usuario o shipper que creo la orden de loads');
             $table->unsignedInteger('quantity');
             $table->enum('type', ['shipper', 'user']);
             $table->timestamps();
-
-            $table->foreign('load_id')->references('id')->on('loads')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

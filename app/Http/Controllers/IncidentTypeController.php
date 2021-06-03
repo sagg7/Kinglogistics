@@ -55,7 +55,7 @@ class IncidentTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): IncidentType
     {
         if ($id)
-            $incidentType = IncidentType::find($id);
+            $incidentType = IncidentType::findOrFail($id);
         else
             $incidentType = new IncidentType();
 
@@ -105,7 +105,7 @@ class IncidentTypeController extends Controller
      */
     public function edit($id)
     {
-        $incidentType = IncidentType::find($id);
+        $incidentType = IncidentType::findOrFail($id);
         $params = compact('incidentType');
         return view('incidentTypes.edit', $params);
     }
@@ -137,7 +137,7 @@ class IncidentTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $incidentType = IncidentType::find($id);
+        $incidentType = IncidentType::findOrFail($id);
 
         if ($incidentType) {
             $message = '';

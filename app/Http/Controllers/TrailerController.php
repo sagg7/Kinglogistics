@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Paperwork;
+use App\Models\PaperworkFile;
+use App\Models\PaperworkTemplate;
 use App\Models\Trailer;
 use App\Models\TrailerType;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TrailerController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
 
     /**
      * @param array $data
@@ -22,10 +26,11 @@ class TrailerController extends Controller
     {
         return Validator::make($data, [
             'trailer_type_id' => ['required', 'exists:trailer_types,id'],
+            'shipper_id' => ['nullable', 'exists:shippers,id'],
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
-            'status' => ['required'],
+            //'status' => ['required'],
         ]);
     }
 
@@ -37,7 +42,7 @@ class TrailerController extends Controller
         return [
             'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
             'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
-        ];
+        ] + $this->getPaperworkByType("trailer");
     }
 
     /**
@@ -69,18 +74,19 @@ class TrailerController extends Controller
     private function storeUpdate(Request $request, $id = null): Trailer
     {
         if ($id)
-            $trailer = Trailer::find($id);
+            $trailer = Trailer::findOrFail($id);
         else {
             $trailer = new Trailer();
+            $trailer->status = 'available';
             if (false && auth()->guard('carrier')->check())
                 $trailer->carrier_id = auth()->user()->id;
         }
 
         $trailer->trailer_type_id = $request->trailer_type_id;
+        $trailer->shipper_id = $request->shipper_id;
         $trailer->number = $request->number;
         $trailer->plate = $request->plate;
         $trailer->vin = $request->vin;
-        $trailer->status = $request->status;
         $trailer->inactive = $request->inactive ?? null;;
         $trailer->save();
 
@@ -121,8 +127,12 @@ class TrailerController extends Controller
      */
     public function edit($id)
     {
-        $trailer = Trailer::find($id);
-        $params = compact('trailer') + $this->createEditParams();
+        $trailer = Trailer::with('shipper:id,name')
+            ->find($id);
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $trailer->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $trailer->id);
+        $params = compact('trailer', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('trailers.edit', $params);
     }
 
@@ -150,7 +160,7 @@ class TrailerController extends Controller
      */
     public function destroy($id)
     {
-        $trailer = Trailer::find($id);
+        $trailer = Trailer::findOrFail($id);
 
         if ($trailer) {
             $message = '';
@@ -181,6 +191,10 @@ class TrailerController extends Controller
                         $s->where("driver_id", $request->driver);
                     });
             })*/
+            ->where(function ($q) use ($request) {
+                if ($request->rental)
+                    $q->where('status', 'available');
+            })
             ->whereNull("inactive");
 
         return $this->selectionData($query, $request->take, $request->page);

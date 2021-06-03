@@ -16,8 +16,9 @@ class CreateLoadsTable extends Migration
         Schema::create('loads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('load_type_id');
-            $table->unsignedBigInteger('driver_id');
+            $table->unsignedBigInteger('driver_id')->nullable();
             $table->unsignedBigInteger('shipper_id');
+            $table->unsignedBigInteger('load_log_id')->nullable();
             $table->date('date');
             $table->string('control_number');
             $table->string('origin');
@@ -27,19 +28,19 @@ class CreateLoadsTable extends Migration
             $table->string('customer_name');
             $table->string('customer_po');
             $table->string('customer_reference');
-            $table->string('sand_type')->nullable();
             $table->string('tons')->nullable();
             $table->string('silo_number')->nullable();
             $table->string('container')->nullable();
             $table->double('weight')->nullable();
             $table->double('mileage')->nullable();
-            $table->enum('status', ['sent', 'accepted', 'loading', 'to_location', 'arrived', 'unloading', 'finished']);
+            $table->enum('status', ['unallocated', 'requested', 'accepted', 'loading', 'to_location', 'arrived', 'unloading', 'finished']);
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('load_type_id')->references('id')->on('load_types')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('driver_id')->references('id')->on('drivers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('shipper_id')->references('id')->on('shippers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('load_log_id')->references('id')->on('load_logs')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

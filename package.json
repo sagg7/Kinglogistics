@@ -27,6 +27,7 @@
         "@fortawesome/fontawesome-free": "^5.15.3",
         "laravel-mix": "^6.0.19",
         "moment": "^2.29.1",
+        "moment-timezone": "^0.5.33",
         "numeral": "^2.0.6",
         "signature_pad": "^3.0.0-beta.4"
     }
