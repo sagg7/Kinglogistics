@@ -24,8 +24,10 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="pane-paperwork" aria-labelledby="pane-paperwork"
              aria-expanded="true">
+            @include('common.paperwork.filesTemplates', ['related_id' => $driver->id])
+            <hr>
             {!! Form::open(['route' => ['paperwork.storeFiles'], 'method' => 'post', 'class' => 'form form-vertical']) !!}
-            @include('common.filesUploads', ['related_id' => $driver->id, 'type' => 'driver'])
+            @include('common.paperwork.filesUploads', ['related_id' => $driver->id, 'type' => 'driver'])
             {!! Form::close() !!}
         </div>
     @endcomponent

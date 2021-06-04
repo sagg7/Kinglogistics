@@ -3,13 +3,15 @@
 
     <table class="table" id="file-uploads">
         <colgroup>
+            <col style="width: 3%;">
             <col style="width: 15%;">
-            <col style="width: 28.333%;">
-            <col style="width: 28.333%;">
-            <col style="width: 28.333%;">
+            <col style="width: 27.333%;">
+            <col style="width: 27.333%;">
+            <col style="width: 27.333%;">
         </colgroup>
         <thead>
         <tr>
+            <th>Status</th>
             <th>Name</th>
             <th>Upload</th>
             <th>File</th>
@@ -19,6 +21,7 @@
         <tbody>
         @foreach($filesUploads as $i => $file)
             <tr data-file="{{ $file->id }}">
+                <td><i class="feather @isset($paperworkUploads[$file->id]){{ 'icon-check-circle text-success' }}@elseif($file->required){{ 'icon-x-circle text-danger' }}@else{{ 'icon-alert-circle text-warning' }}@endisset"></i></td>
                 <td>{{ $file->name }}</td>
                 <td>
                     <div class="file-group">

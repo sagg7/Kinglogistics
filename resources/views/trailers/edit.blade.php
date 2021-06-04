@@ -30,8 +30,10 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="pane-paperwork" aria-labelledby="pane-paperwork"
              aria-expanded="true">
+            @include('common.paperwork.filesTemplates', ['related_id' => $trailer->id])
+            <hr>
             {!! Form::open(['route' => ['paperwork.storeFiles'], 'method' => 'post', 'class' => 'form form-vertical']) !!}
-            @include('common.filesUploads', ['related_id' => $trailer->id, 'type' => 'trailer'])
+            @include('common.paperwork.filesUploads', ['related_id' => $trailer->id, 'type' => 'trailer'])
             {!! Form::close() !!}
         </div>
     @endcomponent

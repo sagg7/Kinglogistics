@@ -22,7 +22,7 @@ trait PaperworkFilesFunctions
             'filesTemplates' => Paperwork::whereNotNull('template')
                 ->where('type', $type)
                 ->orderBy('required', 'DESC')
-                ->get(),
+                ->get(['id', 'name', 'required']),
         ];
     }
 
@@ -45,7 +45,7 @@ trait PaperworkFilesFunctions
             $ids[] = $item->id;
         return PaperworkTemplate::whereIn('paperwork_id', $ids)
             ->where('related_id', $related_id)
-            ->get()
+            ->get(['id', 'paperwork_id'])
             ->keyBy('paperwork_id')
             ->toArray();
     }

@@ -247,7 +247,8 @@ class IncidentController extends Controller
 
         $mpdf = new Mpdf();
         $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
-        $html = view('exports.incidents.pdf', compact('incident'));
+        $title = "Violation Report Form";
+        $html = view('exports.incidents.pdf', compact('title', 'incident'));
         $mpdf->AddPage('', // L - landscape, P - portrait
             '', '', '', '',
             5, // margin_left

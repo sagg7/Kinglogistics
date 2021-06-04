@@ -1,4 +1,5 @@
 <x-pdf-layout>
+    <x-slot name="title">{{ $title }}</x-slot>
     <h1 class="text-center mb-1">Violations Report Form</h1>
     <h3 class="mb-4"><strong style="font-weight: bold;">Reported by:</strong> {{ $incident['user']['name'] }}</h3>
     <div>
@@ -70,7 +71,7 @@
         </table>
     </div>
     <div>
-        <table class="table table-primary text-center w-50">
+        <table class="table table-primary text-center w-100">
             <thead>
             </thead>
             <tbody>
