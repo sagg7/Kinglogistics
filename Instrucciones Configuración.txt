@@ -8,8 +8,8 @@ SESSION_DRIVER=database
 
 Agregar las siguientes variables
 ROUTE_BASE=king.test    #Nombre del dominio local
-ROUTE_CLIENTS=shippers  #Subdominio configurado para Shippers
-ROUTE_CLIENTS=carriers  #Subdominio configurado para Carriers
+ROUTE_SHIPPERS=shippers  #Subdominio configurado para Shippers
+ROUTE_CARRIERS=carriers  #Subdominio configurado para Carriers
 
 *Configurar los accesos correpondientes a la BD
 

@@ -26,7 +26,7 @@ class AuthenticatedSessionController extends Controller
      */
     private function getGuard(): string
     {
-        $subdomain = explode('.', Route::getCurrentRoute()->getDomain())[0];
+        $subdomain = explode('.', request()->getHost())[0];
         switch ($subdomain) {
             case env('ROUTE_SHIPPERS'):
                 $guard = 'shipper';
