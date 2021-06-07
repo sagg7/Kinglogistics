@@ -6,6 +6,10 @@
         <script src="{{ asset('js/sections/incidents/common.min.js') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
         <script>
+            const canvases = [
+                {canvas: document.getElementById('safety_signature'), required: true},
+                {canvas: document.getElementById('driver_signature')},
+            ];
             (() => {
                 $("#carrier_id")
                     .html(`<option value="{{ $incident->carrier_id }}">{{ $incident->carrier->name }}</option>`)
@@ -26,6 +30,7 @@
                     .trigger('change');
             })();
         </script>
+        <script src="{{ asset('js/common/initSignature.min.js') }}"></script>
     @endsection
 
     @section('modals')

@@ -50,7 +50,10 @@
     </head>
     <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
     @include('layouts.header')
-    @include('layouts.menu')
+    @if(auth()->guard('carrier')->check())@include('layouts.subdomains.carriers.menu')@endif
+    @if(auth()->guard('web')->check())@include('layouts.menu')@endif
+    @if(auth()->guard('shipper')->check())@include('layouts.subdomains.shippers.menu')@endif
+    @if(auth()->guard('driver')->check())@include('layouts.subdomains.drivers.menu')@endif
     @yield('modals')
     <div class="app-content content">
         <div class="content-wrapper">

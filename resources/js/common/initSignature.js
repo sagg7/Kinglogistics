@@ -18,9 +18,13 @@
         sigPad.clear();
     };
     let sigPadArr = [];
-    canvases.forEach((canvas) => {
-        const sigPad = new SignaturePad(canvas),
-            btn = canvas.parentNode.querySelector("button"),
+    canvases.forEach((item) => {
+        const required = item.required ? item.required : false,
+            canvas = item.canvas,
+            sigPad = new SignaturePad(canvas),
+            parent = canvas.parentNode,
+            btn = parent.querySelector("button"),
+            label = parent.parentNode.querySelector("label").innerText,
             input = document.createElement("input");
 
         btn.addEventListener("click", (e) => {
@@ -32,7 +36,7 @@
 
         canvas.parentNode.insertBefore(input, canvas.nextSibling);
 
-        sigPadArr.push({signaturePad: sigPad, input});
+        sigPadArr.push({signaturePad: sigPad, input, required, label});
         window.onresize = () => {
             resizeCanvas(canvas, sigPad);
         };
@@ -40,7 +44,11 @@
 
     $('form').submit((e) => {
         sigPadArr.forEach((obj) => {
-            obj.input.value = obj.signaturePad.toDataURL();
+            if (obj.required && obj.signaturePad.isEmpty()) {
+                throwErrorMsg(`The ${obj.label} is required`);
+                e.preventDefault();
+            } else
+                obj.input.value = obj.signaturePad.toDataURL();
         });
     });
 })();

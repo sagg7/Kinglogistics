@@ -317,7 +317,10 @@ class PaperworkController extends Controller
             $template->filled_template = json_encode($template_filled);
             $template->save();
 
-            return redirect()->route("$paperwork->type.index");
+            if (auth()->guard('web')->check())
+                return redirect()->route('driver.profile');
+            else
+                return redirect()->route("$paperwork->type.index");
         });
     }
 

@@ -51,6 +51,11 @@ return [
             'provider' => 'carriers',
         ],
 
+        'driver' => [
+            'driver' => 'session',
+            'provider' => 'drivers',
+        ],
+
         'api' => [
             'driver' => 'token',
             'provider' => 'users',
@@ -89,6 +94,11 @@ return [
         'carriers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Carrier::class,
+        ],
+
+        'drivers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Driver::class,
         ],
 
         // 'users' => [
@@ -130,6 +140,13 @@ return [
         'carriers' => [
             'provider' => 'carriers',
             'table' => 'carrier_password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'drivers' => [
+            'provider' => 'drivers',
+            //'table' => 'carrier_password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],

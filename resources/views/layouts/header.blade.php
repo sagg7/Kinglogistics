@@ -40,7 +40,7 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fa fa-power-off"></i> Salir</a>
+                                <i class="fa fa-power-off"></i> Logout</a>
                         </div>
                     </li>
                 </ul>

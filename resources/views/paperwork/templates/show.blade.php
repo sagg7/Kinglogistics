@@ -13,7 +13,7 @@
             <script>
                 const canvases = [
                     @foreach($data["canvases"] as $canvas)
-                    document.getElementById('{{ $canvas }}'),
+                    {canvas: document.getElementById('{{ $canvas }}'), required: true},
                     @endforeach
                 ];
             </script>

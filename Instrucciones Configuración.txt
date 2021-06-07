@@ -10,6 +10,7 @@ Agregar las siguientes variables
 ROUTE_BASE=king.test    #Nombre del dominio local
 ROUTE_SHIPPERS=shippers  #Subdominio configurado para Shippers
 ROUTE_CARRIERS=carriers  #Subdominio configurado para Carriers
+ROUTE_DRIVERS=drivers  #Subdominio configurado para Drivers
 
 *Configurar los accesos correpondientes a la BD
 
