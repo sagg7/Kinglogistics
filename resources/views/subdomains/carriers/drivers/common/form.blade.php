@@ -2,6 +2,7 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
+                @if(auth()->guard('carrier')->check())
                 <div class="form-group col-md-6">
                     {!! Form::label('turn_id', ucfirst(__('turn')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('turn_id', $turns, $driver->turn_id ?? null, ['class' => 'form-control select2' . ($errors->first('turn_id') ? ' is-invalid' : '')]) !!}
@@ -20,6 +21,7 @@
                     </span>
                     @enderror
                 </div>
+                @endif
                 <div class="form-group col-md-6">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('name', $driver->name ?? null, ['class' => 'form-control' . ($errors->first('name') ? ' is-invalid' : '')]) !!}
@@ -58,17 +60,9 @@
                 </div>
                 <hr>
             </div>
+            @if(auth()->guard('carrier')->check())
             <hr>
             <div class="row">
-                <div class="form-group col-md-6">
-                    {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('shippers[]', $shippers, $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
-                    @error('shippers')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
-                </div>
                 <div class="form-group col-md-6">
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}
@@ -83,6 +77,7 @@
                     </fieldset>
                 </div>
             </div>
+            @endif
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->

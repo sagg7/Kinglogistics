@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Carriers\DriverController;
 use App\Http\Controllers\Drivers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,8 +29,12 @@ Route::middleware('auth:driver')->group(function () {
     })
         ->name('dashboard');
 
-    Route::get('profile', [ProfileController::class, 'profile'])
-        ->name('driver.profile');
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'profile'])
+            ->name('driver.profile');
+        Route::post('update/{id}', [DriverController::class, 'update'])
+            ->name('profile.update');
+    });
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

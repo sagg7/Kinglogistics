@@ -141,17 +141,22 @@ class DriverController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @param bool $profile
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id, bool $profile = false)
     {
         $this->validator($request->all(), $id)->validate();
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('driver.index');
+        if ($profile)
+            return redirect()->route('driver.profile');
+        else
+            return redirect()->route('driver.index');
     }
 
     /**

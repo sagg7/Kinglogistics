@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\Carriers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:carrier')->group(function () {
@@ -30,6 +32,15 @@ Route::middleware('auth:carrier')->group(function () {
         return view('subdomains.carriers.dashboard');
     })
         ->name('dashboard');
+
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'profile'])
+            ->name('driver.profile');
+        Route::post('update/{id}', [CarrierController::class, 'update'])
+            ->name('profile.update');
+    });
+
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

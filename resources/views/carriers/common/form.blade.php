@@ -86,6 +86,7 @@
                     </span>
                     @enderror
                 </div>
+                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-6">
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}
@@ -99,6 +100,7 @@
                         </div>
                     </fieldset>
                 </div>
+                @endif
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

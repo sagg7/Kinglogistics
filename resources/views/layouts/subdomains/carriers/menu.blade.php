@@ -24,6 +24,9 @@
                     <span class="menu-title" data-i18n="Dashboard">Home</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="/profile"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Profile</span></a>
+            </li>
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
                 <ul class="menu-content">
