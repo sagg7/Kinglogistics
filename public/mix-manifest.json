@@ -1,4 +1,4 @@
 {
-    "/js/common/initSignature.min.js": "/js/common/initSignature.min.js",
-    "/css/app.css": "/css/app.css"
+    "/css/app.css": "/css/app.css",
+    "/js/sections/notifications/common.min.js": "/js/sections/notifications/common.min.js"
 }

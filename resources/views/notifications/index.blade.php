@@ -13,9 +13,10 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Title', field: 'title'},
-                        {headerName: 'Preview', field: 'preview'},
+                        //{headerName: 'Preview', field: 'preview'},
                     ],
                     menu: [
+                        //{text: 'Show', route: '/notification/show', icon: 'feather icon-eye'},
                         {text: 'Edit', route: '/notification/edit', icon: 'feather icon-edit'},
                         {route: '/notification/delete', type: 'delete'}
                     ],

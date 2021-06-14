@@ -105,8 +105,8 @@ class IncidentController extends Controller
         }
 
         if (!$id) {
-            $incident->safety_signature = $this->uploadSignature($request->safety_signature, "safety/incident/$incident->id/safety");
-            $incident->driver_signature = $this->uploadSignature($request->driver_signature, "safety/incident/$incident->id/driver");
+            $incident->safety_signature = $this->uploadImage($request->safety_signature, "safety/incident/$incident->id/safety");
+            $incident->driver_signature = $this->uploadImage($request->driver_signature, "safety/incident/$incident->id/driver");
             $incident->save();
         }
 

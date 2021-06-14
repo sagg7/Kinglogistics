@@ -146,7 +146,7 @@
                     @enderror
                 </div>
             </div>
-            <!--<hr>
+            <hr>
             <div class="row">
                 <div class="form-group col-md-3">
                     {!! Form::label('weight', ucfirst(__('weight')), ['class' => 'col-form-label']) !!}
@@ -184,7 +184,7 @@
                     </span>
                     @enderror
                 </div>
-            </div>-->
+            </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->

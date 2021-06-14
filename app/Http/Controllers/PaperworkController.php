@@ -301,7 +301,7 @@ class PaperworkController extends Controller
                         break;
                     case 'signature':
                         $reqAnswer = $request["signature-$idx"];
-                        $reqAnswer = $this->uploadSignature($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
+                        $reqAnswer = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
                         break;
                 }
                 $template_filled[] = $reqAnswer;

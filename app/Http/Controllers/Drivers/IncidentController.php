@@ -61,7 +61,7 @@ class IncidentController extends Controller
         DB::transaction(function () use ($request, $id) {
             $incident = Incident::where('driver_id', auth()->user()->id)
                 ->findOrFail($id);
-            $incident->driver_signature = $this->uploadSignature($request->driver_signature, "safety/incident/$incident->id/driver");
+            $incident->driver_signature = $this->uploadImage($request->driver_signature, "safety/incident/$incident->id/driver");
             $incident->save();
         });
 

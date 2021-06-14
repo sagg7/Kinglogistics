@@ -12,13 +12,15 @@
                     @enderror
                 </div>
                 <div class="form-group col-12">
-                    {!! Form::label('message', ucfirst(__('message')), ['class' => 'col-form-label']) !!}
-                    {!! Form::textarea('message', $notification->message ?? null,['class' => 'form-control' . ($errors->first('message') ? ' is-invalid' : '')]) !!}
-                    @error('title')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
+                    <div>
+                        {!! Form::label('message', ucfirst(__('message')), ['class' => 'col-form-label']) !!}
+                        <div id="message_quill" style="height: calc(100vh - 505px);"></div>
+                        @error('message')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>
