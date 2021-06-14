@@ -18,11 +18,11 @@ class NotificationController extends Controller
      * @param int|null $id
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    private function validator(array $data, int $id = null)
+    private function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['title', 'string', 'max:255'],
-            'message' => ['title', 'string', 'max:512'],
+            'title' => ['required', 'max:255'],
+            'message' => ['required'],
         ]);
     }
 
@@ -74,11 +74,14 @@ class NotificationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
+        $this->validator($request->all())->validate();
+
         $this->storeUpdate($request);
 
         if ($request->ajax())
@@ -123,12 +126,15 @@ class NotificationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, $id)
     {
+        $this->validator($request->all())->validate();
+
         $this->storeUpdate($request, $id);
 
         if ($request->ajax())
