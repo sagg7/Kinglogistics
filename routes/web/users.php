@@ -12,6 +12,8 @@ Route::prefix('user')->group(function () {
         ->name('user.store');
     Route::get('search', [UserController::class, 'search'])
         ->name('user.search');
+    Route::get('selection', [UserController::class, 'selection'])
+        ->name('user.selection');
     Route::get('edit/{id}', [UserController::class, 'edit'])
         ->name('user.edit');
     Route::post('update/{id}', [UserController::class, 'update'])

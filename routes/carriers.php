@@ -23,10 +23,10 @@ Route::middleware('guest:carrier')->group(function () {
 Route::middleware('auth:carrier')->group(function () {
     require __DIR__.'/carriers/drivers.php';
     require __DIR__.'/carriers/turns.php';
-    require __DIR__.'/carriers/trucks.php';
     require __DIR__.'/carriers/trailers.php';
     require __DIR__.'/carriers/zones.php';
     require __DIR__.'/carriers/shippers.php';
+    require __DIR__.'/web/trucks.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.carriers.dashboard');

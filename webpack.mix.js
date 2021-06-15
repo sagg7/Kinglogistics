@@ -32,14 +32,14 @@ mix.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js')
     // Sections
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
-    .scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
+    //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
     //.scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
     //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/notifications/common.js'], 'public/js/sections/notifications/common.min.js')
+    .scripts(['resources/js/sections/trucks/common.js'], 'public/js/sections/trucks/common.min.js')
     // Subdomains
-    .scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
-    //.scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')
+    //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
     ;

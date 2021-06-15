@@ -2,13 +2,193 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrier;
 use App\Models\Truck;
+use App\Models\User;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
+use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TruckController extends Controller
 {
-    use GetSelectionData;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
+
+    /**
+     * @param array $data
+     * @param int|null $id
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    private function validator(array $data, int $id = null)
+    {
+        $validations = [
+            'trailer_id' => ['nullable', 'exists:trailers,id'],
+            'driver_id' => ['nullable', 'exists:drivers,id'],
+            'number' => ['required', 'string', 'max:255'],
+            'plate' => ['nullable', 'string', 'max:255'],
+            'vin' => ['nullable', 'string', 'max:255'],
+            'make' => ['nullable', 'string', 'max:255'],
+            'model' => ['nullable', 'string', 'max:255'],
+            'year' => ['nullable', 'numeric', 'max:' . (date('Y') + 1)],
+        ];
+
+        if (auth()->guard('web')->check()) {
+            $validations['carrier_id'] = ['required', 'exists:carriers,id'];
+            $validations['seller_id'] = ['nullable', 'exists:users,id'];
+        }
+        return Validator::make($data, $validations);
+    }
+
+    /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        $data = [];
+        if (auth()->guard('web')->check())
+            $data = [
+                'carriers' => Carrier::pluck('name', 'id')->toArray(),
+                'sellers' => User::where(function ($q) {
+                    $q->whereHas('roles', function ($r) {
+                        $r->where('slug', 'seller');
+                    });
+                })
+                    ->pluck('name', 'id')->toArray(),
+            ];
+        return $data + $this->getPaperworkByType('truck');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        return view('trucks.index');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('trucks.create');
+    }
+
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return Truck
+     */
+    private function storeUpdate(Request $request, $id = null): Truck
+    {
+        if ($id)
+            $truck = Truck::findOrFail($id);
+        else {
+            $truck = new Truck();
+            $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
+        }
+
+        $truck->trailer_id = $request->trailer_id;
+        $truck->driver_id = $request->driver_id;
+        $truck->number = $request->number;
+        $truck->plate = $request->plate;
+        $truck->vin = $request->vin;
+        $truck->make = $request->make;
+        $truck->model = $request->model;
+        $truck->year = $request->year;
+        $truck->inactive = $request->inactive ?? null;
+        if ($request->seller_id)
+            $truck->seller_id;
+        $truck->save();
+
+        return $truck;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        $this->storeUpdate($request);
+
+        return redirect()->route('truck.index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $truck = Truck::with(['driver:id,name', 'trailer:id,number'])->find($id);
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $truck->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $truck->id);
+        $params = compact('truck', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
+        return view('trucks.edit', $params);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->validator($request->all())->validate();
+
+        $this->storeUpdate($request, $id);
+
+        return redirect()->route('truck.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $truck = Truck::findOrFail($id);
+
+        if ($truck) {
+            $message = '';
+            if ($truck->driver)
+                $message .= "•" . $this->generateCrudMessage(4, 'Truck', ['constraint' => 'driver']) . "<br>";
+            if ($message)
+                return ['success' => false, 'msg' => $message];
+            else
+                return ['success' => $truck->delete()];
+        } else
+            return ['success' => false];
+    }
+
 
     /**
      * @param Request $request
@@ -21,13 +201,11 @@ class TruckController extends Controller
             'number as text',
         ])
             ->where("number", "LIKE", "%$request->search%")
-            /*->whereHas("driver", function ($q) use ($request) {
-                if ($request->driver)
-                    $q->where("id", $request->driver);
-            })*/
             ->where(function ($q) use ($request) {
-                if ($request->carrier)
+                if (auth()->guard('web')->check() && $request->carrier)
                     $q->where("carrier_id", $request->carrier);
+                else if (auth()->guard('carrier')->check())
+                    $q->where("carrier_id", auth()->user()->id);
             })
             ->whereNull("inactive");
 
@@ -36,5 +214,53 @@ class TruckController extends Controller
         }
 
         return $this->selectionData($query, $request->take, $request->page);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        $query = Truck::select([
+            "trucks.id",
+            "trucks.number",
+            "trucks.plate",
+            "trucks.vin",
+            "trucks.trailer_id",
+            "trucks.driver_id",
+        ])
+            ->where(function ($q) use ($request) {
+                if (auth()->guard('carrier')->check())
+                    $q->where("carrier_id", auth()->user()->id);
+            })
+            ->with(['driver:id,name', 'trailer:id,number']);
+
+        if ($request->searchable) {
+            $searchable = [];
+            $statement = "whereHas";
+            foreach ($request->searchable as $item) {
+                switch ($item) {
+                    case 'driver':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    case 'trailer':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('number', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    default:
+                        $searchable[count($searchable) + 1] = $item;
+                        break;
+                }
+            }
+            $request->searchable = $searchable;
+        }
+
+        return $this->simpleSearchData($query, $request);
     }
 }

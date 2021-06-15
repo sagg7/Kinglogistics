@@ -6,13 +6,14 @@ use App\Models\Role;
 use App\Models\User;
 use App\Traits\EloquentQueryBuilder\agFilter;
 use App\Traits\EloquentQueryBuilder\EloquentFiltering;
+use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    use agFilter, EloquentFiltering;
+    use agFilter, EloquentFiltering, GetSelectionData;
     /**
      * @param array $data
      * @param int|null $id
@@ -149,6 +150,29 @@ class UserController extends Controller
             return ['success' => $user->delete()];
         } else
             return ['success' => false];
+    }
+
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function selection(Request $request): array
+    {
+        $query = User::select([
+            'id',
+            'name as text',
+        ])
+            ->where("name", "LIKE", "%$request->search%")
+            ->where(function ($q) use ($request) {
+                if ($request->type)
+                    $q->whereHas('roles', function ($r) use ($request) {
+                        $r->where('slug', $request->type);
+                    });
+            })
+            ->with('roles');
+
+        return $this->selectionData($query, $request->take, $request->page);
     }
 
     /**

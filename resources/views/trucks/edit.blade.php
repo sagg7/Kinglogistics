@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/subdomains/carriers/trucks/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/trucks/common.min.js') }}"></script>
         <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
         <script>
             (() => {
@@ -27,7 +27,7 @@
         <div role="tabpanel" class="tab-pane active" id="pane-general" aria-labelledby="pane-general"
              aria-expanded="true">
             {!! Form::open(['route' => ['truck.update', $truck->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}
-            @include('subdomains.carriers.trucks.common.form')
+            @include('trucks.common.form')
             {!! Form::close() !!}
         </div>
         <div role="tabpanel" class="tab-pane" id="pane-paperwork" aria-labelledby="pane-paperwork"
