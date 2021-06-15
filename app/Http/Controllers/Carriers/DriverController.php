@@ -38,9 +38,7 @@ class DriverController extends Controller
      */
     private function createEditParams(): array
     {
-        return [
-                'shippers' => Shipper::skip(0)->take(15)->pluck('name', 'id'),
-            ] + $this->getTurnsArray() + $this->getPaperworkByType('driver');
+        return $this->getTurnsArray() + $this->getPaperworkByType('driver');
     }
 
     /**
@@ -88,8 +86,6 @@ class DriverController extends Controller
                 $driver->password = Hash::make($request->password);
             $driver->save();
 
-            $driver->shippers()->sync($request->shippers);
-
             return $driver;
         });
     }
@@ -130,7 +126,6 @@ class DriverController extends Controller
     {
         $driver = Driver::with(['zone:id,name'])
             ->find($id);
-        $driver->shippers = $driver->shippers()->pluck('id')->toArray();
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);

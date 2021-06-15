@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDriverShipperTable extends Migration
+class CreateShipperTrailerTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateDriverShipperTable extends Migration
      */
     public function up()
     {
-        Schema::create('driver_shipper', function (Blueprint $table) {
-            $table->unsignedBigInteger('driver_id')->index();
+        Schema::create('shipper_trailer', function (Blueprint $table) {
             $table->unsignedBigInteger('shipper_id')->index();
+            $table->unsignedBigInteger('trailer_id')->index();
 
-            $table->primary(['driver_id', 'shipper_id']);
-            $table->foreign('driver_id')->references('id')->on('drivers')->onUpdate('cascade')->onDelete('cascade');
+            $table->primary(['shipper_id', 'trailer_id']);
             $table->foreign('shipper_id')->references('id')->on('shippers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('trailer_id')->references('id')->on('trailers')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -30,6 +30,6 @@ class CreateDriverShipperTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('driver_shipper');
+        Schema::dropIfExists('shipper_trailer');
     }
 }

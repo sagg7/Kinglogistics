@@ -15,8 +15,8 @@ class Shipper extends Authenticatable
     /**
      * @return BelongsToMany
      */
-    public function drivers(): BelongsToMany
+    public function trailers(): BelongsToMany
     {
-        return $this->belongsToMany(Driver::class);
+        return $this->belongsToMany(Trailer::class);
     }
 }

@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
 use App\Models\PaperworkTemplate;
+use App\Models\Shipper;
 use App\Models\Trailer;
 use App\Models\TrailerType;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TrailerController extends Controller
@@ -40,9 +42,10 @@ class TrailerController extends Controller
     private function createEditParams(): array
     {
         return [
-            'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
-            'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
-        ] + $this->getPaperworkByType("trailer");
+                'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
+                'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
+                'shippers' => Shipper::skip(0)->take(15)->pluck('name', 'id'),
+            ] + $this->getPaperworkByType("trailer");
     }
 
     /**
@@ -73,24 +76,28 @@ class TrailerController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Trailer
     {
-        if ($id)
-            $trailer = Trailer::findOrFail($id);
-        else {
-            $trailer = new Trailer();
-            $trailer->status = 'available';
-            if (false && auth()->guard('carrier')->check())
-                $trailer->carrier_id = auth()->user()->id;
-        }
+        return DB::transaction(function ($q) use ($request, $id) {
+            if ($id)
+                $trailer = Trailer::findOrFail($id);
+            else {
+                $trailer = new Trailer();
+                $trailer->status = 'available';
+                // TODO: CASE FOR CARRIER OWNED TRAILER
+                /*if (false && auth()->guard('carrier')->check())
+                    $trailer->carrier_id = auth()->user()->id;*/
+            }
 
-        $trailer->trailer_type_id = $request->trailer_type_id;
-        $trailer->shipper_id = $request->shipper_id;
-        $trailer->number = $request->number;
-        $trailer->plate = $request->plate;
-        $trailer->vin = $request->vin;
-        $trailer->inactive = $request->inactive ?? null;;
-        $trailer->save();
+            $trailer->trailer_type_id = $request->trailer_type_id;
+            $trailer->number = $request->number;
+            $trailer->plate = $request->plate;
+            $trailer->vin = $request->vin;
+            $trailer->inactive = $request->inactive ?? null;;
+            $trailer->save();
 
-        return $trailer;
+            $trailer->shippers()->sync($request->shippers);
+
+            return $trailer;
+        });
     }
 
     /**

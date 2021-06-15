@@ -12,7 +12,6 @@ class ProfileController extends Controller
     public function profile()
     {
         $driver = auth()->user();
-        $driver->shippers = $driver->shippers()->pluck('id')->toArray();
         $createEdit = $this->getPaperworkByType('driver');
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);

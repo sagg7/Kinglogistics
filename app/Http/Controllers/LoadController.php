@@ -84,7 +84,9 @@ class LoadController extends Controller
                     // WHERE THE ASSIGNED TRAILER TO THE TRUCK THAT BELONGS TO THE DRIVER IS OWNED BY THE SHIPPER
                     $r->whereHas('truck', function ($s) use ($shipper) {
                         $s->whereHas('trailer', function ($t) use ($shipper) {
-                            $t->where('shipper_id', $shipper);
+                            $t->whereHas('shippers', function ($u) use ($shipper) {
+                                $u->where('shipper_id', $shipper);
+                            });
                         });
                     })
                         // OR WHERE THE PIVOT TABLE OF THE DRIVER AND SHIPPER HAS EXISTING RELATIONSHIP

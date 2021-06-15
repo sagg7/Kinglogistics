@@ -5,7 +5,8 @@
     $('#status').select2({
         placeholder: 'Select',
     });
-    $('#shipper_id').select2({
+    $('[id="shippers[]"]').select2({
+        placeholder: 'Select',
         ajax: {
             url: '/shipper/selection',
             data: (params) => {
@@ -15,9 +16,7 @@
                     take: 15,
                 };
             },
-        },
-        placeholder: 'Select',
-        allowClear: true,
+        }
     });
     $('#deleteTrailerType').on('show.bs.modal', (e) => {
         let options = $('#trailer_type_id').html(),

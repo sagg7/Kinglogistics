@@ -1,4 +1,5 @@
 {
     "/css/app.css": "/css/app.css",
-    "/js/sections/notifications/common.min.js": "/js/sections/notifications/common.min.js"
+    "/js/sections/trailers/common.min.js": "/js/sections/trailers/common.min.js",
+    "/js/sections/subdomains/carriers/drivers/common.min.js": "/js/sections/subdomains/carriers/drivers/common.min.js"
 }
