@@ -160,6 +160,21 @@
                 </ul>
             </li>
             <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-map"></i><span class="menu-title" data-i18n="User">Trips</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/trip/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/trip/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title" data-i18n="User">Loads</span></a>
                 <ul class="menu-content">
                     <li>

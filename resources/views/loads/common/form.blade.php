@@ -33,6 +33,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('trip_id', ucfirst(__('trip')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('trip_id', [], $load->trip_id ?? null, ['class' => 'form-control' . ($errors->first('trip_id') ? ' is-invalid' : '')]) !!}
+                    @error('trip_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 @endif
             </div>
             <hr>

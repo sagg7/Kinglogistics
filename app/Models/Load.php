@@ -41,4 +41,12 @@ class Load extends Model
     {
         return $this->belongsTo(LoadType::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function trip(): BelongsTo
+    {
+        return $this->belongsTo(Trip::class);
+    }
 }

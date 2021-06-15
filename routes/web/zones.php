@@ -12,6 +12,8 @@ Route::prefix('zone')->group(function () {
         ->name('zone.store');
     Route::get('search', [ZoneController::class, 'search'])
         ->name('zone.search');
+    Route::get('selection', [ZoneController::class, 'selection'])
+        ->name('zone.selection');
     Route::get('edit/{id}', [ZoneController::class, 'edit'])
         ->name('zone.edit');
     Route::post('update/{id}', [ZoneController::class, 'update'])

@@ -6,6 +6,7 @@ use App\Models\AvailableDriver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\Shipper;
+use App\Models\Trip;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
@@ -23,7 +24,7 @@ class LoadController extends Controller
     private function createEditParams(): array
     {
         return [
-            'shippers' => [null => 'Select'] + Shipper::skip(0)->take(15)->pluck('name', 'id')->toArray(),
+            'shippers' => [null => 'Select'] + Shipper::pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -88,11 +89,7 @@ class LoadController extends Controller
                                 $u->where('shipper_id', $shipper);
                             });
                         });
-                    })
-                        // OR WHERE THE PIVOT TABLE OF THE DRIVER AND SHIPPER HAS EXISTING RELATIONSHIP
-                        ->orWhereHas('shippers', function ($s) use ($shipper) {
-                            $s->where('id', $shipper);
-                        });
+                    });
                 });
             })
             ->take($request->load_number)
@@ -141,6 +138,7 @@ class LoadController extends Controller
     public function edit(int $id)
     {
         $load = Load::with('driver')
+            ->with('load_type:id,name', 'trip:id,name')
             ->find($id);
         $params = compact('load') + $this->createEditParams();
         return view('loads.edit', $params);

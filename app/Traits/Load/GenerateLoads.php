@@ -20,6 +20,7 @@ trait GenerateLoads
         return Validator::make($data, [
             'load_number' => ['sometimes', 'numeric', 'min:1', 'max:999'],
             'shipper_id' => ['sometimes', 'exists:shippers,id'],
+            'trip_id' => ['sometimes', 'exists:trips,id'],
             'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['sometimes', 'required', 'exists:drivers,id'],
             'date' => ['required', 'date'],
@@ -63,6 +64,7 @@ trait GenerateLoads
             $load->load_type_id = $data["load_type_id"];
             $load->driver_id = $data["driver_id"] ?? null;
             $load->load_log_id = $data["load_log_id"] ?? null;
+            $load->trip_id = $data["trip_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
             $load->control_number = $data["control_number"];
             $load->origin = $data["origin"];

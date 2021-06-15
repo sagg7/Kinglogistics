@@ -1,4 +1,6 @@
 {
     "/css/app.css": "/css/app.css",
-    "/js/sections/trucks/common.min.js": "/js/sections/trucks/common.min.js"
+    "/js/sections/trips/common.min.js": "/js/sections/trips/common.min.js",
+    "/js/sections/loads/common.min.js": "/js/sections/loads/common.min.js",
+    "/js/sections/loads/coordsMaps.min.js": "/js/sections/loads/coordsMaps.min.js"
 }
