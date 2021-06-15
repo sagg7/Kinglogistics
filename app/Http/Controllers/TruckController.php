@@ -76,7 +76,8 @@ class TruckController extends Controller
      */
     public function create()
     {
-        return view('trucks.create');
+        $params = $this->createEditParams();
+        return view('trucks.create', $params);
     }
 
     /**
