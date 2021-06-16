@@ -17,10 +17,12 @@
                     .html(`<option value="{{ $load->load_type_id }}">{{ $load->load_type->name }}</option>`)
                     .val({{ $load->load_type_id }})
                     .trigger('change');
+                @if($load->trip)
                 $("#trip_id")
                     .html(`<option value="{{ $load->trip_id }}">{{ $load->trip->name }}</option>`)
                     .val({{ $load->trip_id }})
                     .trigger('change');
+                @endif
             })();
         </script>
         <script src="{{ asset('js/sections/loads/common.min.js') }}"></script>

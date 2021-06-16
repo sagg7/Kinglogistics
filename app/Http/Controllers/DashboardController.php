@@ -18,6 +18,10 @@ class DashboardController extends Controller
         $start = Carbon::now()->subMonths(3)->startOfMonth();
         $end = Carbon::now()->endOfMonth()->endOfDay();
         $loads = Load::whereBetween('loads.date', [$start, $end])
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            })
             ->get();
 
         $loadsSummary = [];

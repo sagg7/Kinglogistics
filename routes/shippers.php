@@ -21,6 +21,7 @@ Route::middleware('guest:shipper')->group(function () {
 });
 
 Route::middleware('auth:shipper')->group(function () {
+    require __DIR__.'/web/dashboard.php';
     require __DIR__.'/web/trips.php';
     require __DIR__.'/shippers/loads.php';
     require __DIR__.'/web/loadTypes.php';
