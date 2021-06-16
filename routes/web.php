@@ -18,11 +18,8 @@ Route::get('/', function () {
 })
     ->middleware('guest');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})/*->middleware(['auth'])*/->name('dashboard');
-
 Route::group(['middleware' => 'auth'], function () {
+    require __DIR__.'/web/dashboard.php';
     require __DIR__.'/web/users.php';
     require __DIR__.'/web/rentals.php';
     require __DIR__.'/web/shippers.php';
