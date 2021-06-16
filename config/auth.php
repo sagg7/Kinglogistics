@@ -58,7 +58,7 @@ return [
 
         'api' => [
             'driver' => 'token',
-            'provider' => 'users',
+            'provider' => 'drivers',
             'hash' => false,
         ],
     ],
@@ -146,7 +146,7 @@ return [
 
         'drivers' => [
             'provider' => 'drivers',
-            //'table' => 'carrier_password_resets',
+            'table' => 'drivers',
             'expire' => 60,
             'throttle' => 60,
         ],

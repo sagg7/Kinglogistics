@@ -15,6 +15,7 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
+
         // Check email
         $user = Driver::where('email', $request->email)->first();
         // Check password
@@ -34,7 +35,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete;
+        auth()->user()->tokens()->delete();
 
         return ["message" => "Logged out"];
     }
