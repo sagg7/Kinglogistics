@@ -10,7 +10,7 @@
         <script defer>
             var tbAG = null;
             (() => {
-                const zoneFormatter = (params) => {
+                const nameFormatter = (params) => {
                     if (params.value)
                         return params.value.name;
                     else
@@ -19,7 +19,10 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Name', field: 'name'},
-                        {headerName: 'Zone', field: 'zone', valueFormatter: zoneFormatter},
+                        {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
+                        @if(auth()->guard('web')->check())
+                        {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
+                        @endif
                     ],
                     menu: [
                         {text: 'Edit', route: '/trip/edit', icon: 'feather icon-edit'},

@@ -33,14 +33,12 @@ Route::middleware('auth:carrier')->group(function () {
     })
         ->name('dashboard');
 
-
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'profile'])
-            ->name('driver.profile');
-        Route::post('update/{id}', [CarrierController::class, 'update'])
-            ->name('profile.update');
+            ->name('carrier.profile');
+        Route::post('update/{id}/{profile?}', [CarrierController::class, 'update'])
+            ->name('carrier.profile.update');
     });
-
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

@@ -16,7 +16,7 @@ Route::prefix('driver')->group(function () {
         ->name('driver.selection');
     Route::get('edit/{id}', [DriverController::class, 'edit'])
         ->name('driver.edit');
-    Route::post('update/{id}/{profile?}', [DriverController::class, 'update'])
+    Route::post('update/{id}', [DriverController::class, 'update'])
         ->name('driver.update')
         ->where('profile', '[0-1]');
     Route::post('delete/{id}', [DriverController::class, 'destroy'])

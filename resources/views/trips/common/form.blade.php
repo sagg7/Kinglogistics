@@ -20,6 +20,7 @@
                     </span>
                     @enderror
                 </div>
+                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-4">
                     {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper_id', [], $trip->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
@@ -29,6 +30,7 @@
                     </span>
                     @enderror
                 </div>
+                @endif
             </div>
             <hr>
             <div class="row">

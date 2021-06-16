@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ShipperController;
+use App\Http\Controllers\Shippers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:shipper')->group(function () {
@@ -19,13 +21,22 @@ Route::middleware('guest:shipper')->group(function () {
 });
 
 Route::middleware('auth:shipper')->group(function () {
+    require __DIR__.'/web/trips.php';
     require __DIR__.'/shippers/loads.php';
     require __DIR__.'/web/loadTypes.php';
+    require __DIR__.'/shippers/zones.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.shippers.dashboard');
     })
         ->name('dashboard');
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'profile'])
+            ->name('shipper.profile');
+        Route::post('update/{id}/{profile?}', [ShipperController::class, 'update'])
+            ->name('shipper.profile.update');
+    });
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

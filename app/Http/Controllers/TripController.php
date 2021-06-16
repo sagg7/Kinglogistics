@@ -123,7 +123,12 @@ class TripController extends Controller
      */
     public function edit(int $id)
     {
-        $trip = Trip::with('zone:id,name', 'shipper:id,name')->find($id);
+        $trip = Trip::with('zone:id,name', 'shipper:id,name')
+            ->where(function ($q) {
+                if (auth()->guard('shipper'))
+                    $q->where('shipper_id', auth()->guard()->user()->id);
+            })
+            ->findOrFail($id);
         $params = compact('trip') + $this->createEditParams();
         return view('trips.edit', $params);
     }
@@ -203,10 +208,14 @@ class TripController extends Controller
             "trips.id",
             "trips.name",
             "trips.zone_id",
+            "trips.shipper_id",
             "trips.origin",
             "trips.destination",
         ])
-            ->with('zone:id,name');
+            ->with([
+                'zone:id,name',
+                'shipper:id,name',
+            ]);
 
         if ($request->searchable) {
             $searchable = [];
@@ -214,6 +223,7 @@ class TripController extends Controller
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'zone':
+                    case 'shipper':
                         $query->$statement($item, function ($q) use ($request) {
                             $q->where('name', 'LIKE', "%$request->search%");
                         });

@@ -9,7 +9,7 @@
     @component('components.nav-pills-form', ['pills' => [['name' => 'General', 'icon' => 'fas fa-user-circle', 'pane' => 'pane-general'],['name' => 'Paperwork', 'icon' => 'fas fa-folder-open', 'pane' => 'pane-paperwork']]])
         <div role="tabpanel" class="tab-pane active" id="pane-general" aria-labelledby="pane-general"
              aria-expanded="true">
-            {!! Form::open(['route' => ['profile.update', [$driver->id, 1]], 'method' => 'post', 'class' => 'form form-vertical']) !!}
+            {!! Form::open(['route' => ['driver.profile.update', $driver->id, 1], 'method' => 'post', 'class' => 'form form-vertical']) !!}
             @include('subdomains.carriers.drivers.common.form')
             {!! Form::close() !!}
         </div>

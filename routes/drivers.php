@@ -32,8 +32,8 @@ Route::middleware('auth:driver')->group(function () {
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'profile'])
             ->name('driver.profile');
-        Route::post('update/{id}', [DriverController::class, 'update'])
-            ->name('profile.update');
+        Route::post('update/{id}/{profile?}', [DriverController::class, 'update'])
+            ->name('driver.profile.update');
     });
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])

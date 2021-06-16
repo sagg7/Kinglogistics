@@ -112,17 +112,22 @@ class ShipperController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @param bool $profile
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id, bool $profile = false)
     {
-        $this->validator($request->all())->validate();
+        $this->validator($request->all(), $id)->validate();
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('shipper.index');
+        if ($profile)
+            return redirect()->route('shipper.profile');
+        else
+            return redirect()->route('shipper.index');
     }
 
     /**
