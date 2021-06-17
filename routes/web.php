@@ -1,5 +1,7 @@
 <?php
 
+use App\Mail\TestMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +38,10 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/trailerTypes.php';
     require __DIR__.'/web/zones.php';
     require __DIR__.'/web/paperwork.php';
+
+    Route::get('/testMail', function () {
+        Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());
+    });
 });
 
 require __DIR__.'/auth.php';
