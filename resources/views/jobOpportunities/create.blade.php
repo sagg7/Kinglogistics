@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Notification</x-slot>
+    <x-slot name="crumb_section">Job Opportunity</x-slot>
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('head')
@@ -11,7 +11,7 @@
         <script src="{{ asset("js/sections/jobOpportunities/common.min.js") }}"></script>
     @endsection
 
-    {!! Form::open(['route' => 'notification.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
-    @include('notifications.common.form')
+    {!! Form::open(['route' => 'jobOpportunity.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
+    @include('jobOpportunities.common.form')
     {!! Form::close() !!}
 </x-app-layout>

@@ -24,6 +24,10 @@ class DriverController extends Controller
             ->where(function ($q) use ($request) {
                 if ($request->carrier)
                     $q->where("carrier_id", $request->carrier);
+                if ($request->zone)
+                    $q->where("zone_id", $request->zone);
+                if ($request->turn)
+                    $q->where("turn_id", $request->turn);
             })
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");

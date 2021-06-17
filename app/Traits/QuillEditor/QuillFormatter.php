@@ -5,6 +5,18 @@ namespace App\Traits\QuillEditor;
 trait QuillFormatter
 {
     /**
+     * @param string $string
+     * @return array|string|string[]|null
+     */
+    private function replaceText(string $string)
+    {
+        $matches = ["/\n/",];
+        $replacements = ["<br>",];
+
+        return preg_replace($matches, $replacements, $string);
+    }
+
+    /**
      * @param $message
      * @return string
      */

@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/trailerTypes.php';
     require __DIR__.'/web/zones.php';
     require __DIR__.'/web/paperwork.php';
+    require __DIR__.'/web/jobOpportunities.php';
 
     Route::get('/testMail', function () {
         Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());

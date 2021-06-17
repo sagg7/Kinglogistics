@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\QuillEditor\QuillFormatter;
 use App\Traits\Storage\FileUpload;
@@ -11,19 +12,28 @@ use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
-    use GetSimpleSearchData, FileUpload, QuillFormatter;
+    use GetSimpleSearchData, FileUpload, QuillFormatter, DriverParams;
 
     /**
      * @param array $data
-     * @param int|null $id
      * @return \Illuminate\Contracts\Validation\Validator
      */
     private function validator(array $data)
     {
         return Validator::make($data, [
+            'carrier' => ['required', 'exists:carriers,id'],
+            'zone' => ['required', 'exists:zones,id'],
             'title' => ['required', 'max:255'],
             'message' => ['required'],
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return $this->getTurnsArray();
     }
 
     /**
@@ -31,7 +41,7 @@ class NotificationController extends Controller
      * @param null $id
      * @return Notification
      */
-    private function storeUpdate(Request $request, $id = null): Notification//: Notification
+    private function storeUpdate(Request $request, $id = null): Notification
     {
         $message = json_decode($request->message);
 
@@ -40,6 +50,9 @@ class NotificationController extends Controller
         else
             $notification = new Notification();
         $notification->title = $request->title;
+        $notification->carrier_id = $request->carrier;
+        $notification->zone_id = $request->zone;
+        $notification->turn_id = $request->turn;
         $notification->save();
 
         $html = $this->formatQuillHtml($message, "notification/$notification->id");
@@ -47,6 +60,8 @@ class NotificationController extends Controller
         $notification->message = $html;
         $notification->message_json = $message->ops;
         $notification->save();
+
+        $notification->drivers()->sync($request->drivers);
 
         return $notification;
     }
@@ -68,7 +83,8 @@ class NotificationController extends Controller
      */
     public function create()
     {
-        return view('notifications.create');
+        $params = $this->createEditParams();
+        return view('notifications.create', $params);
     }
 
     /**
@@ -88,14 +104,6 @@ class NotificationController extends Controller
             return ['success' => true];
         else
             return redirect()->route('notification.index');
-    }
-
-    private function replaceText(string $string)
-    {
-        $matches = ["/\n/",];
-        $replacements = ["<br>",];
-
-        return preg_replace($matches, $replacements, $string);
     }
 
     /**
@@ -118,8 +126,13 @@ class NotificationController extends Controller
      */
     public function edit($id)
     {
-        $notification = Notification::findOrFail($id);
-        $params = compact('notification');
+        $notification = Notification::with([
+            'drivers:id,name',
+            'carrier:id,name',
+            'zone:id,name',
+        ])
+            ->findOrFail($id);
+        $params = compact('notification') + $this->createEditParams();
         return view('notifications.edit', $params);
     }
 

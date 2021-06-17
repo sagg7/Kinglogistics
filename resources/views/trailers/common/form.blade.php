@@ -18,7 +18,7 @@
                 </div>
                 <div class="col-md-6">
                     {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('shippers[]', $shippers, $trailer->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
+                    {!! Form::select('shippers[]', [], $trailer->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
                     @error('shippers')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

@@ -13,9 +13,16 @@
         <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
         <script>
             (() => {
-                $("#shipper_id")
-                    .html(`<option value="{{ $trailer->shipper_id }}">{{ $trailer->shipper->name }}</option>`)
-                    .val({{ $trailer->shipper_id }})
+                const shippers = @json($trailer->shippers);
+                let shippersHtml = '',
+                    shippersIds = [];
+                shippers.forEach((item) => {
+                    shippersHtml += `<option value="${item.id}">${item.name}</option>`;
+                    shippersIds.push(item.id);
+                });
+                $('[name="shippers[]"]')
+                    .html(shippersHtml)
+                    .val(shippersIds)
                     .trigger('change');
             })();
         </script>

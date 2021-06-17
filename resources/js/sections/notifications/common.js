@@ -17,9 +17,9 @@
         //[{ 'font': [] }],
         [{ 'align': [] }],
 
-        ['link', 'image']
+        ['link', 'image'],
 
-            ['clean']                                         // remove formatting button
+        ['clean'],                                       // remove formatting button
     ];
     const quill = new Quill('#message_quill', {
         modules: { toolbar: toolbarOptions },
@@ -28,6 +28,84 @@
 
     if (typeof content != "undefined")
         quill.setContents(content);
+
+    const driverSel = $('[name="drivers[]"]'),
+        carrierSel = $('#carrier_id'),
+        zoneSel = $('#zone_id'),
+        turnSel = $('#turn_id');
+    let carrier = null,
+        zone = null,
+        turn = null;
+    carrierSel.select2({
+        ajax: {
+            url: '/carrier/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            carrier = e.params.data.id;
+            driverSel.val('').trigger('change');
+        })
+        .on('select2:unselect', () => {
+            carrier = null;
+        });
+    zoneSel.select2({
+        ajax: {
+            url: '/zone/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            zone = e.params.data.id;
+            driverSel.val('').trigger('change');
+        })
+        .on('select2:unselect', () => {
+            zone = null;
+        });
+    turnSel.select2({
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            turn = e.params.data.id;
+            driverSel.val('').trigger('change');
+        })
+        .on('select2:unselect', () => {
+            turn = null;
+        });
+    driverSel.select2({
+        ajax: {
+            url: '/driver/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                    carrier,
+                    zone,
+                    turn,
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    });
 
     $('form').submit((e) => {
         e.preventDefault();
@@ -38,6 +116,10 @@
             type: 'POST',
             data: {
                 title: $('#title').val(),
+                carrier,
+                zone,
+                turn,
+                drivers: driverSel.val(),
                 message,
             },
             success: (res) => {
@@ -47,7 +129,6 @@
                     throwErrorMsg();
             },
             error: (res) => {
-                console.log(res);
                 let errors = `<ul class="text-left">`;
                 Object.values(res.responseJSON.errors).forEach((error) => {
                     errors += `<li>${error}</li>`;

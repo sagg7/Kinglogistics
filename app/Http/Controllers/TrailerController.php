@@ -44,7 +44,6 @@ class TrailerController extends Controller
         return [
                 'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
                 'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
-                'shippers' => Shipper::skip(0)->take(15)->pluck('name', 'id'),
             ] + $this->getPaperworkByType("trailer");
     }
 
@@ -134,7 +133,7 @@ class TrailerController extends Controller
      */
     public function edit($id)
     {
-        $trailer = Trailer::with('shipper:id,name')
+        $trailer = Trailer::with('shippers:id,name')
             ->find($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $trailer->id);
