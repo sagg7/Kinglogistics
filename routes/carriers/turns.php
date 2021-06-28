@@ -12,8 +12,8 @@ Route::prefix('turn')->group(function () {
         ->name('turn.store');
     Route::get('search', [TurnController::class, 'search'])
         ->name('turn.search');*/
-    Route::get('selection', [TurnController::class, 'selection'])
-        ->name('turn.selection');
+//    Route::get('selection', [TurnController::class, 'selection'])
+//        ->name('turn.selection');
     /*Route::get('edit/{id}', [TurnController::class, 'edit'])
         ->name('turn.edit');
     Route::post('update/{id}', [TurnController::class, 'update'])

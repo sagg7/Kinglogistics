@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 Route::group([
     'prefix' => 'profile',
-    'middleware' => 'auth:drivers'
+    'middleware' => 'auth:sanctum'
 ], function () {
 
     Route::get('', [ProfileController::class, 'getProfile']);

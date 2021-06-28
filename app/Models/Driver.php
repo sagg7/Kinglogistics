@@ -76,4 +76,12 @@ class Driver extends Authenticatable implements CanResetPassword
     {
         return $this->belongsToMany(Shipper::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Device::class);
+    }
 }
