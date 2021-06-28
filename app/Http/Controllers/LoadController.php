@@ -91,6 +91,10 @@ class LoadController extends Controller
                         });
                     });
                 });
+                // The carrier must be active
+                $q->whereHas("carrier", function ($q) {
+                    $q->whereNull("inactive");
+                });
             })
             ->take($request->load_number)
             ->get();

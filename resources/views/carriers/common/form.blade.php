@@ -86,22 +86,25 @@
                     </span>
                     @enderror
                 </div>
-                @if(auth()->guard('web')->check())
-                <div class="form-group col-md-6">
-                    <fieldset>
-                        {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}
-                        <div class="vs-checkbox-con vs-checkbox-primary">
-                            {{ Form::checkbox('inactive', 1, $carrier->inactive ?? null) }}
-                            <span class="vs-checkbox">
-                                <span class="vs-checkbox--check">
-                                    <i class="vs-icon feather icon-check"></i>
-                                </span>
-                            </span>
-                        </div>
-                    </fieldset>
-                </div>
-                @endif
             </div>
+            @if(auth()->guard('web')->check())
+                <hr>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <fieldset>
+                            {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}
+                            <div class="vs-checkbox-con vs-checkbox-primary">
+                                {{ Form::checkbox('inactive', 1, $carrier->inactive ?? null) }}
+                                <span class="vs-checkbox">
+                                    <span class="vs-checkbox--check">
+                                        <i class="vs-icon feather icon-check"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            @endif
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->

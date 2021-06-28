@@ -82,6 +82,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/charge/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Charges</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">

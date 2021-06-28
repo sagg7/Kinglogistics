@@ -52,7 +52,7 @@
                         {!! Form::label('cost', ucfirst(__('cost')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">$</span>
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
                             </div>
                             {!! Form::text('cost', $rental->cost ?? null, ['class' => 'form-control' . ($errors->first('cost') ? ' is-invalid' : '')]) !!}
                             @error('cost')
@@ -70,7 +70,7 @@
                                 {!! Form::label('deposit', ucfirst(__('deposit')), ['class' => 'col-form-label']) !!}
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="basic-addon1">$</span>
+                                        <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
                                     </div>
                                     {!! Form::text('deposit', $rental->deposit ?? null, ['class' => 'form-control' . ($errors->first('deposit') ? ' is-invalid' : '')]) !!}
                                     @error('deposit')

@@ -21,7 +21,7 @@
                         <label>Fine</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">$</span>
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
                             </div>
                             <input id="fine" class="form-control" name="fine" type="text">
                         </div>

@@ -16,7 +16,7 @@
                         {!! Form::label('fine', ucfirst(__('fine')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">$</span>
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
                             </div>
                             {!! Form::text('fine', $incidentType->fine ?? null, ['class' => 'form-control' . ($errors->first('fine') ? ' is-invalid' : '')]) !!}
                             @error('fine')

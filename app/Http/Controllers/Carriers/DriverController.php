@@ -71,7 +71,8 @@ class DriverController extends Controller
     {
         return DB::transaction(function ($q) use ($request, $id) {
             if ($id)
-                $driver = Driver::findOrFail($id);
+                $driver = Driver::where('carrier_id', auth()->user()->id)
+                    ->findOrFail($id);
             else {
                 $driver = new Driver();
                 $driver->carrier_id = auth()->user()->id;
@@ -124,8 +125,9 @@ class DriverController extends Controller
      */
     public function edit($id)
     {
-        $driver = Driver::with(['zone:id,name'])
-            ->find($id);
+        $driver = Driver::where('carrier_id', auth()->user()->id)
+            ->with(['zone:id,name'])
+            ->findOrFail($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
@@ -160,9 +162,15 @@ class DriverController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        //
+        $driver = Driver::where('carrier_id', auth()->user()->id)
+            ->findOrFail($id);
+
+        if ($driver)
+            return ['success' => $driver->delete()];
+        else
+            return ['success' => false];
     }
 
     /**

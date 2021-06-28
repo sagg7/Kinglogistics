@@ -16,14 +16,11 @@ class CreateCarrierPaymentsTable extends Migration
         Schema::create('carrier_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('carrier_id');
-            $table->unsignedBigInteger('load_id');
             $table->date('date');
             $table->double('gross_amount');
             $table->double('reductions');
             $table->double('total');
             $table->timestamps();
-
-            $table->foreign('load_id')->references('id')->on('loads')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

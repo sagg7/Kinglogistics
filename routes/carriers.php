@@ -26,6 +26,7 @@ Route::middleware('auth:carrier')->group(function () {
     require __DIR__.'/carriers/trailers.php';
     require __DIR__.'/carriers/zones.php';
     require __DIR__.'/carriers/shippers.php';
+    require __DIR__.'/carriers/expenses.php';
     require __DIR__.'/web/trucks.php';
 
     Route::get('/dashboard', function () {
