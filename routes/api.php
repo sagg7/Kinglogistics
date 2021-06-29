@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LoadsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
@@ -29,10 +30,19 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::group([
-    'prefix' => 'profile',
     'middleware' => 'auth:sanctum'
 ], function () {
 
-    Route::get('', [ProfileController::class, 'getProfile']);
+    Route::group([
+        'prefix' => 'profile'
+    ], function () {
+        Route::get('', [ProfileController::class, 'getProfile']);
+    });
+
+    Route::group([
+        'prefix' => 'loads',
+    ], function () {
+        Route::get('', [LoadsController::class, 'index']);
+    });
 
 });
