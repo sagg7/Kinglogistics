@@ -28,4 +28,20 @@ class Truck extends Model
         return $this->belongsTo(Trailer::class);
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function carrier(): BelongsTo
+    {
+        return $this->belongsTo(Carrier::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
 }

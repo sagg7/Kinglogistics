@@ -22,8 +22,10 @@ class TrailerController extends Controller
             'number as text',
         ])
             ->where("number", "LIKE", "%$request->search%")
-            ->whereDoesntHave("truck")
-            ->whereNull("inactive");
+            ->whereNull("inactive")
+            ->whereHas('rentals', function ($q) {
+                $q->where('carrier_id', auth()->user()->id);
+            });
 
         return $this->selectionData($query, $request->take, $request->page);
     }

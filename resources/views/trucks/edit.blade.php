@@ -19,6 +19,18 @@
                     .val({{ $truck->trailer_id }})
                     .trigger('change');
                 @endif
+                @if($truck->carrier_id)
+                $("#carrier_id")
+                    .html(`<option value="{{ $truck->carrier_id }}">{{ $truck->carrier->name }}</option>`)
+                    .val({{ $truck->carrier_id }})
+                    .trigger('change');
+                @endif
+                @if($truck->seller_id)
+                $("#seller_id")
+                    .html(`<option value="{{ $truck->seller_id }}">{{ $truck->seller->name }}</option>`)
+                    .val({{ $truck->seller_id }})
+                    .trigger('change');
+                @endif
             })();
         </script>
     @endsection

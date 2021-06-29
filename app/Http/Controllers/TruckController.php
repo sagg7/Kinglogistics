@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
+use App\Models\Trailer;
 use App\Models\Truck;
 use App\Models\User;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TruckController extends Controller
@@ -25,6 +27,7 @@ class TruckController extends Controller
         $validations = [
             'trailer_id' => ['nullable', 'exists:trailers,id'],
             'driver_id' => ['nullable', 'exists:drivers,id'],
+            'seller_id' => ['nullable', 'exists:users,id'],
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
@@ -46,16 +49,16 @@ class TruckController extends Controller
     private function createEditParams(): array
     {
         $data = [];
-        if (auth()->guard('web')->check())
+        /*if (auth()->guard('web')->check())
             $data = [
-                'carriers' => Carrier::pluck('name', 'id')->toArray(),
-                'sellers' => User::where(function ($q) {
+                //'carriers' => Carrier::pluck('name', 'id')->toArray(),
+                'sellers' => [null => 'Select'] + User::where(function ($q) {
                     $q->whereHas('roles', function ($r) {
                         $r->where('slug', 'seller');
                     });
                 })
                     ->pluck('name', 'id')->toArray(),
-            ];
+            ];*/
         return $data + $this->getPaperworkByType('truck');
     }
 
@@ -87,27 +90,36 @@ class TruckController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Truck
     {
-        if ($id)
-            $truck = Truck::findOrFail($id);
-        else {
-            $truck = new Truck();
-            $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
-        }
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $truck = Truck::findOrFail($id);
+            else {
+                $truck = new Truck();
+                $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
+            }
 
-        $truck->trailer_id = $request->trailer_id;
-        $truck->driver_id = $request->driver_id;
-        $truck->number = $request->number;
-        $truck->plate = $request->plate;
-        $truck->vin = $request->vin;
-        $truck->make = $request->make;
-        $truck->model = $request->model;
-        $truck->year = $request->year;
-        $truck->inactive = $request->inactive ?? null;
-        if ($request->seller_id)
-            $truck->seller_id;
-        $truck->save();
+            $trailer = Trailer::whereHas('truck')
+                ->with('truck')
+                ->find($request->trailer_id);
+            if ($trailer) {
+                $trailer->truck->trailer_id = null;
+                $trailer->truck->save();
+            }
+            $truck->trailer_id = $request->trailer_id;
+            $truck->driver_id = $request->driver_id;
+            $truck->number = $request->number;
+            $truck->plate = $request->plate;
+            $truck->vin = $request->vin;
+            $truck->make = $request->make;
+            $truck->model = $request->model;
+            $truck->year = $request->year;
+            $truck->inactive = $request->inactive ?? null;
+            if ($request->seller_id)
+                $truck->seller_id = $request->seller_id;
+            $truck->save();
 
-        return $truck;
+            return $truck;
+        });
     }
 
     /**
@@ -144,7 +156,12 @@ class TruckController extends Controller
      */
     public function edit($id)
     {
-        $truck = Truck::with(['driver:id,name', 'trailer:id,number'])->find($id);
+        $truck = Truck::with([
+            'driver:id,name',
+            'trailer:id,number',
+            'seller:id,name',
+            'carrier:id,name',
+        ])->find($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $truck->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $truck->id);

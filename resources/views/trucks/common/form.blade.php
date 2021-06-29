@@ -5,7 +5,7 @@
                 @if(auth()->guard('web')->check())
                     <div class="form-group col-md-6">
                         {!! Form::label('carrier_id', ucfirst(__('carrier')), ['class' => 'col-form-label']) !!}
-                        {!! Form::select('carrier_id', $carriers, $truck->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('carrier_id', [], $truck->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
                         @error('carrier_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
@@ -14,7 +14,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         {!! Form::label('seller_id', ucfirst(__('seller')), ['class' => 'col-form-label']) !!}
-                        {!! Form::select('seller_id', $sellers, $truck->seller_id ?? null, ['class' => 'form-control' . ($errors->first('seller_id') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('seller_id', [], $truck->seller_id ?? null, ['class' => 'form-control' . ($errors->first('seller_id') ? ' is-invalid' : '')]) !!}
                         @error('seller_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
