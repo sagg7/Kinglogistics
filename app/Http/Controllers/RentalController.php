@@ -26,7 +26,7 @@ class RentalController extends Controller
             'trailer_id' => ['required', 'exists:trailers,id'],
             'date_submit' => ['required', 'date'],
             'cost' => ['required', 'numeric'],
-            'deposit' => ['required', 'numeric'],
+            'deposit' => ['nullable', 'numeric'],
         ]);
     }
 

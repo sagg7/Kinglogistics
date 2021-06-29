@@ -34,8 +34,9 @@ class DriverController extends Controller
             })
             ->where(function ($q) use ($request) {
                 if ($request->rental)
-                    $q->whereDoesntHave("truck")
-                        ->whereDoesntHave("trailer");
+                    $q->whereHas("truck", function ($s) {
+                        $s->whereDoesntHave("trailer");
+                    });
             })
             ->with('truck.trailer:id,number');
 
