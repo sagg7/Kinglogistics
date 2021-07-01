@@ -37,6 +37,11 @@ class ChargeController extends Controller
         ];
     }
 
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return mixed
+     */
     private function storeUpdate(Request $request, $id = null)
     {
         return DB::transaction(function () use ($request, $id) {

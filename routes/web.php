@@ -40,6 +40,7 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/paperwork.php';
     require __DIR__.'/web/jobOpportunities.php';
     require __DIR__.'/web/charges.php';
+    require __DIR__.'/web/loans.php';
 
     Route::get('/testMail', function () {
         Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());

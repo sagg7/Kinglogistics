@@ -15,7 +15,18 @@ class CreateLoansTable extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('carrier_id');
+            $table->double('amount');
+            $table->double('paid_amount')->nullable();
+            $table->string('description', 512)->nullable();
+            $table->integer('installments');
+            $table->integer('paid_installments')->nullable();
+            $table->double('fee_percentage')->nullable();
+            $table->unsignedTinyInteger('is_paid')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('carrier_id')->references('id')->on('carriers')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
