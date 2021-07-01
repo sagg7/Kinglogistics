@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrier;
 use App\Models\Charge;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
@@ -82,6 +83,13 @@ class ChargeController extends Controller
         return view('charges.create', $params);
     }
 
+    public function diesel()
+    {
+        $carriers = Carrier::pluck('name', 'id')->toArray();
+        $params = compact('carriers');
+        return view('charges.diesel', $params);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -94,6 +102,31 @@ class ChargeController extends Controller
         $this->validator($request->all())->validate();
 
         $this->storeUpdate($request);
+
+        return redirect()->route('charge.index');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeDiesel(Request $request)
+    {
+        foreach ($request->diesel as $carrier_id => $item) {
+
+            if (!$item || !is_numeric($item))
+                continue;
+            $innerRequest = new Request();
+            $innerRequest->setMethod('POST');
+            $innerRequest->request->add(['carriers' => [$carrier_id]]);
+            $innerRequest->request->add(['amount' => $item]);
+            $innerRequest->request->add(['period' => 'single']);
+            $innerRequest->request->add(['description' => 'Diesel charge.']);
+
+            //$this->validator($innerRequest->toArray());
+
+            $this->storeUpdate($innerRequest);
+        }
 
         return redirect()->route('charge.index');
     }
