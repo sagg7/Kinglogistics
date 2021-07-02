@@ -1,3 +1,4 @@
 {
-    "/js/sections/loans/common.min.js": "/js/sections/loans/common.min.js"
+    "/js/common/typesModal.min.js": "/js/common/typesModal.min.js",
+    "/js/sections/rates/common.min.js": "/js/sections/rates/common.min.js"
 }

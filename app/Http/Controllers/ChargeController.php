@@ -201,6 +201,28 @@ class ChargeController extends Controller
         ])
             ->with('carriers:id,name');
 
+        if ($request->searchable) {
+            $searchable = [];
+            $statement = "whereHas";
+            foreach ($request->searchable as $item) {
+                switch ($item) {
+                    case 'carriers':
+                        if (strtolower($request->search) == "all")
+                            $query->whereDoesntHave('carriers');
+                        else
+                            $query->$statement($item, function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%$request->search%");
+                            });
+                        $statement = "orWhereHas";
+                        break;
+                    default:
+                        $searchable[count($searchable) + 1] = $item;
+                        break;
+                }
+            }
+            $request->searchable = $searchable;
+        }
+
         return $this->simpleSearchData($query, $request, 'orWhere');
     }
 }

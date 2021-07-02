@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Loan;
+use App\Models\Rate;
+use App\Models\RateGroup;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class LoanController extends Controller
+class RateController extends Controller
 {
     use GetSimpleSearchData;
 
@@ -19,34 +20,48 @@ class LoanController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'carrier' => ['required', 'exists:carriers,id'],
-            'amount' => ['required', 'numeric'],
-            'fee_percentage' => ['required', 'numeric'],
-            'installments' => ['required', 'numeric'],
-            'description' => ['nullable', 'string', 'max:512'],
+            'rate_group' => ['required', 'exists:rate_groups,id'],
+            'shipper' => ['required', 'exists:carriers,id'],
+            'zone' => ['required', 'exists:zones,id'],
+            'start_mileage' => ['required', 'numeric'],
+            'end_mileage' => ['required', 'numeric'],
+            'shipper_rate' => ['required', 'numeric'],
+            'carrier_rate' => ['required', 'numeric'],
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return [
+            'rate_groups' => [null => ''] + RateGroup::pluck('name', 'id')->toArray(),
+        ];
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return Loan
+     * @return Rate
      */
-    private function storeUpdate(Request $request, $id = null): Loan
+    private function storeUpdate(Request $request, $id = null): Rate
     {
         if ($id)
-            $loan = Loan::findOrFail($id);
+            $rate = Rate::findOrFail($id);
         else
-            $loan = new Loan();
+            $rate = new Rate();
 
-        $loan->carrier_id = $request->carrier;
-        $loan->amount = $request->amount;
-        $loan->fee_percentage = $request->fee_percentage;
-        $loan->installments = $request->installments;
-        $loan->description = $request->description;
-        $loan->save();
+        $rate->rate_group_id = $request->rate_group;
+        $rate->shipper_id = $request->shipper;
+        $rate->zone_id = $request->zone;
+        $rate->start_mileage = $request->start_mileage;
+        $rate->end_mileage = $request->end_mileage;
+        $rate->shipper_rate = $request->shipper_rate;
+        $rate->carrier_rate = $request->carrier_rate;
+        $rate->save();
 
-        return $loan;
+        return $rate;
     }
 
     /**
@@ -56,7 +71,7 @@ class LoanController extends Controller
      */
     public function index()
     {
-        return view('loans.index');
+        return view('rates.index');
     }
 
     /**
@@ -66,7 +81,8 @@ class LoanController extends Controller
      */
     public function create()
     {
-        return view('loans.create');
+        $params = $this->createEditParams();
+        return view('rates.create', $params);
     }
 
     /**
@@ -81,7 +97,7 @@ class LoanController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('loan.index');
+        return redirect()->route('rate.index');
     }
 
     /**
@@ -103,9 +119,9 @@ class LoanController extends Controller
      */
     public function edit(int $id)
     {
-        $loan = Loan::findOrFail($id);
-        $params = compact('loan');
-        return view('loans.create', $params);
+        $rate = Rate::findOrFail($id);
+        $params = compact('rate') + $this->createEditParams();
+        return view('rates.edit', $params);
     }
 
     /**
@@ -121,7 +137,7 @@ class LoanController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('loan.index');
+        return redirect()->route('rate.index');
     }
 
     /**
@@ -132,10 +148,10 @@ class LoanController extends Controller
      */
     public function destroy(int $id)
     {
-        $loan = Loan::findOrFail($id);
+        $rate = Rate::findOrFail($id);
 
-        if ($loan)
-            return ['success' => $loan->delete()];
+        if ($rate)
+            return ['success' => $rate->delete()];
         else
             return ['success' => false];
     }
@@ -146,23 +162,30 @@ class LoanController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Loan::select([
-            "loans.id",
-            "loans.amount",
-            "loans.paid_amount",
-            "loans.installments",
-            "loans.paid_installments",
-            "loans.fee_percentage",
-            "loans.carrier_id",
+        $query = Rate::select([
+            "rates.id",
+            "rates.rate_group_id",
+            "rates.shipper_id",
+            "rates.zone_id",
+            "rates.start_mileage",
+            "rates.end_mileage",
+            "rates.shipper_rate",
+            "rates.carrier_rate",
         ])
-            ->with('carrier:id,name');
+            ->with([
+                'rate_group:id,name',
+                'shipper:id,name',
+                'zone:id,name',
+            ]);
 
         if ($request->searchable) {
             $searchable = [];
             $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
-                    case 'carrier':
+                    case 'rate_group':
+                    case 'shipper':
+                    case 'zone':
                         $query->$statement($item, function ($q) use ($request) {
                             $q->where('name', 'LIKE', "%$request->search%");
                         });

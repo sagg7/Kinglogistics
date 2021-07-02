@@ -27,7 +27,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')*/
     //.js('resources/js/app.js', 'public/js')
     // Common
-    //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
+    .js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js')
     // Sections
@@ -41,7 +41,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/notifications/common.js'], 'public/js/sections/notifications/common.min.js')
     //.scripts(['resources/js/sections/jobOpportunities/common.js'], 'public/js/sections/jobOpportunities/common.min.js')
     //.scripts(['resources/js/sections/charges/common.js'], 'public/js/sections/charges/common.min.js')
-    .scripts(['resources/js/sections/loans/common.js'], 'public/js/sections/loans/common.min.js')
+    //.scripts(['resources/js/sections/loans/common.js'], 'public/js/sections/loans/common.min.js')
+    .scripts(['resources/js/sections/rates/common.js'], 'public/js/sections/rates/common.min.js')
     //.scripts(['resources/js/sections/trucks/common.js'], 'public/js/sections/trucks/common.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
