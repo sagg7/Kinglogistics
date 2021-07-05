@@ -23,7 +23,8 @@ trait PushNotificationsTrait
         $optionBuilder = $this->optionBuild();
 
         $notificationBuilder = new PayloadNotificationBuilder($title);
-        $notificationBuilder->setBody($message)
+        $notificationBuilder
+            ->setBody($message)
             ->setSound('default');
 
         $dataBuilder = new PayloadDataBuilder();

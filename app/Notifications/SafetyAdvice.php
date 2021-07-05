@@ -23,6 +23,7 @@ class SafetyAdvice extends Notification implements IPushNotification
     {
         $this->driver = $driver;
         $this->advice = $advice;
+        $this->sendPushNotification();
     }
 
     /**
@@ -64,8 +65,8 @@ class SafetyAdvice extends Notification implements IPushNotification
     public function notificationBody()
     {
         return [
-            'title' => '',
-            'message' => ''
+            'title' => 'Safety advice',
+            'message' => 'Read the next information carefully!'
         ];
     }
 

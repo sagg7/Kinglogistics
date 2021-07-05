@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadsController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\SafetyAdvicesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
@@ -43,6 +44,20 @@ Route::group([
         'prefix' => 'loads',
     ], function () {
         Route::get('', [LoadsController::class, 'index']);
+    });
+
+    Route::group([
+        'prefix' => 'safety'
+    ], function () {
+        Route::post('send-advice', [SafetyAdvicesController::class, 'sendAdvice']);
+    });
+
+    Route::group([
+        'prefix' => 'notifications'
+    ], function () {
+        Route::get('', [DriverNotificationsController::class, 'index']);
+        Route::get('advices', [DriverNotificationsController::class, 'getSafetyAdvicesList']);
+        Route::post('mark-as-read', [DriverNotificationsController::class, 'markNotificationAsRead']);
     });
 
 });

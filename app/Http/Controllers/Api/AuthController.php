@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -17,16 +18,24 @@ class AuthController extends Controller
         ]);
 
         // Check email
-        $user = Driver::where('email', $request->email)->first();
+        $driver = Driver::where('email', $request->email)->first();
         // Check password
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$driver || !Hash::check($request->password, $driver->password)) {
             return response(["message" => "Access Denied"], 401);
         }
 
-        $token = $user->createToken($user->name.$user->last_name)->plainTextToken;
+        $deviceToken = $request->get('device_token');
+
+        if (!empty($deviceToken) && empty(Device::where('token', $deviceToken)->first())) {
+            $driver->devices()->create([
+                'token' => $deviceToken
+            ]);
+        }
+
+        $token = $driver->createToken($driver->name . $driver->last_name)->plainTextToken;
 
         $response = [
-            "user" => $user,
+            "user" => $driver,
             "token" => $token,
         ];
 

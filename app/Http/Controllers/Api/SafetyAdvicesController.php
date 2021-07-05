@@ -13,10 +13,15 @@ class SafetyAdvicesController extends Controller
 
     public function sendAdvice(Request $request)
     {
-        $driver = Driver::find($request->driver_id);
+        if (isset($request->driver_id)) {
+            $driver = Driver::find($request->driver_id);
+        } else {
+            $driver = Driver::find($request->driver_id);
+        }
 
-        $driver->notify(new SafetyAdvice());
+        $driver->notify(new SafetyAdvice($driver, $request->advice));
 
+        return response(['status' => 'ok'], 200);
     }
 
 }
