@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DriverLocation;
 use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadsController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
@@ -47,9 +49,25 @@ Route::group([
     });
 
     Route::group([
+        'prefix' => 'chat'
+    ], function () {
+
+        Route::post('shipper', [ChatController::class, 'sendMessageAsShipper']);
+        Route::post('driver', [ChatController::class, 'sendMessageAsDriver']);
+        Route::get('conversation', [ChatController::class, 'getConversation']);
+
+    });
+
+    Route::group([
         'prefix' => 'safety'
     ], function () {
         Route::post('send-advice', [SafetyAdvicesController::class, 'sendAdvice']);
+    });
+
+    Route::group([
+        'prefix' => 'location',
+    ], function () {
+        Route::post('update', [DriverLocation::class, 'updateDriverLocation']);
     });
 
     Route::group([

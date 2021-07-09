@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Shipper extends Authenticatable
+class Shipper extends Messenger
 {
     use HasFactory, SoftDeletes;
 

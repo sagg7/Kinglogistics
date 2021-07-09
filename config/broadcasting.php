@@ -36,8 +36,8 @@ return [
             'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
+                'encrypted' => env('WEBSOCKET_ENCRYPTED'),
                 'cluster' => env('PUSHER_APP_CLUSTER'),
-                'useTLS' => true,
             ],
         ],
 
