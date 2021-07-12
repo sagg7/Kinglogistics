@@ -15,11 +15,11 @@ class SafetyAdvicesController extends Controller
     {
         if (isset($request->driver_id)) {
             $driver = Driver::find($request->driver_id);
+            $driver->notify(new SafetyAdvice($driver, $request->advice));
         } else {
-            $driver = Driver::find($request->driver_id);
+            $driver = Driver::all();
         }
 
-        $driver->notify(new SafetyAdvice($driver, $request->advice));
 
         return response(['status' => 'ok'], 200);
     }

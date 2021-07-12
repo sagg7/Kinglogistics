@@ -30,6 +30,7 @@ mix.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js')
     .js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js')
+    .js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
