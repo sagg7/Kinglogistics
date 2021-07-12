@@ -15,6 +15,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
+            'device_token' => 'required|string',
         ]);
 
         // Check email
