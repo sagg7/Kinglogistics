@@ -7,9 +7,9 @@ OptionsRenderer.prototype.guidGenerator = () => {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
-OptionsRenderer.prototype.deleteFunction = (route, table) => {
+OptionsRenderer.prototype.confirmationFunction = (route, table, data) => {
     Swal.fire({
-        title: 'Confirmation to delete item',
+        title: data.title,
         showCancelButton: true,
         confirmButtonText: 'Confirm',
         cancelButtonText: 'Cancel',
@@ -34,16 +34,37 @@ OptionsRenderer.prototype.deleteFunction = (route, table) => {
     });
 }
 
+OptionsRenderer.prototype.deleteFunction = (route, table) => {
+    OptionsRenderer.prototype.confirmationFunction(route, table, {title: 'Confirmation to delete item'});
+}
+
 OptionsRenderer.prototype.init = (params) => {
     this.eGui = document.createElement('div');
     let popId = OptionsRenderer.prototype.guidGenerator(),
         menu = `<button class="btn waves-effect waves-light" data-toggle="popover" data-placement="top" data-container="body" id="pop-${popId}"><i class="fa fa-bars"></i></button>`,
-        content = `<ul class="list-group list-group-flush">`;
+        content = `<ul class="list-group list-group-flush">`,
+        menuData = {};
 
     params.colDef.menuData.forEach((item) => {
-        if (item.type === 'delete')
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 delete" href="${item.route}/${params.data.id}"><i class="feather icon-trash-2"></i> Delete</a></li>`;
-        else if (item.modal)
+        if (item.type) {
+            let classId = '',
+                icon = '',
+                text = '';
+            switch (item.type) {
+                case 'delete':
+                    classId = 'delete';
+                    text = 'Delete';
+                    icon = 'feather icon-trash-2';
+                    break;
+                case 'confirm':
+                    classId = 'confirm';
+                    text = item.text;
+                    icon = item.icon;
+                    break;
+            }
+            menuData = item.menuData;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}"><i class="${icon}"></i> ${text}</a></li>`;
+        } else if (item.modal)
             content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${item.route}/${params.data.id}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
         else
             content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1" href="${item.route}/${params.data.id}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
@@ -56,10 +77,11 @@ OptionsRenderer.prototype.init = (params) => {
         $(`#pop-${popId}`).popover({
             html: true,
             content,
-            trigger: 'focues',
+            trigger: 'focus',
         }).on('shown.bs.popover', function (e) {
             let pop = $('.popover'),
                 del = pop.find('.delete'),
+                confirm = pop.find('.confirm'),
                 modal = pop.find('.open-modal');
             modal.click((e) => {
                 let btn = $(e.currentTarget),
@@ -71,6 +93,10 @@ OptionsRenderer.prototype.init = (params) => {
             del.click(function (e) {
                 e.preventDefault();
                 OptionsRenderer.prototype.deleteFunction(del.attr('href'), params.api.gridCore.gridOptions.components.tableRef);
+            });
+            confirm.click((e) => {
+                e.preventDefault();
+                OptionsRenderer.prototype.confirmationFunction(confirm.attr('href'), params.api.gridCore.gridOptions.components.tableRef, menuData);
             });
         });
     });
@@ -219,32 +245,32 @@ class tableAG {
         let html = `<section>`;
         if (!this.renderSimple)
             html += `<div class="row">` +
-            `<div class="col-12 p-0">` +
-            `<div class="ag-grid-btns d-flex justify-content-between flex-wrap mb-1">` +
-            `<div class="dropdown sort-dropdown mb-1 mb-sm-0">` +
-            `<button class="btn btn-white dropdown-toggle border text-dark" type="button" id="agDropSize" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">` +
-            `Show ${this.gridOptions.paginationPageSize}` +
-            `</button>` +
-            `<div class="dropdown-menu dropdown-menu-right" aria-labelledby="agDropSize">` +
-            `<a class="dropdown-item" href="#">${this.gridOptions.paginationPageSize}</a>` +
-            `<a class="dropdown-item" href="#">50</a>` +
-            `<a class="dropdown-item" href="#">100</a>` +
-            `<a class="dropdown-item" href="#">150</a>` +
-            `</div>` +
-            `</div>` +
-            `<div class="ag-btns d-flex flex-wrap">` +
-            `<div class="input-group">` +
-            `<input type="text" class="ag-grid-filter form-control mb-1 mb-sm-0" id="filter-text-box" placeholder="Search...." />` +
-            `<div class="input-group-append"><button class="btn btn-primary pl-1 pr-1 waves-effect waves-light" type="button"><i class="fa fa-search"></i></button></div>` +
-            `</div>` +
-            /*`<div class="btn-export">` +
-            `<button class="btn btn-primary ag-grid-export-btn">` +
-            `Export as CSV` +
-            `</button>` +
-            `</div>` +*/
-            `</div>` +
-            `</div>` +
-            `</div>`;
+                `<div class="col-12 p-0">` +
+                `<div class="ag-grid-btns d-flex justify-content-between flex-wrap mb-1">` +
+                `<div class="dropdown sort-dropdown mb-1 mb-sm-0">` +
+                `<button class="btn btn-white dropdown-toggle border text-dark filter-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">` +
+                `Show ${this.gridOptions.paginationPageSize}` +
+                `</button>` +
+                `<div class="dropdown-menu dropdown-menu-right">` +
+                `<a class="dropdown-item" href="#">${this.gridOptions.paginationPageSize}</a>` +
+                `<a class="dropdown-item" href="#">50</a>` +
+                `<a class="dropdown-item" href="#">100</a>` +
+                `<a class="dropdown-item" href="#">150</a>` +
+                `</div>` +
+                `</div>` +
+                `<div class="ag-btns d-flex flex-wrap">` +
+                `<div class="input-group">` +
+                `<input type="text" class="ag-grid-filter form-control mb-1 mb-sm-0" placeholder="Search...." />` +
+                `<div class="input-group-append"><button class="btn btn-primary pl-1 pr-1 waves-effect waves-light" type="button"><i class="fa fa-search"></i></button></div>` +
+                `</div>` +
+                /*`<div class="btn-export">` +
+                `<button class="btn btn-primary ag-grid-export-btn">` +
+                `Export as CSV` +
+                `</button>` +
+                `</div>` +*/
+                `</div>` +
+                `</div>` +
+                `</div>`;
         html += `<div id="${this.container}" class="aggrid ag-theme-material w-100"` +
             `</section>`;
         return html;
@@ -303,8 +329,10 @@ class tableAG {
 
         let gridTable = document.querySelector(`#${this.container}`);
 
+        const section = $(`#${this.container}`).closest('section');
+
         /*** FILTER TABLE ***/
-        let filter = $(".ag-grid-filter");
+        let filter = section.find(`.ag-grid-filter`);
         filter.on("keyup", (e) => {
             if (e.which === 13)
                 this.updateSearchQuery(filter.val());
@@ -314,10 +342,10 @@ class tableAG {
         });
 
         /*** CHANGE DATA PER PAGE ***/
-        $(".sort-dropdown .dropdown-item").on("click", (e) => {
+        section.find(`.sort-dropdown .dropdown-item`).on("click", (e) => {
             let el = $(e.target);
             this.changePageSize(el.text());
-            $(".filter-btn").text("Mostrar " + el.text() /*+ " of 500"*/);
+            section.find(`.filter-btn`).text("Mostrar " + el.text() /*+ " of 500"*/);
         });
 
         /*** EXPORT AS CSV BTN ***/

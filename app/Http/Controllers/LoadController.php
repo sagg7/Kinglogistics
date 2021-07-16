@@ -161,7 +161,10 @@ class LoadController extends Controller
         /**
          * THERE SHOULD BE NO CASE TO UPDATE
          */
-        return abort(404);
+        $this->storeUpdate($request->all(), $id);
+
+        return redirect()->route('load.index');
+        //return abort(404);
     }
 
     /**

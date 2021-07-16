@@ -23,7 +23,7 @@ class ExpenseController extends Controller
             'type' => ['required'],
             'truck_id' => ['required', 'exists:trucks,id'],
             'amount' => ['required', 'numeric'],
-            'description' => ['nullable', 'string', 'max:512'],
+            'description' => ['required', 'string', 'max:512'],
             'mileage' => ['nullable', 'numeric'],
             'gallons' => ['nullable', 'numeric'],
         ]);
@@ -171,7 +171,8 @@ class ExpenseController extends Controller
             "expenses.type",
             "expenses.amount",
             "expenses.created_at",
-        ]);
+        ])
+            ->where('carrier_id', auth()->user()->id);
 
         return $this->simpleSearchData($query, $request, 'orWhere');
     }

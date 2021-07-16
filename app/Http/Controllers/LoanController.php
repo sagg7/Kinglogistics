@@ -23,7 +23,7 @@ class LoanController extends Controller
             'amount' => ['required', 'numeric'],
             'fee_percentage' => ['required', 'numeric'],
             'installments' => ['required', 'numeric'],
-            'description' => ['nullable', 'string', 'max:512'],
+            'description' => ['required', 'string', 'max:512'],
         ]);
     }
 

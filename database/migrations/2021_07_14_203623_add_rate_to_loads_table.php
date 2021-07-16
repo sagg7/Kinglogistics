@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTripIdToLoadsTable extends Migration
+class AddRateToLoadsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,9 @@ class AddTripIdToLoadsTable extends Migration
     public function up()
     {
         Schema::table('loads', function (Blueprint $table) {
-            $table->unsignedBigInteger('trip_id')->nullable()->after('date');
-
-            $table->foreign('trip_id')->references('id')->on('trips')->onUpdate('cascade')->onDelete('cascade');
+            $table->string('sand_ticket')->nullable()->after('status');
+            $table->string('bol')->nullable()->after('sand_ticket');
+            $table->double('rate')->nullable()->after('bol');
         });
     }
 
@@ -28,7 +28,7 @@ class AddTripIdToLoadsTable extends Migration
     public function down()
     {
         Schema::table('loads', function (Blueprint $table) {
-            $table->dropColumn('trip_id');
+            $table->dropColumn(['sand_ticket', 'bol', 'rate']);
         });
     }
 }

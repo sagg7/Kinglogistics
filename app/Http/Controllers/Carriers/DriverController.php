@@ -183,6 +183,7 @@ class DriverController extends Controller
             'drivers.id',
             'drivers.name as text',
         ])
+            ->where('carrier_id', auth()->user()->id)
             ->where("name", "LIKE", "%$request->search%")
             ->whereNull("inactive")
             ->whereDoesntHave("truck");
@@ -201,6 +202,7 @@ class DriverController extends Controller
             "drivers.name",
             "drivers.zone_id",
         ])
+            ->where('carrier_id', auth()->user()->id)
             ->with('truck:driver_id,number', 'zone:id,name');
 
         if ($request->searchable) {

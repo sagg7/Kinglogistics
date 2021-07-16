@@ -97,6 +97,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Diesel</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/carrier/payment">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Payments</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">

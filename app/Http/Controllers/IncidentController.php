@@ -242,7 +242,7 @@ class IncidentController extends Controller
             "user",
             "incident_type",
         ])
-            ->find($id)
+            ->findOrFail($id)
             ->toArray();
 
         $mpdf = new Mpdf();

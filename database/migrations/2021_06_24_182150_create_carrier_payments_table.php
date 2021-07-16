@@ -17,9 +17,9 @@ class CreateCarrierPaymentsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('carrier_id');
             $table->date('date');
-            $table->double('gross_amount');
-            $table->double('reductions');
-            $table->double('total');
+            $table->double('gross_amount')->nullable();
+            $table->double('reductions')->nullable();
+            $table->double('total')->nullable();
             $table->timestamps();
         });
     }

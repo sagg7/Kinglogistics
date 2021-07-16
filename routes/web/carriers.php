@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\CarrierPaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('carrier')->group(function () {
@@ -21,4 +22,18 @@ Route::prefix('carrier')->group(function () {
         ->where('profile', '[0-1]');
     Route::post('delete/{id}', [CarrierController::class, 'destroy'])
         ->name('carrier.delete');
+
+    Route::prefix('payment')->group(function () {
+        Route::get('/', [CarrierPaymentController::class, 'index'])
+            ->name('carrier.payments');
+        Route::get('search/{type}', [CarrierPaymentController::class, 'search'])
+            ->name('carrier.paymentsSearch');
+        Route::get('downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
+            ->name('carrier.downloadPaymentPDF');
+
+        Route::post('complete/{id}', [CarrierPaymentController::class, 'complete'])
+            ->name('carrier.completePayment');
+        Route::post('payCharges/{id}', [CarrierPaymentController::class, 'payCharges'])
+            ->name('carrier.payCharges');
+    });
 });

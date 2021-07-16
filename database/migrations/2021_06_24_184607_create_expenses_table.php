@@ -21,8 +21,8 @@ class CreateExpensesTable extends Migration
             $table->double('amount');
             $table->string('description', 512)->nullable();
             $table->enum('type', ['other', 'diesel', 'salary', 'repairments']);
-            $table->double('mileage');
-            $table->double('gallons');
+            $table->double('mileage')->nullable();
+            $table->double('gallons')->nullable();
             $table->unsignedTinyInteger('non_editable')->nullable();
             $table->timestamps();
 
