@@ -18,7 +18,6 @@
             (() => {
                 const moneyFormatter = (params) => {
                     if (params.value) {
-                        console.log(params);
                         if (params.data.status && params.data.status === 'charges' && params.colDef.field === 'total')
                             return numeral(-params.value).format('$0,0.00');
                         else
@@ -36,8 +35,15 @@
                     } else
                         return '$0.00';
                 };
+                const nameFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return '';
+                };
                 const chargesColumns = [
                     {headerName: 'Date', field: 'date'},
+                    {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                     {headerName: 'Subtotal', field: 'gross_amount', valueFormatter: moneyFormatter},
                     {headerName: 'Reductions', field: 'reductions', valueFormatter: moneyFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
@@ -76,7 +82,7 @@
                                 penChargesTable = new tableAG({
                                     columns: [
                                         {headerName: 'Carrier', field: 'name'},
-                                        {headerName: 'Amount', field: 'amount', valueFormatter: expensesFormatter},
+                                        {headerName: 'Amount', field: 'amount', filter:false, valueFormatter: expensesFormatter},
                                     ],
                                     menu: [
                                         {text: 'List', route: '#view-expenses', icon: 'far fa-eye', modal: true},

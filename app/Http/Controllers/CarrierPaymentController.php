@@ -154,12 +154,14 @@ class CarrierPaymentController extends Controller
     {
         $query = CarrierPayment::select([
             "carrier_payments.id",
+            "carrier_payments.carrier_id",
             "carrier_payments.date",
             "carrier_payments.gross_amount",
             "carrier_payments.reductions",
             "carrier_payments.total",
             "carrier_payments.status",
         ])
+            ->with('carrier:id,name')
             ->where(function ($q) use ($type) {
                 switch ($type) {
                     case 'pending':
@@ -174,7 +176,26 @@ class CarrierPaymentController extends Controller
                 }
             });
 
-        return $this->simpleSearchData($query, $request);
+        if ($request->searchable) {
+            $searchable = [];
+            $statement = "whereHas";
+            foreach ($request->searchable as $item) {
+                switch ($item) {
+                    case 'carrier':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    default:
+                        $searchable[count($searchable) + 1] = $item;
+                        break;
+                }
+            }
+            $request->searchable = $searchable;
+        }
+
+        return $this->simpleSearchData($query, $request, 'orWhere');
     }
 
     /**
@@ -199,6 +220,11 @@ class CarrierPaymentController extends Controller
         return $this->simpleSearchData($query, $request);
     }
 
+    /**
+     * @param $id
+     * @return string
+     * @throws \Mpdf\MpdfException
+     */
     public function downloadPDF($id)
     {
         $carrierPayment = CarrierPayment::with([
@@ -207,7 +233,6 @@ class CarrierPaymentController extends Controller
             'expenses',
         ])
             ->findOrFail($id);
-
 
         $mpdf = new Mpdf();
         $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');

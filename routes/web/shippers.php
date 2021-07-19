@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ShipperController;
+use App\Http\Controllers\ShipperInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('shipper')->group(function () {
@@ -22,4 +23,16 @@ Route::prefix('shipper')->group(function () {
         ->name('shipper.update');
     Route::post('delete/{id}', [ShipperController::class, 'destroy'])
         ->name('shipper.delete');
+
+    Route::prefix('invoice')->group(function () {
+        Route::get('/', [ShipperInvoiceController::class, 'index'])
+            ->name('invoice.payments');
+        Route::get('search/{type}', [ShipperInvoiceController::class, 'search'])
+            ->name('invoice.paymentsSearch');
+        Route::get('downloadPDF/{id}', [ShipperInvoiceController::class, 'downloadPDF'])
+            ->name('invoice.downloadPaymentPDF');
+
+        Route::post('complete/{id}', [ShipperInvoiceController::class, 'complete'])
+            ->name('invoice.completePayment');
+    });
 });

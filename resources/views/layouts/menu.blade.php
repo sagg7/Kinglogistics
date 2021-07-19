@@ -67,6 +67,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/shipper/invoice">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Invoices</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">

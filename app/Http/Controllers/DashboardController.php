@@ -9,6 +9,7 @@ use App\Models\Expense;
 use App\Models\Load;
 use App\Models\Loan;
 use App\Models\Rate;
+use App\Models\ShipperInvoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,7 @@ class DashboardController extends Controller
             $all_carriers = [];
             $carbon_now = Carbon::now();
             // Set charges to create expenses
-            foreach ($charges as $charge) {
+            /*foreach ($charges as $charge) {
                 // If there are no related carriers it means it's a charge for all carriers
                 if (count($charge->carriers) === 0) {
                     // All carriers are queried only if at least one of the charges is for all carriers, and it's not queried again
@@ -104,9 +105,13 @@ class DashboardController extends Controller
                     "updated_at" => $carbon_now,
                 ];
             }
-            Expense::insert($new_expenses);
+            Expense::insert($new_expenses);*/
             $carrier_payments = [];
-            $loads = Load::whereNull('carrier_payment_id')
+            $shipper_invoices = [];
+            $loads = Load::where(function ($q) {
+                $q->whereNull('carrier_payment_id')
+                    ->orWhereNull('shipper_invoice_id');
+            })
                 ->whereHas('driver')
                 //->where('status', 'finished') //TODO: CHECK IN WHICH STATUS
                 ->with([
@@ -165,31 +170,28 @@ class DashboardController extends Controller
                     // Save the rate to an array to possibly save futher queries from happening for the same rate
                     $rates[] = ['rate' => $rate, 'flag' => $flag];
                 }
-                if (!isset($carrier_payments[$carrier_id])) {
-                    $carrier_payments[$carrier_id] = [
+                // Save the load to the load set and the corresponding rate
+                if (!$load->carrier_payment_id)
+                    $carrier_payments[$carrier_id]['loads'][] = ['load' => $load, 'rate' => $rate];
+
+                // Shipper invoices
+                if (!isset($shipper_invoices[$shipper_id])) {
+                    $shipper_invoices[$shipper_id] = [
                         'load_count' => 1,
                         'loops' => 0,
                     ];
                 }
+                $loops = $shipper_invoices[$shipper_id]['loops'];
                 // Limits payments to 40 loads
-                /*if ($carrier_payments[$carrier_id]['load_count'] === 40) {
-                    $carrier_payments[$carrier_id]['load_count'] = 0;
-                    $carrier_payments[$carrier_id]['loops']++;
-                }*/
-                $loops = $carrier_payments[$carrier_id]['loops'];
-                //$load_count = $carrier_payments[$carrier_id]['load_count'];
-                // If the first iteration of the 40 loads set, create a new carrier payment object
-                /*if ($load_count === 1)
-                    $carrier_payments[$carrier_id]['load_groups'][$loops]['payment'] = (new CarrierPayment())->save();*/
-                // Set the load total sum
-                /*if (isset($carrier_payments[$carrier_id]['load_groups'][$loops]['load_total']))
-                    $carrier_payments[$carrier_id]['load_groups'][$loops]['load_total'] += $rate->carrier_rate;
-                else
-                    $carrier_payments[$carrier_id]['load_groups'][$loops]['load_total'] = $rate->carrier_rate;*/
-                // Save the load to the load set and the corresponding rate
-                $carrier_payments[$carrier_id]['load_groups'][$loops]['loads'][] = ['load' => $load, 'rate' => $rate];
-                // Update the loud counter
-                $carrier_payments[$carrier_id]['load_count']++;
+                if ($shipper_invoices[$shipper_id]['load_count'] === 40) {
+                    $shipper_invoices[$shipper_id]['load_count'] = 0;
+                    $shipper_invoices[$shipper_id]['loops']++;
+                }
+                // Update the load counter
+                if (!$load->shipper_invoice_id) {
+                    $shipper_invoices[$carrier_id]['load_groups'][$loops]['loads'][] = ['load' => $load, 'rate' => $rate];
+                    $shipper_invoices[$shipper_id]['load_count']++;
+                }
             }
             // Get all pending expenses
             $expenses = Expense::whereNull('carrier_payment_id')
@@ -202,42 +204,57 @@ class DashboardController extends Controller
             }
             // Iterate through the carrier payments array to generate the payments
             foreach ($carrier_payments as $carrier_id => $payment) {
+                // Create the new carrier payment
+                $carrier_payment = new CarrierPayment();
+                $carrier_payment->date = $carbon_now;
+                $carrier_payment->carrier_id = $carrier_id;
+                $carrier_payment->save();
+                // Init the gross amount variable
+                $gross_amount = 0;
+                // Init the expense amount variable
+                $expense_amount = 0;
+                // Calculate the gross amount and save the relation on loads
+                foreach ($payment['loads'] as $item) {
+                    $item['load']->carrier_payment_id = $carrier_payment->id;
+                    $item['load']->rate = $item['rate']->carrier_rate;
+                    $item['load']->save();
+                    $gross_amount += $item['rate']->carrier_rate;
+                }
+                foreach ($payment['expenses'] as $idx => $expense) {
+                    $expense_amount += $expense->amount;
+                    // If the expense amount is bigger than the gross amount
+                    if ($expense_amount > $gross_amount) {
+                        $expense_amount -= $expense->amount;
+                        continue;
+                    }
+                    // Save the carrier payment id to the expense
+                    $expense->carrier_payment_id = $carrier_payment->id;
+                    $expense->save();
+                    // Remove the expense from the array, the ones not removed end up as the pending expenses
+                    unset($payment['expenses'][$idx]);
+                }
+                // Save the carrier payment data
+                $carrier_payment->gross_amount = $gross_amount;
+                $carrier_payment->reductions = $expense_amount;
+                $carrier_payment->total = $gross_amount - $expense_amount;
+                $carrier_payment->save();
+            }
+            foreach ($shipper_invoices as $shipper_id => $invoice) {
                 // Iterate through the load grouping
-                foreach ($payment['load_groups'] as $iteration => $group) {
-                    // Create the new carrier payment
-                    $carrier_payment = new CarrierPayment();
-                    $carrier_payment->date = $carbon_now;
-                    $carrier_payment->carrier_id = $carrier_id;
-                    $carrier_payment->save();
-                    // Init the gross amount variable
-                    $gross_amount = 0;
-                    // Calculate the gross amount and save the relation on loads
+                foreach ($invoice['load_groups'] as $iteration => $group) {
+                    $shipper_invoice = new ShipperInvoice();
+                    $shipper_invoice->date = $carbon_now;
+                    $shipper_invoice->shipper_id = $shipper_id;
+                    $shipper_invoice->save();
+                    $invoice_total = 0;
                     foreach ($group['loads'] as $item) {
-                        $item['load']->carrier_payment_id = $carrier_payment->id;
+                        $item['load']->shipper_invoice_id = $shipper_invoice->id;
+                        $item['load']->shipper_rate = $item['rate']->shipper_rate;
                         $item['load']->save();
-                        $gross_amount += $item['rate']->carrier_rate;
+                        $invoice_total += $item['rate']->shipper_rate;
                     }
-                    // Init the expense amount variable
-                    $expense_amount = 0;
-                    foreach ($payment['expenses'] as $idx => $expense) {
-                        $expense_amount += $expense->amount;
-                        // If the expense amount is bigger than the gross amount
-                        if ($expense_amount > $gross_amount) {
-                            $expense_amount -= $expense->amount;
-                            continue;
-                        }
-                        // Save the carrier payment id to the expense
-                        $expense->carrier_payment_id = $carrier_payment->id;
-                        $expense->save();
-                        // Remove the expense from the array, the ones not removed end up as the
-                        // pending expenses
-                        unset($payment['expenses'][$idx]);
-                    }
-                    // Save the carrier payment data
-                    $carrier_payment->gross_amount = $gross_amount;
-                    $carrier_payment->reductions = $expense_amount;
-                    $carrier_payment->total = $gross_amount - $expense_amount;
-                    $carrier_payment->save();
+                    $shipper_invoice->total = $invoice_total;
+                    $shipper_invoice->save();
                 }
             }
         });
