@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DriverLocation;
+use App\Http\Controllers\Api\DriverLocationController;
 use App\Http\Controllers\Api\DriverNotificationsController;
-use App\Http\Controllers\Api\LoadsController;
+use App\Http\Controllers\Api\LoadController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use Illuminate\Support\Facades\Route;
@@ -45,7 +45,7 @@ Route::group([
     Route::group([
         'prefix' => 'loads',
     ], function () {
-        Route::get('', [LoadsController::class, 'index']);
+        Route::get('', [LoadController::class, 'index']);
     });
 
     Route::group([
@@ -67,7 +67,7 @@ Route::group([
     Route::group([
         'prefix' => 'location',
     ], function () {
-        Route::post('update', [DriverLocation::class, 'updateDriverLocation']);
+        Route::post('update', [DriverLocationController::class, 'updateDriverLocation']);
     });
 
     Route::group([

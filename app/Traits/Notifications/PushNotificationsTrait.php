@@ -3,6 +3,7 @@
 namespace App\Traits\Notifications;
 
 use App\Models\Device;
+use App\Notifications\Constraints\IPushNotification;
 use LaravelFCM\Message\Exceptions\InvalidOptionsException;
 use LaravelFCM\Message\OptionsBuilder;
 use LaravelFCM\Message\PayloadDataBuilder;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 trait PushNotificationsTrait
 {
 
-    public function sendNotification($title, $message, $token, $data = [])
+    public function sendNotification($title, $message, $token, $targetScreen, $data = [])
     {
         if (!$token) {
             return;
@@ -29,7 +30,9 @@ trait PushNotificationsTrait
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData([
-            'payload' => $data
+            'click_action' => IPushNotification::CLICK_ACTION,
+            'screen' => $targetScreen,
+            'payload' => $data,
         ]);
 
         $option = $optionBuilder->build();
@@ -38,7 +41,7 @@ trait PushNotificationsTrait
 
         $downstreamResponse = FCM::sendTo($token, $option, $notification, $data);
 
-        if ($downstreamResponse->numberFailure() > 0) {
+            if ($downstreamResponse->numberFailure() > 0) {
             foreach ($downstreamResponse->tokensToDelete() as $token) {
                 Device::where('token', $token)->delete();
             }

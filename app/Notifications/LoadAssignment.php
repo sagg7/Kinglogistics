@@ -6,24 +6,26 @@ use App\Enums\DriverAppRoutes;
 use App\Notifications\Constraints\IPushNotification;
 use App\Traits\Notifications\PushNotificationsTrait;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SafetyAdvice extends Notification implements IPushNotification
+class LoadAssignment extends Notification implements IPushNotification
 {
     use Queueable, PushNotificationsTrait;
 
     private $driver;
-    private $advice;
+    private $load;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($driver, $advice)
+    public function __construct($driver, $load)
     {
         $this->driver = $driver;
-        $this->advice = $advice;
+        $this->load = $load;
         $this->sendPushNotification();
     }
 
@@ -63,15 +65,15 @@ class SafetyAdvice extends Notification implements IPushNotification
     public function notificationBody()
     {
         return [
-            'title' => 'Safety advice',
-            'message' => 'Read the next information carefully!'
+            'title' => 'New load assignment!',
+            'message' => 'You have been assigned to a new load, tap to see details.'
         ];
     }
 
     public function notificationData()
     {
         return [
-            'advice' => $this->advice,
+            'load' => $this->load,
         ];
     }
 
@@ -84,13 +86,14 @@ class SafetyAdvice extends Notification implements IPushNotification
 
         $notification = $this->notificationBody();
 
+        $data = $this->notificationData();
+
         $this->sendNotification(
             $notification['title'],
             $notification['message'],
             $tokens,
-            DriverAppRoutes::NOTIFICATIONS . '?id=' . 0,
-            $this->notificationData()
+            DriverAppRoutes::LOAD . "?id=" . $this->load->id,
+            $data
         );
     }
-
 }

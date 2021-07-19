@@ -3,7 +3,9 @@
 namespace App\Traits\Load;
 
 use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
+use App\Notifications\LoadAssignment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -70,7 +72,7 @@ trait GenerateLoads
             $load->destination = $data["destination"];
             $load->destination_coords = $data["destination_coords"];
             $load->customer_name = $data["customer_name"];
-            $load->customer_po = $data["customer_po"];
+            $load-> customer_po = $data["customer_po"];
             $load->customer_reference = $data["customer_reference"];
             $load->tons = $data["tons"] ?? null;
             $load->silo_number = $data["silo_number"] ?? null;
@@ -81,6 +83,9 @@ trait GenerateLoads
             $load->save();
 
             if ($data["driver_id"]) {
+                // Send push notification message to Driver
+                $this->notifyToDriver($data["driver_id"], $load);
+
                 // Delete driver from the available driver's lists
                 $availableDriver = AvailableDriver::findOrFail($data["driver_id"]);
                 $availableDriver->delete();
@@ -88,5 +93,18 @@ trait GenerateLoads
 
             return $load;
         });
+    }
+
+    /**
+     * Creates and send a Load Assignment notification to driver
+     *
+     * @param $driverId
+     * @param $load
+     */
+    private function notifyToDriver($driverId, $load)
+    {
+        $driver = Driver::find($driverId);
+
+        $driver->notify(new LoadAssignment($driver, $load));
     }
 }

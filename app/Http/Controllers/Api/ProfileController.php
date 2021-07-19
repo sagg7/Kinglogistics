@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Drivers\ProfileResource;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -10,9 +11,9 @@ class ProfileController extends Controller
 
     public function getProfile()
     {
-        $user = auth()->user();
+        $driver = auth()->user();
 
-        return response($user, 200);
+        return response(new ProfileResource($driver), 200);
     }
 
 }

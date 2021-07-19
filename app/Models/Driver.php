@@ -21,6 +21,10 @@ class Driver extends Authenticatable implements CanResetPassword
         'password'
     ];
 
+    protected $casts = [
+        'inactive' => 'boolean'
+    ];
+
     /**
      * @return BelongsTo
      */
@@ -88,5 +92,21 @@ class Driver extends Authenticatable implements CanResetPassword
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Gets all the rejected loads of driver
+     *
+     * @return HasMany
+     */
+
+    public function rejections(): HasMany
+    {
+        return $this->hasMany(RejectedLoad::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(DriverLocation::class);
     }
 }
