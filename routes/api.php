@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
+use App\Http\Controllers\Api\ShiftController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
@@ -76,6 +77,15 @@ Route::group([
         Route::get('', [DriverNotificationsController::class, 'index']);
         Route::get('advices', [DriverNotificationsController::class, 'getSafetyAdvicesList']);
         Route::post('mark-as-read', [DriverNotificationsController::class, 'markNotificationAsRead']);
+    });
+
+    Route::group([
+        'prefix' => 'shift',
+    ], function () {
+
+        Route::post('start', [ShiftController::class, 'start']);
+        Route::post('end', [ShiftController::class, 'end']);
+
     });
 
 });

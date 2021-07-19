@@ -109,4 +109,9 @@ class Driver extends Authenticatable implements CanResetPassword
     {
         return $this->hasMany(DriverLocation::class);
     }
+
+    public function shifts(): HasMany
+    {
+        return $this->hasMany(Shift::class);
+    }
 }
