@@ -54,6 +54,8 @@ Route::group([
         'prefix' => 'load',
     ], function () {
         Route::get('', [LoadController::class, 'index']);
+        Route::get('get-active', [LoadController::class, 'getActive']);
+        Route::get('pending-to-respond', [LoadController::class, 'getPendingToRespond']);
 
         Route::post('accept', [LoadController::class, 'accept']);
         Route::post('reject', [LoadController::class, 'reject']);

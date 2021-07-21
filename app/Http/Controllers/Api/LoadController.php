@@ -13,6 +13,8 @@ use App\Models\RejectedLoad;
 use App\Traits\Shift\ShiftTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class LoadController extends Controller
 {
@@ -31,6 +33,51 @@ class LoadController extends Controller
         $loads = LoadResource::collection($driver->loads);
 
         return response($loads, 200);
+    }
+
+    public function getActive(Request $request)
+    {
+        $driver = auth()->user();
+
+        $activeLoad = DB::table('loads')
+            ->where('driver_id', $driver->id)
+            ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
+            ->first();
+
+        if (empty($activeLoad)) {
+            $message = __('Not active load');
+            $load = $activeLoad;
+        } else {
+            $message = __('Active load found');
+            $load = new LoadResource($activeLoad);
+        }
+
+        return response([
+            'status' => 'ok',
+            'message' => $message,
+            'load' => $load
+        ]);
+    }
+
+    public function getPendingToRespond()
+    {
+        $driver = auth()->user();
+
+        $pendingLoad = $driver->loads->where('status', LoadStatusEnum::UNALLOCATED)->first();
+
+        if (empty($pendingLoad)) {
+            $message = __('No pending loads available');
+            $load = $pendingLoad;
+        } else {
+            $message = __('You have one pending load to respond');
+            $load = new LoadResource($pendingLoad);
+        }
+
+        return response([
+            'status' => 'ok',
+            'message' => $message,
+            'load' => $load
+        ]);
     }
 
     public function accept(Request $request)
