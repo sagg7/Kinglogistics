@@ -26,11 +26,13 @@ class LoadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function getRecords()
     {
         $driver = auth()->user();
 
-        $loads = LoadResource::collection($driver->loads);
+        $availableLoads = $driver->loads->where('status', LoadStatusEnum::FINISHED);
+
+        $loads = LoadResource::collection($availableLoads);
 
         return response($loads, 200);
     }

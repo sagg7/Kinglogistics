@@ -53,7 +53,7 @@ Route::group([
     Route::group([
         'prefix' => 'load',
     ], function () {
-        Route::get('', [LoadController::class, 'index']);
+        Route::get('records', [LoadController::class, 'getRecords']);
         Route::get('get-active', [LoadController::class, 'getActive']);
         Route::get('pending-to-respond', [LoadController::class, 'getPendingToRespond']);
 
