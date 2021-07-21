@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DriverLocationController;
 use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadController;
@@ -38,15 +39,30 @@ Route::group([
 ], function () {
 
     Route::group([
+        'prefix' => 'dashboard'
+    ], function () {
+        Route::get('', [DashboardController::class, 'appBootstrap']);
+    });
+
+    Route::group([
         'prefix' => 'profile'
     ], function () {
         Route::get('', [ProfileController::class, 'getProfile']);
     });
 
     Route::group([
-        'prefix' => 'loads',
+        'prefix' => 'load',
     ], function () {
         Route::get('', [LoadController::class, 'index']);
+
+        Route::post('accept', [LoadController::class, 'accept']);
+        Route::post('reject', [LoadController::class, 'reject']);
+        Route::post('loading', [LoadController::class, 'loading']);
+        Route::post('to-location', [LoadController::class, 'toLocation']);
+        Route::post('arrived', [LoadController::class, 'arrived']);
+        Route::post('unloading', [LoadController::class, 'unloading']);
+        Route::post('finished', [LoadController::class, 'finished']);
+
     });
 
     Route::group([

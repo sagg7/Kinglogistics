@@ -35,4 +35,14 @@ class Shift extends Model
         return $this->belongsTo(Driver::class);
     }
 
+    public function boxType(): BelongsTo
+    {
+        return $this->belongsTo(BoxType::class);
+    }
+
+    public function chassisType(): BelongsTo
+    {
+        return $this->belongsTo(ChassisType::class);
+    }
+
 }

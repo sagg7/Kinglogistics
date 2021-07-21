@@ -11,6 +11,7 @@ class LoadStatus extends Model
     use HasFactory;
 
     public $fillable = [
+        'load_id',
         'unallocated_timestamp',
         'requested_timestamp',
         'accepted_timestamp',

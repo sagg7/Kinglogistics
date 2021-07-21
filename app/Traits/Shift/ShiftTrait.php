@@ -28,7 +28,7 @@ trait ShiftTrait
         return response(['status' => 'ok'], 200);
     }
 
-    public function endShift($driver, $shift)
+    public function endShift($driver, $shift = null)
     {
         AvailableDriver::where('driver_id', $driver->id)->delete();
 

@@ -24,6 +24,8 @@ class CreateLoadStatusesTable extends Migration
             $table->timestamp('arrived_timestamp')->nullable();
             $table->timestamp('unloading_timestamp')->nullable();
             $table->timestamp('finished_timestamp')->nullable();
+
+            $table->timestamps();
         });
     }
 
