@@ -101,6 +101,7 @@ Route::group([
         'prefix' => 'shift',
     ], function () {
 
+        Route::get('check-status', [ShiftController::class, 'checkStatus']);
         Route::post('start', [ShiftController::class, 'start']);
         Route::post('end', [ShiftController::class, 'end']);
 

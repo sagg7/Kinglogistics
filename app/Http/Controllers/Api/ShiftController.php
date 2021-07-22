@@ -13,6 +13,17 @@ class ShiftController extends Controller
 
     use ShiftTrait;
 
+    public function checkStatus()
+    {
+        $driver = auth()->user();
+
+        $payload = [
+            'active' => !$driver->inactive
+        ];
+
+        return response(['status' => 'ok', 'data' => $payload]);
+    }
+
     public function start(Request $request)
     {
         $driver = auth()->user();
@@ -31,7 +42,9 @@ class ShiftController extends Controller
         $payload = $request->all($shift->getFillable());
         $payload['driver_id'] = $driver->id;
 
-        return $this->startShift($driver, $payload);
+        $this->startShift($driver, $payload);
+
+        return response(['status' => 'ok'], 200);
     }
 
     public function end(Request $request)
@@ -39,7 +52,9 @@ class ShiftController extends Controller
         $driver = auth()->user();
         $shift = Shift::find($request->shift_id);
 
-        return $this->endShift($driver, $shift);
+        $this->endShift($driver, $shift);
+
+        return response(['status' => 'ok'], 200);
     }
 
 

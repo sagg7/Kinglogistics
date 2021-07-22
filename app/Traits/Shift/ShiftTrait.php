@@ -25,7 +25,10 @@ trait ShiftTrait
         $availableDriver->driver_id = $driver->id;
         $availableDriver->save();
 
-        return response(['status' => 'ok'], 200);
+        // Change the driver inactive property
+        $driver->inactive = false;
+        $driver->save();
+
     }
 
     public function endShift($driver, $shift = null)
@@ -33,6 +36,10 @@ trait ShiftTrait
         AvailableDriver::where('driver_id', $driver->id)->delete();
 
         // ... Do stuff related to shift ending
+
+        // Change the driver inactive property
+        $driver->inactive = true;
+        $driver->save();
 
         return response(['status' => 'ok'], 200);
     }
