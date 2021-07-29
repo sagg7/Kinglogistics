@@ -14,6 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // Minum required config for app functionality
+        $this->call(AppConfigsSeeder::class);
+        $this->call(BoxTypesSeeder::class);
+        $this->call(ChassisTypesSeeder::class);
+
+
         // \App\Models\User::factory(10)->create();
         $this->call(RolesSeeder::class);
         $this->call(UsersSeeder::class);

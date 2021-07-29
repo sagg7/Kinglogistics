@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\LoadStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Load extends Model
@@ -48,5 +51,32 @@ class Load extends Model
     public function trip(): BelongsTo
     {
         return $this->belongsTo(Trip::class);
+    }
+
+    public function loadStatus(): HasOne
+    {
+        return $this->hasOne(LoadStatus::class);
+    }
+
+    /**
+     * Get all the load rejections
+     *
+     * @return HasMany
+     */
+
+    public function rejections(): HasMany
+    {
+        return $this->hasMany(RejectedLoad::class);
+    }
+
+    /**
+     * Get all the driver locations related to load
+     *
+     * @return HasMany
+     */
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(DriverLocation::class);
     }
 }

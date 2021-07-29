@@ -12,7 +12,7 @@
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
+ * for events that are broadcast by Laravel. Echo and event broadcasting.blade.php
  * allows your team to easily build robust real-time web applications.
  */
 

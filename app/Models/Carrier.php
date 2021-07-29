@@ -11,6 +11,10 @@ class Carrier extends Authenticatable
 {
     use HasFactory, SoftDeletes;
 
+    protected $hidden = [
+        'password'
+    ];
+
     /**
      * @return HasMany
      */

@@ -11,7 +11,7 @@ const mix = require('laravel-mix');
  |
  */
 
-mix//.sass('resources/sass/app.scss', 'public/css')
+mix.sass('resources/sass/app.scss', 'public/css')
     /*.postCss('resources/css/fontawesome.css', 'public/css')*/
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
@@ -22,30 +22,24 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/bootstrap.js', 'public/js/')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
-    //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
+    /*.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
-    //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
+    .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')*/
     //.js('resources/js/app.js', 'public/js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js')
-    //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js')
+    .js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js')
+    .js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
     //.scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
-    //.scripts(['resources/js/sections/trips/common.js'], 'public/js/sections/trips/common.min.js')
     //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
-    //.scripts(['resources/js/sections/loads/coordsMaps.js'], 'public/js/sections/loads/coordsMaps.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
-    //.scripts(['resources/js/sections/notifications/common.js'], 'public/js/sections/notifications/common.min.js')
-    //.scripts(['resources/js/sections/jobOpportunities/common.js'], 'public/js/sections/jobOpportunities/common.min.js')
-    //.scripts(['resources/js/sections/charges/common.js'], 'public/js/sections/charges/common.min.js')
-    //.scripts(['resources/js/sections/loans/common.js'], 'public/js/sections/loans/common.min.js')
-    //.scripts(['resources/js/sections/rates/common.js'], 'public/js/sections/rates/common.min.js')
-    //.scripts(['resources/js/sections/trucks/common.js'], 'public/js/sections/trucks/common.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
+    //.scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
     ;
