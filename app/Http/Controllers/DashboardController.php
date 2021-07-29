@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
 use App\Models\Charge;
-use App\Models\CarrierExpense;
+use App\Models\Expense;
 use App\Models\Load;
 use App\Models\Loan;
 use App\Models\Rate;
@@ -54,7 +54,7 @@ class DashboardController extends Controller
             $all_carriers = [];
             $carbon_now = Carbon::now();
             // Set charges to create expenses
-            foreach ($charges as $charge) {
+            /*foreach ($charges as $charge) {
                 // If there are no related carriers it means it's a charge for all carriers
                 if (count($charge->carriers) === 0) {
                     // All carriers are queried only if at least one of the charges is for all carriers, and it's not queried again
@@ -105,8 +105,7 @@ class DashboardController extends Controller
                     "updated_at" => $carbon_now,
                 ];
             }
-            // TODO: CREATE CHARGES FOR RENTALS
-            CarrierExpense::insert($new_expenses);
+            Expense::insert($new_expenses);*/
             $carrier_payments = [];
             $shipper_invoices = [];
             $loads = Load::where(function ($q) {
@@ -195,7 +194,7 @@ class DashboardController extends Controller
                 }
             }
             // Get all pending expenses
-            $expenses = CarrierExpense::whereNull('carrier_payment_id')
+            $expenses = Expense::whereNull('carrier_payment_id')
                 ->whereIn('carrier_id', $carriersId)
                 ->with('carrier')
                 //->orderBy('amount', 'ASC')

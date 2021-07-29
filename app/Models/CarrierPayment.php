@@ -28,7 +28,7 @@ class CarrierPayment extends Model
      */
     public function expenses(): HasMany
     {
-        return $this->hasMany(CarrierExpense::class);
+        return $this->hasMany(Expense::class);
     }
 
     /**

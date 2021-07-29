@@ -34,6 +34,6 @@ class Carrier extends Authenticatable
      */
     public function expenses(): HasMany
     {
-        return $this->hasMany(CarrierExpense::class);
+        return $this->hasMany(Expense::class);
     }
 }

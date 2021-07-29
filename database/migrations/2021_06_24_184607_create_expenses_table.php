@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCarrierExpensesTable extends Migration
+class CreateExpensesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCarrierExpensesTable extends Migration
      */
     public function up()
     {
-        Schema::create('carrier_expenses', function (Blueprint $table) {
+        Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('carrier_id');
             $table->unsignedBigInteger('carrier_payment_id')->nullable();
@@ -39,6 +39,6 @@ class CreateCarrierExpensesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('carrier_expenses');
+        Schema::dropIfExists('expenses');
     }
 }
