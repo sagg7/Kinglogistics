@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Notification</x-slot>
+    <x-slot name="crumb_section">Messages</x-slot>
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('head')
@@ -8,10 +8,10 @@
 
     @section('scripts')
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-        <script src="{{ asset("js/sections/jobOpportunities/common.min.js") }}"></script>
+        <script src="{{ asset("js/sections/safetyMessages/common.min.js") }}"></script>
     @endsection
 
-    {!! Form::open(['route' => 'notification.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
-    @include('notifications.common.form')
+    {!! Form::open(['route' => 'safetyMessage.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
+    @include('safetyMessages.common.form')
     {!! Form::close() !!}
 </x-app-layout>

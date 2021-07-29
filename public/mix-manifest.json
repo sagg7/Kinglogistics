@@ -1,6 +1,3 @@
 {
-    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
-    "/js/common/initSignature.min.js": "/js/common/initSignature.min.js",
-    "/js/broadcasting-test.js": "/js/broadcasting-test.js",
-    "/css/app.css": "/css/app.css"
+    "/js/sections/safetyMessages/common.min.js": "/js/sections/safetyMessages/common.min.js"
 }

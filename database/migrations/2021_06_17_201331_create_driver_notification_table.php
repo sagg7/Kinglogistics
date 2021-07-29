@@ -13,13 +13,13 @@ class CreateDriverNotificationTable extends Migration
      */
     public function up()
     {
-        Schema::create('driver_notification', function (Blueprint $table) {
+        Schema::create('driver_safety_message', function (Blueprint $table) {
             $table->unsignedBigInteger('driver_id')->index();
-            $table->unsignedBigInteger('notification_id')->index();
+            $table->unsignedBigInteger('safety_message_id')->index();
 
-            $table->primary(['driver_id', 'notification_id']);
+            $table->primary(['driver_id', 'safety_message_id']);
             $table->foreign('driver_id')->references('id')->on('drivers')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('notification_id')->references('id')->on('notifications')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('safety_message_id')->references('id')->on('safety_messages')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -30,6 +30,6 @@ class CreateDriverNotificationTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('driver_notification');
+        Schema::dropIfExists('driver_safety_message');
     }
 }

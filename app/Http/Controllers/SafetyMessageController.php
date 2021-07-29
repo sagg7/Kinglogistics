@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
+use App\Models\SafetyMessage;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\QuillEditor\QuillFormatter;
@@ -10,7 +10,7 @@ use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class NotificationController extends Controller
+class SafetyMessageController extends Controller
 {
     use GetSimpleSearchData, FileUpload, QuillFormatter, DriverParams;
 
@@ -39,31 +39,31 @@ class NotificationController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return Notification
+     * @return SafetyMessage
      */
-    private function storeUpdate(Request $request, $id = null): Notification
+    private function storeUpdate(Request $request, $id = null): SafetyMessage
     {
         $message = json_decode($request->message);
 
         if ($id)
-            $notification = Notification::findOrFail($id);
+            $message = SafetyMessage::findOrFail($id);
         else
-            $notification = new Notification();
-        $notification->title = $request->title;
-        $notification->carrier_id = $request->carrier;
-        $notification->zone_id = $request->zone;
-        $notification->turn_id = $request->turn;
-        $notification->save();
+            $message = new SafetyMessage();
+        $message->title = $request->title;
+        $message->carrier_id = $request->carrier;
+        $message->zone_id = $request->zone;
+        $message->turn_id = $request->turn;
+        $message->save();
 
-        $html = $this->formatQuillHtml($message, "notification/$notification->id");
+        $html = $this->formatQuillHtml($message, "safety_message/$message->id");
 
-        $notification->message = $html;
-        $notification->message_json = $message->ops;
-        $notification->save();
+        $message->message = $html;
+        $message->message_json = $message->ops;
+        $message->save();
 
-        $notification->drivers()->sync($request->drivers);
+        $message->drivers()->sync($request->drivers);
 
-        return $notification;
+        return $message;
     }
 
     /**
@@ -73,7 +73,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        return view('notifications.index');
+        return view('safetyMessages.index');
     }
 
     /**
@@ -84,7 +84,7 @@ class NotificationController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-        return view('notifications.create', $params);
+        return view('safetyMessages.create', $params);
     }
 
     /**
@@ -103,7 +103,7 @@ class NotificationController extends Controller
         if ($request->ajax())
             return ['success' => true];
         else
-            return redirect()->route('notification.index');
+            return redirect()->route('safety_message.index');
     }
 
     /**
@@ -114,8 +114,8 @@ class NotificationController extends Controller
      */
     public function show($id)
     {
-        /*$notification = Notification::findOrFail($id);
-        return view('exports.paperwork.template', ['title' => $notification->title, 'html' => $notification->message]);*/
+        /*$message = SafetyMessage::findOrFail($id);
+        return view('exports.paperwork.template', ['title' => $message->title, 'html' => $message->message]);*/
     }
 
     /**
@@ -126,14 +126,14 @@ class NotificationController extends Controller
      */
     public function edit($id)
     {
-        $notification = Notification::with([
+        $message = SafetyMessage::with([
             'drivers:id,name',
             'carrier:id,name',
             'zone:id,name',
         ])
             ->findOrFail($id);
-        $params = compact('notification') + $this->createEditParams();
-        return view('notifications.edit', $params);
+        $params = compact('message') + $this->createEditParams();
+        return view('safetyMessages.edit', $params);
     }
 
     /**
@@ -153,7 +153,7 @@ class NotificationController extends Controller
         if ($request->ajax())
             return ['success' => true];
         else
-            return redirect()->route('notification.index');
+            return redirect()->route('safety_message.index');
     }
 
     /**
@@ -164,10 +164,10 @@ class NotificationController extends Controller
      */
     public function destroy($id)
     {
-        $notification = Notification::findOrFail($id);
+        $message = SafetyMessage::findOrFail($id);
 
-        if ($notification && $this->deleteDirectory("notification/$notification->id")) {
-            return ['success' => $notification->delete()];
+        if ($message && $this->deleteDirectory("safety_message/$message->id")) {
+            return ['success' => $message->delete()];
         } else
             return ['success' => false];
     }
@@ -178,9 +178,9 @@ class NotificationController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Notification::select([
-            "notifications.id",
-            "notifications.title",
+        $query = SafetyMessage::select([
+            "safety_messages.id",
+            "safety_messages.title",
         ]);
 
         return $this->simpleSearchData($query, $request);

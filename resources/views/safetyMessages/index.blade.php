@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Notification</x-slot>
+    <x-slot name="crumb_section">Messages</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -16,12 +16,12 @@
                         //{headerName: 'Preview', field: 'preview'},
                     ],
                     menu: [
-                        //{text: 'Show', route: '/notification/show', icon: 'feather icon-eye'},
-                        {text: 'Edit', route: '/notification/edit', icon: 'feather icon-edit'},
-                        {route: '/notification/delete', type: 'delete'}
+                        //{text: 'Show', route: '/safetyMessage/show', icon: 'feather icon-eye'},
+                        {text: 'Edit', route: '/safetyMessage/edit', icon: 'feather icon-edit'},
+                        {route: '/safetyMessage/delete', type: 'delete'}
                     ],
                     container: 'myGrid',
-                    url: '/notification/search',
+                    url: '/safetyMessage/search',
                     tableRef: 'tbAG',
                 });
             })();
