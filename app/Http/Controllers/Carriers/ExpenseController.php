@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Carriers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Expense;
+use App\Models\CarrierExpense;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +21,7 @@ class ExpenseController extends Controller
     {
         return Validator::make($data, [
             'type' => ['required'],
-            'truck_id' => ['required', 'exists:trucks,id'],
+            'truck_id' => ['nullable', 'exists:trucks,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
             'mileage' => ['nullable', 'numeric'],
@@ -42,19 +42,20 @@ class ExpenseController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return Expense
+     * @return CarrierExpense
      */
-    private function storeUpdate(Request $request, $id = null): Expense
+    private function storeUpdate(Request $request, $id = null): CarrierExpense
     {
         if ($id)
-            $expense = Expense::where('carrier_id', auth()->user()->id)
+            $expense = CarrierExpense::where('carrier_id', auth()->user()->id)
                 ->whereNull('carrier_payment_id')
                 ->findOrFail($id);
         else {
-            $expense = new Expense();
+            $expense = new CarrierExpense();
             $expense->carrier_id = auth()->user()->id;
         }
 
+        $expense->type = $request->type;
         $expense->amount = $request->amount;
         $expense->truck_id = $request->truck_id;
         $expense->description = $request->description;
@@ -120,7 +121,8 @@ class ExpenseController extends Controller
      */
     public function edit(int $id)
     {
-        $expense = Expense::where('carrier_id', auth()->user()->id)
+        $expense = CarrierExpense::with('truck')
+            ->where('carrier_id', auth()->user()->id)
             ->findOrFail($id);
         $params = compact('expense') + $this->createEditParams();
         return view('subdomains.carriers.expenses.edit', $params);
@@ -150,7 +152,7 @@ class ExpenseController extends Controller
      */
     public function destroy(int $id)
     {
-        $expense = Expense::where('carrier_id', auth()->user()->id)
+        $expense = CarrierExpense::where('carrier_id', auth()->user()->id)
             ->whereNull('carrier_payment_id')
             ->findOrFail($id);
 
@@ -166,11 +168,11 @@ class ExpenseController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Expense::select([
-            "expenses.id",
-            "expenses.type",
-            "expenses.amount",
-            "expenses.created_at",
+        $query = CarrierExpense::select([
+            "carrier_expenses.id",
+            "carrier_expenses.type",
+            "carrier_expenses.amount",
+            "carrier_expenses.created_at",
         ])
             ->where('carrier_id', auth()->user()->id);
 

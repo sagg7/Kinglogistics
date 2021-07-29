@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
-use App\Models\Expense;
+use App\Models\CarrierExpense;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -101,7 +101,7 @@ class CarrierPaymentController extends Controller
     public function payCharges($carrier_id)
     {
         return DB::transaction(function () use ($carrier_id) {
-            $expenses = Expense::where('carrier_id', $carrier_id)
+            $expenses = CarrierExpense::where('carrier_id', $carrier_id)
                 ->where('non_editable', 1)
                 ->whereNull('carrier_payment_id')
                 ->get();
