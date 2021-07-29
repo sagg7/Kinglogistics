@@ -161,7 +161,10 @@ class LoadController extends Controller
         /**
          * THERE SHOULD BE NO CASE TO UPDATE
          */
-        return abort(404);
+        $this->storeUpdate($request->all(), $id);
+
+        return redirect()->route('load.index');
+        //return abort(404);
     }
 
     /**
@@ -233,6 +236,6 @@ class LoadController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request);
+        return $this->simpleSearchData($query, $request, 'orWhere');
     }
 }

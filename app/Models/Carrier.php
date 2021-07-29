@@ -25,4 +25,11 @@ class Carrier extends Authenticatable
     {
         return $this->hasMany(Driver::class);
     }
+    /**
+     * @return HasMany
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
 }

@@ -39,7 +39,7 @@
             <div class="row">
                 <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('start_mileage', ucfirst(__('start_mileage')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('start_mileage', ucfirst(__('start mileage')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-tachometer-alt"></i></span>
@@ -55,7 +55,7 @@
                 </div>
                 <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('end_mileage', ucfirst(__('end_mileage')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('end_mileage', ucfirst(__('end mileage')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-tachometer-alt"></i></span>
@@ -71,7 +71,7 @@
                 </div>
                 <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('shipper_rate', ucfirst(__('shipper_rate')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('shipper_rate', ucfirst(__('shipper rate')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('carrier_rate', ucfirst(__('carrier_rate')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('carrier_rate', ucfirst(__('carrier rate')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>

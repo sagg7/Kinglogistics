@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class CarrierPayment extends Model
+class ShipperInvoice extends Model
 {
     use HasFactory;
 
@@ -18,17 +18,9 @@ class CarrierPayment extends Model
     /**
      * @return BelongsTo
      */
-    public function carrier(): BelongsTo
+    public function shipper(): BelongsTo
     {
-        return $this->belongsTo(Carrier::class);
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function expenses(): HasMany
-    {
-        return $this->hasMany(Expense::class);
+        return $this->belongsTo(Shipper::class);
     }
 
     /**

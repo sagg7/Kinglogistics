@@ -24,7 +24,7 @@ class ChargeController extends Controller
             'period' => ['required'],
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
-            'description' => ['nullable', 'string', 'max:512'],
+            'description' => ['required', 'string', 'max:512'],
         ]);
     }
 

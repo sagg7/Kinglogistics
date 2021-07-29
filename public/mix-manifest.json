@@ -1,4 +1,3 @@
 {
-    "/js/common/typesModal.min.js": "/js/common/typesModal.min.js",
-    "/js/sections/rates/common.min.js": "/js/sections/rates/common.min.js"
+    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js"
 }

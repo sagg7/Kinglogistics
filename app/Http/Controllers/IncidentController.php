@@ -229,7 +229,7 @@ class IncidentController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request);
+        return $this->simpleSearchData($query, $request, 'orWhere');
     }
 
     public function downloadPDF($id)
@@ -242,7 +242,7 @@ class IncidentController extends Controller
             "user",
             "incident_type",
         ])
-            ->find($id)
+            ->findOrFail($id)
             ->toArray();
 
         $mpdf = new Mpdf();

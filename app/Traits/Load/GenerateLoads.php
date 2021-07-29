@@ -60,9 +60,11 @@ trait GenerateLoads
             else
                 $load = new Load();
 
-            $load->shipper_id = $data["shipper_id"];
+            if (isset($data['shipper_id']))
+                $load->shipper_id = $data["shipper_id"];
             $load->load_type_id = $data["load_type_id"];
-            $load->driver_id = $data["driver_id"] ?? null;
+            if (isset($data['driver_id']))
+                $load->driver_id = $data["driver_id"] ?? null;
             $load->load_log_id = $data["load_log_id"] ?? null;
             $load->trip_id = $data["trip_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
@@ -79,10 +81,11 @@ trait GenerateLoads
             $load->container = $data["container"] ?? null;
             $load->weight = $data["weight"] ?? null;
             $load->mileage = $data["mileage"] ?? null;
-            $load->status = $data["status"];
+            if (isset($data['status']))
+                $load->status = $data["status"];
             $load->save();
 
-            if ($data["driver_id"]) {
+            if (isset($data["driver_id"])) {
                 // Delete driver from the available driver's lists
                 $availableDriver = AvailableDriver::findOrFail($data["driver_id"]);
                 $availableDriver->delete();
