@@ -1,0 +1,48 @@
+#vehicleInspection .panel-heading {
+    background-color: #10163A; !important;
+    padding: 0px !important;
+}
+
+#vehicleInspection .panel-heading a {
+    width: 100%;
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+}
+
+#vehicleInspection .panel-body .radio-inline {
+    margin-top: 0;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+#vehicleInspection .panel-body .radio-inline input {
+    margin-top:  -7px;
+    margin-left: -20px;
+}
+
+#vehicleInspection .panel-body td {
+    text-align: center;
+}
+
+#vehicleInspection .panel-body td:first-child {
+    text-align: left;
+}
+
+#vehicleInspection .panel-body table {
+    margin: 0 !important;
+}
+
+#vehicleInspection button.clear {
+    background-color: #1a84ce;
+    border: none;
+    padding: 10px;
+    font: 400 13px Helvetica, sans-serif;
+    color: #fff;
+    height: 45px;
+    margin: 4px auto;
+    display: block;
+}
+#inspectionAccordion {
+    text-align: center;
+}

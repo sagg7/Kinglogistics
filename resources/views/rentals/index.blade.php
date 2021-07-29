@@ -46,6 +46,7 @@
                         {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
                     ],
                     menu: [
+                        {text: 'Create Inspection', route: '/inspection/create', icon: 'feather icon-edit'},
                         {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
                         {route: '/rental/delete', type: 'delete'}
                     ],
