@@ -29,7 +29,7 @@
                 <div class="card-body text-center">
                     <div class="avatar avatar-lg bg-rgba-info p-50 m-0 mb-1">
                         <div class="avatar-content text-white">
-                            <i class="fas fa-truck-loading text-info font-large-1"></i>
+                            <i class="fas fa-truck-loading font-large-1"></i>
                         </div>
                     </div>
                     <div class="text-center">

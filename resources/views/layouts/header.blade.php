@@ -13,6 +13,7 @@
                             </a>
                         </li>
                     </ul>
+                    <img src="{{ asset("images/app/logos/logo-dark-simple.png") }}" alt="King Logistic Oil" style="max-height: 40px;">
                 </div>
                 <ul class="nav navbar-nav float-right">
                     <li class="nav-item d-none d-lg-block">
