@@ -4,6 +4,7 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
+                @isset($roles)
                 <div class="form-group col-md-6">
                     {!! Form::label('role', ucfirst(__('role')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('role', $roles, $user->role ?? null, ['class' => 'form-control select2' . ($errors->first('role') ? ' is-invalid' : '')]) !!}
@@ -13,6 +14,7 @@
                     </span>
                     @enderror
                 </div>
+                @endisset
                 <div class="form-group col-md-6">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('name', $user->name ?? null, ['class' => 'form-control' . ($errors->first('name') ? ' is-invalid' : '')]) !!}
@@ -22,7 +24,7 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-12">
+                <div class="form-group @isset($roles){{ "col-md-12" }}@else{{ "col-md-6" }}@endif">
                     {!! Form::label('email', ucfirst(__('email')), ['class' => 'col-form-label']) !!}
                     {!! Form::email('email', $user->email ?? null, ['class' => 'form-control' . ($errors->first('email') ? ' is-invalid' : '')]) !!}
                     @error('email')
@@ -49,7 +51,6 @@
                     </span>
                     @enderror
                 </div>
-
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

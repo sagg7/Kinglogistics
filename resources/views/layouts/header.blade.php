@@ -13,7 +13,11 @@
                             </a>
                         </li>
                     </ul>
-                    <img src="{{ asset("images/app/logos/logo-dark-simple.png") }}" alt="King Logistic Oil" style="max-height: 40px;">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item d-none d-lg-block">
+                            <img src="{{ asset("images/app/logos/logo-dark-simple.png") }}" alt="King Logistic Oil" style="max-height: 40px;">
+                        </li>
+                    </ul>
                 </div>
                 <ul class="nav navbar-nav float-right">
                     <li class="nav-item d-none d-lg-block">
@@ -38,6 +42,9 @@
                             @csrf
                         </form>
                         <div class="dropdown-menu dropdown-menu-right">
+                            @if(auth()->guard('web')->check())
+                            <a class="dropdown-item" href="/user/profile"><i class="fas fa-user"></i> Profile</a>
+                            @endif
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

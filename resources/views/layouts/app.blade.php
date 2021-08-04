@@ -61,7 +61,7 @@
         <!-- END: Custom CSS-->
         @yield("head")
     </head>
-    <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
+    <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
     @include('layouts.header')
     @if(auth()->guard('carrier')->check())@include('layouts.subdomains.carriers.menu')@endif
     @if(auth()->guard('web')->check())@include('layouts.menu')@endif

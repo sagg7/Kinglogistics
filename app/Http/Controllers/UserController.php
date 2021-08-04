@@ -25,7 +25,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['string', 'email', 'max:255', "unique:users,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'exists:roles,id']
+            'role' => ['sometimes', 'exists:roles,id']
         ]);
     }
 
@@ -75,7 +75,8 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
         $user->save();
 
-        $user->roles()->sync($request->role);
+        if ($request->role)
+            $user->roles()->sync($request->role);
 
         return $user;
     }
@@ -121,6 +122,19 @@ class UserController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function profile()
+    {
+        $user = User::findOrFail(auth()->user()->id);
+        $params = compact('user');
+        return view('users.profile', $params);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -133,7 +147,10 @@ class UserController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('user.index');
+        if (!$request->role)
+            return redirect()->route('user.profile');
+        else
+            return redirect()->route('user.index');
     }
 
     /**
