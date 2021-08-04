@@ -8,6 +8,8 @@ Route::prefix('load')->group(function () {
         ->name('load.index');
     Route::get('show/{id}', [LoadController::class, 'show'])
         ->name('load.show');
+    Route::get('location/{id}', [LoadController::class, 'location'])
+        ->name('load.location');
     Route::get('create', [LoadController::class, 'create'])
         ->name('load.create');
     Route::post('store', [LoadController::class, 'store'])

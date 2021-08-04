@@ -28,6 +28,7 @@
                     ],
                     menu: [
                         {text: 'Show', route: '/load/show', icon: 'feather icon-eye'},
+                        {text: 'Location', route: '/load/location', icon: 'feather icon-map-pin'},
                         @if(auth()->guard('web')->check())
                         {text: 'Edit', route: '/load/edit', icon: 'feather icon-edit'},
                         {route: '/load/delete', type: 'delete'}
