@@ -10,7 +10,7 @@
     @section('scripts')
         <script src="{{ asset('js/sections/trailers/common.min.js') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
         <script>
             (() => {
                 const shippers = @json($trailer->shippers);

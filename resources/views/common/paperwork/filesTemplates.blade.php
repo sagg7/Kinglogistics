@@ -1,7 +1,7 @@
 <div>
     <h3>Paperwork</h3>
 
-    <table class="table" id="file-uploads">
+    <table class="table" id="file-templates">
         <colgroup>
             <col style="width: 3%;">
             <col style="width: 48.5%;">

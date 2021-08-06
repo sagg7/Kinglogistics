@@ -47,7 +47,7 @@
             if (obj.required && obj.signaturePad.isEmpty()) {
                 throwErrorMsg(`The ${obj.label} is required`);
                 e.preventDefault();
-            } else
+            } else if (!obj.signaturePad.isEmpty())
                 obj.input.value = obj.signaturePad.toDataURL();
         });
     });

@@ -8,14 +8,16 @@ use App\Models\PaperworkTemplate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Storage\FileUpload;
+use App\Traits\Storage\S3Functions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Mpdf\Mpdf;
 
 class PaperworkController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, FileUpload;
+    use GetSelectionData, GetSimpleSearchData, FileUpload, S3Functions;
 
     /**
      * @param array $data
@@ -178,6 +180,8 @@ class PaperworkController extends Controller
                         ->first();
                     if (!$paperwork)
                         $paperwork = new PaperworkFile();
+                    else
+                        $this->deleteFile($paperwork->getRawOriginal('url'));
                     $paperwork->paperwork_id = $i;
                     $paperwork->related_id = $request->related_id;
                     $paperwork->expiration_date = $request->expiration_date[$i];
@@ -301,7 +305,7 @@ class PaperworkController extends Controller
                         break;
                     case 'signature':
                         $reqAnswer = $request["signature-$idx"];
-                        $reqAnswer = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
+                        $reqAnswer = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id", 100, "public");
                         break;
                 }
                 $template_filled[] = $reqAnswer;
@@ -339,6 +343,8 @@ class PaperworkController extends Controller
         }
 
         $filled = $template->filled_template;
+        if (!is_array($filled))
+            $filled = json_decode($filled);
 
         preg_match_all("/{{[^}]*}}/", $paperwork->template, $result);
         $matches = ["/{{/", "/}}/", "/,\s/", "/\"validate\"/", "/\"signature\"/"];
@@ -361,7 +367,7 @@ class PaperworkController extends Controller
                     $replaced[] = "\r\n<div><h4 class='mt-2'>$json->text</h4>\r\n<p>$filled[$idx]</p></div>";
                     break;
                 case 'signature':
-                    $replaced[] = "\r\n<div style='text-align: center;'><img src='/$filled[$idx]' alt='signature'></div>";
+                    $replaced[] = "\r\n<div style='text-align: center;'><img src='" . $this->getTemporaryFile($filled[$idx]) . "' alt='signature'></div>";
                     break;
             }
         }

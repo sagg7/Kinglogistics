@@ -44,6 +44,7 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/rateGroups.php';
     require __DIR__.'/web/rates.php';
     require __DIR__.'/web/chat.php';
+    require __DIR__.'/web/s3storage.php';
 
     Route::get('/testMail', function () {
         Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());

@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section("scripts")
-        <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
     @endsection
 
     @component('components.nav-pills-form', ['pills' => [['name' => 'General', 'icon' => 'fas fa-user-circle', 'pane' => 'pane-general'],['name' => 'Paperwork', 'icon' => 'fas fa-folder-open', 'pane' => 'pane-paperwork']]])

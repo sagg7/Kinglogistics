@@ -17,7 +17,7 @@
                     @endforeach
                 ];
             </script>
-            <script src="{{ asset('js/common/initSignature.min.js') }}"></script>
+            <script src="{{ asset('js/common/initSignature.min.js?1.0.0') }}"></script>
         @endif
         @if(count($data["validation"]) > 0)
             <script>

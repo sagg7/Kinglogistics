@@ -173,7 +173,9 @@ class LoadController extends Controller
         /**
          * THERE SHOULD BE NO CASE TO UPDATE
          */
-        $this->storeUpdate($request->all(), $id);
+        $data = $request->all();
+        $this->validator($data)->validate();
+        $this->storeUpdate($data, $id);
 
         return redirect()->route('load.index');
         //return abort(404);

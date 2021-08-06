@@ -1,3 +1,4 @@
 {
-    "/js/sections/safetyMessages/common.min.js": "/js/sections/safetyMessages/common.min.js"
+    "/js/common/filesUploads.min.js": "/js/common/filesUploads.min.js",
+    "/js/common/initSignature.min.js": "/js/common/initSignature.min.js"
 }

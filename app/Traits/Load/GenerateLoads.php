@@ -22,7 +22,7 @@ trait GenerateLoads
         return Validator::make($data, [
             'load_number' => ['sometimes', 'numeric', 'min:1', 'max:999'],
             'shipper_id' => ['sometimes', 'exists:shippers,id'],
-            'trip_id' => ['sometimes', 'exists:trips,id'],
+            'trip_id' => ['required', 'exists:trips,id'],
             'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['sometimes', 'required', 'exists:drivers,id'],
             'date' => ['required', 'date'],

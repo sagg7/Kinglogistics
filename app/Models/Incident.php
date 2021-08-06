@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Storage\S3Functions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,11 +10,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Incident extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, S3Functions;
 
     protected $casts = [
         'date' => 'date:m/d/Y',
     ];
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getSafetySignatureAttribute($value): string
+    {
+        return $this->getTemporaryFile($value);
+    }
+
+    /**
+     * @param $value
+     * @return string|void
+     */
+    public function getDriverSignatureAttribute($value)
+    {
+        if ($value)
+            return $this->getTemporaryFile($value);
+    }
 
     /**
      * @return BelongsTo

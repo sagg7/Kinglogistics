@@ -4,7 +4,7 @@
 
     @section("scripts")
         <script src="{{ asset('js/sections/subdomains/carriers/drivers/common.min.js') }}"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
         <script>
             (() => {
                 $("#zone_id")

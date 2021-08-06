@@ -42,7 +42,7 @@
                         const tr = tbody.find(`tr[data-file="${item.paperwork_id}"]`),
                             fLink = tr.find('.file-link');
                         tr.find('input[type=file]').val('').trigger('change');
-                        fLink.html(`<a href="/${item.url}" target="_blank">${item.file_name}</a>`);
+                        fLink.html(`<a href="${item.url}" target="_blank">${item.file_name}</a>`);
                     });
                 } else
                     throwErrorMsg();

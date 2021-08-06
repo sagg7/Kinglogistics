@@ -125,11 +125,17 @@
                 </div>
                 @else
                     <div class="form-group col-md-6 text-center">
-                        <img src="{{ asset($incident->safety_signature) }}" alt="Safety Signature" id="safety_signature">
+                        <img src="{{ $incident->safety_signature }}" alt="Safety Signature" id="safety_signature">
                         <label class="col-form-label d-block" for="safety_signature">Safety Signature</label>
                     </div>
                     <div class="form-group col-md-6 text-center">
-                        <img src="{{ asset($incident->driver_signature) }}" alt="Driver Signature" id="driver_signature">
+                        @if($incident->driver_signature)
+                            <img src="{{ $incident->driver_signature }}" alt="Driver Signature" id="driver_signature">
+                        @else
+                            <div>
+                                <canvas class="d-block mx-auto" id="driver_signature"></canvas>
+                            </div>
+                        @endif
                         <label class="col-form-label d-block" for="driver_signature">Driver Signature</label>
                     </div>
                 @endif

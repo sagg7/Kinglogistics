@@ -4,7 +4,7 @@
 
     @section('scripts')
         <script src="{{ asset('js/sections/trucks/common.min.js') }}"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
         <script>
             (() => {
                 @if($truck->driver_id)

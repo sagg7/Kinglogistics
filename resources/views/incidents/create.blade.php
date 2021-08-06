@@ -11,7 +11,7 @@
                 {canvas: document.getElementById('driver_signature')},
             ];
         </script>
-        <script src="{{ asset('js/common/initSignature.min.js') }}"></script>
+        <script src="{{ asset('js/common/initSignature.min.js?1.0.0') }}"></script>
     @endsection
 
     @section('modals')

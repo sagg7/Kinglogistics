@@ -37,7 +37,7 @@
                 </td>
                 <td class="file-link">
                     @if(isset($paperworkUploads[$file->id]))
-                        <a href="/{{ $paperworkUploads[$file->id]['url'] }}" target="_blank">{{ $paperworkUploads[$file->id]['file_name'] }}</a>
+                        <a href="{{ route('s3storage.temporaryUrl', ['url' => $paperworkUploads[$file->id]['url']]) }}" target="_blank">{{ $paperworkUploads[$file->id]['file_name'] }}</a>
                     @endif
                 </td>
                 <td class="position-relative">
