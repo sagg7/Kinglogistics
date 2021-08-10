@@ -15,8 +15,7 @@ class Message extends Model
     protected $fillable = [
         'content',
         'driver_id',
-        'messageable_id',
-        'messageable_type',
+        'user_id',
         'is_driver_sender',
     ];
 
@@ -29,8 +28,8 @@ class Message extends Model
         return $this->belongsTo(Driver::class);
     }
 
-    public function messageable(): MorphTo
+    public function user(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(User::class);    
     }
 }

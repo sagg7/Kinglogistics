@@ -36,11 +36,16 @@ class TruckLocationUpdate implements ShouldBroadcast
                 'name' => $this->driver->name,
                 'truck' => [
                     'number' => $this->driver->truck->number,
-                    'plate' => $this->driver->truck->plate,
-                    'vin' => $this->driver->truck->vin,
-                    'model' => $this->driver->truck->model,
                 ]
             ],
+            'carrier' => [
+                'id' => $this->driver->carrier->id,
+                'name' => $this->driver->carrier->name,
+            ],
+            'shippers' => $this->driver
+                ->shippers
+                ->map
+                ->only('id', 'name'),
             'coords' => $this->coords,
         ];
     }

@@ -23,12 +23,12 @@ class ChatController extends Controller
         return response(['status' => 'ok', 'messages' => $messages], 200);
     }
 
-    public function sendMessageAsShipper(Request $request)
+    public function sendMessageAsUser(Request $request)
     {
         $this->sendMessage(
             $request->get('content'),
             $request->get('driver_id'),
-            $request->get('shipper_id'),
+            $request->get('user_id'),
             $request->get(Shipper::class),
             null
         );
@@ -44,7 +44,6 @@ class ChatController extends Controller
             $request->get('content'),
             $driver->id,
             null,
-            null,
             true
         );
 
@@ -56,15 +55,13 @@ class ChatController extends Controller
     private function sendMessage(
         string $content,
         int $driverId,
-        int $messageableId = null,
-        string $messageableType = null,
+        int $userId = null,
         bool $isDriverSender = null): Message
     {
         $message = Message::create([
             'content' => $content,
             'driver_id' => $driverId,
-            'messageable_type' => $messageableType,
-            'messageable_id' => $messageableId,
+            'user_id' => $userId,
             'is_driver_sender' => $isDriverSender,
         ]);
 
