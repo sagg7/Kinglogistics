@@ -8,6 +8,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\QuillEditor\QuillFormatter;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SafetyMessageController extends Controller
@@ -43,27 +44,29 @@ class SafetyMessageController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): SafetyMessage
     {
-        $message = json_decode($request->message);
+        return DB::transaction(function () use ($request, $id) {
+            $content = json_decode($request->message);
 
-        if ($id)
-            $message = SafetyMessage::findOrFail($id);
-        else
-            $message = new SafetyMessage();
-        $message->title = $request->title;
-        $message->carrier_id = $request->carrier;
-        $message->zone_id = $request->zone;
-        $message->turn_id = $request->turn;
-        $message->save();
+            if ($id)
+                $message = SafetyMessage::findOrFail($id);
+            else
+                $message = new SafetyMessage();
+            $message->title = $request->title;
+            $message->carrier_id = $request->carrier;
+            $message->zone_id = $request->zone;
+            $message->turn_id = $request->turn;
+            $message->save();
 
-        $html = $this->formatQuillHtml($message, "safety_message/$message->id");
+            $html = $this->formatQuillHtml($content, "safety_message/$message->id");
 
-        $message->message = $html;
-        $message->message_json = $message->ops;
-        $message->save();
+            $message->message = $html;
+            $message->message_json = $content->ops;
+            $message->save();
 
-        $message->drivers()->sync($request->drivers);
+            $message->drivers()->sync($request->drivers);
 
-        return $message;
+            return $message;
+        });
     }
 
     /**
