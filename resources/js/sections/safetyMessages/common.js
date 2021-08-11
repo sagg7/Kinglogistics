@@ -116,15 +116,15 @@
             type: 'POST',
             data: {
                 title: $('#title').val(),
-                carrier,
-                zone,
-                turn,
+                carrier: carrierSel.val(),
+                zone: zoneSel.val(),
+                turn: turnSel.val(),
                 drivers: driverSel.val(),
                 message,
             },
             success: (res) => {
                 if (res.success)
-                    window.location = '/notification/index';
+                    window.location = '/safetyMessage/index';
                 else
                     throwErrorMsg();
             },
