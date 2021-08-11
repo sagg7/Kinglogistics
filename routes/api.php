@@ -71,7 +71,7 @@ Route::group([
         'prefix' => 'chat'
     ], function () {
 
-        Route::post('shipper', [ChatController::class, 'sendMessageAsUser']);
+        Route::post('user', [ChatController::class, 'sendMessageAsUser']);
         Route::post('driver', [ChatController::class, 'sendMessageAsDriver']);
         Route::get('conversation', [ChatController::class, 'getConversation']);
 
