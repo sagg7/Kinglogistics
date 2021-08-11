@@ -6230,9 +6230,39 @@ window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__.default({
   forceTLS: true,
   disableStats: true
 });
-window.Echo.channel('driver-location').listen('TruckLocationUpdate', function (e) {
-  console.log(e);
-}); ////////////////////////////////////////////////////////////////////////
+document.getElementById('joinChannelAsShippers').addEventListener('click', function () {
+  joinToShipperssChannel();
+});
+
+function joinToShipperssChannel() {
+  console.log('Joining as shippers');
+  window.Echo["private"]('driver-location-shipper.1').listen('DriverLocationUpdateForShipper', function (e) {
+    console.log('Shipper broadcasted event', e);
+  });
+}
+
+document.getElementById('joinChannelAsCarrier').addEventListener('click', function () {
+  joinToCarriersChannel();
+});
+
+function joinToCarriersChannel() {
+  console.log('Joining as carriers');
+  window.Echo["private"]('driver-location-carrier.2').listen('DriverLocationUpdateForCarrier', function (e) {
+    console.log('Carrier broadcasted event', e);
+  });
+}
+
+document.getElementById('joinAdminChannel').addEventListener('click', function () {
+  joinToAdminChannel();
+});
+
+function joinToAdminChannel() {
+  console.log('Joining as admin');
+  window.Echo["private"]('driver-location-king').listen('DriverLocationUpdateForKing', function (e) {
+    console.log('Admin broadcasted event', e);
+  });
+} ////////////////////////////////////////////////////////////////////////
+
 
 var onlineUsers = 0;
 

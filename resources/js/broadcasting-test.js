@@ -11,11 +11,41 @@ window.Echo = new Echo({
     disableStats: true,
 });
 
-window.Echo.channel('driver-location')
-    .listen('TruckLocationUpdate', e => {
-        console.log(e);
-    });
+document.getElementById('joinChannelAsShippers').addEventListener('click', () => {
+    joinToShipperssChannel()
+})
 
+function joinToShipperssChannel() {
+    console.log('Joining as shippers')
+    window.Echo.private('driver-location-shipper.1')
+        .listen('DriverLocationUpdateForShipper', e => {
+            console.log('Shipper broadcasted event', e);
+        });
+}
+
+document.getElementById('joinChannelAsCarrier').addEventListener('click', () => {
+    joinToCarriersChannel()
+})
+
+function joinToCarriersChannel() {
+    console.log('Joining as carriers')
+    window.Echo.private('driver-location-carrier.2')
+        .listen('DriverLocationUpdateForCarrier', e => {
+            console.log('Carrier broadcasted event', e);
+        });
+}
+
+document.getElementById('joinAdminChannel').addEventListener('click', () => {
+    joinToAdminChannel()
+})
+
+function joinToAdminChannel() {
+    console.log('Joining as admin')
+    window.Echo.private('driver-location-king')
+        .listen('DriverLocationUpdateForKing', e => {
+            console.log('Admin broadcasted event', e);
+        });
+}
 
 ////////////////////////////////////////////////////////////////////////
 

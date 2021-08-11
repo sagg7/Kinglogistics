@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\LocationGroup;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +18,24 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int)$user->id === (int)$id;
 });
 
-Broadcast::channel('driver-location', function ($user) {
-    return true;
+Broadcast::channel('driver-location-king', function ($user) {
+    // TODO: Check if user is admin
+    return $user;
+});
+
+Broadcast::channel('driver-location-carrier.{locationGroupId}', function ($carrier, $locationGroupId) {
+    // At this point, the authenticated user should be
+//    return $carrier->id === LocationGroup::find($locationGroupId)->carrier_id;
+    return 2 === LocationGroup::find($locationGroupId)->carrier_id;
+});
+
+Broadcast::channel('driver-location-shipper.{locationGroupId}', function ($shipper, $locationGroupId) {
+//    return $shipper->id === LocationGroup::find($locationGroupId)->shipper_id;
+    return 1 === LocationGroup::find($locationGroupId)->shipper_id;
 });
 
 Broadcast::channel('chat', function ($user) {
-    return true;
+    // TODO: Check if user is admin
+    return $user;
 });
 

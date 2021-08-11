@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -36,4 +37,10 @@ class Carrier extends Authenticatable
     {
         return $this->hasMany(CarrierExpense::class);
     }
+
+    public function locationGroup(): HasOne
+    {
+        return $this->hasOne(LocationGroup::class);
+    }
+
 }
