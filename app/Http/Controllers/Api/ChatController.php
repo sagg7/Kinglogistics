@@ -9,9 +9,14 @@ use App\Models\Driver;
 use App\Models\Message;
 use App\Models\Shipper;
 use Illuminate\Http\Request;
+use App\Traits\Notifications\PushNotificationsTrait;
+use App\Enums\DriverAppRoutes;
+
 
 class ChatController extends Controller
 {
+
+    use PushNotificationsTrait;
 
     public function getConversation(Request $request)
     {
@@ -25,13 +30,33 @@ class ChatController extends Controller
 
     public function sendMessageAsUser(Request $request)
     {
-        $this->sendMessage(
-            $request->get('content'),
-            $request->get('driver_id'),
-            $request->get('user_id'),
-            $request->get(Shipper::class),
-            null
-        );
+        $driverIds = $request->get('driver_ids');
+        $content = $request->get('content');
+        $userId = $request->get('user_id');
+
+        if (empty($driverIds)) {
+            return response('Drivers collection is not setted', 400);
+        }
+
+        foreach ($driverIds as $driverId) {
+            $driver = Driver::find($driverId);
+
+            $this->sendMessage(
+                $content,
+                $driverId,
+                $userId,
+                null
+            );
+
+            $driverDevices = $this->getUserDevices($driver);
+
+            $this->sendNotification(
+                'Message from King',
+                $content,
+                $driverDevices,
+                DriverAppRoutes::CHAT
+            );
+        }
 
         return response(['status' => 'ok'], 200);
     }
