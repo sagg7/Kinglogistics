@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Shipper extends Model
+class Shipper extends Authenticatable
 {
     use HasFactory, SoftDeletes;
 

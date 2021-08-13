@@ -55,24 +55,7 @@ function update_online_counter() {
     document.getElementById('online').textContent = '' + onlineUsers;
 }
 
-window.Echo.channel('chat')
+window.Echo.private('chat')
     .listen('NewChatMessage', e => {
-        console.log(e);
-    });
-
-window.Echo.join('chat')
-    .here((users) => {
-        onlineUsers = users.length;
-
-        update_online_counter();
-    })
-    .joining((user) => {
-        onlineUsers++;
-
-        update_online_counter();
-    })
-    .leaving((user) => {
-        onlineUsers--;
-
-        update_online_counter();
+        console.log("New message", e);
     });

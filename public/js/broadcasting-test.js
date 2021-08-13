@@ -6270,18 +6270,8 @@ function update_online_counter() {
   document.getElementById('online').textContent = '' + onlineUsers;
 }
 
-window.Echo.channel('chat').listen('NewChatMessage', function (e) {
-  console.log(e);
-});
-window.Echo.join('chat').here(function (users) {
-  onlineUsers = users.length;
-  update_online_counter();
-}).joining(function (user) {
-  onlineUsers++;
-  update_online_counter();
-}).leaving(function (user) {
-  onlineUsers--;
-  update_online_counter();
+window.Echo["private"]('chat').listen('NewChatMessage', function (e) {
+  console.log("New message", e);
 });
 })();
 

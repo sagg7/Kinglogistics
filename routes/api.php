@@ -108,3 +108,7 @@ Route::group([
     });
 
 });
+
+Route::post('broadcast/auth', function() {
+    return App\Models\User::find(1);
+});

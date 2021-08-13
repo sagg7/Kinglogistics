@@ -64,13 +64,16 @@ class ChatController extends Controller
     public function sendMessageAsDriver(Request $request)
     {
         $driver = auth()->user();
+        $message = $request->get('content');
 
         $this->sendMessage(
-            $request->get('content'),
+            $message,
             $driver->id,
             null,
             true
         );
+
+        event(new NewChatMessage($message));
 
         return response(['status' => 'ok'], 200);
     }
@@ -89,8 +92,6 @@ class ChatController extends Controller
             'user_id' => $userId,
             'is_driver_sender' => $isDriverSender,
         ]);
-
-        event(new NewChatMessage($message));
 
         return $message;
     }

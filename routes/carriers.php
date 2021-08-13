@@ -45,3 +45,5 @@ Route::middleware('auth:carrier')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
+
+Route::view('broadcasting/carriers', 'test.broadcasting');
