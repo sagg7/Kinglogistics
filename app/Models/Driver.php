@@ -94,6 +94,11 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasMany(Message::class);
     }
 
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(Message::class)->latest();
+    }
+
     /**
      * Gets all the rejected loads of driver
      *

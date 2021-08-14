@@ -170,7 +170,7 @@
                 </ul>
             </li>
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-folder-open"></i></i><span class="menu-title" data-i18n="User">Paperwork</span></a>
+                <a href="#"><i class="fas fa-folder-open"></i><span class="menu-title" data-i18n="User">Paperwork</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/paperwork/create">
@@ -184,7 +184,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item has-sub">
+            <!--<li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-map"></i><span class="menu-title" data-i18n="User">Trips</span></a>
                 <ul class="menu-content">
                     <li>
@@ -198,7 +198,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li>-->
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title" data-i18n="User">Loads</span></a>
                 <ul class="menu-content">
@@ -213,14 +213,24 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/trip/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Trips</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/rate/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Rates</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tracking">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Tracking</span>
                         </a>
                     </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-hand-holding-usd"></i></i><span class="menu-title" data-i18n="User">Job Opportunities</span></a>
+                <a href="#"><i class="fas fa-hand-holding-usd"></i><span class="menu-title" data-i18n="User">Job Opportunities</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/jobOpportunity/create">
@@ -233,6 +243,9 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+            <li class="nav-item">
+                <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
             </li>
             <li class="navigation-header">
                 <span>Safety</span>

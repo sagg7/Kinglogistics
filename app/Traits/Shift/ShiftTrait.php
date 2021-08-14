@@ -26,8 +26,8 @@ trait ShiftTrait
         $availableDriver->save();
 
         // Change the driver inactive property
-        $driver->inactive = false;
-        $driver->save();
+        //$driver->inactive = false;
+        //$driver->save();
 
     }
 
@@ -38,8 +38,8 @@ trait ShiftTrait
         // ... Do stuff related to shift ending
 
         // Change the driver inactive property
-        $driver->inactive = true;
-        $driver->save();
+        //$driver->inactive = true;
+        //$driver->save();
 
         return response(['status' => 'ok'], 200);
     }

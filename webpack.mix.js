@@ -28,9 +28,11 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/app.js', 'public/js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
-    .js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
-    .js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
-    .js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
+    //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
+    //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
+    //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
+    //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
+    //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
     //.scripts(['resources/js/sections/safetyMessages/common.js'], 'public/js/sections/safetyMessages/common.min.js')
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
@@ -43,4 +45,5 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
+    .scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
     ;

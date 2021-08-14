@@ -108,6 +108,10 @@ class DashboardController extends Controller
     {
         $loads = Load::whereNull('shipper_invoice_id')
             ->whereHas('driver')
+            ->whereHas('shipper', function($q) {
+                // TODO: IMPLEMENT FILTER FOR DAY CONFIG OF SHIPPER
+                //$q->whereIn('payment_days', $todays_number);
+            })
             ->where('status', 'finished') //TODO: CHECK IN WHICH STATUS
             ->with([
                 'shipper',
@@ -204,6 +208,7 @@ class DashboardController extends Controller
 
     private function carrierPayments()
     {
+        // TODO: EACH MONDAY KERNEL
         $new_expenses = [];
         $charges = Charge::with('carriers')
             ->get();
@@ -284,6 +289,11 @@ class DashboardController extends Controller
         $loads = Load::whereNull('carrier_payment_id')
             ->whereHas('driver')
             ->where('status', 'finished') //TODO: CHECK IN WHICH STATUS
+            // TODO: FOR CARRIER PAYMENTS (CONDITION OF AT LEAST ONLY PAST WEEK LOADS)
+            /*->whereHas('loadStatus', function ($q) {
+                $q->whereDate('finished_timestamp', '<', Carbon::now()->subWeeks(1));
+            })
+            */
             ->with([
                 'shipper',
                 'driver.carrier',

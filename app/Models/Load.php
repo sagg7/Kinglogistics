@@ -79,4 +79,15 @@ class Load extends Model
     {
         return $this->hasMany(DriverLocation::class);
     }
+
+    /**
+     * Get all the driver locations related to load
+     *
+     * @return HasOne
+     */
+
+    public function latestLocation(): HasOne
+    {
+        return $this->hasOne(DriverLocation::class)->latest();
+    }
 }

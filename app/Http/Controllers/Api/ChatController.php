@@ -8,6 +8,7 @@ use App\Http\Resources\ConversationResource;
 use App\Models\Driver;
 use App\Models\Message;
 use App\Models\Shipper;
+use App\Traits\Chat\MessagesTrait;
 use Illuminate\Http\Request;
 use App\Traits\Notifications\PushNotificationsTrait;
 use App\Enums\DriverAppRoutes;
@@ -16,7 +17,7 @@ use App\Enums\DriverAppRoutes;
 class ChatController extends Controller
 {
 
-    use PushNotificationsTrait;
+    use PushNotificationsTrait, MessagesTrait;
 
     public function getConversation(Request $request)
     {
@@ -64,10 +65,10 @@ class ChatController extends Controller
     public function sendMessageAsDriver(Request $request)
     {
         $driver = auth()->user();
-        $message = $request->get('content');
+        $content = $request->get('content');
 
-        $this->sendMessage(
-            $message,
+        $message = $this->sendMessage(
+            $content,
             $driver->id,
             null,
             true
@@ -76,24 +77,6 @@ class ChatController extends Controller
         event(new NewChatMessage($message));
 
         return response(['status' => 'ok'], 200);
-    }
-
-    // ....
-
-    private function sendMessage(
-        string $content,
-        int $driverId,
-        int $userId = null,
-        bool $isDriverSender = null): Message
-    {
-        $message = Message::create([
-            'content' => $content,
-            'driver_id' => $driverId,
-            'user_id' => $userId,
-            'is_driver_sender' => $isDriverSender,
-        ]);
-
-        return $message;
     }
 
 }

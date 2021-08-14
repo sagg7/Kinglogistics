@@ -1,5 +1,3 @@
 {
-    "/js/common/filesUploads.min.js?1.0.0.js": "/js/common/filesUploads.min.js?1.0.0.js",
-    "/js/common/initSignature.min.js?1.0.0.js": "/js/common/initSignature.min.js?1.0.0.js",
-    "/js/broadcasting-test.js": "/js/broadcasting-test.js"
+    "/app-assets/js/scripts/pages/app-chat.min.js": "/app-assets/js/scripts/pages/app-chat.min.js"
 }

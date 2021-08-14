@@ -36,5 +36,5 @@
         </script>
     @endsection
 
-    <x-aggrid-index></x-aggrid-index>
+    @component('components.aggrid-index', ['create_btn' => ['url' => '/trip/create', 'text' => 'Create trip']])@endcomponent
 </x-app-layout>

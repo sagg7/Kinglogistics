@@ -69,10 +69,11 @@ class LoadController extends Controller
             ->whereHas('driver', function ($q) use ($shipper) {
                 // Filter users by current Turn, check if is morning first else night
                 $now = Carbon::now();
+                // TODO: CHANGE IT TO THE VALUES ON THE TURNS TABLE
                 if ($now->between(Carbon::createFromTimeString('6:00'), Carbon::createFromTimeString('17:59')))
-                    $q->where('turn_id', 0);
-                else
                     $q->where('turn_id', 1);
+                else
+                    $q->where('turn_id', 2);
                 // The driver must not be inactive
                 $q->whereNull('inactive')
                     // and also a truck
@@ -131,18 +132,6 @@ class LoadController extends Controller
             ->find($id);
         $params = compact('load') + $this->createEditParams();
         return view('loads.show', $params);
-    }
-
-    /**
-     * @param int $id
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    public function location(int $id)
-    {
-        $load = Load::with('locations')
-            ->findOrFail($id);
-        $params = compact('load');
-        return view('loads.location', $params);
     }
 
     /**
