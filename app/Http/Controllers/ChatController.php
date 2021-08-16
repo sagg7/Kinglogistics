@@ -26,7 +26,7 @@ class ChatController extends Controller
             ->whereNull("inactive")
             ->with([
                 'latestMessage' => function ($q) {
-                    $q->select(['id',DB::raw('SUBSTRING(content, 1, 100) as content'),'created_at','driver_id']);
+                    $q->select(['id',DB::raw('SUBSTRING(content, 1, 100) as content'),'created_at','driver_id', 'is_driver_sender']);
                 },
                 /*'shifts'/* => function ($q) {
                     $q->skip(0)->take(15);
@@ -36,6 +36,11 @@ class ChatController extends Controller
                     $q->with('trailer:id,number')
                         ->select(['id', 'number', 'driver_id', 'trailer_id']);
                 },*/
+            ])
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('user_unread', 1);
+                }
             ])
             ->get([
                 'id',
@@ -53,6 +58,8 @@ class ChatController extends Controller
         $query = Message::where('driver_id', $driver_id)
             //->where('user_id', auth()->user()->id)
             ->orderBy('id', 'desc');
+
+        $this->readMessages($driver_id, auth()->user()->id);
 
         return $this->selectionData($query, $request->take, $request->page);
     }
@@ -74,7 +81,9 @@ class ChatController extends Controller
             $content,
             $driver_id,
             $user_id,
-            null
+            null,
+            null,
+            true,
         );
 
         $driver = Driver::find($driver_id);

@@ -71,7 +71,8 @@ class ChatController extends Controller
             $content,
             $driver->id,
             null,
-            true
+            true,
+            true,
         );
 
         event(new NewChatMessage($message));
