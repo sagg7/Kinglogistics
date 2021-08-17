@@ -13,6 +13,11 @@ class Shipper extends Authenticatable
 {
     use HasFactory, SoftDeletes;
 
+    public function getPaymentDaysAttribute($value)
+    {
+        return explode(',', $value);
+    }
+
     /**
      * @return BelongsToMany
      */

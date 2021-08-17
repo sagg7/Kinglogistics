@@ -14,6 +14,16 @@ class ShipperController extends Controller
     use GetSelectionData, GetSimpleSearchData;
 
     /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return [
+            'weekdays' => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        ];
+    }
+
+    /**
      * @param array $data
      * @param int|null $id
      * @return \Illuminate\Contracts\Validation\Validator
@@ -45,7 +55,8 @@ class ShipperController extends Controller
      */
     public function create()
     {
-        return view('shippers.create');
+        $params = $this->createEditParams();
+        return view('shippers.create', $params);
     }
 
     /**
@@ -65,6 +76,7 @@ class ShipperController extends Controller
         $shipper->invoice_email = $request->invoice_email;
         if ($request->password)
             $shipper->password = Hash::make($request->password);
+        $shipper->payment_days = implode(',',$request->payment_days);
         $shipper->save();
 
         return $shipper;
@@ -105,7 +117,7 @@ class ShipperController extends Controller
     public function edit($id)
     {
         $shipper = Shipper::findOrFail($id);
-        $params = compact('shipper');
+        $params = compact('shipper') + $this->createEditParams();
         return view('shippers.edit', $params);
     }
 
