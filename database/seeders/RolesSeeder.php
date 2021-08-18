@@ -49,5 +49,17 @@ class RolesSeeder extends Seeder
         $doctor_role->slug = 'dispatch';
         $doctor_role->name = 'Dispatch';
         $doctor_role->save();
+
+        // Dispatch Role
+        $doctor_role = new Role();
+        $doctor_role->slug = 'spotter';
+        $doctor_role->name = 'Spotter';
+        $doctor_role->save();
+
+        // Dispatch Role
+        $doctor_role = new Role();
+        $doctor_role->slug = 'hr';
+        $doctor_role->name = 'Human Resources';
+        $doctor_role->save();
     }
 }
