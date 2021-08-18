@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Carriers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\CarrierExpenseType;
+use App\Models\ExpenseType;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -29,14 +28,14 @@ class ExpenseTypeController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return CarrierExpenseType
+     * @return ExpenseType
      */
-    private function storeUpdate(Request $request, $id = null): CarrierExpenseType
+    private function storeUpdate(Request $request, $id = null): ExpenseType
     {
         if ($id)
-            $type = CarrierExpenseType::findOrFail($id);
+            $type = ExpenseType::findOrFail($id);
         else
-            $type = new CarrierExpenseType();
+            $type = new ExpenseType();
 
         $type->name = $request->name;
         $type->save();
@@ -70,7 +69,7 @@ class ExpenseTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $type = CarrierExpenseType::findOrFail($id);
+        $type = ExpenseType::findOrFail($id);
 
         if ($type) {
             $message = '';
@@ -90,7 +89,7 @@ class ExpenseTypeController extends Controller
      */
     public function selection(Request $request): array
     {
-        $query = CarrierExpenseType::select([
+        $query = ExpenseType::select([
             'id',
             'name as text',
         ])

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CarrierExpenseType extends Model
+class ExpenseType extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -16,6 +16,6 @@ class CarrierExpenseType extends Model
      */
     public function expenses(): HasMany
     {
-        return $this->hasMany(CarrierExpense::class);
+        return $this->hasMany(Expense::class);
     }
 }

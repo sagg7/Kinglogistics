@@ -9,7 +9,7 @@
 
     @section('modals')
         @include('common.modals.typeModal', ['id' => 'expenseTypeModal', 'name' => 'Expense Type', 'route' => 'carrierExpenseType.store', 'selectId' => 'type', 'deleteTypeModalId' => 'deleteExpenseTypeModal'])
-        @include('common.modals.deleteTypeModal', ['id' => 'deleteExpenseTypeModal', 'name' => 'Expense Type', 'route' => 'carrierExpenseType.delete', 'selectId' => 'type')
+        @include('common.modals.deleteTypeModal', ['id' => 'deleteExpenseTypeModal', 'name' => 'Expense Type', 'route' => 'carrierExpenseType.delete', 'selectId' => 'type'])
     @endsection
 
     {!! Form::open(['route' => 'carrierExpense.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
