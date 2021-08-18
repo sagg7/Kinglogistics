@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Carriers;
 
 use App\Http\Controllers\Controller;
 use App\Models\CarrierExpense;
+use App\Models\CarrierExpenseType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,7 @@ class ExpenseController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'type' => ['required'],
+            'type' => ['required', 'exists:carrier_expense_types,id'],
             'truck_id' => ['nullable', 'exists:trucks,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
@@ -35,7 +36,7 @@ class ExpenseController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => '', 'diesel' => 'Diesel', 'salary' => 'Salary', 'repairments' => 'Repairments', 'other' => 'Other'],
+            'types' => [null => ''] + CarrierExpenseType::pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -55,7 +56,7 @@ class ExpenseController extends Controller
             $expense->carrier_id = auth()->user()->id;
         }
 
-        $expense->type = $request->type;
+        $expense->type_id = $request->type;
         $expense->amount = $request->amount;
         $expense->truck_id = $request->truck_id;
         $expense->description = $request->description;
@@ -99,7 +100,7 @@ class ExpenseController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('expense.index');
+        return redirect()->route('carrierExpense.index');
     }
 
     /**
@@ -141,7 +142,7 @@ class ExpenseController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('expense.index');
+        return redirect()->route('carrierExpense.index');
     }
 
     /**
@@ -170,11 +171,31 @@ class ExpenseController extends Controller
     {
         $query = CarrierExpense::select([
             "carrier_expenses.id",
-            "carrier_expenses.type",
+            "carrier_expenses.type_id",
             "carrier_expenses.amount",
             "carrier_expenses.created_at",
         ])
+            ->with('type:id,name')
             ->where('carrier_id', auth()->user()->id);
+
+        if ($request->searchable) {
+            $searchable = [];
+            $statement = "whereHas";
+            foreach ($request->searchable as $item) {
+                switch ($item) {
+                    case 'type':
+                        $query->$statement($item, function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%$request->search%");
+                        });
+                        $statement = "orWhereHas";
+                        break;
+                    default:
+                        $searchable[count($searchable) + 1] = $item;
+                        break;
+                }
+            }
+            $request->searchable = $searchable;
+        }
 
         return $this->simpleSearchData($query, $request, 'orWhere');
     }

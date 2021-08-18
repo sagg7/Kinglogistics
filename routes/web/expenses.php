@@ -1,31 +1,31 @@
 <?php
 
-use App\Http\Controllers\Carriers\ExpenseController;
-use App\Http\Controllers\Carriers\ExpenseTypeController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ExpenseTypeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('expense')->group(function () {
     Route::get('index', [ExpenseController::class, 'index'])
-        ->name('carrierExpense.index');
+        ->name('expense.index');
     Route::get('create', [ExpenseController::class, 'create'])
-        ->name('carrierExpense.create');
+        ->name('expense.create');
     Route::post('store', [ExpenseController::class, 'store'])
-        ->name('carrierExpense.store');
+        ->name('expense.store');
     Route::get('search', [ExpenseController::class, 'search'])
-        ->name('carrierExpense.search');
+        ->name('expense.search');
     Route::get('edit/{id}', [ExpenseController::class, 'edit'])
-        ->name('carrierExpense.edit');
+        ->name('expense.edit');
     Route::post('update/{id}', [ExpenseController::class, 'update'])
-        ->name('carrierExpense.update');
+        ->name('expense.update');
     Route::post('delete/{id}', [ExpenseController::class, 'destroy'])
-        ->name('carrierExpense.delete');
+        ->name('expense.delete');
 
     Route::prefix('type')->group(function () {
         Route::post('store', [ExpenseTypeController::class, 'store'])
-            ->name('carrierExpenseType.store');
+            ->name('expenseType.store');
         Route::get('selection', [ExpenseTypeController::class, 'selection'])
-            ->name('carrierExpenseType.selection');
+            ->name('expenseType.selection');
         Route::post('delete/{id?}', [ExpenseTypeController::class, 'destroy'])
-            ->name('carrierExpenseType.delete');
+            ->name('expenseType.delete');
     });
 });

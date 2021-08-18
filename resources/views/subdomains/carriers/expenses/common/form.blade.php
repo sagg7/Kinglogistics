@@ -4,12 +4,17 @@
             <div class="row">
                 <div class="form-group col-md-4">
                     {!! Form::label('type', ucfirst(__('type')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('type', $types, $expense->type ?? null, ['class' => 'form-control' . ($errors->first('type') ? ' is-invalid' : '')]) !!}
-                    @error('type')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
+                    <div class="input-group">
+                        {!! Form::select('type', $types, $expense->type_id ?? null, ['class' => 'form-control' . ($errors->first('type') ? ' is-invalid' : '')]) !!}
+                        <div class="input-group-append">
+                            <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#expenseTypeModal"><i class="fas fa-plus"></i></button>
+                        </div>
+                        @error('type')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
                 </div>
                 <div class="form-group col-md-4">
                     <fieldset>

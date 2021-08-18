@@ -10,8 +10,11 @@
         <script defer>
             var tbAG = null;
             (() => {
-                const upperFormatter = (params) => {
-                    return  params.value ? `${params.value.replace(/^\w/, (c) => c.toUpperCase())}` : '';
+                const nameFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return '';
                 };
                 const moneyFormatter = (params) => {
                     if (params.value)
@@ -22,7 +25,7 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'created_at'},
-                        {headerName: 'Type', field: 'type', valueFormatter: upperFormatter},
+                        {headerName: 'Type', field: 'type', valueFormatter: nameFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],
                     menu: [
