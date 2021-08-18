@@ -15,7 +15,6 @@ class TrackingController extends Controller
                     $q->with([
                         'driver' => function ($q) {
                             $q->with([
-                                'truck:id,number,driver_id',
                                 'carrier:id,name',
                             ])
                                 ->select([
@@ -23,9 +22,10 @@ class TrackingController extends Controller
                                     'drivers.name',
                                     'drivers.carrier_id',
                                 ]);
-                        }
+                        },
                     ]);
                 },
+                'truck:id,number',
                 'shipper:id,name',
             ])
             ->get([
@@ -33,6 +33,7 @@ class TrackingController extends Controller
                 'loads.origin',
                 'loads.destination',
                 'loads.driver_id',
+                'loads.truck_id',
                 'loads.shipper_id',
             ]);
 

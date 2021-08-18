@@ -32,6 +32,14 @@ class Load extends Model
     /**
      * @return BelongsTo
      */
+    public function truck(): BelongsTo
+    {
+        return $this->belongsTo(Truck::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
     public function shipper(): BelongsTo
     {
         return $this->belongsTo(Shipper::class);

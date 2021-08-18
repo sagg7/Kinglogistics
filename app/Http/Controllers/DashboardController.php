@@ -39,6 +39,40 @@ class DashboardController extends Controller
         ];
     }
 
+    public function loadSummary(Request $request)
+    {
+        $start = Carbon::now()->subMonths(3)->startOfMonth();
+        $end = Carbon::now()->endOfMonth()->endOfDay();
+        return Load::whereBetween('loads.date', [$start, $end])
+            ->with([
+                'driver' => function ($q) {
+                    $q->with([
+                        'carrier:id,name',
+                    ])
+                        ->select([
+                            'drivers.id',
+                            'drivers.name',
+                            'drivers.carrier_id',
+                        ]);
+                },
+                'truck:id,number',
+                'shipper:id,name',
+            ])
+            ->where('loads.status', $request->status)
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            })
+            ->get([
+                'id',
+                'origin',
+                'destination',
+                'shipper_id',
+                'driver_id',
+                'truck_id',
+            ]);
+    }
+
     public function testKernel()
     {
         //$this->shipperInvoices();

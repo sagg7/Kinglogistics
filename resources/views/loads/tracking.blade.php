@@ -14,7 +14,7 @@
                         `<p><strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` +
                         `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
                         `<strong>Driver:</strong> ${data.driver.name}<br>` +
-                        `<strong>Truck#:</strong> ${data.driver.truck.number}</p>`;
+                        `<strong>Truck#:</strong> ${data.truck.number}</p>`;
                     const infowindow = new google.maps.InfoWindow({
                         content: info,
                     });
@@ -63,14 +63,14 @@
                     const shipper = load.shipper;
                     const driver = location.driver;
                     const carrier = driver.carrier;
-                    const truck = driver.truck;
+                    const truck = load.truck;
                     const data = {
                         driver: {
                             id: driver.id,
                             name: driver.name,
-                            truck: {
-                                number: truck.number,
-                            },
+                        },
+                        truck: {
+                            number: truck.number,
                         },
                         carrier: {
                             id: carrier.id,

@@ -8,6 +8,8 @@ Route::prefix('dashboard')->group(function () {
         ->name('dashboard');
     Route::get('getData', [DashboardController::class, 'getData'])
         ->name('dashboard.getData');
+    Route::get('loadSummary', [DashboardController::class, 'loadSummary'])
+        ->name('dashboard.loadSummary');
     Route::get('testKernel', [DashboardController::class, 'testKernel'])
         ->name('testKernel');
 });
