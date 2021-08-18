@@ -40,7 +40,7 @@
                 </ul>
             </li>
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Users</span></a>
+                <a href="#"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Staff</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/user/create">
