@@ -79,8 +79,17 @@
                 </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('zip_code', ucfirst(__('zip code')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('zip_code', $carrier->phone ?? null, ['class' => 'form-control' . ($errors->first('zip_code') ? ' is-invalid' : ''), 'maxlength' => 5]) !!}
+                    {!! Form::text('zip_code', $carrier->zip_code ?? null, ['class' => 'form-control' . ($errors->first('zip_code') ? ' is-invalid' : ''), 'maxlength' => 5]) !!}
                     @error('zip_code')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('owner', ucfirst(__('owner name')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('owner', $carrier->owner ?? null, ['class' => 'form-control' . ($errors->first('owner') ? ' is-invalid' : '')]) !!}
+                    @error('owner')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
                     </span>

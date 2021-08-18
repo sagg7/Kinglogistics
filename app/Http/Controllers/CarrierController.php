@@ -34,6 +34,7 @@ class CarrierController extends Controller
             'city' => ['nullable','string','max:255'],
             'state' => ['nullable','string','max:255'],
             'zip_code' => ['nullable','string','max:255'],
+            'owner' => ['nullable','string','max:255'],
         ]);
     }
 
@@ -85,7 +86,8 @@ class CarrierController extends Controller
         $carrier->city = $request->city;
         $carrier->state = $request->state;
         $carrier->zip_code = $request->zip_code;
-        $carrier->inactive = $request->inactive ?? null;;
+        $carrier->owner = $request->owner;
+        $carrier->inactive = $request->inactive ?? null;
         if ($request->password)
             $carrier->password = Hash::make($request->password);
         $carrier->save();
