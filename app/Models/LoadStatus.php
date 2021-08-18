@@ -19,7 +19,9 @@ class LoadStatus extends Model
         'to_location_timestamp',
         'arrived_timestamp',
         'unloading_timestamp',
-        'finished_timestamp'
+        'finished_timestamp',
+        'to_location_voucher',
+        'finished_voucher',
     ];
 
     /**

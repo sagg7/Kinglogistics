@@ -3,16 +3,22 @@
 namespace App\Traits\Chat;
 
 use App\Models\Message;
+use App\Traits\Storage\FileUpload;
 
 trait MessagesTrait
 {
+
+    use FileUpload;
+
     private function sendMessage(
         string $content,
         int $driverId,
         int $userId = null,
         bool $isDriverSender = null,
         bool $userUnread = null,
-        bool $driverUnread = null): Message
+        bool $driverUnread = null,
+        string $imageUrl = null
+    ): Message
     {
         return Message::create([
             'content' => $content,
@@ -21,6 +27,7 @@ trait MessagesTrait
             'is_driver_sender' => $isDriverSender,
             'user_unread' => $userUnread,
             'driver_unread' => $driverUnread,
+            'image' => $imageUrl,
         ]);
     }
 

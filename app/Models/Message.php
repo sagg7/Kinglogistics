@@ -16,6 +16,9 @@ class Message extends Model
         'driver_id',
         'user_id',
         'is_driver_sender',
+        'user_unread',
+        'driver_unread',
+        'image',
     ];
 
     protected $casts = [

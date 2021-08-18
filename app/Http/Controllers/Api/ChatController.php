@@ -34,9 +34,14 @@ class ChatController extends Controller
         $driverIds = $request->get('driver_ids');
         $content = $request->get('content');
         $userId = $request->get('user_id');
+        $image = $request->get('image');
 
         if (empty($driverIds)) {
             return response('Drivers collection is not setted', 400);
+        }
+
+        if (!empty($image)) {
+            $image = $this->uploadImage($image, 'chat');
         }
 
         foreach ($driverIds as $driverId) {
@@ -46,7 +51,10 @@ class ChatController extends Controller
                 $content,
                 $driverId,
                 $userId,
-                null
+                null,
+                null,
+                null,
+                $image
             );
 
             $driverDevices = $this->getUserDevices($driver);
@@ -66,13 +74,20 @@ class ChatController extends Controller
     {
         $driver = auth()->user();
         $content = $request->get('content');
+        $image = $request->get('image');
+
+        if (!empty($image)) {
+            $image = $this->uploadImage($image, 'chat');
+        }
 
         $message = $this->sendMessage(
             $content,
             $driver->id,
             null,
-            true,
-            true,
+            null,
+            null,
+            null,
+            $image
         );
 
         event(new NewChatMessage($message));

@@ -11,6 +11,7 @@ use App\Models\Load;
 use App\Models\LoadStatus;
 use App\Models\RejectedLoad;
 use App\Traits\Shift\ShiftTrait;
+use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 class LoadController extends Controller
 {
 
-    use ShiftTrait;
+    use ShiftTrait, FileUpload;
 
     /**
      * Display a listing of the resource.
@@ -86,8 +87,6 @@ class LoadController extends Controller
     {
         $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
 
-        // Do stuff required for "On accept" event
-
         return response(['status' => 'ok']);
     }
 
@@ -137,9 +136,16 @@ class LoadController extends Controller
 
     public function toLocation(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+        $receipt = $request->get('receipt');
+        if (empty($receipt)) {
+            return response('You must attach a valid voucher', 400);
+        }
 
-        // Do required stuff for "Loading" event
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+
+        $voucher = $this->uploadImage($receipt, 'loads/' . $loadStatus->id);
+        $loadStatus->to_location_voucher = $voucher;
+        $loadStatus->update();
 
         return response(['status' => 'ok']);
     }
@@ -164,15 +170,22 @@ class LoadController extends Controller
 
     public function finished(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::FINISHED);
+        $receipt = $request->get('receipt');
+        if (empty($receipt)) {
+            return response('You must attach a valid voucher', 400);
+        }
 
-        // Do required stuff for "Finished" event
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::FINISHED);
+
+        $voucher = $this->uploadImage($receipt, 'loads/' . $loadStatus->id);
+        $loadStatus->finished_voucher = $voucher;
+        $loadStatus->update();
 
         return response(['status' => 'ok']);
     }
 
     // Move this method to a Trait: Useful for Load creation scenarios...
-    private function switchLoadStatus($loadId, string $status): Load
+    private function switchLoadStatus($loadId, string $status): LoadStatus
     {
         $load = Load::find($loadId);
 
@@ -196,7 +209,7 @@ class LoadController extends Controller
         $loadStatus[$status . '_timestamp'] = Carbon::now();
         $loadStatus->update();
 
-        return $load;
+        return $loadStatus;
     }
 
 }
