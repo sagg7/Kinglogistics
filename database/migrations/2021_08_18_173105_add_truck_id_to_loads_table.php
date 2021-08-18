@@ -15,6 +15,7 @@ class AddTruckIdToLoadsTable extends Migration
     {
         Schema::table('loads', function (Blueprint $table) {
             $table->unsignedBigInteger('truck_id')->after('driver_id')->nullable();
+            $table->string('notes', 512)->after('bol')->nullable();
 
             $table->foreign('truck_id')->references('id')->on('trucks')->onUpdate('cascade')->onDelete('cascade');
         });
@@ -33,6 +34,8 @@ class AddTruckIdToLoadsTable extends Migration
     public function down()
     {
         Schema::table('loads', function (Blueprint $table) {
+            $table->dropForeign('loads_truck_id_foreign');
+            $table->dropIndex('loads_truck_id_foreign');
             $table->dropColumn('truck_id');
         });
     }

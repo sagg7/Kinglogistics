@@ -107,7 +107,7 @@
                                 <th><h6>Requested</h6></th>
                                 <th><h6>Accepted</h6></th>
                                 <th><h6>Loading</h6></th>
-                                <th><h6>To&nbsp;location</h6></th>
+                                <th><h6>In&nbsp;transit</h6></th>
                                 <th><h6>Arrived</h6></th>
                                 <th><h6>Unloading</h6></th>
                                 <th><h6>Finished</h6></th>

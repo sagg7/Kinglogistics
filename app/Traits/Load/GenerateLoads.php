@@ -62,10 +62,13 @@ trait GenerateLoads
             else
                 $load = new Load();
 
-            $load->shipper_id = $data["shipper_id"] ?? null;
+            if (isset($data['shipper_id']))
+                $load->shipper_id = $data["shipper_id"];
             $load->load_type_id = $data["load_type_id"];
-            $load->driver_id = $data["driver_id"] ?? null;
-            $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
+            if (isset($data['driver_id'])) {
+                $load->driver_id = $data["driver_id"] ?? null;
+                $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
+            }
             $load->load_log_id = $data["load_log_id"] ?? null;
             $load->trip_id = $data["trip_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
@@ -84,6 +87,7 @@ trait GenerateLoads
             $load->mileage = $data["mileage"] ?? null;
             $load->rate = $data["rate"] ?? null;
             $load->shipper_rate = $data["shipper_rate"] ?? null;
+            $load->notes = $data["notes"] ?? null;
             if (isset($data['status']))
                 $load->status = $data["status"];
             $load->save();

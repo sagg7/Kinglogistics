@@ -163,6 +163,7 @@ class LoadController extends Controller
          * THERE SHOULD BE NO CASE TO UPDATE
          */
         $data = $request->all();
+        $data['date'] = $request->date_submit;
         $this->validator($data)->validate();
         $this->storeUpdate($data, $id);
 
