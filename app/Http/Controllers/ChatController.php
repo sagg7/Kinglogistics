@@ -21,7 +21,7 @@ class ChatController extends Controller
             $q->whereHas('latestMessage', function ($r) {
                 //$r->where('user_id', auth()->user()->id);
             })
-                ->orWhereHas('shifts');
+                ->orWhereHas('shift');
         })
             ->whereNull("inactive")
             ->with([
