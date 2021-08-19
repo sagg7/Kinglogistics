@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\AppConfigEnum;
 use App\Enums\LoadStatusEnum;
+use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Models\AppConfig;
@@ -107,7 +108,11 @@ class LoadController extends Controller
 
         if ($driver->rejections->count() == $maxLoadRejections->value) {
 
-            // End the driver
+            /**
+             * End shift could throw a DriverHasUnfinishedLoadsException, but at this point of the process is illogic that scenario,
+             * just ignore that exception
+             **/
+
             $this->endShift($driver);
 
             return response([
