@@ -97,7 +97,7 @@ trait GenerateLoads
                 $this->notifyToDriver($data["driver_id"], $load);
 
                 // Delete driver from the available driver's lists
-                $availableDriver = AvailableDriver::findOrFail($data["driver_id"]);
+                $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
                 $availableDriver->delete();
             }
 
