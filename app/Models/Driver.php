@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Driver extends Authenticatable implements CanResetPassword
 {
@@ -55,6 +56,14 @@ class Driver extends Authenticatable implements CanResetPassword
     public function trailer(): HasOne
     {
         return $this->hasOne(Trailer::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function availableDriver(): HasOne
+    {
+        return $this->hasOne(AvailableDriver::class);
     }
 
     /**
@@ -115,8 +124,19 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasMany(DriverLocation::class);
     }
 
-    public function shifts(): HasMany
+    public function shift(): HasOne
     {
-        return $this->hasMany(Shift::class);
+        return $this->hasOne(Shift::class);
+    }
+
+    /**
+     *
+     * Helpers
+     *
+     */
+
+    public function hasActiveShift(): bool
+    {
+        return !empty($this->availableDriver) && !empty($this->shift);
     }
 }
