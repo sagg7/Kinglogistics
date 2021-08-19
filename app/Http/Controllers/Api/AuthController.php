@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AvailableDriver;
 use App\Models\Device;
 use App\Models\Driver;
 use Illuminate\Http\Request;
@@ -45,7 +46,15 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        $driver = auth()->user();
+
+        $shift = AvailableDriver::where('driver_id', $driver->id);
+
+        if (!empty($shift)) {
+            AvailableDriver::destroy($shift->id);
+        }
+
+        $driver->tokens()->delete();
 
         return ["message" => "Logged out"];
     }

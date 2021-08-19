@@ -18,7 +18,7 @@ class ShiftController extends Controller
         $driver = auth()->user();
 
         $payload = [
-            'active' => !$driver->inactive
+            'active' => !!AvailableDriver::where('driver_id', $driver->id)->first()
         ];
 
         return response(['status' => 'ok', 'data' => $payload]);
