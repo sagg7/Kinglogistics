@@ -68,12 +68,22 @@ class LoadController extends Controller
         $drivers = AvailableDriver::with('driver')
             ->whereHas('driver', function ($q) use ($shipper) {
                 // Filter users by current Turn, check if is morning first else night
-                $now = Carbon::now();
-                // TODO: CHANGE IT TO THE VALUES ON THE TURNS TABLE
-                if ($now->between(Carbon::createFromTimeString('6:00'), Carbon::createFromTimeString('17:59')))
-                    $q->where('turn_id', 1);
-                else
-                    $q->where('turn_id', 2);
+                $q->whereHas('turn', function ($r)  {
+                    $now = Carbon::now();
+                    $timeString = $now->toTimeString();
+                    $r->where(function ($s) use ($timeString, $now) {
+                        $s->whereTime('turns.end', '<', DB::raw('TIME(turns.start)'));
+                        if ($now->hour >= 0 && $now->hour <= 12)
+                            $s->whereTime('end', '>', $timeString);
+                        else
+                            $s->whereTime('start', '<=', $timeString);
+                    })
+                        ->orWhere(function ($s) use ($timeString) {
+                            $s->whereTime('turns.end', '>', DB::raw('TIME(turns.start)'))
+                                ->whereTime('start', '<=', $timeString)
+                                ->whereTime('end', '>', $timeString);
+                        });
+                });
                 // The driver must not be inactive
                 $q->whereNull('inactive')
                     // and also a truck
