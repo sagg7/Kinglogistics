@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,6 +33,14 @@ class Driver extends Authenticatable implements CanResetPassword
     public function carrier(): BelongsTo
     {
         return $this->belongsTo(Carrier::class);
+    }
+
+    /**
+     * @return belongsTo
+     */
+    public function turn(): BelongsTo
+    {
+        return $this->belongsTo(Turn::class);
     }
 
     /**
@@ -138,5 +147,26 @@ class Driver extends Authenticatable implements CanResetPassword
     public function hasActiveShift(): bool
     {
         return !empty($this->availableDriver) && !empty($this->shift);
+    }
+
+    public function canActiveShift(): bool
+    {
+        $turn = $this->turn;
+        $now = Carbon::now();
+
+        if ($turn->start->isAfter($turn->end)) {
+            // The shift is "broken" in two different days by midnight, should do an extra validation
+            $canActivate =
+                // The current moment is after the start of the turn and has not passed the midnight
+                $now->isAfter($turn->start) && $now->isAfter($turn->end)
+                ||
+                // The current moment is before the end of the turn and has been passed the midnight
+                $now->isBefore($turn->end) && $now->isBefore($turn->start);
+        } else {
+            // Normal turn, just check between times
+            $canActivate = $now->isBetween($turn->start, $turn->end);
+        }
+
+        return $canActivate;
     }
 }

@@ -28,7 +28,7 @@ trait ShiftTrait
     public function endShift($driver)
     {
         $unfinishedLoads = $driver->loads->filter(function ($load) {
-            return in_array($load->status, [LoadStatusEnum::FINISHED, LoadStatusEnum::UNALLOCATED]);
+            return !in_array($load->status, [LoadStatusEnum::FINISHED, LoadStatusEnum::UNALLOCATED]);
         });
 
         if (count($unfinishedLoads) > 0) {

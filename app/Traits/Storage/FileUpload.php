@@ -17,7 +17,7 @@ trait FileUpload
      * @param bool $delete
      * @return string
      */
-    private function uploadImage($file, string $path, int $quality = 100, string $options = null, bool $local = false, bool $delete = true): string
+    private function uploadImage($file, string $path, int $quality = 100, string $options = null, bool $local = false, bool $delete = true, string $extension = 'png'): string
     {
         $originalPath = $path;
         $path = ($local ? "public" : "temp") . "/$path";
@@ -25,16 +25,17 @@ trait FileUpload
             Storage::deleteDirectory($path);
         Storage::makeDirectory($path);
         $storage_path = storage_path("app/$path/");
-        $img = Image::make($file)->encode('png', $quality);
+        $img = Image::make($file)->encode($extension, $quality);
         $md5 = md5($img->__toString());
-        $img->save($storage_path . "$md5.png");
+        $img->save($storage_path . "$md5.$extension");
         // Store file on local storage
-        $filepath = "$originalPath/$md5.png";
+        $filepath = "$originalPath/$md5.$extension";
 
         if ($local)
             return "storage/$filepath";
         else {
-            Storage::disk('s3')->put($filepath, (string)file_get_contents($storage_path . "$md5.png"), $options);
+            Storage::disk('s3')
+                ->put($filepath, (string)file_get_contents($storage_path . "$md5.$extension"), $options);
             Storage::deleteDirectory($path);
             return $filepath;
         }

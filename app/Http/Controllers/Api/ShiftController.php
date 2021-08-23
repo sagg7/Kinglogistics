@@ -15,8 +15,40 @@ class ShiftController extends Controller
 
     use ShiftTrait;
 
-    public function create() {
+    public function create()
+    {
+        $driver = auth()->user();
+        $payload = [];
 
+        $lastLoad = $driver->loads()->orderBy('id', 'desc')->first();
+
+        if (!empty($lastLoad)) {
+            $payload['last_load'] = [
+                'box_status' => $lastLoad->box_status_init,
+                'box_type_id' => $lastLoad->box_type_id,
+                'box_number' => $lastLoad->box_number
+            ];
+        }
+
+        $truck = $driver->truck;
+
+        if (!empty($truck)) {
+            $payload['truck'] = [
+                'have_truck' => !empty($truck),
+                'truck_number' => $truck->number
+            ];
+
+            $trailer = $truck->trailer;
+
+
+            $payload['chassis'] = [
+                'have_chassis' => !empty($trailer),
+                // Add relation to chassis_types and retrieve the entry
+            ];
+
+        }
+
+        return response($payload);
     }
 
     public function checkStatus()
@@ -39,6 +71,14 @@ class ShiftController extends Controller
             return response([
                 'status' => 'error',
                 'message' => __('You already have an ongoing shift')
+            ], 400);
+        }
+
+        // Check if the user can activate its shift, checking current time compared to assigned turn time range
+        if (!$driver->canActiveShift()) {
+            return response([
+                'status' => 'error',
+                'message' => __('Your turn is out of time range')
             ], 400);
         }
 

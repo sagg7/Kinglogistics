@@ -11,6 +11,11 @@ class Turn extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $casts = [
+        'start' => 'datetime',
+        'end' => 'datetime'
+    ];
+
     /**
      * @return HasOne
      */

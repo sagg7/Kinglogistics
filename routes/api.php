@@ -64,6 +64,7 @@ Route::group([
         Route::post('arrived', [LoadController::class, 'arrived']);
         Route::post('unloading', [LoadController::class, 'unloading']);
         Route::post('finished', [LoadController::class, 'finished']);
+        Route::post('update-end-box', [LoadController::class, 'updateEndBox']);
 
     });
 
@@ -101,6 +102,7 @@ Route::group([
         'prefix' => 'shift',
     ], function () {
 
+        Route::get('create', [ShiftController::class, 'create']);
         Route::get('check-status', [ShiftController::class, 'checkStatus']);
         Route::post('start', [ShiftController::class, 'start']);
         Route::post('end', [ShiftController::class, 'end']);
@@ -109,6 +111,6 @@ Route::group([
 
 });
 
-Route::post('broadcast/auth', function() {
+Route::post('broadcast/auth', function () {
     return App\Models\User::find(1);
 });

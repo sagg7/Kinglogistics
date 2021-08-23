@@ -14,5 +14,4 @@ abstract class LoadStatusEnum
     public const UNLOADING = 'unloading';
     public const FINISHED = 'finished';
 
-
 }

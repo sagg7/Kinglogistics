@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AvailableDriver;
 use App\Models\Device;
 use App\Models\Driver;
+use App\Traits\Shift\ShiftTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    use ShiftTrait;
+
     public function login(Request $request)
     {
         $request->validate([
@@ -48,10 +51,8 @@ class AuthController extends Controller
     {
         $driver = auth()->user();
 
-        $shift = AvailableDriver::where('driver_id', $driver->id);
-
-        if (!empty($shift)) {
-            AvailableDriver::destroy($shift->id);
+        if ($driver->hasActiveShift()) {
+            $this->endShift($driver);
         }
 
         $driver->tokens()->delete();
