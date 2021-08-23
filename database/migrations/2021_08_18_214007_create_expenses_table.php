@@ -13,12 +13,17 @@ class CreateExpensesTable extends Migration
      */
     public function up()
     {
-        /*Schema::create('expenses', function (Blueprint $table) {
+        Schema::dropIfExists('expenses');
+        Schema::create('expenses', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('type_id');
             $table->double('amount');
             $table->string('description', 512)->nullable();
             $table->timestamps();
-        });*/
+            $table->softDeletes();
+
+            $table->foreign('type_id')->references('id')->on('expense_types')->onUpdate('cascade')->onDelete('cascade');
+        });
     }
 
     /**

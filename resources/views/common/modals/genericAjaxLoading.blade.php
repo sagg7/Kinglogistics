@@ -11,7 +11,7 @@
                 @isset($content)
                     <div class="content-body">{!! $content !!}</div>
                 @else
-                    <div class="text-center p-5" id="modal-spinner">
+                    <div class="text-center p-5 modal-spinner">
                         <span class="spinner-border" role="status" aria-hidden="true"></span>
                     </div>
                     <div class="content-body d-none"></div>

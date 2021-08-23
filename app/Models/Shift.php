@@ -13,7 +13,7 @@ class Shift extends Model
     protected $casts = [
         'have_truck' => 'boolean',
         'have_chassis' => 'boolean',
-        'have_box' => 'boolean',
+        'have_box' => 'boolean'
     ];
 
     protected $fillable = [

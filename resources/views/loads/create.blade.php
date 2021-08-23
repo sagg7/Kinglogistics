@@ -11,7 +11,7 @@
 
     @section('scripts')
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env("GOOGLE_MAPS_API") }}&libraries=places"></script>
-        <script src="{{ asset('js/sections/loads/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/coordsMaps.min.js') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
     @endsection

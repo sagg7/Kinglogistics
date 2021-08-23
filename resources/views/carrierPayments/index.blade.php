@@ -106,7 +106,7 @@
                                                     tbody.append(`<tr><td>${item.description}</td><td>${numeral(item.amount).format('$0,0.00')}</td></tr>`);
                                                 });
                                                 content.removeClass('d-none');
-                                                $('#modal-spinner').addClass('d-none');
+                                                $('.modal-spinner').addClass('d-none');
                                                 modal.modal('show');
                                             }
                                         },

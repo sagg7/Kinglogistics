@@ -50,6 +50,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('payment_days', ucfirst(__('payment days')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('payment_days[]', $weekdays, $shipper->payment_days, ['class' => 'form-control select2' . ($errors->first('payment_days') ? ' is-invalid' : ''), 'multiple']) !!}
+                    @error('payment_days')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AvailableDriver;
 use App\Models\Device;
 use App\Models\Driver;
+use App\Traits\Shift\ShiftTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    use ShiftTrait;
+
     public function login(Request $request)
     {
         $request->validate([
@@ -45,7 +49,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        $driver = auth()->user();
+
+        if ($driver->hasActiveShift()) {
+            $this->endShift($driver);
+        }
+
+        $driver->tokens()->delete();
 
         return ["message" => "Logged out"];
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\AppConfigEnum;
 use App\Enums\LoadStatusEnum;
+use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Models\AppConfig;
@@ -11,15 +12,15 @@ use App\Models\Load;
 use App\Models\LoadStatus;
 use App\Models\RejectedLoad;
 use App\Traits\Shift\ShiftTrait;
+use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
 class LoadController extends Controller
 {
 
-    use ShiftTrait;
+    use ShiftTrait, FileUpload;
 
     /**
      * Display a listing of the resource.
@@ -65,7 +66,9 @@ class LoadController extends Controller
     {
         $driver = auth()->user();
 
-        $pendingLoad = $driver->loads->where('status', LoadStatusEnum::UNALLOCATED)->first();
+        $pendingLoad = $driver->loads
+            ->where('status', LoadStatusEnum::REQUESTED)
+            ->first();
 
         if (empty($pendingLoad)) {
             $message = __('No pending loads available');
@@ -82,23 +85,40 @@ class LoadController extends Controller
         ]);
     }
 
+    /**
+     * @throws ShiftNotActiveException
+     */
     public function accept(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
+        $driver = auth()->user();
+        $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
 
-        // Do stuff required for "On accept" event
+        $load = Load::find($request->get('load_id'));
+        $shift = $driver->shift;
 
-        return response(['status' => 'ok']);
+        if (empty($shift))
+            throw new ShiftNotActiveException();
+
+        // Assign the box details to load coming from shift
+        $load->box_status_init = $shift->box_status;
+        $load->box_type_id_init = $shift->box_type_id;
+        $load->box_number_init = $shift->box_number;
+        $load->update();
+
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ACCEPTED]);
     }
 
     public function reject(Request $request)
     {
         $driver = auth()->user();
+        $loadId = $request->get('load_id');
 
         RejectedLoad::create([
-            'load_id' => $request->get('load_id'),
+            'load_id' => $loadId,
             'driver_id' => $driver->id,
         ]);
+
+        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 
@@ -108,20 +128,30 @@ class LoadController extends Controller
 
         if ($driver->rejections->count() == $maxLoadRejections->value) {
 
-            // End the driver
+            /**
+             * End shift could throw a DriverHasUnfinishedLoadsException, but at this point of the process is illogic that scenario,
+             * just ignore that exception
+             **/
+
             $this->endShift($driver);
 
             return response([
                 'status' => 'ok',
                 'message' => 'You have been reached the maximum rejection times, your shift has been ended automatically.',
                 'reached_max_rejections' => true,
+                'load_status' => LoadStatusEnum::UNALLOCATED
             ]);
         }
 
+        $message = $request->get('is_automatic') ?
+            'The load has been rejected automatically due no response' :
+            'The load has been rejected successfully';
+
         return response([
             'status' => 'ok',
-            'message' => 'The load has been rejected successfully',
-            'reached_max_rejections' => false
+            'message' => $message,
+            'reached_max_rejections' => false,
+            'load_status' => LoadStatusEnum::UNALLOCATED
         ]);
 
     }
@@ -132,16 +162,31 @@ class LoadController extends Controller
 
         // Do required stuff for "Loading" event
 
-        return response(['status' => 'ok']);
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::LOADING]);
     }
 
     public function toLocation(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+        $receipt = $request->get('receipt');
+        if (empty($receipt)) {
+            return response('You must attach a valid voucher', 400);
+        }
 
-        // Do required stuff for "Loading" event
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
 
-        return response(['status' => 'ok']);
+        $voucher = $this->uploadImage(
+            $receipt,
+            'loads/' . $loadStatus->id,
+            50,
+            null,
+            false,
+            true,
+            'jpg');
+
+        $loadStatus->to_location_voucher = $voucher;
+        $loadStatus->update();
+
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
     }
 
     public function arrived(Request $request)
@@ -150,7 +195,7 @@ class LoadController extends Controller
 
         // Do required stuff for "Arrived" event
 
-        return response(['status' => 'ok']);
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ARRIVED]);
     }
 
     public function unloading(Request $request)
@@ -159,20 +204,56 @@ class LoadController extends Controller
 
         // Do required stuff for "Unloading" event
 
-        return response(['status' => 'ok']);
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::UNLOADING]);
     }
 
     public function finished(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::FINISHED);
+        $driver = auth()->user();
 
-        // Do required stuff for "Finished" event
+        $receipt = $request->get('receipt');
+        if (empty($receipt)) {
+            return response('You must attach a valid voucher', 400);
+        }
 
-        return response(['status' => 'ok']);
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::FINISHED);
+
+        $voucher = $this->uploadImage(
+            $receipt,
+            'loads/' . $loadStatus->id,
+            50,
+            null,
+            false,
+            true,
+            'jpg');
+        $loadStatus->finished_voucher = $voucher;
+        $loadStatus->update();
+
+        // Check if driver can accept more loads and attach to response
+        return response([
+            'status' => 'ok',
+            'can_keep_shift' => $driver->canActiveShift(),
+            'load_status' => LoadStatusEnum::FINISHED
+        ]);
+    }
+
+    public function updateEndBox(Request $request) {
+        $load = Load::find($request->get('load_id'));
+
+        // Assign the box details to load coming from shift
+        $load->box_status_end = $request->get('box_status');
+        $load->box_type_id_end = $request->get('box_type_id');
+        $load->box_number_end = $request->get('box_number');
+        $load->update();
+
+        return response([
+            'status' => 'ok',
+            'message' => 'Your box have been saved successfully'
+        ]);
     }
 
     // Move this method to a Trait: Useful for Load creation scenarios...
-    private function switchLoadStatus($loadId, string $status): Load
+    private function switchLoadStatus($loadId, string $status): LoadStatus
     {
         $load = Load::find($loadId);
 
@@ -196,7 +277,7 @@ class LoadController extends Controller
         $loadStatus[$status . '_timestamp'] = Carbon::now();
         $loadStatus->update();
 
-        return $load;
+        return $loadStatus;
     }
 
 }

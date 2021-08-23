@@ -195,6 +195,18 @@
                 </div>
             </div>
         </div>
+        <hr>
+        <div class="row">
+            <div class="form-group col-md-12">
+                {!! Form::label('notes', ucfirst(__('notes')), ['class' => 'col-form-label']) !!}
+                {!! Form::textarea('notes', $load->notes ?? null, ['class' => 'form-control' . ($errors->first('notes') ? ' is-invalid' : ''), 'rows' => 5, 'maxlength' => 512]) !!}
+                @error('notes')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ ucfirst($message) }}</strong>
+                </span>
+                @enderror
+            </div>
+        </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->
 </div>

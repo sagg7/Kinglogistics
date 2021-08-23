@@ -12,7 +12,7 @@
         mileage = $('#mileage');
     const interactive = typeof readOnly === "undefined";
     if (interactive) {
-        let shipper = null;
+        let shipper = shipperSel.val();
         loadTypeSel.select2({
             ajax: {
                 url: '/loadType/selection',

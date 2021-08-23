@@ -29,4 +29,12 @@ class CarrierExpense extends Model
     {
         return $this->belongsTo(Truck::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(CarrierExpenseType::class);
+    }
 }

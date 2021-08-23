@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\CarrierPaymentController;
 use App\Http\Controllers\Carriers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,11 @@ Route::middleware('auth:carrier')->group(function () {
     require __DIR__.'/carriers/shippers.php';
     require __DIR__.'/carriers/expenses.php';
     require __DIR__.'/carriers/paperwork.php';
+    require __DIR__.'/carriers/reports.php';
     require __DIR__.'/web/trucks.php';
+
+    Route::get('carrier/payment/downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
+        ->name('carrier.downloadPaymentPDF');
 
     Route::get('/dashboard', function () {
         return view('subdomains.carriers.dashboard');

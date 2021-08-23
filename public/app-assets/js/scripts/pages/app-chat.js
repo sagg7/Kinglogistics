@@ -6,6 +6,10 @@
 
     if (contacts) {
         contacts.forEach(item => {
+            const time = item.latest_message ?
+                item.latest_message.is_driver_sender ? moment.utc(item.latest_message.created_at).format('h:mm A')
+                    : moment(item.latest_message.created_at).format('h:mm A')
+                : '';
             const element = `<li>` +
                 `<div class="pr-1">` +
                 //`<span class="avatar m-0 avatar-md"><img class="media-object rounded-circle" src="../../../app-assets/images/portrait/small/avatar-s-2.jpg" height="42" width="42" alt="Generic placeholder image">` +
@@ -18,8 +22,8 @@
                 `<p class="truncate">${item.latest_message ? item.latest_message.content : ''}</p>` +
                 `</div>` +
                 `<div class="contact-meta">` +
-                `<span class="float-right mb-25">${item.latest_message ? moment(item.latest_message.created_at).format('h:mm A') : ''}</span>` +
-                //`<span class="badge badge-primary badge-pill float-right">3</span>` +
+                `<span class="float-right mb-25">${time}</span>` +
+                (item.unread_count ? `<span class="badge badge-primary badge-pill float-right">${item.unread_count}</span>` : '') +
                 `</div>` +
                 `</div>` +
                 `<i>`;
@@ -152,9 +156,10 @@
         const original_height = chatsContainer.height();
         const original_scrollTop = chatsContainer.scrollTop();
         messages.forEach((item, count) => {
-            const date = moment(item.created_at);
+            const date = (item.is_driver_sender && !item.newly_received) ? moment.utc(item.created_at) : moment(item.created_at);
+            const time = (item.is_driver_sender && !item.newly_received) ? moment.utc(item.created_at).format('h:mm A') : moment(item.created_at).format('h:mm A');
             let html = `<div class="chat-content">` +
-                `<p>${item.content}<span class="block text-right line-height-1"><sub>${moment(item.created_at).format('h:mm A')}</sub></span></p>` +
+                `<p>${item.content}<span class="block text-right line-height-1"><sub>${time}</sub></span></p>` +
                 `</div>`;
             const lastChat = prepend ? $(".chat:first-child") : $(".chat:last-child");
             if (prepend) {
@@ -221,6 +226,7 @@
                             page: page + 1,
                         };
                         appendMessages((prepend ? res.results : result), prepend);
+                        console.log('here');
                         if (res.pagination.more)
                             userChat.prepend('<div class="text-center more-data-spinner"><div class="spinner-border"></div></div>');
                     }
@@ -324,7 +330,6 @@
     // Add message to chat
     $('.chat-app-input').submit(() => {
         const message = $(".message").val();
-        console.log(message);
         if (message !== "") {
             let html = `<div class="chat-content"><p>${message}<span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span></p></div>`;
             const lastChat = $(".chat:last-child");
@@ -346,14 +351,16 @@
     window.Echo.private('chat')
         .listen('NewChatMessage', e => {
             const message = e.message;
-            if (activeContact.messages)
-                activeContact.messages.history.push(message);
+            message.newly_received = true;
             if (activeContact.id === message.driver_id) {
                 appendMessages([message]);
             } else {
-                const contact = $(`.user-chat-info[data-userid="${message.driver_id}"]`),
-                    preview = contact.find('.truncate'),
-                    meta = contact.find('.contact-meta'),
+                const contact = contacts.find(obj => Number(obj.id) === Number(message.driver_id));
+                if (contact.messages)
+                    contact.messages.history.push(message);
+                const menu = $(`.user-chat-info[data-userid="${message.driver_id}"]`),
+                    preview = menu.find('.truncate'),
+                    meta = menu.find('.contact-meta'),
                     badge = meta.find('.badge');
                 preview.text(message.content.substring(0, 100));
                 if (badge.length > 0) {

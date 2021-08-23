@@ -2,7 +2,10 @@
 
 namespace App\Traits\Shift;
 
+use App\Enums\LoadStatusEnum;
+use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Models\AvailableDriver;
+use App\Models\LoadStatus;
 use App\Models\Shift;
 
 trait ShiftTrait
@@ -10,36 +13,35 @@ trait ShiftTrait
 
     public function startShift($driver, $payload)
     {
-        if (AvailableDriver::where('driver_id', $driver->id)->first()) {
-            return response([
-                'status' => 'error',
-                'message' => __('You already have an ongoing shift')
-            ], 403);
-        }
+        // Create and assign the shift to provided driver
+        $driver->shift()->create($payload);
 
-        $shift = new Shift();
-        $shift->fill($payload);
-        $shift->save();
-
+        // Registry the driver in the available drivers table
         $availableDriver = new AvailableDriver();
         $availableDriver->driver_id = $driver->id;
         $availableDriver->save();
-
-        // Change the driver inactive property
-        //$driver->inactive = false;
-        //$driver->save();
-
     }
 
-    public function endShift($driver, $shift = null)
+    /**
+     * @throws DriverHasUnfinishedLoadsException
+     */
+    public function endShift($driver)
     {
-        AvailableDriver::where('driver_id', $driver->id)->delete();
+        $unfinishedLoads = $driver->loads->filter(function ($load) {
+            return !in_array($load->status, [LoadStatusEnum::FINISHED, LoadStatusEnum::UNALLOCATED]);
+        });
 
-        // ... Do stuff related to shift ending
+        if (count($unfinishedLoads) > 0) {
+            throw new DriverHasUnfinishedLoadsException;
+        }
 
-        // Change the driver inactive property
-        //$driver->inactive = true;
-        //$driver->save();
+        if (!empty($driver->availableDriver)) {
+            AvailableDriver::destroy($driver->availableDriver->id);
+        }
+
+        if (!empty($driver->shift)) {
+            Shift::destroy($driver->shift->id);
+        }
 
         return response(['status' => 'ok'], 200);
     }
