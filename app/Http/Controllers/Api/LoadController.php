@@ -113,12 +113,18 @@ class LoadController extends Controller
         $driver = auth()->user();
         $loadId = $request->get('load_id');
 
+        // Register load rejection
         RejectedLoad::create([
             'load_id' => $loadId,
             'driver_id' => $driver->id,
         ]);
 
         $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
+
+        // Remove the driver from this load
+        $load = Load::find($loadId);
+        $load->driver_id = null;
+        $load->update();
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 
@@ -167,12 +173,21 @@ class LoadController extends Controller
 
     public function toLocation(Request $request)
     {
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+
+        // Do required stuff for "ToLocation" event
+
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
+    }
+
+    public function arrived(Request $request)
+    {
         $receipt = $request->get('receipt');
         if (empty($receipt)) {
             return response('You must attach a valid voucher', 400);
         }
 
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ARRIVED);
 
         $voucher = $this->uploadImage(
             $receipt,
@@ -185,15 +200,6 @@ class LoadController extends Controller
 
         $loadStatus->to_location_voucher = $voucher;
         $loadStatus->update();
-
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
-    }
-
-    public function arrived(Request $request)
-    {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ARRIVED);
-
-        // Do required stuff for "Arrived" event
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ARRIVED]);
     }
@@ -237,7 +243,8 @@ class LoadController extends Controller
         ]);
     }
 
-    public function updateEndBox(Request $request) {
+    public function updateEndBox(Request $request)
+    {
         $load = Load::find($request->get('load_id'));
 
         // Assign the box details to load coming from shift

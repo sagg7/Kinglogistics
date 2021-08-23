@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exceptions\DriverHasUnfinishedLoads;
+use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
-use App\Models\AvailableDriver;
+use App\Models\Load;
 use App\Models\Shift;
+use App\Notifications\LoadAssignment;
 use App\Traits\Shift\ShiftTrait;
 use Illuminate\Http\Request;
 
@@ -89,22 +90,44 @@ class ShiftController extends Controller
         // Starts shift for this driver
         $this->startShift($driver, $payload);
 
-        return response(['status' => 'ok'], 200);
+        // Check if exists unallocated loads and auto assign to driver
+        $load = $this->autoAssignUnallocatedLoad($driver);
+
+        return response(['status' => 'ok', 'assigned_load' => $load], 200);
     }
 
+    /**
+     * @throws DriverHasUnfinishedLoadsException
+     */
     public function end(Request $request)
     {
         $driver = auth()->user();
 
-        try {
-            // End the driver
-            $this->endShift($driver);
-        } catch (DriverHasUnfinishedLoadsException $exception) {
-            return response(['status' => 'error', 'message' => 'You have unfinished loads']);
-        }
+        $this->endShift($driver);
 
         return response(['status' => 'ok'], 200);
     }
 
+    private function autoAssignUnallocatedLoad($driver): ?Load
+    {
+        $load = Load::where([
+            ['status', LoadStatusEnum::UNALLOCATED],
+            ['driver_id', null]
+        ])
+            ->orderBy('id')
+            ->first();
+
+        if (!empty($load)) {
+            // Assign the driver and update the entry
+            $load->driver_id = $driver->id;
+            $load->status = LoadStatusEnum::REQUESTED;
+            $load->update();
+
+            // Notify to the driver of assignment
+            $driver->notify(new LoadAssignment($driver, $load));
+        }
+
+        return $load;
+    }
 
 }

@@ -19,6 +19,10 @@ class Load extends Model
      */
     protected $casts = [
         'date' => 'date:m/d/Y',
+        'weight' => 'decimal:2',
+        'mileage' => 'decimal:2',
+        'rate' => 'decimal:2',
+        'shipper_rate' => 'decimal:2',
     ];
 
     /**
