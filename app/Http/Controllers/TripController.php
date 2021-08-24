@@ -28,6 +28,7 @@ class TripController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
+            'customer_name' => ['required', 'string', 'max:255'],
             'zone_id' => ['required', 'exists:zones,id'],
             'origin' => ['required', 'string', 'max:255'],
             'origin_coords' => ['required', 'string', 'max:255'],
@@ -94,6 +95,7 @@ class TripController extends Controller
         $trip->zone_id = $request->zone_id;
         $trip->shipper_id = $shipper;
         $trip->name = $request->name;
+        $trip->customer_name = $request->customer_name;
         $trip->origin = $request->origin;
         $trip->origin_coords = $request->origin_coords;
         $trip->destination = $request->destination;
@@ -161,13 +163,13 @@ class TripController extends Controller
         $trip = Trip::findOrFail($id);
 
         if ($trip) {
-            $message = '';
+            /*$message = '';
             if ($trip->loads()->first())
                 $message .= "•" . $this->generateCrudMessage(4, 'Trip', ['constraint' => 'loads']) . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];
-            else
-                return ['success' => $trip->delete()];
+            else*/
+            return ['success' => $trip->delete()];
         } else
             return ['success' => false];
     }
@@ -202,7 +204,7 @@ class TripController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function search(Request $request, $type)
     {
         $query = Trip::select([
             "trips.id",
@@ -216,6 +218,15 @@ class TripController extends Controller
                 'zone:id,name',
                 'shipper:id,name',
             ]);
+
+        switch ($type) {
+            case 'inactive':
+                $query = $query->onlyTrashed();
+                break;
+            case 'active':
+            default:
+                break;
+        }
 
         if ($request->searchable) {
             $searchable = [];

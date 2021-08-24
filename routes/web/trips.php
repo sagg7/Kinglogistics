@@ -10,7 +10,7 @@ Route::prefix('trip')->group(function () {
         ->name('trip.create');
     Route::post('store', [TripController::class, 'store'])
         ->name('trip.store');
-    Route::get('search', [TripController::class, 'search'])
+    Route::get('search/{type?}', [TripController::class, 'search'])
         ->name('trip.search');
     Route::get('selection', [TripController::class, 'selection'])
         ->name('trip.selection');

@@ -5,6 +5,7 @@
         loadTypeShipper = $('#load_type_shipper'),
         shipperSel = $('#shipper_id'),
         tripSel = $('#trip_id'),
+        customerName = $('#customer_name'),
         origin = $('#origin'),
         originCoords = $('[name=origin_coords]'),
         destination = $('#destination'),
@@ -55,6 +56,7 @@
                         originCoords.val(res.origin_coords).trigger('change');
                         destination.val(res.destination);
                         destinationCoords.val(res.destination_coords).trigger('change');
+                        customerName.val(res.customer_name);
                         mileage.val(res.mileage);
                     },
                     error: () => {
