@@ -5,13 +5,16 @@ namespace App\Traits\Load;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
+use App\Models\Trip;
 use App\Notifications\LoadAssignment;
+use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 trait GenerateLoads
 {
+    use PaymentsAndCollection;
     /**
      * @param array $data
      * @param int|null $id
@@ -85,8 +88,17 @@ trait GenerateLoads
             $load->container = $data["container"] ?? null;
             $load->weight = $data["weight"] ?? null;
             $load->mileage = $data["mileage"] ?? null;
-            $load->rate = $data["rate"] ?? null;
-            $load->shipper_rate = $data["shipper_rate"] ?? null;
+            // If newly created or updating a load which is not finished
+            if (!$load->id || ($load->id && $load->status !== 'finished')) {
+                // Get the trip zone id
+                $zone_id = Trip::find($data['trip_id'])->zone_id ?? null;
+                // If all corresponding data to get the rate is set, then get the rate
+                if (isset($data["mileage"]) && $data["shipper_id"] && $zone_id) {
+                    $rate = $this->getRate($data["mileage"], $data["shipper_id"], $zone_id)["rate"];
+                    $load->rate = $rate->carrier_rate ?? null;
+                    $load->shipper_rate = $rate->shipper_rate ?? null;
+                }
+            }
             $load->notes = $data["notes"] ?? null;
             if (isset($data['status']))
                 $load->status = $data["status"];
