@@ -115,7 +115,6 @@ class ShiftController extends Controller
             ['status', LoadStatusEnum::UNALLOCATED],
             ['driver_id', null]
         ])
-            ->orderBy('id')
             ->first();
 
         if (!empty($load)) {
