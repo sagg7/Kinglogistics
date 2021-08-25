@@ -222,11 +222,6 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Rates</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="/tracking">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Tracking</span>
-                        </a>
-                    </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">
@@ -259,9 +254,16 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
-            </li>
+            @if(auth()->user()->hasRole('admin'))
+                <li class="nav-item">
+                    <a href="/tracking">
+                        <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
+                </li>
+            @endif
             <li class="navigation-header">
                 <span>Safety</span>
             </li>

@@ -57,6 +57,6 @@ class DriverLocationUpdateForCarrier implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('driver-location-carrier.' . $this->locationGroup->id);
+        return new PrivateChannel('driver-location-carrier.' . $this->carrier->id);
     }
 }

@@ -52,7 +52,8 @@ class DriverLocationController extends Controller
                 $driver,
                 $shipper,
                 LocationGroup::where('shipper_id', $shipper->shipper_id)->first(),
-                $coords)
+                $coords,
+                $request->get('status'))
         );
 
         // Broadcast event for carriers channel
@@ -60,11 +61,12 @@ class DriverLocationController extends Controller
                 $driver,
                 $driver->carrier,
                 LocationGroup::where('carrier_id', $driver->carrier_id)->first(),
-                $coords)
+                $coords,
+                $request->get('status'))
         );
 
         // Broadcast event for king (admin) channel
-        event(new DriverLocationUpdateForKing($driver, $coords));
+        event(new DriverLocationUpdateForKing($driver, $coords, $request->get('status')));
 
         return response(['status' => 'ok'], 200);
     }

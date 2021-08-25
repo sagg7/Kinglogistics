@@ -60,7 +60,7 @@ class LoadController extends Controller
         $data['driver_id'] = $driver->id;
         $data['status'] = $loadStatus;
         $data['load_type_id'] = 1; //need to change this to null in database;
-        $data['control_number'] = $request->get('control_number');
+        $data['control_number'] = $request->control_number ?? "undefined";
         $data['origin'] = null;
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
@@ -73,6 +73,7 @@ class LoadController extends Controller
         $data['destination'] = $trip->destination;
         $data['destination_coords'] = $trip->destination_coords;
         $data['customer_name'] = $trip->customer_name;
+        $data['mileage'] = $trip->mileage;
 
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
@@ -88,7 +89,7 @@ class LoadController extends Controller
         ])
             ->where("name", "LIKE", "%$request->search%");
 
-        return response($query, 200);
+        return response($query->get(), 200);
     }
 
     public function getActive(Request $request)
