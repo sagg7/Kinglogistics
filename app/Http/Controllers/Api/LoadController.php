@@ -8,19 +8,27 @@ use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Models\AppConfig;
+use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
+use App\Models\LoadLog;
 use App\Models\LoadStatus;
 use App\Models\RejectedLoad;
+use App\Traits\Load\GenerateLoads;
 use App\Traits\Load\ManageLoadProcessTrait;
+use App\Models\Trip;
 use App\Traits\Shift\ShiftTrait;
 use App\Traits\Storage\FileUpload;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\Accounting\PaymentsAndCollection;
+
 
 class LoadController extends Controller
 {
 
-    use ShiftTrait, FileUpload, ManageLoadProcessTrait;
+    use ShiftTrait, FileUpload, PaymentsAndCollection, ManageLoadProcessTrait, GenerateLoads;
 
     /**
      * Display a listing of the resource.
@@ -40,6 +48,49 @@ class LoadController extends Controller
         return response($loads, 200);
     }
 
+    public function storeLoad(Request $request)
+    {
+        $driver = auth()->user();
+        $data = $request->all();
+        $loadStatus = LoadStatusEnum::ACCEPTED;
+
+        // Required data to create a new Load...
+
+        $data['date'] = Carbon::now();
+        $data['driver_id'] = $driver->id;
+        $data['status'] = $loadStatus;
+        $data['load_type_id'] = 1; //need to change this to null in database;
+        $data['control_number'] = ""; // Should be nullable in db
+        $data['origin'] = null;
+        $data['customer_po'] = ""; // Should be nullable in db
+        $data['customer_reference'] = ""; // Should be nullable in db
+
+        $trip = Trip::find($request->trip_id);
+        // Trip related info
+        $data['id'] = $trip->id;
+        $data['origin'] = $trip->origin;
+        $data['origin_coords'] = $trip->origin_coords;
+        $data['destination'] = $trip->destination;
+        $data['destination_coords'] = $trip->destination_coords;
+        $data['customer_name'] = $trip->customer_name;
+
+        $load = $this->storeUpdate($data);
+        $this->switchLoadStatus($load->id, $loadStatus);
+
+        return response($load, 200);
+    }
+
+    public function getTrips(Request $request)
+    {
+        $query = Trip::select([
+            'id',
+            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as text"),
+        ])
+            ->where("name", "LIKE", "%$request->search%");
+
+        return response($query, 200);
+    }
+
     public function getActive(Request $request)
     {
         $driver = auth()->user();
@@ -49,16 +100,16 @@ class LoadController extends Controller
             ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
             ->first();
 
-        /**
-         * Temporary fix, the previous lines does return the load but in a stdObject instance,
-         * we need to call the eloquent constructor to get a model instance
-         */
-        $activeLoad = Load::find($activeLoad->id);
-
         if (empty($activeLoad)) {
             $message = __('Not active load');
             $load = $activeLoad;
         } else {
+            /**
+             * Temporary fix, the previous query does return the load but in a stdObject instance,
+             * we need to call the eloquent constructor to get a model instance for further methods
+             */
+            $activeLoad = Load::find($activeLoad->id);
+
             $message = __('Active load found');
             $load = new LoadResource($activeLoad);
         }

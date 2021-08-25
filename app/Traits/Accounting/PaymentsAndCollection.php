@@ -16,6 +16,40 @@ use Carbon\Carbon;
 
 trait PaymentsAndCollection
 {
+    /**
+     * @param $load_mileage
+     * @param int $shipper_id
+     * @param int $zone_id
+     * @return array
+     */
+    private function getRate($load_mileage, int $shipper_id, int $zone_id)
+    {
+        // Find the rate of the load mileage between the start and end mileage
+        $rate = Rate::where('shipper_id', $shipper_id)
+            ->where('zone_id', $zone_id)
+            ->where(function ($q) use ($load_mileage) {
+                $q->where('start_mileage', '<=', $load_mileage)
+                    ->where('end_mileage', '>=', $load_mileage);
+            })
+            ->first();
+        $flag = null;
+        // If the mileage was not between the mileage of any rate find if it's lower than the lowest mileage
+        if (!$rate) {
+            $rate = Rate::where('start_mileage', '>', $load_mileage)
+                ->orderBy('start_mileage', 'ASC')
+                ->first();
+            $flag = 'min';
+        }
+        // Or if it was not lower, find if it's higher than the highest mileage
+        if (!$rate) {
+            $rate = Rate::where('end_mileage', '<', $load_mileage)
+                ->orderBy('end_mileage', 'DESC')
+                ->first();
+            $flag = 'max';
+        }
+
+        return ['rate' => $rate, 'flag' => $flag];
+    }
 
     /**
      * @param $rates
@@ -45,31 +79,8 @@ trait PaymentsAndCollection
         }
         // If no rate has previously been queried
         if (!$rate) {
-            // Find the rate of the load mileage between the start and end mileage
-            $rate = Rate::where('shipper_id', $shipper_id)
-                ->where('zone_id', $zone_id)
-                ->where(function ($q) use ($load_mileage) {
-                    $q->where('start_mileage', '<=', $load_mileage)
-                        ->where('end_mileage', '>=', $load_mileage);
-                })
-                ->first();
-            $flag = null;
-            // If the mileage was not between the mileage of any rate find if it's lower than the lowest mileage
-            if (!$rate) {
-                $rate = Rate::where('start_mileage', '>', $load_mileage)
-                    ->orderBy('start_mileage', 'ASC')
-                    ->first();
-                $flag = 'min';
-            }
-            // Or if it was not lower, find if it's higher than the highest mileage
-            if (!$rate) {
-                $rate = Rate::where('end_mileage', '<', $load_mileage)
-                    ->orderBy('end_mileage', 'DESC')
-                    ->first();
-                $flag = 'max';
-            }
             // Save the rate to an array to possibly save further queries from happening for the same rate
-            $rates[] = ['rate' => $rate, 'flag' => $flag];
+            $rates[] = $this->getRate($load_mileage, $shipper_id, $zone_id);
         }
         return $rate;
     }
