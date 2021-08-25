@@ -66,8 +66,10 @@ trait GenerateLoads
             else
                 $load = new Load();
 
-            if (isset($data['shipper_id']))
-                $load->shipper_id = $data["shipper_id"];
+
+            $trip = Trip::find($data['trip_id']);
+
+            $load->shipper_id = $trip->shipper_id;
             $load->load_type_id = $data["load_type_id"];
             if (isset($data['driver_id'])) {
                 $load->driver_id = $data["driver_id"] ?? null;
@@ -92,7 +94,7 @@ trait GenerateLoads
             // If newly created or updating a load which is not finished
             if (!$load->id || ($load->id && $load->status !== 'finished')) {
                 // Get the trip zone id
-                $zone_id = Trip::find($data['trip_id'])->zone_id ?? null;
+                $zone_id = $trip->zone_id ?? null;
                 // If all corresponding data to get the rate is set, then get the rate
                 if (isset($data["mileage"]) && $data["shipper_id"] && $zone_id) {
                     $rate = $this->getRate($data["mileage"], $data["shipper_id"], $zone_id)["rate"];
