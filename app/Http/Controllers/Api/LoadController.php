@@ -20,11 +20,14 @@ use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\Accounting\PaymentsAndCollection;
+
 
 class LoadController extends Controller
 {
 
-    use ShiftTrait, FileUpload;
+    use ShiftTrait, FileUpload, PaymentsAndCollection;
+
 
     /**
      * Display a listing of the resource.
