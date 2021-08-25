@@ -35,7 +35,7 @@ class DriverLocationController extends Controller
 
         $driverLocation = new DriverLocation();
         $driverLocation->fill($payload);
-        $driverLocation->save();
+        //$driverLocation->save();
 
         $load = Load::find($loadId);
 

@@ -42,10 +42,10 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
                 'id' => $this->driver->carrier->id,
                 'name' => $this->driver->carrier->name,
             ],
-            'shippers' => $this->driver
+            /*'shippers' => $this->driver
                 ->shippers
                 ->map
-                ->only('id', 'name'),
+                ->only('id', 'name'),*/
             'coords' => $this->coords,
         ];
     }
