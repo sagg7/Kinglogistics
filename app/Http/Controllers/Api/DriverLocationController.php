@@ -44,12 +44,16 @@ class DriverLocationController extends Controller
             'longitude' => $longitude,
         ];
 
+        // TODO: CHECK THIS! Does driver could have more than one shipper????
+        $shipper = empty($load) ? $driver->shippers->first() : $load->shipper;
+
         // Broadcast event for shippers channel
         event(new DriverLocationUpdateForShipper(
                 $driver,
-                $load->shipper,
-                LocationGroup::where('shipper_id', $load->shipper_id)->first(),
-                $coords)
+                $shipper,
+                LocationGroup::where('shipper_id', $shipper->shipper_id)->first(),
+                $coords,
+                $request->get('status'))
         );
 
         // Broadcast event for carriers channel
@@ -57,11 +61,12 @@ class DriverLocationController extends Controller
                 $driver,
                 $driver->carrier,
                 LocationGroup::where('carrier_id', $driver->carrier_id)->first(),
-                $coords)
+                $coords,
+                $request->get('status'))
         );
 
         // Broadcast event for king (admin) channel
-        event(new DriverLocationUpdateForKing($driver, $coords));
+        event(new DriverLocationUpdateForKing($driver, $coords, $request->get('status')));
 
         return response(['status' => 'ok'], 200);
     }

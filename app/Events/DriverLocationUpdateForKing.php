@@ -16,16 +16,18 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
 
     public $driver;
     public $coords;
+    public $status;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($driver, $coords)
+    public function __construct($driver, $coords, $status)
     {
         $this->driver = $driver;
         $this->coords = $coords;
+        $this->status = $status;
     }
 
     public function broadcastWith()
@@ -47,6 +49,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
                 ->map
                 ->only('id', 'name'),*/
             'coords' => $this->coords,
+            'status' => $this->status
         ];
     }
 

@@ -5,7 +5,6 @@ namespace App\Traits\Shift;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Models\AvailableDriver;
-use App\Models\LoadStatus;
 use App\Models\Shift;
 
 trait ShiftTrait

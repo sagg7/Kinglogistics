@@ -18,6 +18,7 @@ class DriverLocationUpdateForShipper implements ShouldBroadcast
     public $driver;
     public $shipper;
     public $coords;
+    public $status;
 
     /**
      * Create a new event instance.

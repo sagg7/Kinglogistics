@@ -26,7 +26,7 @@ class TrackingController extends Controller
             if (!auth()->user()->hasRole('admin'))
                 abort(404);
         }
-        
+
         $data = Driver::whereHas('latestLocation')
             ->with([
                 'latestLocation' => function ($q) {
