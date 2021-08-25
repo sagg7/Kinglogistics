@@ -60,7 +60,7 @@ class LoadController extends Controller
         $data['driver_id'] = $driver->id;
         $data['status'] = $loadStatus;
         $data['load_type_id'] = 1; //need to change this to null in database;
-        $data['control_number'] = ""; // Should be nullable in db
+        $data['control_number'] = $request->control_number ?? "undefined";
         $data['origin'] = null;
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
