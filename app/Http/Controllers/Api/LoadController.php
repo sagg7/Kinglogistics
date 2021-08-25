@@ -62,20 +62,20 @@ class LoadController extends Controller
         return DB::transaction(function () use ($data, $trip) {
             $load = new Load();
             $load->shipper_id = $data["shipper_id"];
-            //$load->load_type_id = $data["load_type_id"];
+            $load->load_type_id = 1; //need to change this to null in database;
             $load->driver_id = $data["driver"]->id;
             $load->truck_id = Driver::with('truck')->find($data["driver"]->id)->truck->id;
             $load->load_log_id = null;
             $load->trip_id = $trip->id;
             $load->date = $data['date'];
-            $load->control_number = null;
+            $load->control_number = "Undefined";
             $load->origin = $trip->origin;
             $load->origin_coords = $trip->origin_coords;
             $load->destination = $trip->destination;
             $load->destination_coords = $trip->destination_coords;
             $load->customer_name = $trip->customer_name;
-            $load->customer_po = null;
-            $load->customer_reference = null;
+            $load->customer_po = "Undefined";
+            $load->customer_reference = "Undefined";
             $load->tons = $data["tons"] ?? null;
             $load->silo_number = $data["silo_number"] ?? null;
             $load->container = $data["container"] ?? null;
@@ -99,7 +99,8 @@ class LoadController extends Controller
 
             // Delete driver from the available driver's lists
             $availableDriver = AvailableDriver::where('driver_id', $data["driver"]->id)->first();
-            $availableDriver->delete();
+	    if(!empty($availableDriver))
+            	$availableDriver->delete();
 
             return $load;
         });
