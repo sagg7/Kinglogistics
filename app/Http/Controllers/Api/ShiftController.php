@@ -8,13 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Load;
 use App\Models\Shift;
 use App\Notifications\LoadAssignment;
+use App\Traits\Load\ManageLoadProcessTrait;
 use App\Traits\Shift\ShiftTrait;
 use Illuminate\Http\Request;
 
 class ShiftController extends Controller
 {
 
-    use ShiftTrait;
+    use ShiftTrait, ManageLoadProcessTrait;
 
     public function create()
     {
@@ -118,10 +119,15 @@ class ShiftController extends Controller
             ->first();
 
         if (!empty($load)) {
+            $assignedStatus = LoadStatusEnum::REQUESTED;
             // Assign the driver and update the entry
             $load->driver_id = $driver->id;
-            $load->status = LoadStatusEnum::REQUESTED;
+            $load->status = $assignedStatus;
+            $load->auto_assigned = true;
             $load->update();
+
+            // Update load status
+            $this->switchLoadStatus($load->id, $assignedStatus);
 
             // Notify to the driver of assignment
             $driver->notify(new LoadAssignment($driver, $load));

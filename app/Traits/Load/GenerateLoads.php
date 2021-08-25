@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 trait GenerateLoads
 {
     use PaymentsAndCollection;
+
     /**
      * @param array $data
      * @param int|null $id
@@ -110,7 +111,9 @@ trait GenerateLoads
 
                 // Delete driver from the available driver's lists
                 $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
-                $availableDriver->delete();
+
+                if (!empty($availableDriver))
+                    $availableDriver->delete();
             }
 
             return $load;
