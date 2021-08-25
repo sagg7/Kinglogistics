@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\LoadStatusEnum;
+use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class Load extends Model
 {
@@ -19,6 +21,11 @@ class Load extends Model
      */
     protected $casts = [
         'date' => 'date:m/d/Y',
+        'weight' => 'decimal:2',
+        'mileage' => 'decimal:2',
+        'rate' => 'decimal:2',
+        'shipper_rate' => 'decimal:2',
+        'auto_assigned' => 'boolean',
     ];
 
     /**
@@ -98,4 +105,37 @@ class Load extends Model
     {
         return $this->hasOne(DriverLocation::class)->latest();
     }
+
+    public function getNotifiedAtProperty(): ?Carbon
+    {
+        $loadId = $this->id;
+        $driver = $this->driver;
+
+        if (empty($driver))
+            return null;
+
+        $notifications = $driver->notifications;
+
+        if (empty($notifications))
+            return null;
+
+        $loadNotification = $notifications->first(function ($n) use ($loadId) {
+            $data = $n->data;
+            if (empty($data) || !isset($data['load']))
+                return null;
+
+            $load = $data['load'];
+
+            if (empty($load))
+                return null;
+
+            return $load['id'] == $loadId;
+        });
+
+        if (empty($loadNotification))
+            return null;
+
+        return $loadNotification->created_at ?: null;
+    }
+
 }

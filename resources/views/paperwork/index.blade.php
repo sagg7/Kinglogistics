@@ -22,6 +22,7 @@
                         const checkFormatter = (params) => {
                             return  params.value ? 'Yes' : 'No';
                         };
+                        const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         return {
                             columns: [
                                 {headerName: 'Name', field: 'name'},
@@ -32,9 +33,9 @@
                                 {text: 'Edit', route: '/paperwork/edit', icon: 'feather icon-edit'},
                                 {route: '/paperwork/delete', type: 'delete'}
                             ],
-                            container: `grid${type.replace(/^\w/, (c) => c.toUpperCase())}`,
+                            container: `grid${tableName}`,
                             url: `/paperwork/search/${type.slice(0, -1)}`,
-                            tableRef: 'tbAG',
+                            tableRef: `tb${tableName}`,
                         };
                     },
                     initTables = (type) => {

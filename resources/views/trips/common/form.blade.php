@@ -2,7 +2,7 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
-                <div class="form-group col-md-4">
+                <div class="form-group @if(auth()->guard('web')->check()){{ 'col-md-3' }}@else{{ 'col-md-4' }}@endif">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('name', $trip->name ?? null, ['class' => 'form-control' . ($errors->first('name') ? ' is-invalid' : '')]) !!}
                     @error('name')
@@ -11,7 +11,16 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-4">
+                <div class="form-group @if(auth()->guard('web')->check()){{ 'col-md-3' }}@else{{ 'col-md-4' }}@endif">
+                    {!! Form::label('customer_name', ucfirst(__('customer name')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('customer_name', $trip->customer_name ?? null, ['class' => 'form-control' . ($errors->first('customer_name') ? ' is-invalid' : '')]) !!}
+                    @error('customer_name')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group @if(auth()->guard('web')->check()){{ 'col-md-3' }}@else{{ 'col-md-4' }}@endif">
                     {!! Form::label('zone_id', ucfirst(__('zone')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('zone_id', $zones, $trip->zone_id ?? null, ['class' => 'form-control' . ($errors->first('zone_id') ? ' is-invalid' : '')]) !!}
                     @error('zone_id')
@@ -21,7 +30,7 @@
                     @enderror
                 </div>
                 @if(auth()->guard('web')->check())
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper_id', [], $trip->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
                     @error('shipper_id')

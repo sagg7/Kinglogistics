@@ -6,7 +6,6 @@ use App\Models\AvailableDriver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\Shipper;
-use App\Models\Trip;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
@@ -52,7 +51,7 @@ class LoadController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -60,7 +59,7 @@ class LoadController extends Controller
         $data = $request->all();
         $data['date'] = $request->date_submit;
 
-        $shipper = auth()->guard('shipper') ? auth()->guard()->user()->id : $request->shipper_id;
+        $shipper = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper_id;
         $data['shipper_id'] = $shipper;
 
         $this->validator($data)->validate();
@@ -68,7 +67,7 @@ class LoadController extends Controller
         $drivers = AvailableDriver::with('driver')
             ->whereHas('driver', function ($q) use ($shipper) {
                 // Filter users by current Turn, check if is morning first else night
-                $q->whereHas('turn', function ($r)  {
+                $q->whereHas('turn', function ($r) {
                     $now = Carbon::now();
                     $timeString = $now->toTimeString();
                     $r->where(function ($s) use ($timeString, $now) {
@@ -133,7 +132,7 @@ class LoadController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Load  $load
+     * @param \App\Models\Load $load
      * @return \Illuminate\Http\Response
      */
     public function show(int $id)

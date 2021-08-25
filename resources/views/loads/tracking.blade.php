@@ -11,7 +11,7 @@
                 const addMarker = (data) => {
                     const markerPosition = {lat: Number(data.coords.latitude), lng: Number(data.coords.longitude)};
                     const info = `<p><strong>Shipper:</strong> ${data.shippers.name}</p>` +
-                        `<p><strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` +
+                        `<p><strong>Status:</strong> ${data.load.status}<br><strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` +
                         `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
                         `<strong>Driver:</strong> ${data.driver.name}<br>` +
                         `<strong>Truck#:</strong> ${data.truck.number}</p>`;

@@ -34,7 +34,7 @@ class Driver extends Authenticatable implements CanResetPassword
     {
         return $this->belongsTo(Carrier::class);
     }
-    
+
     /**
      * @return belongsTo
      */

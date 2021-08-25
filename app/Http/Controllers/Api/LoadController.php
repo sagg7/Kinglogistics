@@ -8,19 +8,27 @@ use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Models\AppConfig;
+use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
+use App\Models\LoadLog;
 use App\Models\LoadStatus;
 use App\Models\RejectedLoad;
+use App\Traits\Load\GenerateLoads;
+use App\Traits\Load\ManageLoadProcessTrait;
+use App\Models\Trip;
 use App\Traits\Shift\ShiftTrait;
 use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\Accounting\PaymentsAndCollection;
+
 
 class LoadController extends Controller
 {
 
-    use ShiftTrait, FileUpload;
+    use ShiftTrait, FileUpload, PaymentsAndCollection, ManageLoadProcessTrait, GenerateLoads;
 
     /**
      * Display a listing of the resource.
@@ -31,11 +39,56 @@ class LoadController extends Controller
     {
         $driver = auth()->user();
 
-        $availableLoads = $driver->loads->where('status', LoadStatusEnum::FINISHED);
+        $availableLoads = $driver->loads
+            ->where('status', LoadStatusEnum::FINISHED)
+            ->sortByDesc('id');
 
         $loads = LoadResource::collection($availableLoads);
 
         return response($loads, 200);
+    }
+
+    public function storeLoad(Request $request)
+    {
+        $driver = auth()->user();
+        $data = $request->all();
+        $loadStatus = LoadStatusEnum::ACCEPTED;
+
+        // Required data to create a new Load...
+
+        $data['date'] = Carbon::now();
+        $data['driver_id'] = $driver->id;
+        $data['status'] = $loadStatus;
+        $data['load_type_id'] = 1; //need to change this to null in database;
+        $data['control_number'] = ""; // Should be nullable in db
+        $data['origin'] = null;
+        $data['customer_po'] = ""; // Should be nullable in db
+        $data['customer_reference'] = ""; // Should be nullable in db
+
+        $trip = Trip::find($request->trip_id);
+        // Trip related info
+        $data['id'] = $trip->id;
+        $data['origin'] = $trip->origin;
+        $data['origin_coords'] = $trip->origin_coords;
+        $data['destination'] = $trip->destination;
+        $data['destination_coords'] = $trip->destination_coords;
+        $data['customer_name'] = $trip->customer_name;
+
+        $load = $this->storeUpdate($data);
+        $this->switchLoadStatus($load->id, $loadStatus);
+
+        return response($load, 200);
+    }
+
+    public function getTrips(Request $request)
+    {
+        $query = Trip::select([
+            'id',
+            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as text"),
+        ])
+            ->where("name", "LIKE", "%$request->search%");
+
+        return response($query, 200);
     }
 
     public function getActive(Request $request)
@@ -51,6 +104,12 @@ class LoadController extends Controller
             $message = __('Not active load');
             $load = $activeLoad;
         } else {
+            /**
+             * Temporary fix, the previous query does return the load but in a stdObject instance,
+             * we need to call the eloquent constructor to get a model instance for further methods
+             */
+            $activeLoad = Load::find($activeLoad->id);
+
             $message = __('Active load found');
             $load = new LoadResource($activeLoad);
         }
@@ -113,12 +172,18 @@ class LoadController extends Controller
         $driver = auth()->user();
         $loadId = $request->get('load_id');
 
+        // Register load rejection
         RejectedLoad::create([
             'load_id' => $loadId,
             'driver_id' => $driver->id,
         ]);
 
         $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
+
+        // Remove the driver from this load
+        $load = Load::find($loadId);
+        $load->driver_id = null;
+        $load->update();
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 
@@ -167,12 +232,27 @@ class LoadController extends Controller
 
     public function toLocation(Request $request)
     {
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+
+        // Do required stuff for "ToLocation" event
+
+        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
+    }
+
+    public function arrived(Request $request)
+    {
         $receipt = $request->get('receipt');
+        $loadId = $request->get('load_id');
         if (empty($receipt)) {
             return response('You must attach a valid voucher', 400);
         }
 
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
+        $load = Load::find($loadId);
+        $load->sand_ticket = $request->get('sand_ticket');
+        $load->weight = $request->get('weight');
+        $load->update();
+
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
 
         $voucher = $this->uploadImage(
             $receipt,
@@ -186,29 +266,26 @@ class LoadController extends Controller
         $loadStatus->to_location_voucher = $voucher;
         $loadStatus->update();
 
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
-    }
-
-    public function arrived(Request $request)
-    {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ARRIVED);
-
-        // Do required stuff for "Arrived" event
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ARRIVED]);
     }
 
     public function unloading(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::UNLOADING);
+        $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
 
-        // Do required stuff for "Unloading" event
+        $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
+
+        $load->customer_po = $request->get('customer_po');
+        $load->update();
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::UNLOADING]);
     }
 
     public function finished(Request $request)
     {
+        $loadId = $request->get('load_id');
         $driver = auth()->user();
 
         $receipt = $request->get('receipt');
@@ -216,7 +293,11 @@ class LoadController extends Controller
             return response('You must attach a valid voucher', 400);
         }
 
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::FINISHED);
+        $load = Load::find($loadId);
+        $load->bol = $request->get('bol');
+        $load->update();
+
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);
 
         $voucher = $this->uploadImage(
             $receipt,
@@ -229,6 +310,8 @@ class LoadController extends Controller
         $loadStatus->finished_voucher = $voucher;
         $loadStatus->update();
 
+        $this->endShift($driver);
+
         // Check if driver can accept more loads and attach to response
         return response([
             'status' => 'ok',
@@ -237,7 +320,8 @@ class LoadController extends Controller
         ]);
     }
 
-    public function updateEndBox(Request $request) {
+    public function updateEndBox(Request $request)
+    {
         $load = Load::find($request->get('load_id'));
 
         // Assign the box details to load coming from shift
@@ -250,34 +334,6 @@ class LoadController extends Controller
             'status' => 'ok',
             'message' => 'Your box have been saved successfully'
         ]);
-    }
-
-    // Move this method to a Trait: Useful for Load creation scenarios...
-    private function switchLoadStatus($loadId, string $status): LoadStatus
-    {
-        $load = Load::find($loadId);
-
-        if (empty($load)) {
-            abort(404, 'The requested load has not been found');
-        }
-
-        $load->status = $status;
-        $load->save();
-
-        $loadStatus = $load->loadStatus;
-
-        // If this load does not have a load status entry, create one and assign the incoming status
-        if (empty($loadStatus)) {
-            $loadStatus = LoadStatus::create([
-                'load_id' => $load->id
-            ]);
-        }
-
-        // Update load statuses table
-        $loadStatus[$status . '_timestamp'] = Carbon::now();
-        $loadStatus->update();
-
-        return $loadStatus;
     }
 
 }
