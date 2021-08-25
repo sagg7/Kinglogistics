@@ -11,14 +11,14 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.sass('resources/sass/app.scss', 'public/css')
+mix//.sass('resources/sass/app.scss', 'public/css')
     /*.postCss('resources/css/fontawesome.css', 'public/css')*/
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
         require('tailwindcss'),
         require('autoprefixer'),
-    ])
-    .js('resources/js/common/master.js', 'public/js/common/master.min.js')*/
+    ])*/
+    //.js('resources/js/common/master.js', 'public/js/common/master.min.js')
     //.js('resources/js/bootstrap.js', 'public/js/')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
@@ -30,7 +30,7 @@ mix.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
-    //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
+    .js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
     //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections

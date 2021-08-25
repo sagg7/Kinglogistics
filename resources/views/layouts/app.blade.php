@@ -118,7 +118,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script src="{{ asset('js/section/master/globalFunctions.js') }}"></script>
-    <script src="{{ asset('js/common/master.min.js?1.0.0') }}"></script>
+    <script src="{{ asset('js/common/master.min.js?1.0.1') }}"></script>
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
 
