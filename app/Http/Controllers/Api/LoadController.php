@@ -60,7 +60,7 @@ class LoadController extends Controller
         $data['driver_id'] = $driver->id;
         $data['status'] = $loadStatus;
         $data['load_type_id'] = 1; //need to change this to null in database;
-        $data['control_number'] = ""; // Should be nullable in db
+        $data['control_number'] = $request->get('control_number');
         $data['origin'] = null;
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
@@ -232,9 +232,13 @@ class LoadController extends Controller
 
     public function toLocation(Request $request)
     {
+        $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
+
         $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
 
-        // Do required stuff for "ToLocation" event
+        $load->customer_po = $request->get('customer_po');
+        $load->update();
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
     }
@@ -273,12 +277,8 @@ class LoadController extends Controller
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
 
         $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
-
-        $load->customer_po = $request->get('customer_po');
-        $load->update();
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::UNLOADING]);
     }
