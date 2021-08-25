@@ -88,7 +88,7 @@ class LoadController extends Controller
         ])
             ->where("name", "LIKE", "%$request->search%");
 
-        return response($query, 200);
+        return response($query->get(), 200);
     }
 
     public function getActive(Request $request)
