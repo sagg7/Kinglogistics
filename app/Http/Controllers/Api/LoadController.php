@@ -73,6 +73,7 @@ class LoadController extends Controller
         $data['destination'] = $trip->destination;
         $data['destination_coords'] = $trip->destination_coords;
         $data['customer_name'] = $trip->customer_name;
+        $data['mileage'] = $trip->mileage;
 
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
