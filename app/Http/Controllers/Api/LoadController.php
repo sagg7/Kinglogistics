@@ -8,9 +8,13 @@ use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Models\AppConfig;
+use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
+use App\Models\LoadLog;
 use App\Models\LoadStatus;
 use App\Models\RejectedLoad;
+use App\Models\Trip;
 use App\Traits\Shift\ShiftTrait;
 use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
@@ -36,6 +40,80 @@ class LoadController extends Controller
         $loads = LoadResource::collection($availableLoads);
 
         return response($loads, 200);
+    }
+
+    public function storeLoad(Request $request)
+    {
+        $data = $request->all();
+        $data['date'] = Carbon::now();
+
+        $shipper = $request->shipper_id;
+        $data['shipper_id'] = $shipper;
+
+        $data["driver"] = auth()->user();
+
+        $trip = Trip::find($request->trip_id);
+
+        $data["status"] = "accepted";
+
+        return DB::transaction(function () use ($data, $trip) {
+            $load = new Load();
+            $load->shipper_id = $data["shipper_id"];
+            //$load->load_type_id = $data["load_type_id"];
+            $load->driver_id = $data["driver"]->id;
+            $load->truck_id = Driver::with('truck')->find($data["driver_id"])->truck->id;
+            $load->load_log_id = null;
+            $load->trip_id = $trip->id;
+            $load->date = $data['date'];
+            $load->control_number = null;
+            $load->origin = $trip->origin;
+            $load->origin_coords = $trip->origin_coords;
+            $load->destination = $trip->destination;
+            $load->destination_coords = $trip->destination_coords;
+            $load->customer_name = $trip->customer_name;
+            $load->customer_po = null;
+            $load->customer_reference = null;
+            $load->tons = $data["tons"] ?? null;
+            $load->silo_number = $data["silo_number"] ?? null;
+            $load->container = $data["container"] ?? null;
+            $load->weight = $data["weight"] ?? null;
+            $load->mileage = $data["mileage"] ?? null;
+            // If newly created or updating a load which is not finished
+            if (!$load->id || ($load->id && $load->status !== 'finished')) {
+                // Get the trip zone id
+                $zone_id = $trip->zone_id ?? null;
+                // If all corresponding data to get the rate is set, then get the rate
+                if (isset($trip->mileage) && $data["shipper_id"] && $zone_id) {
+                    $rate = $this->getRate($trip->mileage, $data["shipper_id"], $zone_id)["rate"];
+                    $load->rate = $rate->carrier_rate ?? null;
+                    $load->shipper_rate = $rate->shipper_rate ?? null;
+                }
+            }
+            $load->notes = $data["notes"] ?? null;
+            if (isset($data['status']))
+                $load->status = $data["status"];
+            $load->save();
+
+            // Delete driver from the available driver's lists
+            $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
+            $availableDriver->delete();
+
+            return $load;
+        });
+
+
+    }
+
+
+
+    public function getTrips(Request $request){
+        $query = Trip::select([
+            'id',
+            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as text"),
+        ])
+            ->where("name", "LIKE", "%$request->search%");
+
+        return $query->get();
     }
 
     public function getActive(Request $request)

@@ -56,6 +56,7 @@ Route::group([
         Route::get('records', [LoadController::class, 'getRecords']);
         Route::get('get-active', [LoadController::class, 'getActive']);
         Route::get('pending-to-respond', [LoadController::class, 'getPendingToRespond']);
+        Route::get('get-trips', [LoadController::class, 'getTrips']);
 
         Route::post('accept', [LoadController::class, 'accept']);
         Route::post('reject', [LoadController::class, 'reject']);
@@ -65,6 +66,8 @@ Route::group([
         Route::post('unloading', [LoadController::class, 'unloading']);
         Route::post('finished', [LoadController::class, 'finished']);
         Route::post('update-end-box', [LoadController::class, 'updateEndBox']);
+        Route::post('store-load', [LoadController::class, 'storeLoad']);
+
 
     });
 
