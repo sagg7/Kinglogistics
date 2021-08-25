@@ -61,7 +61,7 @@ class LoadController extends Controller
             $load->shipper_id = $data["shipper_id"];
             //$load->load_type_id = $data["load_type_id"];
             $load->driver_id = $data["driver"]->id;
-            $load->truck_id = Driver::with('truck')->find($data["driver_id"])->truck->id;
+            $load->truck_id = Driver::with('truck')->find($data["driver"]->id)->truck->id;
             $load->load_log_id = null;
             $load->trip_id = $trip->id;
             $load->date = $data['date'];
@@ -95,7 +95,7 @@ class LoadController extends Controller
             $load->save();
 
             // Delete driver from the available driver's lists
-            $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
+            $availableDriver = AvailableDriver::where('driver_id', $data["driver"]->id)->first();
             $availableDriver->delete();
 
             return $load;
