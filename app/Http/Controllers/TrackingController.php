@@ -41,6 +41,7 @@ class TrackingController extends Controller
                     }]);
                 },
                 'carrier:id,name',
+                'truck:id,number,driver_id',
             ])
             /*->whereHas('latestLocation', function ($q) {
                 $q->where('status', '!=', 'finished');

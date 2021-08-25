@@ -1,8 +1,14 @@
 (() => {
     const addMarker = (data) => {
+        const capitalizeStatus = (string) => {
+            if (string === "to_location")
+                string = "in transit";
+            return string.charAt(0).toUpperCase()  + string.slice(1)
+        };
         const markerPosition = {lat: Number(data.coords.latitude), lng: Number(data.coords.longitude)};
-        const info = `<p><strong>Shipper:</strong> ${data.shippers.name}</p>` +
-            `<p><strong>Status:</strong> ${data.load.status}<br><strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` +
+        const info = (data.shippers.name ? `<p><strong>Shipper:</strong> ${data.shippers.name}</p>` : '') +
+            `<p><strong>Status:</strong> ${capitalizeStatus(data.status)}<br>` +
+            (data.load.origin ? `<strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` : '') +
             `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
             `<strong>Truck#:</strong> ${data.truck.number}</p>`;
@@ -51,9 +57,9 @@
     let markersArray = [];
     data.forEach((item) => {
         const location = item.latest_location;
-        const load = location.parent_load;
-        const shipper = load.shipper;
-        const truck = load.truck;
+        const load = location.parent_load ? location.parent_load : {};
+        const shipper = load.shipper ? load.shipper : {};
+        const truck = load.truck ? load.truck : item.truck;
         const carrier = item.carrier;
         const data = {
             driver: {
@@ -78,7 +84,8 @@
             load: {
                 origin: load.origin,
                 destination: load.destination,
-            }
+            },
+            status: location.status,
         }
         const marker = addMarker(data);
         bounds.extend(marker.position);
