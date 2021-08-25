@@ -35,6 +35,7 @@ class TrackingController extends Controller
                 'loads.driver_id',
                 'loads.truck_id',
                 'loads.shipper_id',
+                'loads.status',
             ]);
 
         $params = compact('loads');
