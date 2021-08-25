@@ -233,9 +233,13 @@ class LoadController extends Controller
 
     public function toLocation(Request $request)
     {
+        $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
+
         $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
 
-        // Do required stuff for "ToLocation" event
+        $load->customer_po = $request->get('customer_po');
+        $load->update();
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
     }
@@ -274,12 +278,8 @@ class LoadController extends Controller
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
 
         $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
-
-        $load->customer_po = $request->get('customer_po');
-        $load->update();
 
         return response(['status' => 'ok', 'load_status' => LoadStatusEnum::UNLOADING]);
     }

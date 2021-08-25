@@ -53,4 +53,9 @@ class Trailer extends Model
     {
         return $this->belongsToMany(Shipper::class);
     }
+
+    public function chassisType(): BelongsTo
+    {
+        return $this->belongsTo(ChassisType::class);
+    }
 }

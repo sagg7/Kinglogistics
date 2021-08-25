@@ -42,12 +42,14 @@ class ShiftController extends Controller
 
             $trailer = $truck->trailer;
 
-
-            $payload['chassis'] = [
-                'have_chassis' => !empty($trailer),
+            if (!empty($trailer)) {
+                $payload['chassis'] = [
+                    'have_chassis' => true,
+                    'trailer_number' => $trailer->number,
+                    'chassis_type_id' => $trailer->chassis_type_id,
                 // Add relation to chassis_types and retrieve the entry
             ];
-
+            }
         }
 
         return response($payload);

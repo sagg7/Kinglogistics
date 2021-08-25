@@ -18,4 +18,9 @@ class ChassisType extends Model
     {
         return $this->hasMany(Shift::class);
     }
+
+    public function trailers(): HasMany
+    {
+        return $this->hasMany(Trailer::class);
+    }
 }
