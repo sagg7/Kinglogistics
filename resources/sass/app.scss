@@ -39,6 +39,11 @@ canvas {
     }
 }
 
+.ag-grid-btns {
+    .mb-1, .my-1 {
+        margin-bottom: 0!important;
+    }
+}
 .aggrid {
     &.ag-auto-height {
         height: auto;
@@ -229,6 +234,21 @@ table.total-rows {
         td {
             padding: 0;
             border: 0;
+        }
+    }
+}
+
+.pills-layout {
+    .pills-menu-col {
+        max-width: 200px;
+    }
+}
+
+// Small devices (landscape phones, 768 and down)
+@media (max-width: 768px) {
+    .pills-layout {
+        .pills-menu-col {
+            max-width: 100%;
         }
     }
 }

@@ -11,7 +11,7 @@ const mix = require('laravel-mix');
  |
  */
 
-mix//.sass('resources/sass/app.scss', 'public/css')
+mix.sass('resources/sass/app.scss', 'public/css')
     /*.postCss('resources/css/fontawesome.css', 'public/css')*/
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
@@ -41,7 +41,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
-    .scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
+    //.scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
     //.scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
