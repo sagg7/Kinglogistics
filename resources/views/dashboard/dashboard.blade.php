@@ -2,7 +2,7 @@
 
     @section("scripts")
         <script>
-            const guard = 'shipper';
+            const guard = 'web';
         </script>
         <script src="{{ asset('js/sections/dashboard/common.min.js') }}"></script>
     @endsection
