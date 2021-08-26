@@ -50,6 +50,7 @@
                     </span>
                     @enderror
                 </div>
+                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-6">
                     {!! Form::label('payment_days', ucfirst(__('payment days')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('payment_days[]', $weekdays, $shipper->payment_days, ['class' => 'form-control select2' . ($errors->first('payment_days') ? ' is-invalid' : ''), 'multiple']) !!}
@@ -59,6 +60,7 @@
                     </span>
                     @enderror
                 </div>
+                @endif
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
