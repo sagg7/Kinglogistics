@@ -17,8 +17,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
         require('postcss-import'),
         require('tailwindcss'),
         require('autoprefixer'),
-    ])
-    .js('resources/js/common/master.js', 'public/js/common/master.min.js')*/
+    ])*/
+    //.js('resources/js/common/master.js', 'public/js/common/master.min.js')
     //.js('resources/js/bootstrap.js', 'public/js/')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
@@ -30,7 +30,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
-    //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
+    .js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
     //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
@@ -42,7 +42,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
     //.scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
-    .scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
+    //.scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/drivers/common.js'], 'public/js/sections/subdomains/carriers/drivers/common.min.js')
     //.scripts(['resources/js/sections/subdomains/carriers/trucks/common.js'], 'public/js/sections/subdomains/carriers/trucks/common.min.js')

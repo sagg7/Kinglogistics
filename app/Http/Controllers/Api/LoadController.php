@@ -7,6 +7,7 @@ use App\Enums\LoadStatusEnum;
 use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
+use App\Http\Resources\Helpers\KeyValueResource;
 use App\Models\AppConfig;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
@@ -74,22 +75,31 @@ class LoadController extends Controller
         $data['destination_coords'] = $trip->destination_coords;
         $data['customer_name'] = $trip->customer_name;
         $data['mileage'] = $trip->mileage;
+        $data['shipper_id'] = $trip->shipper_id;
 
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
 
-        return response($load, 200);
+        return response([
+            'status' => 'ok',
+            'message' => 'The load has been successfully created!',
+            'load' => $load
+        ]);
     }
 
     public function getTrips(Request $request)
     {
         $query = Trip::select([
-            'id',
-            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as text"),
+            'id as key',
+            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
         ])
             ->where("name", "LIKE", "%$request->search%");
 
-        return response($query->get(), 200);
+        return response([
+            'status' => 'ok',
+            'message' => 'Found trips',
+            'trips' => KeyValueResource::collection($query->get()),
+        ]);
     }
 
     public function getActive(Request $request)

@@ -90,7 +90,10 @@
         const marker = addMarker(data);
         bounds.extend(marker.position);
     });
-    map.fitBounds(bounds);
+    if (!bounds.isEmpty())
+        map.fitBounds(bounds);
+    else
+        map.setZoom(6);
 
     window.Echo.private(channel)
         .listen(echoEvent, e => {
