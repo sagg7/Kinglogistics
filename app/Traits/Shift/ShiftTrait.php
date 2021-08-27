@@ -10,15 +10,17 @@ use App\Models\Shift;
 trait ShiftTrait
 {
 
-    public function startShift($driver, $payload)
+    public function startShift($driver, $payload, $load)
     {
         // Create and assign the shift to provided driver
         $driver->shift()->create($payload);
 
-        // Registry the driver in the available drivers table
-        $availableDriver = new AvailableDriver();
-        $availableDriver->driver_id = $driver->id;
-        $availableDriver->save();
+        if (!$load) {
+            // Registry the driver in the available drivers table
+            $availableDriver = new AvailableDriver();
+            $availableDriver->driver_id = $driver->id;
+            $availableDriver->save();
+        }
     }
 
     /**
