@@ -109,6 +109,9 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item">
+                <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
+            </li>
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
                 <ul class="menu-content">

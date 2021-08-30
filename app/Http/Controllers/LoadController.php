@@ -9,13 +9,13 @@ use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
-use Carbon\Carbon;
+use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn;
 
     /**
      * @return array
@@ -68,20 +68,7 @@ class LoadController extends Controller
             ->whereHas('driver', function ($q) use ($shipper) {
                 // Filter users by current Turn, check if is morning first else night
                 $q->whereHas('turn', function ($r) {
-                    $now = Carbon::now();
-                    $timeString = $now->toTimeString();
-                    $r->where(function ($s) use ($timeString, $now) {
-                        $s->whereTime('turns.end', '<', DB::raw('TIME(turns.start)'));
-                        if ($now->hour >= 0 && $now->hour <= 12)
-                            $s->whereTime('end', '>', $timeString);
-                        else
-                            $s->whereTime('start', '<=', $timeString);
-                    })
-                        ->orWhere(function ($s) use ($timeString) {
-                            $s->whereTime('turns.end', '>', DB::raw('TIME(turns.start)'))
-                                ->whereTime('start', '<=', $timeString)
-                                ->whereTime('end', '>', $timeString);
-                        });
+                    $this->filterByActiveTurn($r);
                 });
                 // The driver must not be inactive
                 $q->whereNull('inactive')

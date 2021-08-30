@@ -76,7 +76,8 @@ class ShipperController extends Controller
         $shipper->invoice_email = $request->invoice_email;
         if ($request->password)
             $shipper->password = Hash::make($request->password);
-        $shipper->payment_days = implode(',',$request->payment_days);
+        if ($request->payment_days)
+            $shipper->payment_days = implode(',',$request->payment_days);
         $shipper->save();
 
         return $shipper;
