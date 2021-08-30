@@ -3,7 +3,6 @@
         barChart = null;
     function MenuRenderer() {}
     MenuRenderer.prototype.init = (params) => {
-        console.log(params.data);
         this.eGui = document.createElement('div');
         if (params.data.id) {
             this.eGui.innerHTML = `<a href="/carrier/payment/downloadPDF/${params.data.id}" target="_blank"><i class="fa fa-file-pdf-o"></i> PDF</a>`;

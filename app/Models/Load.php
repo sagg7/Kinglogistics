@@ -16,6 +16,12 @@ class Load extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'control_number',
+        'sand_ticket',
+        'bol',
+    ];
+
     /**
      * @var string[]
      */
@@ -93,6 +99,17 @@ class Load extends Model
     public function locations(): HasMany
     {
         return $this->hasMany(DriverLocation::class);
+    }
+
+    /**
+     * Get all the load rejections
+     *
+     * @return HasMany
+     */
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(LoadPhoto::class);
     }
 
     /**
