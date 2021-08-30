@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 trait PushNotificationsTrait
 {
 
-    public function sendNotification($title, $message, $token, $targetScreen, $data = [])
+    public function sendNotification($title, $message, $token, $targetScreen, $data = [], $targetScreenName = null)
     {
         if (!$token) {
             return;
@@ -26,12 +26,15 @@ trait PushNotificationsTrait
         $notificationBuilder = new PayloadNotificationBuilder($title);
         $notificationBuilder
             ->setBody($message)
+            ->setChannelId('notifications')
             ->setSound('default');
+
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData([
             'click_action' => IPushNotification::CLICK_ACTION,
             'screen' => $targetScreen,
+            'target_screen' => $targetScreenName,
             'payload' => $data,
         ]);
 
