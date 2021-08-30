@@ -153,7 +153,7 @@ class tableAG {
         this.columnDefs = [];
         this.renderSimple = typeof properties.renderSimple !== "undefined" ? properties.renderSimple : false;
         this.successCallback = typeof properties.successCallback !== "undefined" ? properties.successCallback : null;
-        this.menu = properties.menu;
+        this.menu = properties.menu ? properties.menu : [];
         this.constructColumns();
         this.page = 0;
         let columnDefs = this.columnDefs;
@@ -237,7 +237,7 @@ class tableAG {
 
             this.columnDefs.push(baseProp);
         });
-        if (!this.renderSimple)
+        if (!this.renderSimple && this.menu.length > 0)
             this.columnDefs.push({headerName: 'Menu', width: 50, field: 'options', filter: false, sortable: false, cellRenderer: 'OptionsRenderer', menuData: this.menu});
     }
 
