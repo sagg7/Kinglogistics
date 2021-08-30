@@ -70,14 +70,7 @@ class ChatController extends Controller
         $content = $request->message;
         $user_id = auth()->user()->id;
 
-        $message = new Message();
-        $message->content = $content;
-        $message->driver_id = $driver_id;
-        $message->user_id = $user_id;
-        $message->is_driver_sender = null;
-        $message->save();
-
-        $this->sendMessage(
+        $message = $this->sendMessage(
             $content,
             $driver_id,
             $user_id,
@@ -94,7 +87,9 @@ class ChatController extends Controller
             'Message from King',
             $content,
             $driverDevices,
-            DriverAppRoutes::CHAT
+            DriverAppRoutes::CHAT,
+            $message,
+            DriverAppRoutes::CHAT_ID,
         );
 
         return ['success' => true, 'message' => $message];
