@@ -177,3 +177,9 @@ table.total-rows tbody tr:nth-last-of-type(4) {
   padding: 0;
   border: 0;
 }
+
+.disabled {
+    pointer-events:none;
+    cursor: not-allowed;
+    background-color: rgb(229, 229, 229) !important;
+}

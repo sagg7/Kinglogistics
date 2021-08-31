@@ -5,12 +5,12 @@
                 <div class="center-screen">
                     <button id="x" data-toggle="modal" data-target="#swiperModal" modal="dismiss">X</button>
                     <div class="owl-carousel owl-theme" id='picturesCarousel'>
-                        @foreach ($pictures->sortBy('picture_id')->reverse() as $index => $picture)
-                            <div id="slider-{{$picture->id}}">
-                                <img class="owl-lazy" data-src="{{$picture->picture_path.$picture->picture_slider}}"
-                                     alt="" title="{{$picture->picture_description}}">
+                        @foreach ($pictures as $index => $picture)
+                            <div id="slider-{{$picture["id"]}}">
+                                <img class="owl-lazy" data-src="{{$picture["url"]}}"
+                                     alt="" title="">
                                 <div class='context' style="background-color:white; text: black;">
-                                    <p>{{$picture->picture_description}}</p>
+                                    <p></p>
                                 </div>
                             </div>
                         @endforeach

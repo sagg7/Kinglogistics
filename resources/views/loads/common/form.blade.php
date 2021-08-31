@@ -15,7 +15,11 @@
                 @else
                     <div class="form-group col-md-3">
                         {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
-                        {!! Form::text('driver', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
+                        @if(isset($load->driver->name))
+                            {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
+                        @else
+                            {!! Form::select('driver_id', $available_drivers, $load->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
+                        @endif
                         @error('driver')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>

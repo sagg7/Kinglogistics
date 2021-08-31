@@ -49,7 +49,8 @@ OptionsRenderer.prototype.init = (params) => {
         if (item.type) {
             let classId = '',
                 icon = '',
-                text = '';
+                text = '',
+                show = true;
             switch (item.type) {
                 case 'delete':
                     classId = 'delete';
@@ -61,9 +62,18 @@ OptionsRenderer.prototype.init = (params) => {
                     text = item.text;
                     icon = item.icon;
                     break;
+                case 'dynamic':
+                    classId = '';
+                    text = item.text;
+                    icon = item.icon;
+                    let condition = "params.data."+item.contdition;
+                    if (!eval(condition)){
+                        show = false;
+                    }
             }
             menuData = item.menuData;
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}"><i class="${icon}"></i> ${text}</a></li>`;
+            if (show)
+                content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}"><i class="${icon}"></i> ${text}</a></li>`;
         } else if (item.modal)
             content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${item.route}/${params.data.id}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
         else

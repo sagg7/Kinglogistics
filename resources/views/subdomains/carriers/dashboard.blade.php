@@ -30,7 +30,7 @@
                             </div>
                         </div>
                         <h2 class="text-bold-700 mt-1 mb-25">92.6k</h2>
-                        <p class="mb-0">Subscribers Gained</p>
+                        <p class="mb-0">Earn this month</p>
                     </div>
                     <div class="card-content">
                         <div id="subscribe-gain-chart"></div>
