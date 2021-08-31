@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Paperwork;
-use App\Models\PaperworkFile;
-use App\Models\PaperworkTemplate;
-use App\Models\Shipper;
+use App\Models\ChassisType;
 use App\Models\Trailer;
 use App\Models\TrailerType;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
@@ -28,11 +25,17 @@ class TrailerController extends Controller
     {
         return Validator::make($data, [
             'trailer_type_id' => ['required', 'exists:trailer_types,id'],
+            'chassis_type_id' => ['required', 'exists:chassis_types,id'],
             'shipper_id' => ['nullable', 'exists:shippers,id'],
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
             //'status' => ['required'],
+        ],
+        [],
+        [
+            'trailer_type_id' => 'trailer type',
+            'chassis_type_id' => 'chassis type',
         ]);
     }
 
@@ -43,6 +46,7 @@ class TrailerController extends Controller
     {
         return [
                 'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
+                'chassis_types' => [null => ''] + ChassisType::pluck('name', 'id')->toArray(),
                 'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
             ] + $this->getPaperworkByType("trailer");
     }
