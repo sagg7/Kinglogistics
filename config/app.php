@@ -67,7 +67,11 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'timezone' => 'America/Denver',
+=======
+    'timezone' => 'America/Chihuahua',
+>>>>>>> 62be4ab0f1904effc3a9aaac4fce85af67b01bf7
 
     /*
     |--------------------------------------------------------------------------

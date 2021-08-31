@@ -14,15 +14,21 @@ const select2Lang = {
     },
     throwErrorMsg = (error, config = {}) => {
         let optns = {
-            title: "Error!",
+            title: config.title ? config.title :"Error!",
             html: error ? error : "There was an error processing your request",
-            type: "error",
+            type: config.type ? config.type :"error",
             confirmButtonClass: 'btn btn-primary',
             buttonsStyling: false,
             timer: 5000,
         };
         _.merge(optns, config);
-        Swal.fire(optns);
+        if (config.redirect){
+            Swal.fire(optns).then((result) => {
+                window.location = config.redirect;
+            });
+        } else {
+            Swal.fire(optns);
+        }
     },
     confirmMsg = (obj = {}) => {
         let optns = {

@@ -93,7 +93,8 @@ class LoadAssignment extends Notification implements IPushNotification
             $notification['message'],
             $tokens,
             DriverAppRoutes::LOAD . "?id=" . $this->load->id,
-            $data
+            $data,
+            DriverAppRoutes::LOAD_ID
         );
     }
 }
