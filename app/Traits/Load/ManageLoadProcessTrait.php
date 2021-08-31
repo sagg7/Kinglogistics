@@ -2,6 +2,7 @@
 
 namespace App\Traits\Load;
 
+use App\Events\LoadUpdate;
 use App\Models\Load;
 use App\Models\LoadStatus;
 use Carbon\Carbon;
@@ -32,6 +33,8 @@ trait ManageLoadProcessTrait {
         // Update load statuses table
         $loadStatus[$status . '_timestamp'] = Carbon::now();
         $loadStatus->update();
+
+        event(new LoadUpdate($load));
 
         return $loadStatus;
     }

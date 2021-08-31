@@ -23,8 +23,6 @@ class TrackingController extends Controller
         } else {
             $channel = "driver-location-king";
             $event = "DriverLocationUpdateForKing";
-            if (!auth()->user()->hasRole('admin'))
-                abort(404);
         }
 
         $data = Driver::whereHas('latestLocation')

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LoadUpdate;
 use App\Models\AvailableDriver;
 use App\Models\Load;
 use App\Models\LoadLog;
@@ -35,7 +36,10 @@ class LoadController extends Controller
      */
     public function index()
     {
-        return view('loads.index');
+        if (auth()->user()->hasRole('dispatch'))
+            return view('loads.indexDispatch');
+        else
+            return view('loads.index');
     }
 
     /**
@@ -110,7 +114,9 @@ class LoadController extends Controller
                 // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
                 $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
 
-                $this->storeUpdate($data);
+                $load = $this->storeUpdate($data);
+
+                event(new LoadUpdate($load));
             }
         });
 
@@ -222,11 +228,12 @@ class LoadController extends Controller
             "loads.origin",
             "loads.destination",
             "loads.driver_id",
+            "loads.status",
         ];
-        $query = Load::with('driver:id,name');
+        $query = Load::with('driver:id,name')
+            ->orderByDesc('date');
 
-        //if (auth()->user()->hasRole('dispatch'))
-        if (true) {
+        if (auth()->user()->hasRole('dispatch')) {
             $query->with('photos');
             $select[] = 'sand_ticket';
             $select[] = 'bol';
