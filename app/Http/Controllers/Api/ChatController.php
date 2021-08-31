@@ -24,9 +24,14 @@ class ChatController extends Controller
         $driverId = $request->get('driver_id');
         $driver = $driverId ? Driver::find($driverId) : auth()->user();
 
-        $messages = ConversationResource::collection($driver->messages);
+        $messages = $driver
+            ->messages()
+            ->orderBy('id', 'desc')
+            ->paginate(20);
 
-        return response(['status' => 'ok', 'messages' => $messages], 200);
+        $conversation = ConversationResource::collection($messages);
+
+        return response(['status' => 'ok', 'messages' => $conversation], 200);
     }
 
     public function sendMessageAsUser(Request $request)
@@ -47,7 +52,7 @@ class ChatController extends Controller
         foreach ($driverIds as $driverId) {
             $driver = Driver::find($driverId);
 
-            $this->sendMessage(
+            $message = $this->sendMessage(
                 $content,
                 $driverId,
                 $userId,
@@ -63,7 +68,9 @@ class ChatController extends Controller
                 'Message from King',
                 $content,
                 $driverDevices,
-                DriverAppRoutes::CHAT
+                DriverAppRoutes::CHAT,
+                $message,
+                DriverAppRoutes::CHAT_ID,
             );
         }
 
@@ -84,7 +91,7 @@ class ChatController extends Controller
             $content,
             $driver->id,
             null,
-            null,
+            true,
             null,
             null,
             $image

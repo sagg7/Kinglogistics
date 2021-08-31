@@ -24,6 +24,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('phone', ucfirst(__('phone')), ['class' => 'col-form-label']) !!}
+                    {!! Form::tel('phone', $user->phone ?? null, ['class' => 'form-control' . ($errors->first('phone') ? ' is-invalid' : '')]) !!}
+                    @error('phone')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 <div class="form-group @isset($roles){{ "col-md-12" }}@else{{ "col-md-6" }}@endif">
                     {!! Form::label('email', ucfirst(__('email')), ['class' => 'col-form-label']) !!}
                     {!! Form::email('email', $user->email ?? null, ['class' => 'form-control' . ($errors->first('email') ? ' is-invalid' : '')]) !!}

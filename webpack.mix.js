@@ -22,15 +22,15 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/bootstrap.js', 'public/js/')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
-    /*.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
+    //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
-    .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')*/
+    //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
     //.js('resources/js/app.js', 'public/js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
-    .js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
+    //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
     //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
