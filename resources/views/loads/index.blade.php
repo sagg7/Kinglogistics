@@ -34,6 +34,7 @@
                         ];
                         break;
                     case 'admin':
+                    default:
                         columns = [
                             {headerName: 'Date', field: 'date'},
                             {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
