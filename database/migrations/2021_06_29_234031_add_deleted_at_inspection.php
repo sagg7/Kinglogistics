@@ -20,10 +20,10 @@ class AddDeletedAtInspection extends Migration
             $table->softDeletes();
         });
         Schema::table('inspection_rental_delivery', function (Blueprint $table) {
-            $table->string('option_value')->after('inspection_item_id')->nullable();
+            $table->string('option_value', 1024)->after('inspection_item_id')->nullable();
         });
         Schema::table('inspection_rental_return', function (Blueprint $table) {
-            $table->string('option_value')->after('inspection_item_id')->nullable();
+            $table->string('option_value', 1024)->after('inspection_item_id')->nullable();
         });
     }
 

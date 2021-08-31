@@ -23,7 +23,7 @@ class CreateRentalsTable extends Migration
             $table->double('deposit')->nullable();
             $table->unsignedTinyInteger('deposit_is_paid')->nullable();
             $table->enum('period', ['weekly', 'monthly', 'annual']);
-            $table->enum('status', ['uninspected', 'delivered', 'finished']);
+            $table->enum('status', ['uninspected', 'rented', 'finished']);
             $table->timestamp('delivered_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamps();

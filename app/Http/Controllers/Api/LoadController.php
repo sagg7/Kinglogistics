@@ -219,6 +219,12 @@ class LoadController extends Controller
             ]);
         }
 
+        // As the user has been pushed out of the AvailableDrivers table when load has been assigned,
+        // we must add him to queue again. At this point, the driver can keep its shift as have not reached
+        // the max rejections amount.
+
+        $this->registryInAvailableDriversQueue($driver);
+
         $message = $request->get('is_automatic') ?
             'The load has been rejected automatically due no response' :
             'The load has been rejected successfully';
