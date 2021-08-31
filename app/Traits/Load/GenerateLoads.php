@@ -37,7 +37,7 @@ trait GenerateLoads
             'destination_coords' => ['required', 'string', 'max:255'],
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_po' => ['required', 'string', 'max:255'],
-            'customer_reference' => ['required', 'string', 'max:255'],
+            'customer_reference' => ['nullable', 'string', 'max:255'],
             'tons' => ['nullable', 'string', 'max:255'],
             'silo_number' => ['nullable', 'string', 'max:255'],
             'container' => ['nullable', 'string', 'max:255'],

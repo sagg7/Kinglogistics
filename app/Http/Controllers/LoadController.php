@@ -167,6 +167,13 @@ class LoadController extends Controller
         //return abort(404);
     }
 
+    public function partialUpdate(Request $request, int $id)
+    {
+        $load = Load::findOrFail($id);
+        $load->fill($request->all());
+        return $load->update();
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -205,7 +212,7 @@ class LoadController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Load::select([
+        $select = [
             "loads.id",
             "loads.date",
             "loads.control_number",
@@ -214,8 +221,17 @@ class LoadController extends Controller
             "loads.origin",
             "loads.destination",
             "loads.driver_id",
-        ])
-            ->with('driver:id,name');
+        ];
+        $query = Load::with('driver:id,name');
+
+        //if (auth()->user()->hasRole('dispatch'))
+        if (true) {
+            $query->with('photos');
+            $select[] = 'sand_ticket';
+            $select[] = 'bol';
+        }
+
+        $query->select($select);
 
         if ($request->searchable) {
             $searchable = [];
