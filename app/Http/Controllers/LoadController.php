@@ -9,13 +9,13 @@ use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
-use Carbon\Carbon;
+use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn;
 
     /**
      * @return array
@@ -69,20 +69,7 @@ class LoadController extends Controller
             ->whereHas('driver', function ($q) use ($shipper) {
                 // Filter users by current Turn, check if is morning first else night
                 $q->whereHas('turn', function ($r) {
-                    $now = Carbon::now();
-                    $timeString = $now->toTimeString();
-                    $r->where(function ($s) use ($timeString, $now) {
-                        $s->whereTime('turns.end', '<', DB::raw('TIME(turns.start)'));
-                        if ($now->hour >= 0 && $now->hour <= 12)
-                            $s->whereTime('end', '>', $timeString);
-                        else
-                            $s->whereTime('start', '<=', $timeString);
-                    })
-                        ->orWhere(function ($s) use ($timeString) {
-                            $s->whereTime('turns.end', '>', DB::raw('TIME(turns.start)'))
-                                ->whereTime('start', '<=', $timeString)
-                                ->whereTime('end', '>', $timeString);
-                        });
+                    $this->filterByActiveTurn($r);
                 });
                 // The driver must not be inactive
                 $q->whereNull('inactive')
@@ -181,6 +168,13 @@ class LoadController extends Controller
         //return abort(404);
     }
 
+    public function partialUpdate(Request $request, int $id)
+    {
+        $load = Load::findOrFail($id);
+        $load->fill($request->all());
+        return $load->update();
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -219,7 +213,7 @@ class LoadController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Load::select([
+        $select = [
             "loads.id",
             "loads.date",
             "loads.control_number",
@@ -228,8 +222,17 @@ class LoadController extends Controller
             "loads.origin",
             "loads.destination",
             "loads.driver_id",
-        ])
-            ->with('driver:id,name');
+        ];
+        $query = Load::with('driver:id,name');
+
+        //if (auth()->user()->hasRole('dispatch'))
+        if (true) {
+            $query->with('photos');
+            $select[] = 'sand_ticket';
+            $select[] = 'bol';
+        }
+
+        $query->select($select);
 
         if ($request->searchable) {
             $searchable = [];

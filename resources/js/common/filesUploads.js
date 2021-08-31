@@ -30,6 +30,10 @@
         const form = $(e.currentTarget),
             url = form.attr('action');
         let formData = new FormData(form[0]);
+        const btn = $(e.originalEvent.submitter),
+            btnText = btn.text();
+        btn.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+        btn.prop('disabled', true);
         $.ajax({
             url,
             type: 'POST',
@@ -50,6 +54,8 @@
             error: () => {
                 throwErrorMsg();
             }
+        }).always(() => {
+            btn.text(btnText).prop('disabled', false);
         });
     });
 })();

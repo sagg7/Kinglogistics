@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('chat')->group(function () {
-    Route::get('/', [ChatController::class, 'index'])
-        ->name('chat.index');
-    Route::get('getChatHistory', [ChatController::class, 'getChatHistory'])
-        ->name('chat.getChatHistory');
-    Route::post('sendMessage', [ChatController::class, 'sendMessageAsUser'])
-        ->name('chat.sendMessage');
+Route::group(['middleware' => ['role:admin']], function () {
+    Route::prefix('chat')->group(function () {
+        Route::get('/', [ChatController::class, 'index'])
+            ->name('chat.index');
+        Route::get('getChatHistory', [ChatController::class, 'getChatHistory'])
+            ->name('chat.getChatHistory');
+        Route::post('sendMessage', [ChatController::class, 'sendMessageAsUser'])
+            ->name('chat.sendMessage');
+    });
 });

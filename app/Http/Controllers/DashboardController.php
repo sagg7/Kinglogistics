@@ -12,7 +12,7 @@ class DashboardController extends Controller
     use PaymentsAndCollection;
     public function index()
     {
-        return view('dashboard');
+        return view('dashboard.dashboard');
     }
 
     public function getData(Request $request)
@@ -23,6 +23,10 @@ class DashboardController extends Controller
             ->where(function ($q) {
                 if (auth()->guard('shipper')->check())
                     $q->where('shipper_id', auth()->user()->id);
+                else if (auth()->guard('carrier')->check())
+                    $q->whereHas('driver', function ($q) {
+                        $q->where('carrier_id', auth()->user()->id);
+                    });
             })
             ->get();
 
@@ -44,6 +48,14 @@ class DashboardController extends Controller
         $start = Carbon::now()->subMonths(3)->startOfMonth();
         $end = Carbon::now()->endOfMonth()->endOfDay();
         return Load::whereBetween('loads.date', [$start, $end])
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+                else if (auth()->guard('carrier')->check())
+                    $q->whereHas('driver', function ($q) {
+                        $q->where('carrier_id', auth()->user()->id);
+                    });
+            })
             ->with([
                 'driver' => function ($q) {
                     $q->with([

@@ -45,6 +45,14 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item">
+                <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="/tracking">
+                    <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>

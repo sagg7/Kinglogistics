@@ -45,7 +45,7 @@
         <!--<link rel="stylesheet" href="{{ asset("css/modules/daterangepicker/daterangepicker.css") }}">-->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
-        <link rel="stylesheet" href="{{ asset("css/app.css?1.0.0") }}">
+        <link rel="stylesheet" href="{{ asset("css/app.css?1.0.1") }}">
         <style>
             .main-menu {
                 background-image: url("{{ asset('images/app/logos/signature.png') }}")!important;
@@ -118,7 +118,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script src="{{ asset('js/section/master/globalFunctions.js') }}"></script>
-    <script src="{{ asset('js/common/master.min.js?1.0.0') }}"></script>
+    <script src="{{ asset('js/common/master.min.js?1.0.1') }}"></script>
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
 

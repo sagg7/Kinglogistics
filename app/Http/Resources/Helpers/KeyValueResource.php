@@ -15,7 +15,7 @@ class KeyValueResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'key' => $this->key,
+            'key' => strval($this->key),
             'value' => $this->value,
         ];
     }

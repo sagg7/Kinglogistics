@@ -42,12 +42,14 @@ class ShiftController extends Controller
 
             $trailer = $truck->trailer;
 
-
-            $payload['chassis'] = [
-                'have_chassis' => !empty($trailer),
+            if (!empty($trailer)) {
+                $payload['chassis'] = [
+                    'have_chassis' => true,
+                    'trailer_number' => $trailer->number,
+                    'chassis_type_id' => $trailer->chassis_type_id,
                 // Add relation to chassis_types and retrieve the entry
             ];
-
+            }
         }
 
         return response($payload);
@@ -88,11 +90,11 @@ class ShiftController extends Controller
         $shift = new Shift();
         $payload = $request->all($shift->getFillable());
 
-        // Starts shift for this driver
-        $this->startShift($driver, $payload);
-
         // Check if exists unallocated loads and auto assign to driver
         $load = $this->autoAssignUnallocatedLoad($driver);
+
+        // Starts shift for this driver
+        $this->startShift($driver, $payload, $load);
 
         return response(['status' => 'ok', 'assigned_load' => $load], 200);
     }

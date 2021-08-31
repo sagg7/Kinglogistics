@@ -62,6 +62,14 @@ class Driver extends Authenticatable implements CanResetPassword
     /**
      * @return HasOne
      */
+    public function latestLoad(): HasOne
+    {
+        return $this->hasOne(Load::class)->latest();
+    }
+
+    /**
+     * @return HasOne
+     */
     public function trailer(): HasOne
     {
         return $this->hasOne(Trailer::class);
@@ -131,6 +139,11 @@ class Driver extends Authenticatable implements CanResetPassword
     public function locations(): HasMany
     {
         return $this->hasMany(DriverLocation::class);
+    }
+
+    public function latestLocation(): HasOne
+    {
+        return $this->hasOne(DriverLocation::class)->latest();
     }
 
     public function shift(): HasOne

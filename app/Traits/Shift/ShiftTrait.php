@@ -6,19 +6,19 @@ use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Models\AvailableDriver;
 use App\Models\Shift;
+use Illuminate\Database\Eloquent\Model;
 
 trait ShiftTrait
 {
 
-    public function startShift($driver, $payload)
+    public function startShift($driver, $payload, $load)
     {
         // Create and assign the shift to provided driver
         $driver->shift()->create($payload);
 
-        // Registry the driver in the available drivers table
-        $availableDriver = new AvailableDriver();
-        $availableDriver->driver_id = $driver->id;
-        $availableDriver->save();
+        if (!$load) {
+            $this->registryInAvailableDriversQueue($driver);
+        }
     }
 
     /**
@@ -43,5 +43,12 @@ trait ShiftTrait
         }
 
         return response(['status' => 'ok'], 200);
+    }
+
+    public function registryInAvailableDriversQueue($driver) {
+        // Registry the driver in the available drivers table
+        $availableDriver = new AvailableDriver();
+        $availableDriver->driver_id = $driver->id;
+        $availableDriver->save();
     }
 }
