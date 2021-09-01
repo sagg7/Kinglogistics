@@ -1,5 +1,5 @@
-const loadSummary = [];
 (() => {
+    const loadSummary = [];
     $.ajax({
         url: '/dashboard/getData',
         type: 'GET',

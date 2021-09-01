@@ -24,11 +24,13 @@ class LoadUpdate implements ShouldBroadcast
      */
     public function __construct($load)
     {
-        $this->load = $load;
-        $this->load->photos;
-        $this->load->driver->carrier;
-        $this->load->truck;
-        $this->load->shipper;
+        $this->load = Load::with([
+            'photos',
+            'driver.carrier',
+            'truck',
+            'shipper',
+        ])
+            ->find($load->id);
     }
 
     /**

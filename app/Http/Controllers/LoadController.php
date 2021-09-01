@@ -235,7 +235,7 @@ class LoadController extends Controller
             ->orderByDesc('date');
 
         if (auth()->user()->hasRole('dispatch')) {
-            $query->with('photos');
+            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
             $select[] = 'sand_ticket';
             $select[] = 'bol';
         }

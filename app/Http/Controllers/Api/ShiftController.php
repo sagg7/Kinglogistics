@@ -78,6 +78,14 @@ class ShiftController extends Controller
             ], 400);
         }
 
+        // Check if the user can activate its shift, checking if the last load rejection is between the latest 12 hours
+        if (!$driver->rejectionCheck()) {
+            return response([
+                'status' => 'error',
+                'message' => __("You're unable to start a shift because you have a rejected load in between your latest turn")
+            ], 400);
+        }
+
         // Check if the user can activate its shift, checking current time compared to assigned turn time range
         if (!$driver->canActiveShift()) {
             return response([
