@@ -18,7 +18,7 @@
                         @if(isset($load->driver->name))
                             {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
                         @else
-                            {!! Form::select('driver_id', $available_drivers, $load->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
+                            {!! Form::select('driver_id', $available_drivers, $load->driver_id ?? null, ['class' => 'form-control select2' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
                         @endif
                         @error('driver')
                         <span class="invalid-feedback" role="alert">
