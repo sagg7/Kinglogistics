@@ -61,9 +61,14 @@
                 PhotosRenderer.prototype.init = (params) => {
                     this.eGui = document.createElement('div');
                     if (params.value) {
-                        let html = '';
-                        params.value.forEach(item => {
-                            html += `<a class="avatar" href="#view-photo" data-toggle="modal" data-target="#view-photo"><img src="${item.url}" alt="photo" width="32" height="32"></a>`;
+                        let html = '',
+                            photos = [];
+                        if (params.value.to_location_voucher_image_url)
+                            photos.push(params.value.to_location_voucher_image_url);
+                        if (params.value.finished_voucher_image_url)
+                            photos.push(params.value.finished_voucher_image_url);
+                        photos.forEach(item => {
+                            html += `<a class="avatar" href="#view-photo" data-toggle="modal" data-target="#view-photo"><img src="${item}" alt="photo" width="32" height="32"></a>`;
                         });
                         this.eGui.innerHTML = html;
                     }
@@ -75,7 +80,7 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
-                        {headerName: 'Photos', field: 'photos', cellRenderer: PhotosRenderer},
+                        {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'Sand ticket', field: 'sand_ticket', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
