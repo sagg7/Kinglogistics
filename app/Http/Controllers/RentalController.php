@@ -325,7 +325,7 @@ class RentalController extends Controller
         $signature_shop = $request->input('signature-7');
 
         if (!empty($signature_shop)) {
-            $inspection_items[40] = ['option_value' => $this->uploadImage($signature_client, "rentals/rental_".$rental->id."/".$stage,80),'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
+            $inspection_items[40] = ['option_value' => $this->uploadImage($signature_shop, "rentals/rental_".$rental->id."/".$stage,80),'updated_at' => Carbon::now(),'created_at' => Carbon::now()];
         }
 
         $comment = $request->commentInspection;
@@ -375,7 +375,10 @@ class RentalController extends Controller
         $rental->drivers;
         $rental->trailers;
         $inspectionItems = InspectionRentalReturned::where('rental_id', $rental_id)->pluck( 'option_value','inspection_item_id')->toArray();// add flag to deliver trailer
-
+        foreach ($inspectionItems as $key => $inspectionItem){
+            if ($key == 41 || $key == 40)
+                $inspectionItems[$key] = $this->getTemporaryFile($inspectionItems[$key]);
+        }
         $params['title'] = 'Return - End Rental';
         $params['inspection_categories'] = $inspection_categories;
         $params['rental'] = $rental;
