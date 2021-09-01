@@ -136,6 +136,12 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasMany(RejectedLoad::class);
     }
 
+
+    public function latestRejection(): HasOne
+    {
+        return $this->hasOne(RejectedLoad::class)->latest();
+    }
+
     public function locations(): HasMany
     {
         return $this->hasMany(DriverLocation::class);
@@ -167,17 +173,21 @@ class Driver extends Authenticatable implements CanResetPassword
         $turn = $this->turn;
         $now = Carbon::now();
 
-        if ($turn->start->isAfter($turn->end)) {
-            // The shift is "broken" in two different days by midnight, should do an extra validation
-            $canActivate =
-                // The current moment is after the start of the turn and has not passed the midnight
-                $now->isAfter($turn->start) && $now->isAfter($turn->end)
-                ||
-                // The current moment is before the end of the turn and has been passed the midnight
-                $now->isBefore($turn->end) && $now->isBefore($turn->start);
-        } else {
-            // Normal turn, just check between times
-            $canActivate = $now->isBetween($turn->start, $turn->end);
+        $canActivate = !$this->latestRejection || $now->isAfter($this->latestRejection->created_at->addHours(12));
+
+        if ($canActivate) {
+            if ($turn->start->isAfter($turn->end)) {
+                // The shift is "broken" in two different days by midnight, should do an extra validation
+                $canActivate =
+                    // The current moment is after the start of the turn and has not passed the midnight
+                    $now->isAfter($turn->start) && $now->isAfter($turn->end)
+                    ||
+                    // The current moment is before the end of the turn and has been passed the midnight
+                    $now->isBefore($turn->end) && $now->isBefore($turn->start);
+            } else {
+                // Normal turn, just check between times
+                $canActivate = $now->isBetween($turn->start, $turn->end);
+            }
         }
 
         return $canActivate;
