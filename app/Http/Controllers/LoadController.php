@@ -26,7 +26,7 @@ class LoadController extends Controller
     {
         return [
             'shippers' => [null => 'Select'] + Shipper::pluck('name', 'id')->toArray(),
-            'available_drivers' => [null => 'Select'] + Driver::pluck('name', 'driver_id')->toArray(),
+            'available_drivers' => [null => 'Select'] + Driver::pluck('name', 'id')->toArray(),
         ];
     }
 
