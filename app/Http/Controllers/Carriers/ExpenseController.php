@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\CarrierExpense;
 use App\Models\CarrierExpenseType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -60,6 +62,7 @@ class ExpenseController extends Controller
         $expense->amount = $request->amount;
         $expense->truck_id = $request->truck_id;
         $expense->description = $request->description;
+        $expense->date = Carbon::parse($request->date_submit);
         $expense->mileage = $request->mileage;
         $expense->gallons = $request->gallons;
         $expense->save();
@@ -173,7 +176,7 @@ class ExpenseController extends Controller
             "carrier_expenses.id",
             "carrier_expenses.type_id",
             "carrier_expenses.amount",
-            "carrier_expenses.created_at",
+            DB::raw('DATE_FORMAT(date, \'%m-%d-%Y\') AS date'),
         ])
             ->with('type:id,name')
             ->where('carrier_id', auth()->user()->id);

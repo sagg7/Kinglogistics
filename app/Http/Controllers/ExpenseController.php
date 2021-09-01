@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Expense;
 use App\Models\ExpenseType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
@@ -51,6 +53,8 @@ class ExpenseController extends Controller
         $expense->type_id = $request->type;
         $expense->amount = $request->amount;
         $expense->description = $request->description;
+        $expense->date = Carbon::parse($request->date_submit);
+        $expense->user_id = auth()->user()->id;
         $expense->save();
 
         return $expense;
@@ -123,7 +127,7 @@ class ExpenseController extends Controller
      * @param  \App\Models\Expense  $expense
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ind $id)
+    public function update(Request $request, $id)
     {
         $this->validator($request->all())->errors();
 
@@ -158,7 +162,8 @@ class ExpenseController extends Controller
             "expenses.id",
             "expenses.type_id",
             "expenses.amount",
-            "expenses.created_at",
+            DB::raw('DATE_FORMAT(date, \'%m-%d-%Y\') AS date'),
+
         ])
             ->with('type:id,name');
 

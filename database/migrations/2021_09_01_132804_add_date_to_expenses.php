@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddDateToExpenses extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('expenses', function (Blueprint $table) {
+            $table->date('date')->after('description')->nullable();
+            $table->bigInteger('user_id')->unsigned()->after('date');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+        });
+        Schema::table('carrier_expenses', function (Blueprint $table) {
+            $table->date('date')->after('description')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('expenses', function (Blueprint $table) {
+            //
+        });
+    }
+}
