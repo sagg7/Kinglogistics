@@ -3,7 +3,7 @@
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => ['role:admin']], function () {
+Route::group(['middleware' => ['role:admin|operations|dispatch']], function () {
     Route::prefix('chat')->group(function () {
         Route::get('/', [ChatController::class, 'index'])
             ->name('chat.index');

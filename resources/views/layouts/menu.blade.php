@@ -257,7 +257,7 @@
                     </li>
                 </ul>
             </li>
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))
+            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
                 <li class="nav-item">
                     <a href="/tracking">
                         <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>

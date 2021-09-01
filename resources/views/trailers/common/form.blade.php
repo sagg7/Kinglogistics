@@ -25,6 +25,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="col-md-6">
+                    {!! Form::label('chassis_type_id', ucfirst(__('chassis type')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('chassis_type_id', $chassis_types, $trailer->chassis_type_id ?? null, ['class' => 'form-control' . ($errors->first('chassis_type_id') ? ' is-invalid' : '')]) !!}
+                    @error('chassis_type_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('number', ucfirst(__('number')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('number', $trailer->number ?? null, ['class' => 'form-control' . ($errors->first('number') ? ' is-invalid' : '')]) !!}
@@ -61,6 +70,9 @@
                     </span>
                     @enderror
                 </div>-->
+            </div>
+            <hr>
+            <div class="row">
                 <div class="form-group col-md-6">
                     <fieldset>
                         {!! Form::label('inactive', ucfirst(__('inactive')), ['class' => 'col-form-label']) !!}

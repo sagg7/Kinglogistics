@@ -4,7 +4,7 @@
         <script>
             const guard = 'shipper';
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.0') }}"></script>
     @endsection
 
     @section('modals')

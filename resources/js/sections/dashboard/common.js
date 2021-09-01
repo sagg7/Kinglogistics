@@ -7,12 +7,13 @@ const loadSummary = [];
             if (res.loads) {
                 Object.entries(res.loads).forEach(item => {
                     const [key, value] = item;
-                    const countUp = new CountUp(`${key}_summary`, value);
+                    const countUp = new CountUp(`${key}_summary`, value.count);
                     !countUp.error ? countUp.start() : console.error(countUp.error);
                     loadSummary.push({
                         status: key,
-                        count: value,
-                    })
+                        count: value.count,
+                        data: value.data,
+                    });
                 });
             }
         },
@@ -44,8 +45,9 @@ const loadSummary = [];
         modalTitle.text(`${capitalizeString(status.status)}`);
         let html = '';
         status.data.forEach(item => {
-            html += `<tr><td>${item.shipper.name}</td><td>${item.origin}</td><td>${item.destination}</td><td>${item.driver.name}</td><td>${item.truck.number}</td>` +
-                (guard !== 'carrier' ? `<td>${item.driver.carrier.name}</td></tr>` : '');
+            html += `<tr><td>${item.shipper.name}</td><td>${item.origin}</td><td>${item.destination}</td>` +
+                `<td>${item.driver ? item.driver.name : ''}</td><td>${item.truck ? item.truck.number : ''}</td>` +
+                (guard !== 'carrier' ? `<td>${item.driver ? item.driver.carrier.name : ''}</td></tr>` : '');
         });
         tbody.html(html);
         modalSpinner.addClass('d-none');
@@ -59,21 +61,46 @@ const loadSummary = [];
             id = heading.attr('id').split('_')[0];
         const status = loadSummary.find(obj => obj.status === id);
         if (status)
-            if (!status.data)
-                $.ajax({
-                    url: '/dashboard/loadSummary',
-                    data: {
-                        status: id,
-                    },
-                    success: (res) => {
-                        status.data = res;
-                        showStatusModal(status);
-                    },
-                    error: () => {
-                        throwErrorMsg();
-                    }
-                });
-            else
                 showStatusModal(status);
     });
+
+    if (typeof window.Echo !== "undefined")
+        window.Echo.private('load-status-update')
+            .listen('LoadUpdate', res => {
+                const load = res.load;
+                const status = load.status;
+                let mainIdx = null,
+                    dataIdx = null;
+                loadSummary.forEach((obj, i) => {
+                    //obj.status === load.status
+                    const idx = obj.data.findIndex(item => Number(item.id) === Number(load.id));
+                    if (idx !== -1) {
+                        dataIdx = idx;
+                        mainIdx = i;
+                        return false;
+                    }
+                });
+                if (dataIdx !== null) {
+                    const main = loadSummary[mainIdx];
+                    const mainStatus = main.status;
+                    if (mainStatus !== status) {
+                        main.data.splice(dataIdx, 1);
+                        main.count = main.data.length;
+                        $(`#${mainStatus}_summary`).text(main.count);
+                    } else {
+                        return false;
+                    }
+                }
+                const dashCount = $(`#${status}_summary`);
+                const summaryToAssign = loadSummary.find(obj => obj.status === status);
+                dashCount.text(Number(dashCount.text()) + 1);
+                if (summaryToAssign)
+                    summaryToAssign.data.push(load);
+                else
+                    loadSummary.push({
+                        status,
+                        count: 1,
+                        data: [load],
+                    });
+            });
 })();

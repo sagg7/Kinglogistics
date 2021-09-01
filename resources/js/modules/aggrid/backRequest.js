@@ -121,6 +121,7 @@ class DataSource {
         this.params = data.params;
         this.ajax = null;
         this.successCallback = data.successCallback;
+        this.data = null;
     }
 
     getRows(params)  {
@@ -146,6 +147,7 @@ class DataSource {
                 params.successCallback(res.rows, res.lastRow);
                 if (this.successCallback)
                     this.successCallback(res);
+                this.data = res;
             },
             error: () => {
                 // inform the grid request failed
@@ -166,6 +168,7 @@ class tableAG {
         this.menu = properties.menu ? properties.menu : [];
         this.constructColumns();
         this.page = 0;
+        this.dataSource = null;
         let columnDefs = this.columnDefs;
         this.gridOptions = {
             columnDefs,
@@ -323,6 +326,7 @@ class tableAG {
         if (val !== '')
             dsPar.params = {search: val};
         let ds = new DataSource(dsPar);
+        this.dataSource = ds;
         this.gridOptions.api.setServerSideDatasource(ds);
     }
 
@@ -381,6 +385,7 @@ class tableAG {
         });
 
         let ds = new DataSource({url: this.url, successCallback: this.successCallback});
+        this.dataSource = ds;
         this.gridOptions.api.setServerSideDatasource(ds);
     }
 }
