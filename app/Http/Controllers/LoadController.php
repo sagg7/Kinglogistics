@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\LoadUpdate;
 use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\Shipper;
@@ -25,7 +26,7 @@ class LoadController extends Controller
     {
         return [
             'shippers' => [null => 'Select'] + Shipper::pluck('name', 'id')->toArray(),
-            'available_drivers' => [null => 'Select'] + AvailableDriver::join('drivers', 'driver_id', '=', 'drivers.id')->pluck('name', 'driver_id')->toArray(),
+            'available_drivers' => [null => 'Select'] + Driver::pluck('name', 'id')->toArray(),
         ];
     }
 
