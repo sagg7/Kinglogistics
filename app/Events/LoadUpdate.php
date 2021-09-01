@@ -26,7 +26,9 @@ class LoadUpdate implements ShouldBroadcast
     {
         $this->load = $load;
         $this->load->photos;
-        $this->load->driver;
+        $this->load->driver->carrier;
+        $this->load->truck;
+        $this->load->shipper;
     }
 
     /**

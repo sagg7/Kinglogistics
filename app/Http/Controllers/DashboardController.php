@@ -28,34 +28,6 @@ class DashboardController extends Controller
                         $q->where('carrier_id', auth()->user()->id);
                     });
             })
-            ->get();
-
-        $loadsSummary = [];
-        foreach ($loads as $load) {
-            if (isset($loadsSummary[$load->status]))
-                $loadsSummary[$load->status]++;
-            else
-                $loadsSummary[$load->status] = 1;
-        }
-
-        return [
-            'loads' => $loadsSummary
-        ];
-    }
-
-    public function loadSummary(Request $request)
-    {
-        $start = Carbon::now()->subMonths(3)->startOfMonth();
-        $end = Carbon::now()->endOfMonth()->endOfDay();
-        return Load::whereBetween('loads.date', [$start, $end])
-            ->where(function ($q) {
-                if (auth()->guard('shipper')->check())
-                    $q->where('shipper_id', auth()->user()->id);
-                else if (auth()->guard('carrier')->check())
-                    $q->whereHas('driver', function ($q) {
-                        $q->where('carrier_id', auth()->user()->id);
-                    });
-            })
             ->with([
                 'driver' => function ($q) {
                     $q->with([
@@ -70,11 +42,6 @@ class DashboardController extends Controller
                 'truck:id,number',
                 'shipper:id,name',
             ])
-            ->where('loads.status', $request->status)
-            ->where(function ($q) {
-                if (auth()->guard('shipper')->check())
-                    $q->where('shipper_id', auth()->user()->id);
-            })
             ->get([
                 'id',
                 'origin',
@@ -82,7 +49,21 @@ class DashboardController extends Controller
                 'shipper_id',
                 'driver_id',
                 'truck_id',
+                'status',
             ]);
+
+        $loadsSummary = [];
+        foreach ($loads as $load) {
+            if (isset($loadsSummary[$load->status]))
+                $loadsSummary[$load->status]["count"]++;
+            else
+                $loadsSummary[$load->status]["count"] = 1;
+            $loadsSummary[$load->status]["data"][] = $load;
+        }
+
+        return [
+            'loads' => $loadsSummary
+        ];
     }
 
     public function testKernel()
