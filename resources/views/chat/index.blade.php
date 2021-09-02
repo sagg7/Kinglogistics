@@ -17,6 +17,53 @@
             .chat-application .chats .chat-body .chat-image {
                 max-width: 250px;
             }
+            .preview-image {
+                display: block;
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 0;
+                background: #eee;
+                transition: all 300ms ease;
+                bottom: 79px;
+            }
+            .preview-image.open {
+                height: calc(100% - 123px);
+            }
+            .preview-header {
+                top: 0;
+                left: 0;
+            }
+            .preview-image .main {
+                display: none;
+                height: 100%;
+            }
+            .preview-image.open .main {
+                display: block;
+            }
+            .preview-image .preview-header .close-btn {
+                color: gray;
+                font-size: 6em;
+                line-height: 1;
+                margin: -10px 0 -15px 0;
+                padding: 0 0 0 10px;
+            }
+            .preview-image.open .preview-header .close-btn {
+                display: block;
+            }
+            .preview-image .d-flex {
+                height: calc(100% - 80px);
+            }
+            .preview-body,
+            .preview-body .content-body {
+                height: 100%;
+            }
+            .preview-body .content-body {
+                padding: 15px 0;
+            }
+            .preview-image img {
+                max-height: 100%;
+            }
         </style>
     @endsection
 
@@ -43,7 +90,7 @@
             const userId = {{ auth()->user()->id }};
         </script>
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
-        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js') }}"></script>
+        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.0') }}"></script>
     @endsection
 
     <div class="chat-application">
@@ -172,7 +219,7 @@
                                 <span class="mb-1 start-chat-icon feather icon-message-square"></span>
                                 <h4 class="py-50 px-1 sidebar-toggle start-chat-text">Start Conversation</h4>
                             </div>
-                            <div class="active-chat d-none">
+                            <div class="active-chat d-none position-relative">
                                 <div class="chat_navbar">
                                     <header class="chat_header d-flex justify-content-between align-items-center p-1">
                                         <div class="vs-con-items d-flex align-items-center">
@@ -203,6 +250,19 @@
                                         <input type="text" class="form-control message mr-1 ml-50" id="iconLeft4-1" placeholder="Type your message" maxlength="2000">
                                         <button type="submit" class="btn btn-primary send"><i class="far fa-paper-plane d-lg-none"></i> <span class="d-none d-lg-block">Send</span></button>
                                     </form>
+                                </div>
+                                <div class="preview-image" id="imageToSend" tabindex="-1">
+                                    <div class="main">
+                                        <div class="preview-header">
+                                            <span class="cursor-pointer close-btn">×</span>
+                                            <hr class="mb-0">
+                                        </div>
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <div class="preview-body col">
+                                                <div class="content-body text-center d-flex align-items-center"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>

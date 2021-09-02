@@ -158,11 +158,12 @@
             let html = '';
             const timeSpan = `<span class="block text-right line-height-1"><sub>${time}</sub></span>`;
             if (item.content) {
-                html = `<p>${item.content}${timeSpan}</p>`;
-            } else {
-                html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview"><img class="img-fluid" src="${item.image_url}" alt="image"></a>${timeSpan}</div>`;
+                html = `<p>${item.content}</p>`;
             }
-            html = `<div class="chat-content" data-message="${item.id}">${html}</div>`;
+            if (item.image) {
+                html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview"><img class="img-fluid" src="${item.image_url}" alt="image"></a>${html}</div>`;
+            }
+            html = `<div class="chat-content" data-message="${item.id}">${html}${timeSpan}</div>`;
 
             const lastChat = prepend ? $(".chat:first-child") : $(".chat:last-child");
             if (prepend) {
@@ -337,15 +338,25 @@
         }
     });
 
-    let sentMessage = {};
+    let sentMessage = null;
     const sendMessage = () => {
+        const formData = new FormData();
+        if (sentMessage)
+            formData.append('message', sentMessage);
+        if (chosenFile.data) {
+            formData.append('image', chosenFile.data);
+            closePreview();
+        }
+        formData.append('driver_id', activeContact.id);
         $.ajax({
             url: '/chat/sendMessage',
             type: 'POST',
-            data: sentMessage,
+            data: formData,
+            contentType: false,
+            processData: false,
             success: (res) => {
                 if (res.success) {
-                    sentMessage = {};
+                    sentMessage = null;
                     activeContact.messages.history.push(res.message);
                 }
             },
@@ -364,21 +375,47 @@
             lastChat.find(".chat-body").append(html);
         }
     };
+    let chosenFile = {};
+    const toSend = $('#imageToSend'),
+        closeBtn = toSend.find('.close-btn'),
+        toSendContent = toSend.find('.content-body');
+    const closePreview = () => {
+        toSend.removeClass('open');
+        chosenFile = {};
+        setTimeout(() => {
+            toSendContent.html('');
+        }, 300);
+    }
+    closeBtn.click(() => {
+        closePreview();
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && toSend.hasClass('open')) {
+            closePreview();
+        }
+    });
+    const sendImage = () => {
+    };
     // Add message to chat
     $('.chat-app-input').submit(() => {
         const message = $(".message"),
             string = message.val();
+        let html = '';
         if (string !== "") {
-            const html = `<p>${string}<span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span></p>`;
-            addMessageToView(html);
+            html = `<p>${string}</p>`;
             message.val("");
-            $(".user-chats").scrollTop($(".user-chats > .chats").height());
-            sentMessage = {
-                driver_id: activeContact.id,
-                string,
-            };
-            sendMessage();
+            sentMessage = string;
         }
+        if (chosenFile.reader) {
+            html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview">` +
+                `<img class="img-fluid" src="${chosenFile.reader.result}" alt="image"></a>${html}`;
+        }
+        if (html === '')
+            return false;
+        html += `<span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span>`;
+        addMessageToView(html);
+        $(".user-chats").scrollTop($(".user-chats > .chats").height());
+        sendMessage();
     });
     $('#appendImage').change((e) => {
         const files = $(e.currentTarget);
@@ -387,26 +424,11 @@
             const reader = new FileReader();
             reader.readAsDataURL(data);
             reader.onload = () => {
-                const html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview"><img class="img-fluid" src="${reader.result}" alt="image"></a><span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span></div>`;
-                addMessageToView(html);
+                toSendContent.html(`<img class="img-fluid mx-auto" src="${reader.result}" alt="image"></a>`);
+                toSendContent.removeClass('d-none');
+                toSend.addClass('open');
             }
-            const formData = new FormData();
-            formData.append('image', data);
-            formData.append('driver_id', activeContact.id);
-            $.ajax({
-                url: '/chat/sendMessage',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: (res) => {
-                    if (res.success)
-                        activeContact.messages.history.push(res.message);
-                },
-                error: () => {
-                    throwErrorMsg();
-                }
-            });
+            chosenFile = {reader, data};
             files.val('');
         }
     });
