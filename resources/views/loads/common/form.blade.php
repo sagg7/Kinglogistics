@@ -18,11 +18,11 @@
                     <div class="form-group col-md-3">
                         {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
                         @if(isset($load->driver->name))
-                            {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
+                            {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : ''), 'disabled']) !!}
                         @else
                             {!! Form::select('driver_id', $available_drivers, $load->driver_id ?? null, ['class' => 'form-control select2' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
                         @endif
-                        @error('driver')
+                        @error('driver_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
                         </span>
