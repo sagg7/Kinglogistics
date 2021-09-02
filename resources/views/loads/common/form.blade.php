@@ -13,6 +13,8 @@
                         @enderror
                     </div>
                 @else
+
+                @endif
                     <div class="form-group col-md-3">
                         {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
                         @if(isset($load->driver->name))
@@ -26,7 +28,6 @@
                         </span>
                         @enderror
                     </div>
-                @endif
                 @if(auth()->guard('web')->check())
                 <div class="form-group col-md-3">
                     {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}

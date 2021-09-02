@@ -110,10 +110,16 @@ class LoadController extends Controller
             $load_log->save();
             $data['load_log_id'] = $load_log->id;
             for ($i = 0; $i < $request->load_number; $i++) {
-                // Assign available drivers to load
-                $data['driver_id'] = $drivers[$i]->driver_id ?? null;
-                // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
-                $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
+                if (isset($request->driver_id)){ //temporary
+                    $data['driver_id'] = $request->driver_id;
+                    $data['status'] = 'finished';
+                } else {
+                    // Assign available drivers to load
+                    $data['driver_id'] = $drivers[$i]->driver_id ?? null;
+                    // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
+                    $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
+                }
+
 
                 $load = $this->storeUpdate($data);
 
