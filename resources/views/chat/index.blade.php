@@ -3,20 +3,40 @@
         <link rel="stylesheet" href="{{ asset('app-assets/css/pages/app-chat.min.css') }}">
         <style>
             .content.app-content .content-area-wrapper {
-                margin: 0!important;
+                margin: 0 !important;
             }
             .chat-application .chats .chat-body,
             .chat-application .chats .chat-content {
-                margin-left: 0!important;
-                margin-right: 0!important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             .chat-application .chats .chat-body .chat-content {
                 text-align: left;
                 max-width: 85%;
             }
+            .chat-application .chats .chat-body .chat-image {
+                max-width: 250px;
+            }
         </style>
     @endsection
 
+    @section("modals")
+        <div class="modal fade" id="imagePreview" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                <div class="modal-content bg-transparent border-0 box-shadow-0" style="max-height: calc(100vh - 3.5rem);">
+                    <div class="modal-header bg-transparent">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center p-5 modal-spinner">
+                            <span class="spinner-border white" role="status" aria-hidden="true"></span>
+                        </div>
+                        <div class="content-body text-center d-none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endsection
     @section("scripts")
         <script>
             const contacts = @json($contacts);
@@ -156,7 +176,8 @@
                                 <div class="chat_navbar">
                                     <header class="chat_header d-flex justify-content-between align-items-center p-1">
                                         <div class="vs-con-items d-flex align-items-center">
-                                            <div class="sidebar-toggle d-block d-lg-none mr-1"><i class="feather icon-menu font-large-1"></i></div>
+                                            <div class="sidebar-toggle d-block d-lg-none mr-1"><i
+                                                    class="feather icon-menu font-large-1"></i></div>
                                             <!--<div class="avatar user-profile-toggle m-0 m-0 mr-1">
                                                 <img src="" alt="" height="40" width="40" />
                                                 <span class="avatar-status-busy"></span>
@@ -168,11 +189,17 @@
                                 </div>
                                 <div class="user-chats">
                                     <div class="chats">
-                                        <div class="text-center more-data-spinner"><div class="spinner-border"></div></div>
+                                        <div class="text-center more-data-spinner">
+                                            <div class="spinner-border"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="chat-app-form">
                                     <form class="chat-app-input d-flex" action="javascript:void(0);">
+                                        <label for="appendImage" class="btn btn-primary">
+                                            <i class="fas fa-paperclip"></i>
+                                            <input type="file" accept="image/jpeg, image/png" id="appendImage" class="d-none">
+                                        </label>
                                         <input type="text" class="form-control message mr-1 ml-50" id="iconLeft4-1" placeholder="Type your message" maxlength="2000">
                                         <button type="submit" class="btn btn-primary send"><i class="far fa-paper-plane d-lg-none"></i> <span class="d-none d-lg-block">Send</span></button>
                                     </form>

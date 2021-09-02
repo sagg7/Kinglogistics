@@ -11,8 +11,8 @@ trait MessagesTrait
     use FileUpload;
 
     private function sendMessage(
-        string $content,
         int $driverId,
+        string $content = null,
         int $userId = null,
         bool $isDriverSender = null,
         bool $userUnread = null,

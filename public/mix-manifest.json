@@ -1,4 +1,4 @@
 {
     "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
-    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js"
+    "/app-assets/js/scripts/pages/app-chat.min.js": "/app-assets/js/scripts/pages/app-chat.min.js"
 }
