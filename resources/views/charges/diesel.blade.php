@@ -13,13 +13,17 @@
                 <div class="row">
                     <table class="table">
                         <colgroup>
-                            <col style="width: 50%;">
-                            <col style="width: 50%;">
+                            <col style="width: 40%;">
+                            <col style="width: 20%;">
+                            <col style="width: 20%;">
+                            <col style="width: 20%;">
                         </colgroup>
                         <thead>
                         <tr>
                             <th>Carrier</th>
+                            <th>Gallons</th>
                             <th>Diesel Price</th>
+                            <th>Date</th>
                         </tr>
                         </thead>
                         <tbdoy>
@@ -29,9 +33,25 @@
                                     <td>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>
+                                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-gas-pump"></i></span>
+                                            </div>
+                                            {!! Form::text("gallons[$id]",null,['class' => 'form-control']) !!}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon2"><i class="fas fa-dollar-sign"></i></span>
                                             </div>
                                             {!! Form::text("diesel[$id]",null,['class' => 'form-control']) !!}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon3"><i class="fas fa-calendar-alt"></i></span>
+                                            </div>
+                                            {!! Form::text("date[$id]",date('Y-m-d'),['class' => 'form-control pickadate-months-year']) !!}
                                         </div>
                                     </td>
                                 </tr>

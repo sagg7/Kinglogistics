@@ -54,6 +54,8 @@ class ChargeController extends Controller
             $charge->amount = $request->amount;
             $charge->description = $request->description;
             $charge->period = $request->period;
+            $charge->date = $request->date;
+            $charge->gallons = $request->gallons;
             $charge->save();
 
             $charge->carriers()->sync($request->carriers);
@@ -100,7 +102,7 @@ class ChargeController extends Controller
     public function store(Request $request)
     {
         $this->validator($request->all())->validate();
-
+        $request->date = $request->date_submit;
         $this->storeUpdate($request);
 
         return redirect()->route('charge.index');
@@ -121,6 +123,8 @@ class ChargeController extends Controller
             $innerRequest->request->add(['carriers' => [$carrier_id]]);
             $innerRequest->request->add(['amount' => $item]);
             $innerRequest->request->add(['period' => 'single']);
+            $innerRequest->request->add(['date' => $request->date[$carrier_id]]);
+            $innerRequest->request->add(['gallons' => $request->gallons[$carrier_id]]);
             $innerRequest->request->add(['description' => 'Diesel charge.']);
 
             //$this->validator($innerRequest->toArray());
@@ -198,6 +202,8 @@ class ChargeController extends Controller
             "charges.id",
             "charges.amount",
             "charges.period",
+            "charges.description",
+            DB::raw('DATE_FORMAT(charges.date, \'%m-%d-%Y\') AS date'),
         ])
             ->with('carriers:id,name');
 

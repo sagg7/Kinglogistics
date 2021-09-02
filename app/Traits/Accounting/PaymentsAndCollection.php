@@ -212,6 +212,8 @@ trait PaymentsAndCollection
                 $new_expenses[] = [
                     "amount" => $charge->amount,
                     "description" => $charge->description,
+                    "date" => $charge->date,
+                    "gallons" => $charge->gallons,
                     "non_editable" => true,
                     "carrier_id" => $item->id,
                     "created_at" => $carbon_now,

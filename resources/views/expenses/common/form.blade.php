@@ -57,6 +57,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-12">
+                    {!! Form::label('note', ucfirst(__('note')), ['class' => 'col-form-label']) !!}
+                    {!! Form::textarea('note', $expense->note ?? null, ['class' => 'form-control' . ($errors->first('note') ? ' is-invalid' : ''), 'rows' => 5, 'maxlength' => 512]) !!}
+                    @error('note')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

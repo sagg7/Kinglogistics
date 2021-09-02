@@ -54,6 +54,7 @@ class ExpenseController extends Controller
         $expense->amount = $request->amount;
         $expense->description = $request->description;
         $expense->date = Carbon::parse($request->date_submit);
+        $expense->note = $request->note;
         $expense->user_id = auth()->user()->id;
         $expense->save();
 
