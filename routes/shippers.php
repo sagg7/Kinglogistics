@@ -28,6 +28,7 @@ Route::middleware('auth:shipper')->group(function () {
     require __DIR__.'/shippers/zones.php';
     require __DIR__.'/shippers/tracking.php';
     require __DIR__.'/web/drivers.php';
+    require __DIR__.'/shippers/reports.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.shippers.dashboard');

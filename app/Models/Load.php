@@ -123,6 +123,16 @@ class Load extends Model
         return $this->hasOne(DriverLocation::class)->latest();
     }
 
+    public function boxInit(): HasOne
+    {
+        return $this->hasOne(BoxType::class, 'id', 'box_type_id_init');
+    }
+
+    public function boxEnd(): HasOne
+    {
+        return $this->hasOne(BoxType::class, 'id', 'box_type_id_end');
+    }
+
     public function getNotifiedAtProperty(): ?Carbon
     {
         $loadId = $this->id;

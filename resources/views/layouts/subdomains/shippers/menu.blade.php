@@ -53,6 +53,16 @@
                     <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>
                 </a>
             </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-chart-bar"></i><span class="menu-title" data-i18n="User">Reports</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/report/trailers">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Historical</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>
