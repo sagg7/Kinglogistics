@@ -91,6 +91,7 @@ class TrailerController extends Controller
             }
 
             $trailer->trailer_type_id = $request->trailer_type_id;
+            $trailer->chassis_type_id = $request->chassis_type_id;
             $trailer->number = $request->number;
             $trailer->plate = $request->plate;
             $trailer->vin = $request->vin;
