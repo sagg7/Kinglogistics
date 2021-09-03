@@ -95,11 +95,11 @@ trait PaymentsAndCollection
     {
         $loads = Load::whereNull('shipper_invoice_id')
             ->whereHas('driver')
-            /*->whereHas('shipper', function($q) {
+            ->whereHas('shipper', function($q) {
                 // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
                 $q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
             })
-            ->where('status', 'finished')*/
+            ->where('status', 'finished')
             ->with([
                 'shipper',
                 'trip',
