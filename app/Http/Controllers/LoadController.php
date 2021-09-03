@@ -37,7 +37,7 @@ class LoadController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->hasRole('dispatch'))
+        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch'))
             return view('loads.indexDispatch');
         else
             return view('loads.index');
@@ -240,7 +240,7 @@ class LoadController extends Controller
         $query = Load::with('driver:id,name')
             ->orderByDesc('date');
 
-        if (auth()->user()->hasRole('dispatch')) {
+        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
             $select[] = 'sand_ticket';
             $select[] = 'bol';
