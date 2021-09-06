@@ -58,7 +58,9 @@ class ReportController extends Controller
 
     public function trips()
     {
-        return view('subdomains.shippers.reports.trips');
+        $trips = [null => ''] + Trip::where('shipper_id', auth()->user()->id)->pluck('name', 'id')->toArray();
+        $params = compact('trips');
+        return view('subdomains.shippers.reports.trips', $params);
     }
 
     public function tripsData(Request $request)
@@ -70,6 +72,10 @@ class ReportController extends Controller
             $q->where('shipper_id', auth()->user()->id)
                 ->whereBetween('date', [$start, $end]);
         })
+            ->where(function ($q) use ($request) {
+                if ($request->trip)
+                    $q->where('trips.id', $request->trip);
+            })
             ->with('loads', function($q) {
                 $q->with('load_type:id,name')
                     ->select('id', 'load_type_id', 'trip_id');

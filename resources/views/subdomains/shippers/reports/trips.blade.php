@@ -10,7 +10,8 @@
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js') }}"></script>
         <script>
             (() => {
-                const dateRange = $('#dateRange');
+                const dateRange = $('#dateRange'),
+                    trip = $('[name=trips]');
                 let barChart = null;
                 const initChart = (series, xaxis) => {
                         if (barChart) {
@@ -75,6 +76,7 @@
                             data: {
                                 start: start.format('YYYY/MM/DD'),
                                 end: end.format('YYYY/MM/DD'),
+                                trip: trip.val(),
                             },
                             success: (res) => {
                                 let series = [],
@@ -95,7 +97,10 @@
                                     });
                                     xaxis.categories.push(item.name);
                                 });
-                                console.log(series, xaxis);
+                                let sel2Data = [''];
+                                xaxis.categories.forEach((item, i) => {
+                                    sel2Data.push({id: i, text: item});
+                                });
                                 initChart(series, xaxis);
                             }
                         })
@@ -108,29 +113,41 @@
                 }, (start, end, label) => {
                     getData(start, end);
                 });
+                trip.select2({
+                    placeholder: 'Select',
+                    allowClear: true,
+                }).on('select2:select', () => {
+                    getData();
+                }).on('select2:unselect', () => {
+                    getData();
+                });
                 getData();
             })();
         </script>
     @endsection
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <fieldset class="form-group col-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <fieldset class="form-group">
                         <label for="dateRange">Select Dates</label>
                         <input type="text" id="dateRange" class="form-control">
                     </fieldset>
                 </div>
+                <div class="col-6">
+                    <fieldset class="form-group">
+                        <label for="trips">Trip</label>
+                        {!! Form::select('trips', $trips, null, ['class' => 'form-control']) !!}
+                    </fieldset>
+                </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="card">
-                <div class="card-content">
-                    <div class="card-body">
-                        <div id="chart"></div>
-                    </div>
-                </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div id="chart"></div>
             </div>
         </div>
     </div>
