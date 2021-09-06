@@ -61,6 +61,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Historical</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/report/trips">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Trips</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>

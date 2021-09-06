@@ -8,4 +8,8 @@ Route::prefix('report')->group(function () {
         ->name('report.trailers');
     Route::get('trailersData', [ReportController::class, 'trailersData'])
         ->name('report.trailersData');
+    Route::get('trips', [ReportController::class, 'trips'])
+        ->name('report.trips');
+    Route::get('tripsData', [ReportController::class, 'tripsData'])
+        ->name('report.tripsData');
 });

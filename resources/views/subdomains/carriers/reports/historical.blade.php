@@ -20,7 +20,7 @@
             <div class="card">
                 <div class="card-header">
                     <fieldset class="form-group col-12">
-                        <label for="dateRange">Seleccionar fechas</label>
+                        <label for="dateRange">Select Dates</label>
                         <input type="text" id="dateRange" class="form-control">
                     </fieldset>
                 </div>

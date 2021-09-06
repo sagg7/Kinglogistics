@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shippers;
 use App\Http\Controllers\Controller;
 use App\Models\Load;
 use App\Models\Trailer;
+use App\Models\Trip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -53,5 +54,26 @@ class ReportController extends Controller
                 'chassisType:id,name',
             ])
             ->get();
+    }
+
+    public function trips()
+    {
+        return view('subdomains.shippers.reports.trips');
+    }
+
+    public function tripsData(Request $request)
+    {
+        $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
+        $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
+
+        return Trip::whereHas('loads', function ($q) use ($start, $end) {
+            $q->where('shipper_id', auth()->user()->id)
+                ->whereBetween('date', [$start, $end]);
+        })
+            ->with('loads', function($q) {
+                $q->with('load_type:id,name')
+                    ->select('id', 'load_type_id', 'trip_id');
+            })
+            ->get(['id', 'name'])->toArray();
     }
 }
