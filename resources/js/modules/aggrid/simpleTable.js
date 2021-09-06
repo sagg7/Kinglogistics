@@ -20,9 +20,6 @@ class simpleTableAG {
             pagination: false,
             stopEditingWhenGridLosesFocus: true,
             pinnedBottomRowData: this.pinnedBottomFunction(this),
-            localeText: {
-                noRowsToShow: 'No hay elementos para mostrar',
-            },
             defaultColDef: {
                 flex: 1,
                 minWidth: 100,

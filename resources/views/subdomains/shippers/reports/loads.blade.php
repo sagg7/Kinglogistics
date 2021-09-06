@@ -17,7 +17,7 @@
                     trip = $('[name=trips]');
                 let rowData = [],
                     barChart = null;
-                const initChart = (series, xaxis) => {
+                const initChart = (series) => {
                         if (barChart) {
                             barChart.updateSeries(series);
                             return;
@@ -29,7 +29,6 @@
                                 height: 350,
                                 type: 'bar',
                             },
-                            //colors: [chartColorsObj.success, chartColorsObj.primary],
                             plotOptions: {
                                 bar: {
                                     horizontal: false,
@@ -49,10 +48,12 @@
                             legend: {
                                 offsetY: -10
                             },
-                            xaxis,
+                            xaxis: {
+                                categories: [''],
+                            },
                             yaxis: {
                                 title: {
-                                    text: 'Number of loads'
+                                    text: 'Number of finished loads'
                                 },
                             },
                             fill: {
@@ -85,16 +86,24 @@
                             id: 'reportTable',
                             columns: [
                                 {
-                                    headerName: "Trip",
-                                    field: "trip",
+                                    headerName: "Date",
+                                    field: "date",
                                 },
                                 {
-                                    headerName: "Load Type",
-                                    field: "type",
+                                    headerName: "Driver",
+                                    field: "driver",
                                 },
                                 {
-                                    headerName: "# of Loads",
-                                    field: "loads",
+                                    headerName: "Control #",
+                                    field: "control",
+                                },
+                                {
+                                    headerName: "Origin",
+                                    field: "origin",
+                                },
+                                {
+                                    headerName: "Destination",
+                                    field: "destination",
                                 },
                             ],
                             gridOptions: {
@@ -111,7 +120,7 @@
                     },
                     getData = (start = dateRange.data().daterangepicker.startDate, end = dateRange.data().daterangepicker.endDate) => {
                         $.ajax({
-                            url: '/report/tripsData',
+                            url: '/report/loadsData',
                             type: 'GET',
                             data: {
                                 start: start.format('YYYY/MM/DD'),
@@ -120,34 +129,24 @@
                             },
                             success: (res) => {
                                 rowData = [];
-                                let series = [],
-                                    xaxis = {categories: []};
+                                let series = [];
                                 res.forEach((item, i) => {
-                                    item.loads.forEach(load => {
-                                        const serItem = series.find(obj => obj.name === load.load_type.name);
-                                        if (serItem) {
-                                            if (serItem.data[i])
-                                                serItem.data[i]++;
-                                            else
-                                                serItem.data[i] = 1;
-                                        } else
-                                            series.push({
-                                                name: load.load_type.name,
-                                                data: [1],
-                                            });
+                                    series.push({
+                                        name: item.name,
+                                        data: [item.loads_count],
                                     });
-                                    xaxis.categories.push(item.name);
-                                });
-                                series.forEach(item => {
-                                    item.data.forEach((count, i) => {
+                                    item.loads.forEach(load => {
                                         rowData.push({
-                                            trip: xaxis.categories[i],
-                                            type: item.name,
-                                            loads: count,
+                                            id: load.id,
+                                            date: load.date,
+                                            driver: item.name,
+                                            control: load.control_number,
+                                            origin: load.origin,
+                                            destination: load.destination,
                                         });
                                     });
                                 });
-                                initChart(series, xaxis);
+                                initChart(series);
                                 fillTable();
                             }
                         })

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Shippers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Load;
+use App\Models\Driver;
 use App\Models\Trailer;
 use App\Models\Trip;
 use Carbon\Carbon;
@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
+    private function tripsSelect()
+    {
+        return ['trips' => [null => ''] + Trip::where('shipper_id', auth()->user()->id)->pluck('name', 'id')->toArray()];
+    }
+
     public function trailers()
     {
         return view('subdomains.shippers.reports.trailers');
@@ -58,8 +63,7 @@ class ReportController extends Controller
 
     public function trips()
     {
-        $trips = [null => ''] + Trip::where('shipper_id', auth()->user()->id)->pluck('name', 'id')->toArray();
-        $params = compact('trips');
+        $params = $this->tripsSelect();
         return view('subdomains.shippers.reports.trips', $params);
     }
 
@@ -68,18 +72,45 @@ class ReportController extends Controller
         $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
         $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
 
-        return Trip::whereHas('loads', function ($q) use ($start, $end) {
-            $q->where('shipper_id', auth()->user()->id)
-                ->whereBetween('date', [$start, $end]);
-        })
-            ->where(function ($q) use ($request) {
+        return Trip::where(function ($q) use ($request) {
                 if ($request->trip)
                     $q->where('trips.id', $request->trip);
             })
-            ->with('loads', function($q) {
+            ->with('loads', function($q) use ($start, $end) {
                 $q->with('load_type:id,name')
-                    ->select('id', 'load_type_id', 'trip_id');
+                    ->where('shipper_id', auth()->user()->id)
+                    ->whereBetween('date', [$start, $end])
+                    ->select('id', 'load_type_id', 'trip_id', 'date');
             })
-            ->get(['id', 'name'])->toArray();
+            ->get(['id', 'name']);
+    }
+
+    public function loads()
+    {
+        $params = $this->tripsSelect();
+        return view('subdomains.shippers.reports.loads', $params);
+    }
+
+    public function loadsData(Request $request)
+    {
+        $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
+        $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
+
+        return Driver::whereHas('loads', function ($q) use ($request, $start, $end) {
+            $q->where('shipper_id', auth()->user()->id)
+                ->where('status', 'finished')
+                ->whereBetween('date', [$start, $end]);
+
+            $q->where(function ($q) use ($request) {
+                if ($request->trip)
+                    $q->where('loads.trip_id', $request->trip);
+            });
+        })
+            ->withCount('loads')
+            ->with('loads', function ($q) {
+                $q->orderBy('date')
+                ->select(['id','date','driver_id','control_number','origin','destination']);
+            })
+            ->get(['id', 'name']);
     }
 }

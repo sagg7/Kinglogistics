@@ -58,12 +58,17 @@
                 <ul class="menu-content">
                     <li>
                         <a href="/report/trailers">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Historical</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Trailers</span>
                         </a>
                     </li>
                     <li>
                         <a href="/report/trips">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Trips</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/report/loads">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Loads</span>
                         </a>
                     </li>
                 </ul>

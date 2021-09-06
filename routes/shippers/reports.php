@@ -12,4 +12,8 @@ Route::prefix('report')->group(function () {
         ->name('report.trips');
     Route::get('tripsData', [ReportController::class, 'tripsData'])
         ->name('report.tripsData');
+    Route::get('loads', [ReportController::class, 'loads'])
+        ->name('report.loads');
+    Route::get('loadsData', [ReportController::class, 'loadsData'])
+        ->name('report.loadsData');
 });
