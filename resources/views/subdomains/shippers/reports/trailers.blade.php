@@ -134,7 +134,7 @@
                                 res.forEach(item => {
                                     trailerCount++;
                                     const trailer = item;
-                                    const chassis = item.chassis_type;
+                                    const chassis = item.chassis_type ? item.chassis_type : {};
                                     const truck = trailer.truck ? trailer.truck : {};
                                     const driver = truck.driver;
                                     const load = driver.latest_load;
