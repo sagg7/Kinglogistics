@@ -11,7 +11,7 @@ const mix = require('laravel-mix');
  |
  */
 
-mix//.sass('resources/sass/app.scss', 'public/css')
+mix.sass('resources/sass/app.scss', 'public/css')
     /*.postCss('resources/css/fontawesome.css', 'public/css')*/
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
@@ -31,7 +31,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
     //.js('resources/js/common/filesUploads.js', 'public/js/common/filesUploads.min.js?1.0.0')
-    .js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
+    //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
     //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
     //.scripts(['resources/js/sections/safetyMessages/common.js'], 'public/js/sections/safetyMessages/common.min.js')

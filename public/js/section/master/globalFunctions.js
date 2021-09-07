@@ -66,4 +66,14 @@ const select2Lang = {
         select.find('option:selected').prop('selected', false);
         select.find('option:first').remove();
         select.prepend('<option selected disabled></option>');
+    },
+    removeAjaxLoaders = () => {
+        $('.ajax-loader').parent().prop('disabled',false).html('Submit');
     };
+$('.submit-ajax').click((e) => {
+    const btn = $(e.currentTarget);
+    btn.html(`<span class="spinner-border spinner-border-sm ajax-loader" role="status" aria-hidden="true"></span>`);
+    setTimeout(() => {
+        btn.prop('disabled', true);
+    }, 3)
+});

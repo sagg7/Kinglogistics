@@ -3,12 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Broker;
+use App\Models\Equipment;
+use App\Models\Service;
+use App\Traits\QuillEditor\QuillFormatter;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class BrokerController extends Controller
 {
-    use FileUpload;
+    use FileUpload, QuillFormatter;
+
+    protected $broker_id;
+
+    public function __construct()
+    {
+        $this->broker_id = 1;
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -16,14 +29,24 @@ class BrokerController extends Controller
      */
     public function profile()
     {
-        $company = Broker::find(1);
-        $params = compact('company');
+        $company = Broker::find($this->broker_id);
+        $equipment = Equipment::where('broker_id', $this->broker_id)->first();
+        $service = Service::where('broker_id', $this->broker_id)->first();
+        $params = compact('company', 'equipment', 'service');
         return view('brokers.profile', $params);
     }
 
-    public function update(Request $request, int $id)
+    private function quillValidator(array $data)
     {
-        $company = Broker::find($id ?? 1) ?: new Broker();
+        return Validator::make($data, [
+            'title' => ['required', 'max:255'],
+            'message' => ['required'],
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $company = Broker::find($this->broker_id) ?: new Broker();
         $company->name = $request->name;
         $company->contact_phone = $request->contact_phone;
         $company->email = $request->email;
@@ -36,5 +59,49 @@ class BrokerController extends Controller
         $company->save();
 
         return redirect()->route('company.profile');
+    }
+
+    public function equipment(Request $request)
+    {
+        $this->quillValidator($request->all())->validate();
+        DB::transaction(function () use ($request) {
+            $content = json_decode($request->message);
+
+            $equipment = Equipment::where('broker_id', $this->broker_id)->first() ?: new Equipment();
+            $equipment->broker_id = $this->broker_id;
+            $equipment->title = $request->title;
+            $equipment->save();
+
+            $html = $this->formatQuillHtml($content, "equipment/$this->broker_id");
+
+            $equipment->message = $html;
+            $equipment->message_json = $content->ops;
+            $equipment->save();
+
+            return $equipment;
+        });
+        return ['success' => true];
+    }
+
+    public function service(Request $request)
+    {
+        $this->quillValidator($request->all())->validate();
+        DB::transaction(function () use ($request) {
+            $content = json_decode($request->message);
+
+            $service = Service::where('broker_id', $this->broker_id)->first() ?: new service();
+            $service->broker_id = $this->broker_id;
+            $service->title = $request->title;
+            $service->save();
+
+            $html = $this->formatQuillHtml($content, "service/$this->broker_id");
+
+            $service->message = $html;
+            $service->message_json = $content->ops;
+            $service->save();
+
+            return $service;
+        });
+        return ['success' => true];
     }
 }
