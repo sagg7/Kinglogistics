@@ -42,7 +42,7 @@
         };
     });
 
-    $('form').submit((e) => {
+    $('form.with-sig-pad').submit((e) => {
         sigPadArr.forEach((obj) => {
             if (obj.required && obj.signaturePad.isEmpty()) {
                 throwErrorMsg(`The ${obj.label} is required`);

@@ -73,6 +73,19 @@
                     </li>
                 </ul>
             </li>
+            <li class="navigation-header">
+                <span>Safety</span>
+            </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/incident/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
 </div>

@@ -17,7 +17,7 @@
                     @endforeach
                 ];
             </script>
-            <script src="{{ asset('js/common/initSignature.min.js?1.0.0') }}"></script>
+            <script src="{{ asset('js/common/initSignature.min.js?1.0.1') }}"></script>
         @endif
         @if(count($data["validation"]) > 0)
             <script>
@@ -42,7 +42,7 @@
     <div class="card">
         <div class="card-content">
             <div class="card-body">
-                {!! Form::open(['route' => ['paperwork.storeTemplate', 'id' => $id, 'related_id' => $related_id]]) !!}
+                {!! Form::open(['route' => ['paperwork.storeTemplate', 'class' => 'with-sig-pad', 'id' => $id, 'related_id' => $related_id]]) !!}
                 <h1 class="text-center mb-3">{{ $paperwork->name }}</h1>
                 {!! $data["html"] !!}
                 {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

@@ -67,7 +67,9 @@ class DriverController extends Controller
                 if (auth()->guard('shipper')->check())
                     $q->whereHas('truck', function ($q) {
                         $q->whereHas('trailer', function ($q) {
-                            $q->where('shipper_id', auth()->user()->id);
+                            $q->whereHas('shippers', function ($q) {
+                                $q->where('id', auth()->user()->id);
+                            });
                         });
                     });
             })
