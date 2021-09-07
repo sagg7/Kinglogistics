@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ShipperController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Shippers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,13 @@ Route::middleware('auth:shipper')->group(function () {
             ->name('shipper.profile');
         Route::post('update/{id}/{profile?}', [ShipperController::class, 'update'])
             ->name('shipper.profile.update');
+    });
+    Route::prefix('staff')->group(function () {
+        Route::get('/active', function () {
+            return view('subdomains.shippers.staffOnTurn.index');
+        });
+        Route::get('searchActive', [UserController::class, 'staffOnTurn'])
+            ->name('user.searchActive');
     });
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])

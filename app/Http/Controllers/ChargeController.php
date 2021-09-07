@@ -170,6 +170,7 @@ class ChargeController extends Controller
     public function update(Request $request, int $id)
     {
         $this->validator($request->all())->validate();
+        $request->date = $request->date_submit;
 
         $this->storeUpdate($request, $id);
 

@@ -60,6 +60,24 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('turn_start', ucfirst(__('check in time')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('turn_start', $user->turn_start ?? null, ['class' => 'form-control pickatime' . ($errors->first('turn_start') ? ' is-invalid' : '')]) !!}
+                    @error('turn_start')
+                    <span class="invalid-feedback" role="alert">
+                    <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('turn_end', ucfirst(__('check out time')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('turn_end', $user->turn_end ?? null, ['class' => 'form-control pickatime' . ($errors->first('turn_end') ? ' is-invalid' : '')]) !!}
+                    @error('turn_end')
+                    <span class="invalid-feedback" role="alert">
+                <strong>{{ ucfirst($message) }}</strong>
+                </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

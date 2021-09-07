@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shippers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
+use App\Models\LoadStatus;
 use App\Models\Trailer;
 use App\Models\Trip;
 use Carbon\Carbon;
@@ -112,5 +113,12 @@ class ReportController extends Controller
                 ->select(['id','date','driver_id','control_number','origin','destination']);
             })
             ->get(['id', 'name']);
+    }
+
+    public function AvgTimePerLoad($shipper = null){
+        $loads = LoadStatus::get(['accepted_timestamp', 'finished_timestamp']);
+        if ($shipper != null){
+           // $loads->where()
+        }
     }
 }

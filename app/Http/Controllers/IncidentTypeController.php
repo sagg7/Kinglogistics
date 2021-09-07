@@ -178,6 +178,8 @@ class IncidentTypeController extends Controller
             "incident_types.name",
             "incident_types.fine",
         ]);
+        if (auth()->guard('shipper')->check())
+            $query->where('shipper_id', auth()->user()->id);
 
         return $this->simpleSearchData($query, $request);
     }

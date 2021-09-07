@@ -46,6 +46,9 @@
                 </ul>
             </li>
             <li class="nav-item">
+                <a href="/staff/active"><i class="fas fa-users"></i><span class="menu-item" data-i18n="List">Staff on Duty</span></a>
+            </li>
+            <li class="nav-item">
                 <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
             </li>
             <li class="nav-item">

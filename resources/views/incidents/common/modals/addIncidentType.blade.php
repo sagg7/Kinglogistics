@@ -27,17 +27,15 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <fieldset>
-                            {!! Form::label('visible', ucfirst(__('visible for shipper')), ['class' => 'col-form-label']) !!}
-                            <div class="vs-checkbox-con vs-checkbox-primary">
-                                {{ Form::checkbox('visible', 1, $carrier->inactive ?? null) }}
-                                <span class="vs-checkbox">
-                                    <span class="vs-checkbox--check">
-                                        <i class="vs-icon feather icon-check"></i>
-                                    </span>
+                        <label>Show shipper</label>
+                        <div class="vs-checkbox-con vs-checkbox-primary">
+                            {{ Form::checkbox('show_shipper', 1) }}
+                            <span class="vs-checkbox">
+                                <span class="vs-checkbox--check">
+                                    <i class="vs-icon feather icon-check"></i>
                                 </span>
-                            </div>
-                        </fieldset>
+                            </span>
+                        </div>
                     </div>
 
                 </div>

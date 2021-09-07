@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Traits\EloquentQueryBuilder\agFilter;
 use App\Traits\EloquentQueryBuilder\EloquentFiltering;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -73,6 +75,8 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
+        $user->turn_start = date("H:i:s", strtotime($request->turn_start));
+        $user->turn_end = date("H:i:s", strtotime($request->turn_end));
         if ($request->password)
             $user->password = Hash::make($request->password);
         $user->save();
@@ -213,6 +217,81 @@ class UserController extends Controller
             //"users.created_at as date",
         ])
             ->with('roles:name');
+
+        if ($request->filterModel)
+            foreach ($request->filterModel as $key => $item) {
+                $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
+                $statement = $filterArr['statement'];
+
+                $query->where(function ($q) use ($filterArr, $statement, $key) {
+                    $q->$statement($key, $filterArr['comparative'], $filterArr['string']);
+
+                    /*if ($key === 'name')
+                        $q->orWhere("last_name", $filterArr['comparative'], $filterArr['string']);*/
+                });
+            }
+
+        if ($request->searchable)
+            $query->where(function ($q) use ($request) {
+                foreach ($request->searchable as $i => $item) {
+                    ($i == 0) ? $statement = "where" : $statement = "orWhere";
+                    $q->$statement($item, 'LIKE', "%$request->search%");
+                    /*if ($item === "name")
+                        $this->searchNameLastName($q, $request->search);*/
+                }
+            });
+
+        if ($request->sortModel) {
+            $column = $request->sortModel[0]['colId'];
+            $dir = $request->sortModel[0]['sort'];
+            $query->orderBy($column, $dir);
+        }
+
+        $total = $query->count();
+        $query = $query->skip($skip)->take($take);
+        $result = $query->get();
+
+        $params = [
+            'rows' => $result,
+            'lastRow' => $total,
+        ];
+
+        return response()->json($params);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function staffOnTurn(Request $request)
+    {
+        // Skip-Take data
+        $take = $request->endRow;
+        $current = $request->startRow / $take;
+        $skip = $take * $current;
+
+        $query = User::select([
+            "users.id",
+            "users.name",
+            "users.email",
+            "users.phone",
+            //"users.created_at as date",
+        ])
+            ->with('roles:name');
+        $now = Carbon::now();
+        $timeString = $now->toTimeString();
+        $query->where(function ($q) use ($timeString, $now) {
+            $q->whereTime('users.turn_end', '<', DB::raw('TIME(users.turn_start)'));
+            if ($now->hour >= 0 && $now->hour <= 12)
+                $q->whereTime('turn_end', '>', $timeString);
+            else
+                $q->whereTime('turn_start', '<=', $timeString);
+        })
+            ->orWhere(function ($q) use ($timeString) {
+                $q->whereTime('turn_end', '>', DB::raw('TIME(turn_start)'))
+                    ->whereTime('turn_start', '<=', $timeString)
+                    ->whereTime('turn_end', '>', $timeString);
+            });
 
         if ($request->filterModel)
             foreach ($request->filterModel as $key => $item) {
