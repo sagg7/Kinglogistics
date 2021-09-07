@@ -136,8 +136,8 @@
                                     const trailer = item;
                                     const chassis = item.chassis_type ? item.chassis_type : {};
                                     const truck = trailer.truck ? trailer.truck : {};
-                                    const driver = truck.driver;
-                                    const load = driver.latest_load;
+                                    const driver = truck.driver ? truck.driver : {};
+                                    const load = driver.latest_load ? driver.latest_load : {};
                                     const boxEnd = load.box_end ? load.box_end : {};
                                     if (load.box_status_end === "loaded")
                                         boxCount++;
