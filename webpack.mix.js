@@ -24,7 +24,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     // Modules
     //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     //.scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
-    .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
+    //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
     //.js('resources/js/app.js', 'public/js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
@@ -41,7 +41,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
-    //.scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
+    .scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
     //.scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
     //.scripts(['resources/js/sections/trips/common.js'], 'public/js/sections/trips/common.min.js')
     // Subdomains

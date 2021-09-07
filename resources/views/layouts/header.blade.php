@@ -43,7 +43,10 @@
                         </form>
                         <div class="dropdown-menu dropdown-menu-right">
                             @if(auth()->guard('web')->check())
-                            <a class="dropdown-item" href="/user/profile"><i class="fas fa-user"></i> Profile</a>
+                                @if(auth()->user()->hasRole('admin'))
+                                    <a class="dropdown-item" href="/company/profile"><i class="fas fa-user"></i>Company Profile</a>
+                                @endif
+                                <a class="dropdown-item" href="/user/profile"><i class="fas fa-user"></i>My Profile</a>
                             @endif
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#"

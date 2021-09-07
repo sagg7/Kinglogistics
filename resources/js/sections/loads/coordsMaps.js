@@ -13,8 +13,8 @@
     const mapD = new google.maps.Map(document.getElementById('mapDestination'), mapProperties);
     let handleLocationError = (browserHasGeolocation) => {
         browserHasGeolocation
-            ? throwErrorMsg("Error: Hay un error con el servicio de geolocalización.")
-            : throwErrorMsg("Error: Tu navegador no soporta el servicio de geolocalización.")
+            ? throwErrorMsg("Error: The Geolocation service failed.")
+            : throwErrorMsg("Error: Your browser doesn't support geolocation.")
     }
     const markerO = new google.maps.Marker({
         map: mapO,

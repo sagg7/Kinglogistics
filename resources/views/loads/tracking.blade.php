@@ -9,8 +9,9 @@
             const data = @json($data);
             const channel = "{{ $channel }}";
             const echoEvent = "{{ $event }}";
+            const company = @json($company);
         </script>
-        <script src="{{ asset('js/sections/tracking/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/tracking/common.min.js?1.0.0') }}"></script>
     @endsection
 
     <div class="card">

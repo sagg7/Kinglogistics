@@ -31,7 +31,7 @@
             infowindow.open({
                 anchor: marker,
                 map,
-                shouldFocus: false,
+                shouldFocus: true,
             });
         });
         markersArray.push({
@@ -54,6 +54,37 @@
         fullscreenControl: true,
     });
     const bounds = new google.maps.LatLngBounds();
+    if (company) {
+        const info = (company.name ? `<p><strong>Company:</strong> ${company.name}</p>` : '') +
+            (company.contact_phone ? `<p></p><strong>Phone:</strong> ${company.contact_phone}</p>` : '') +
+            (company.email ? `<p></p><strong>Email:</strong> ${company.email}</p>` : '') +
+            (company.address ? `<p></p><strong>Address:</strong> ${company.address}</p>` : '');
+        const infowindow = new google.maps.InfoWindow({
+            content: info,
+        });
+        const coords = company.location.split(","),
+            position = {lat:Number(coords[0]),lng:Number(coords[1])};
+        const markerObj = {
+            position: position,
+            map,
+            animation: google.maps.Animation.DROP,
+            icon: {
+                url: "/images/app/tracking/icons/office-building.svg",
+                scaledSize: new google.maps.Size(50, 50), // scaled size
+                origin: new google.maps.Point(0,0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor
+            },
+        };
+        const marker = new google.maps.Marker(markerObj);
+        marker.addListener("click", () => {
+            infowindow.open({
+                anchor: marker,
+                map,
+                shouldFocus: true,
+            });
+        });
+        bounds.extend(marker.position);
+    }
     let markersArray = [];
     data.forEach((item) => {
         const location = item.latest_location;

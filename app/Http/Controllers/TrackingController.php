@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Broker;
 use App\Models\Driver;
 use App\Models\LocationGroup;
 use Illuminate\Http\Request;
@@ -62,7 +63,9 @@ class TrackingController extends Controller
                 'drivers.carrier_id',
             ]);
 
-        $params = compact('data', 'channel', 'event');
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(1);
+
+        $params = compact('data', 'channel', 'event', 'company');
 
         return view('loads.tracking', $params);
     }
