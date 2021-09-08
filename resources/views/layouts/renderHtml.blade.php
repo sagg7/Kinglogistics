@@ -3,8 +3,14 @@
 
     <div class="card">
         <div class="card-body">
-            <h1>{{ $title }}</h1>
-            {!! $html !!}
+            @isset($html)
+                <h1>{{ $title }}</h1>
+                {!! $html !!}
+            @else
+                <div class="text-center">
+                    <h3>No information has been provided at this time</h3>
+                </div>
+            @endisset
         </div>
     </div>
 </x-app-layout>

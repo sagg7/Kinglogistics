@@ -29,21 +29,21 @@ class ProfileController extends Controller
             ->first([
                 'title',
                 'message as html'
-            ])
-            ->toArray();
+            ]);
+        !$equipment ? $equipment = [] : $equipment = $equipment->toArray();
         $params = ['section' => 'Equipment'] + $equipment;
         return view('layouts.renderHtml', $params);
     }
 
     public function services()
     {
-        $equipment = Service::where('broker_id', $this->broker_id)
+        $service = Service::where('broker_id', $this->broker_id)
             ->first([
                 'title',
                 'message as html'
-            ])
-            ->toArray();
-        $params = ['section' => 'Services'] + $equipment;
+            ]);
+        !$service ? $service = [] : $service = $service->toArray();
+        $params = ['section' => 'Services'] + $service;
         return view('layouts.renderHtml', $params);
     }
 }
