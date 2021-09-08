@@ -6,6 +6,7 @@ use App\Models\Broker;
 use App\Models\Equipment;
 use App\Models\Service;
 use App\Traits\QuillEditor\QuillFormatter;
+use App\Traits\QuillEditor\QuillHtmlRendering;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BrokerController extends Controller
 {
-    use FileUpload, QuillFormatter;
+    use FileUpload, QuillFormatter, QuillHtmlRendering;
 
     protected $broker_id;
 
@@ -31,7 +32,9 @@ class BrokerController extends Controller
     {
         $company = Broker::find($this->broker_id);
         $equipment = Equipment::where('broker_id', $this->broker_id)->first();
+        !$equipment ?: $equipment->message_json = $this->renderForJsonMessage($equipment->message_json);
         $service = Service::where('broker_id', $this->broker_id)->first();
+        !$service ?: $service->message_json = $this->renderForJsonMessage($service->message_json);
         $params = compact('company', 'equipment', 'service');
         return view('brokers.profile', $params);
     }

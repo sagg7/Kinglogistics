@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Shippers;
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
 use App\Models\Service;
-use App\Traits\Storage\S3Functions;
-use DOMDocument;
+use App\Traits\QuillEditor\QuillHtmlRendering;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    use S3Functions;
+    use QuillHtmlRendering;
 
     protected $broker_id;
 
@@ -37,18 +36,7 @@ class ProfileController extends Controller
         if (!$equipment) {
             $equipment = [];
         } else {
-            $dom = new DOMDocument();
-            $dom->loadHTML($equipment->message);
-
-            foreach ($dom->getElementsByTagName('img') as $img) {
-                $img->setAttribute('src', $this->getTemporaryFile(substr($img->getAttribute('src'),1)));
-                $img->setAttribute('class', 'img-fluid');
-            }
-
-            foreach ($dom->getElementsByTagName('blockquote') as $item) {
-                $item->setAttribute('class', 'blockquote pl-1 border-left-primary border-left-3');
-            }
-            $equipment->html = $dom->saveHTML();
+            $equipment->html = $this->renderHtmlString($equipment->message);
             $equipment = $equipment->toArray();
         }
         $params = ['section' => 'Equipment'] + $equipment;
@@ -65,18 +53,7 @@ class ProfileController extends Controller
         if (!$service) {
             $service = [];
         } else {
-            $dom = new DOMDocument();
-            $dom->loadHTML($service->message);
-
-            foreach ($dom->getElementsByTagName('img') as $img) {
-                $img->setAttribute('src', $this->getTemporaryFile(substr($img->getAttribute('src'),1)));
-                $img->setAttribute('class', 'img-fluid');
-            }
-
-            foreach ($dom->getElementsByTagName('blockquote') as $item) {
-                $item->setAttribute('class', 'blockquote pl-1 border-left-primary border-left-3');
-            }
-            $service->html = $dom->saveHTML();
+            $service->html = $this->renderHtmlString($service->message);
             $service = $service->toArray();
         }
         $params = ['section' => 'Services'] + $service;
