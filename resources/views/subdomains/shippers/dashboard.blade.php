@@ -60,14 +60,13 @@
                 chart.render();
             })();
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.1') }}"></script>
     @endsection
 
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
     @endsection
-        @include('dashboard.common.loadStatus')
-
+    @include('dashboard.common.loadStatus')
 
     <div class="row">
         <div class="col-12">

@@ -35,6 +35,7 @@
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
                                 {
                                     headerName: 'Shift', field: 'shift',
+                                    filter: false,
                                     valueFormatter: (params) => {
                                         return params.value ? 'Active' : 'Inactive';
                                     }

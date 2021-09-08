@@ -204,8 +204,8 @@ class TripController extends Controller
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
-                    $q->where('shipper_id', auth()->user()->id());
-                else
+                    $q->where('shipper_id', auth()->user()->id);
+                else if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
             });
 

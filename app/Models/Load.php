@@ -74,6 +74,14 @@ class Load extends Model
         return $this->belongsTo(Trip::class);
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function shipper_invoice(): BelongsTo
+    {
+        return $this->belongsTo(ShipperInvoice::class);
+    }
+
     public function loadStatus(): HasOne
     {
         return $this->hasOne(LoadStatus::class);

@@ -184,7 +184,7 @@
                 </div>
                 <div class="col-6">
                     <fieldset class="form-group">
-                        <label for="trips">Trip</label>
+                        <label for="trips">Job</label>
                         {!! Form::select('trips', $trips, null, ['class' => 'form-control']) !!}
                     </fieldset>
                 </div>

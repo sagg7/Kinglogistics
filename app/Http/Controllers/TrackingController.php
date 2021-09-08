@@ -67,6 +67,6 @@ class TrackingController extends Controller
 
         $params = compact('data', 'channel', 'event', 'company');
 
-        return view('loads.tracking', $params);
+        return view('tracking.tracking', $params);
     }
 }

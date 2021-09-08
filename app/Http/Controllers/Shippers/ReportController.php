@@ -70,8 +70,8 @@ class ReportController extends Controller
 
     public function tripsData(Request $request)
     {
-        $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
-        $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         return Trip::where(function ($q) use ($request) {
                 if ($request->trip)
@@ -94,8 +94,8 @@ class ReportController extends Controller
 
     public function loadsData(Request $request)
     {
-        $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
-        $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfWeek();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfWeek()->endOfDay();
 
         return Driver::whereHas('loads', function ($q) use ($request, $start, $end) {
             $q->where('shipper_id', auth()->user()->id)

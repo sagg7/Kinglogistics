@@ -11,7 +11,8 @@
             (data.load.origin ? `<strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` : '') +
             `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
-            `<strong>Truck#:</strong> ${data.truck.number}</p>`;
+            `<strong>Truck#:</strong> ${data.truck.number}</p>` +
+            `<strong>MPH:</strong> 0</p>`;
         const infowindow = new google.maps.InfoWindow({
             content: info,
         });
@@ -69,7 +70,7 @@
             map,
             animation: google.maps.Animation.DROP,
             icon: {
-                url: "/images/app/tracking/icons/office-building.svg",
+                url: "/images/app/logos/logo-dark-simple.png",
                 scaledSize: new google.maps.Size(50, 50), // scaled size
                 origin: new google.maps.Point(0,0), // origin
                 anchor: new google.maps.Point(0, 0) // anchor

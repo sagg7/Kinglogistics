@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Trip</x-slot>
+    <x-slot name="crumb_section">Job</x-slot>
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section('modals')

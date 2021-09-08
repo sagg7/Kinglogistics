@@ -217,7 +217,7 @@
                     </li>
                     <li>
                         <a href="/trip/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Trips</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Jobs</span>
                         </a>
                     </li>
                     <li>

@@ -1,26 +1,61 @@
 (() => {
+    const tripSel = $('[name=trips]');
+    let trip = null;
     const loadSummary = [];
-    $.ajax({
-        url: '/dashboard/getData',
-        type: 'GET',
-        success: (res) => {
-            if (res.loads) {
-                Object.entries(res.loads).forEach(item => {
-                    const [key, value] = item;
-                    const countUp = new CountUp(`${key}_summary`, value.count);
-                    !countUp.error ? countUp.start() : console.error(countUp.error);
-                    loadSummary.push({
-                        status: key,
-                        count: value.count,
-                        data: value.data,
+    const summaryArea = $('#loads-summary');
+    const summaryTable = summaryArea.find('table');
+    const getLoadsData = () => {
+        summaryTable.find('h2').text(0);
+        $.ajax({
+            url: '/dashboard/getData',
+            type: 'GET',
+            data: {
+                trip,
+            },
+            success: (res) => {
+                if (res.loads) {
+                    Object.entries(res.loads).forEach(item => {
+                        const [key, value] = item;
+                        $(`#${key}_summary`).text(value.count);
+                        //const countUp = new CountUp(`${key}_summary`, value.count);
+                        //!countUp.error ? countUp.start() : console.error(countUp.error);
+                        loadSummary.push({
+                            status: key,
+                            count: value.count,
+                            data: value.data,
+                        });
                     });
-                });
+                }
+            },
+            error: () => {
+                throwErrorMsg();
             }
+        });
+    }
+    tripSel.select2({
+        ajax: {
+            url: '/trip/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                };
+            },
         },
-        error: () => {
-            throwErrorMsg();
-        }
-    });
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            trip = e.params.data.id;
+            loadSummary.length = 0;
+            getLoadsData();
+        })
+        .on('select2:unselect', (e) => {
+            trip = null;
+            getLoadsData();
+        });
+    getLoadsData();
     const capitalizeString = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };

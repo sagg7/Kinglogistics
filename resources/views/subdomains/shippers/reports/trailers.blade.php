@@ -80,6 +80,13 @@
                         );
                         barChart.render();
                     },
+                    trailerFormatter = (params) => {
+                        return `${params.data.chassis} - ${params.value}`;
+                    },
+                    boxFormatter = (params) => {
+                        if (params.value)
+                            return `${params.value} - ${params.data.boxNumber}`;
+                    },
                     fillTable = () => {
                         if (_aggrid) {
                             _aggrid.rowData = rowData;
@@ -94,22 +101,20 @@
                                 {
                                     headerName: "Trailer",
                                     field: "number",
-                                },
-                                {
-                                    headerName: "Chassis",
-                                    field: "chassis",
+                                    valueFormatter: trailerFormatter,
                                 },
                                 {
                                     headerName: "Truck",
                                     field: "truck",
                                 },
                                 {
-                                    headerName: "Box Type",
-                                    field: "box",
+                                    headerName: "Driver",
+                                    field: "driver",
                                 },
                                 {
-                                    headerName: "Box Number",
-                                    field: "boxNumber",
+                                    headerName: "Box",
+                                    field: "box",
+                                    valueFormatter: boxFormatter,
                                 },
                             ],
                             gridOptions: {
@@ -145,6 +150,7 @@
                                         id: item.id,
                                         number: trailer.number,
                                         chassis: chassis.name,
+                                        driver: driver.name,
                                         truck: truck.number,
                                         box: boxEnd.name,
                                         boxNumber: load.box_number_end,

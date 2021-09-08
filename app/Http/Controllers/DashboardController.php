@@ -17,16 +17,20 @@ class DashboardController extends Controller
 
     public function getData(Request $request)
     {
-        $start = Carbon::now()->subMonths(3)->startOfMonth();
-        $end = Carbon::now()->endOfMonth()->endOfDay();
-        $loads = Load::whereBetween('loads.date', [$start, $end])
-            ->where(function ($q) {
+        /*$start = Carbon::now()->subMonths(3)->startOfMonth();
+        $end = Carbon::now()->endOfMonth()->endOfDay();*/
+        //whereBetween('loads.date', [$start, $end])
+        $loads = Load::whereDoesntHave('shipper_invoice')
+            ->where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
                     $q->where('shipper_id', auth()->user()->id);
                 else if (auth()->guard('carrier')->check())
                     $q->whereHas('driver', function ($q) {
                         $q->where('carrier_id', auth()->user()->id);
                     });
+                if ($request->trip) {
+                    $q->where('trip_id', $request->trip);
+                }
             })
             ->with([
                 'driver' => function ($q) {

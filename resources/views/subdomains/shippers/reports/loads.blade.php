@@ -154,8 +154,8 @@
                 dateRange.daterangepicker({
                     format: 'YYYY/MM/DD',
                     locale: dateRangeLocale,
-                    startDate: moment().startOf('month'),
-                    endDate: moment().endOf('month'),
+                    startDate: moment().startOf('week'),
+                    endDate: moment().endOf('week'),
                 }, (start, end, label) => {
                     getData(start, end);
                 });
@@ -183,7 +183,7 @@
                 </div>
                 <div class="col-6">
                     <fieldset class="form-group">
-                        <label for="trips">Trip</label>
+                        <label for="trips">Job</label>
                         {!! Form::select('trips', $trips, null, ['class' => 'form-control']) !!}
                     </fieldset>
                 </div>

@@ -40,7 +40,7 @@
                     </li>
                     <li>
                         <a href="/trip/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Trips</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Jobs</span>
                         </a>
                     </li>
                 </ul>
@@ -51,10 +51,20 @@
             <li class="nav-item">
                 <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
             </li>
-            <li class="nav-item">
-                <a href="/tracking">
-                    <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>
-                </a>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/tracking">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Real time</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tracking/history">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">History</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a href="/equipment">
@@ -76,12 +86,17 @@
                     </li>
                     <li>
                         <a href="/report/trips">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Trips</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Jobs</span>
                         </a>
                     </li>
                     <li>
                         <a href="/report/loads">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Loads</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/report/accounting">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Accounting</span>
                         </a>
                     </li>
                 </ul>

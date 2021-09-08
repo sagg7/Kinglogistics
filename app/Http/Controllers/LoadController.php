@@ -109,6 +109,7 @@ class LoadController extends Controller
             $load_log->type = auth()->guard('shipper')->check() ? 'shipper' : 'user';
             $load_log->save();
             $data['load_log_id'] = $load_log->id;
+            $control_number = (int)$request->control_number;
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)){ //temporary
                     $data['driver_id'] = $request->driver_id;
@@ -119,9 +120,11 @@ class LoadController extends Controller
                     // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
                     $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
                 }
-
+                $data['control_number'] = $control_number;
 
                 $load = $this->storeUpdate($data);
+
+                $control_number++;
 
                 event(new LoadUpdate($load));
             }
@@ -196,6 +199,11 @@ class LoadController extends Controller
      */
     public function destroy(int $id)
     {
+        /**
+         * TODO: Return drivers to available drivers
+         *
+         */
+
         $load = Load::findOrFail($id);
 
         if ($load)

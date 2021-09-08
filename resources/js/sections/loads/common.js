@@ -13,7 +13,7 @@
         mileage = $('#mileage');
     const interactive = typeof readOnly === "undefined";
     if (interactive) {
-        let shipper = shipperSel.val();
+        let shipper = shipperSel.length > 0 ? shipperSel.val() : null;
         loadTypeSel.select2({
             ajax: {
                 url: '/loadType/selection',
@@ -99,7 +99,7 @@
                 select = $('#delete_type');
             deleteHandler(select,options);
         });
-        if (!shipperSel.val())
+        if (shipperSel.length > 0 && !shipperSel.val())
             tripSel.prop('disabled', true).trigger('change');
     }
 })();
