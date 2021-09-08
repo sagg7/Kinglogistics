@@ -145,7 +145,7 @@
                                         id: item.id,
                                         number: trailer.number,
                                         chassis: chassis.name,
-                                        truck: item.truck.number,
+                                        truck: truck.number,
                                         box: boxEnd.name,
                                         boxNumber: load.box_number_end,
                                     });
