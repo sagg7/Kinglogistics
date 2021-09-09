@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CarrierPaymentEnum;
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
 use App\Models\CarrierExpense;
@@ -90,10 +91,18 @@ class CarrierPaymentController extends Controller
         //
     }
 
+    public function approve($id)
+    {
+        $payment = CarrierPayment::findOrFail($id);
+        $payment->status = CarrierPaymentEnum::APPROVED;
+
+        return ['success' => $payment->save()];
+    }
+
     public function complete($id)
     {
         $payment = CarrierPayment::findOrFail($id);
-        $payment->status = 'completed';
+        $payment->status = CarrierPaymentEnum::COMPLETED;
 
         return ['success' => $payment->save()];
     }

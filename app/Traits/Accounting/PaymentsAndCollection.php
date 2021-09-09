@@ -282,7 +282,7 @@ trait PaymentsAndCollection
             ->where('status', 'finished')
             // CONDITION OF AT LEAST ONLY PAST WEEK LOADS
             ->whereHas('loadStatus', function ($q) {
-                $q->whereDate('finished_timestamp', '<=', Carbon::now()->subWeeks(1));
+                $q->whereDate('finished_timestamp', '<=', Carbon::now());
             })
             ->with([
                 'shipper',

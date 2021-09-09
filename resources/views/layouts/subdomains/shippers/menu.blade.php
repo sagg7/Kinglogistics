@@ -46,9 +46,6 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a href="/staff/active"><i class="fas fa-users"></i><span class="menu-item" data-i18n="List">Staff on Duty</span></a>
-            </li>
-            <li class="nav-item">
                 <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
             </li>
             <li class="nav-item has-sub">
@@ -67,14 +64,7 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a href="/equipment">
-                    <i class="fas fa-tools"></i><span class="menu-item" data-i18n="View">Equipment</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/services">
-                    <i class="fas fa-clipboard-list"></i><span class="menu-item" data-i18n="View">Services</span>
-                </a>
+                <a href="/company"><i class="fas fa-users"></i><span class="menu-item" data-i18n="List">Company Profile</span></a>
             </li>
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-chart-bar"></i><span class="menu-title" data-i18n="User">Reports</span></a>

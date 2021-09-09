@@ -16,8 +16,8 @@ class ReportController extends Controller
 
     public function historicalData(Request $request)
     {
-        $start = Carbon::parse($request->start) ?? Carbon::now()->startOfMonth();
-        $end = Carbon::parse($request->end)->endOfDay() ?? Carbon::now()->endOfMonth()->endOfDay();
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         return CarrierPayment::whereBetween('date', [$start, $end])
             ->select([

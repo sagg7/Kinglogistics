@@ -22,9 +22,9 @@
             animation: google.maps.Animation.DROP,
             icon: {
                 url: "/images/app/tracking/icons/delivery-truck.svg",
-                scaledSize: new google.maps.Size(50, 50), // scaled size
-                origin: new google.maps.Point(0,0), // origin
-                anchor: new google.maps.Point(0, 0) // anchor
+                scaledSize: new google.maps.Size(35, 35), // scaled size
+                /*origin: new google.maps.Point(0,0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor*/
             },
         };
         const marker = new google.maps.Marker(markerObj);
@@ -71,9 +71,9 @@
             animation: google.maps.Animation.DROP,
             icon: {
                 url: "/images/app/logos/logo-dark-simple.png",
-                scaledSize: new google.maps.Size(50, 50), // scaled size
-                origin: new google.maps.Point(0,0), // origin
-                anchor: new google.maps.Point(0, 0) // anchor
+                scaledSize: new google.maps.Size(35, 35), // scaled size
+                /*origin: new google.maps.Point(0,0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor*/
             },
         };
         const marker = new google.maps.Marker(markerObj);

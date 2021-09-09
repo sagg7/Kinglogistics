@@ -1,6 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Load</x-slot>
-    <x-slot name="crumb_subsection">Tracking</x-slot>
+    <x-slot name="crumb_section">Tracking</x-slot>
 
     @section('scripts')
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env("GOOGLE_MAPS_API") }}"></script>

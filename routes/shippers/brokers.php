@@ -1,13 +1,18 @@
 <?php
 
-use App\Http\Controllers\Shippers\ProfileController;
+use App\Http\Controllers\Shippers\BrokerController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('equipment')->group(function () {
-    Route::get('/', [ProfileController::class, 'equipment'])
+Route::prefix('company')->group(function () {
+    Route::get('/', [BrokerController::class, 'index'])
+        ->name('company.index');
+    Route::get('equipment', [BrokerController::class, 'equipment'])
         ->name('company.equipment');
-});
-Route::prefix('services')->group(function () {
-    Route::get('/', [ProfileController::class, 'services'])
+    Route::get('equipment', [BrokerController::class, 'equipment'])
+        ->name('company.equipment');
+    Route::get('services', [BrokerController::class, 'services'])
         ->name('equipment.services');
+    Route::get('searchStaff', [UserController::class, 'staffOnTurn'])
+        ->name('user.searchStaff');
 });
