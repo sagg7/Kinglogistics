@@ -33,8 +33,8 @@ class IncidentController extends Controller
             'sanction' => ['required'],
             'date_submit' => ['required', 'date'],
             'location' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:512'],
-            'excuse' => ['required', 'string', 'max:512'],
+            'description' => ['required', 'string', 'max:1024'],
+            'excuse' => ['required', 'string', 'max:1024'],
         ]);
     }
 

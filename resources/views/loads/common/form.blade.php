@@ -14,7 +14,7 @@
                     </div>
                 @endif
                 <div class="form-group col-md-3">
-                    {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('driver', ucfirst(__('Carrier')), ['class' => 'col-form-label']) !!}
                     @if(isset($load->driver->name))
                         {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : ''), 'disabled']) !!}
                     @else
