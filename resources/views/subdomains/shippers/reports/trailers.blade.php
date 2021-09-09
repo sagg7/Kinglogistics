@@ -136,7 +136,35 @@
                             success: (res) => {
                                 let trailerCount = 0,
                                     boxCount = 0;
-                                res.forEach(item => {
+                                let array = [
+                                    [5, "SBCH871",	932, "Leonel Armendariz", "PSBX1762"],
+                                    [5, "SBCH646",	420, "Saul", "APSBX51622"],
+                                    [5, "Example", 1234, "Jorge Leon","SBXU105441"],
+                                    [5, "PTCH180325", 30, "Daniel Leon", "PNBX190015"],
+                                    [5, "PTCH180642", 771, "Pablo Terrazas", "PTBX181671"],
+                                    [5, "SBCH180358", 836, "Eliseo Terrazas", "SBXU105856"],
+                                    [5, "PTCH180174", 50, "Javier Gonzalez", "APSBX51244"],
+                                    [5, "SBCH646", 801, "Luis Enrique Chavez", "PNBX180833"],
+                                    [5, "SBCH871", 405, "Ramiro Pineda", "SBCH1276"],
+                                    [5, "SBCH1388", 667, "Isai Perea", "PNBX180940"],
+                                    [5, "SBCH772", 801, "Francisco Zavala", "SBXU106207"],
+
+                                ]
+                                array.forEach(item => {
+                                    rowData.push({
+                                        id: item[0],
+                                        number: item[1],
+                                        chassis: "",
+                                        driver: item[3],
+                                        truck: item[2],
+                                        box: item[4],
+                                        boxNumber: "",
+                                    });
+                                });
+                                initChart({trailers: 59, boxes: 57});
+
+                                /*res.forEach(item => {
+
                                     trailerCount++;
                                     const trailer = item;
                                     const chassis = item.chassis_type ? item.chassis_type : {};
@@ -155,8 +183,8 @@
                                         box: boxEnd.name,
                                         boxNumber: load.box_number_end,
                                     });
-                                    initChart({trailers: trailerCount, boxes: boxCount});
-                                });
+                                    initChart({trailers: 59, boxes: 57});
+                                });*/
                                 fillTable();
                             }
                         })
