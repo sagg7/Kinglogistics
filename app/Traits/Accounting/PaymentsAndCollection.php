@@ -115,7 +115,7 @@ trait PaymentsAndCollection
             $trip_pos = "trip_$load->trip_id";
             // Shipper invoices
             if (!isset($shipper_invoices[$shipper_id][$trip_pos])) {
-                $rate = Trip::with('rate')->find($load->trip_id) ?? $this->handleRates($rates, $load)['rate'];
+                $rate = Trip::with('rate')->find($load->trip_id)->rate ?? $this->handleRates($rates, $load)['rate'];
                 $shipper_invoices[$shipper_id][$trip_pos] = [
                     'load_count' => 1,
                     'loops' => 0,
