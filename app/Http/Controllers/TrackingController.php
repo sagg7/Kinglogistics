@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Broker;
 use App\Models\Driver;
 use App\Models\Load;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TrackingController extends Controller
@@ -74,31 +75,37 @@ class TrackingController extends Controller
 
     public function history()
     {
-        $user_id = auth()->user()->id;
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(1);
 
-        $data = Driver::with([
+        $params = compact('company');
+
+        return view('tracking.history', $params);
+    }
+
+    public function historyData(Request $request)
+    {
+        $user_id = auth()->user()->id;
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+
+        return Driver::with([
             'locations',
             'carrier:id,name',
             'truck:id,number,driver_id',
         ])
-            ->where(function ($q) use ($user_id) {
+            ->where(function ($q) use ($user_id, $start, $end) {
                 if (auth()->guard('shipper')->check()) {
-                    $q->whereHas('locations', function ($q) use ($user_id) {
-                        $q->whereHas('parentLoad', function ($q) use ($user_id) {
-                            $q->whereHas('trip', function ($q) use ($user_id) {
+                    $q->whereHas('locations', function ($q) use ($user_id, $start, $end) {
+                        $q->whereHas('parentLoad', function ($q) use ($user_id, $start, $end) {
+                            $q->whereHas('trip', function ($q) use ($user_id, $start, $end) {
                                 $q->where('shipper_id', $user_id);
-                            });
+                            })
+                                ->whereBetween('date', [$start, $end]);
                         });
                     });
                 }
             })
             ->get();
-
-        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(1);
-
-        $params = compact('data',  'company');
-
-        return view('tracking.history', $params);
     }
 
     public function getPinLoadData(Request $request)
