@@ -28,8 +28,8 @@
                                     (res.origin ? `<strong>Origin:</strong> ${res.origin}<br><strong>Destination:</strong> ${res.destination}</p>` : '') +
                                     `<p><strong>Carrier:</strong> ${markerData.carrier.name}<br>` +
                                     `<strong>Driver:</strong> ${markerData.driver.name}<br>` +
-                                    `<strong>Truck#:</strong> ${res.truck.number}`+
-                                    `<strong>MPH:</strong> 52MPH</p>` +
+                                    `<strong>Truck#:</strong> ${res.truck.number}<br>`+
+                                    `<strong>MPH:</strong> 52</p>` +
                                     `<strong>Coords:</strong> ${markerData.coords}</p>`;
                                 const infowindow = new google.maps.InfoWindow({
                                     content: info,
