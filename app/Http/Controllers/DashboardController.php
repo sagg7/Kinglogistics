@@ -72,10 +72,5 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-        $this->shipperInvoices();
-        dd(Carbon::now()->subDays(2)->weekday());
-        DB::transaction(function () {
-            $this->chargeRentals();
-        });
     }
 }
