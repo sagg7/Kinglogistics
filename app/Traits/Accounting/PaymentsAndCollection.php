@@ -115,7 +115,7 @@ trait PaymentsAndCollection
             $trip_pos = "trip_$load->trip_id";
             // Shipper invoices
             if (!isset($shipper_invoices[$shipper_id][$trip_pos])) {
-                $rate = Trip::with('rate')->find($load->trip_id)->rate ?? $this->handleRates($rates, $load);
+                $rate = Trip::with('rate')->find($load->trip_id) ?? $this->handleRates($rates, $load)['rate'];
                 $shipper_invoices[$shipper_id][$trip_pos] = [
                     'load_count' => 1,
                     'loops' => 0,
@@ -295,7 +295,7 @@ trait PaymentsAndCollection
         foreach ($loads as $load) {
             $carrier_id = $load->driver->carrier_id;
             $carriersId[] = $carrier_id;
-            $rate = $this->handleRates($rates, $load);
+            $rate = Trip::with('rate')->find($load->trip_id)->rate ?? $this->handleRates($rates, $load)['rate'];
             // Save the load to the load set and the corresponding rate
             if (!$load->carrier_payment_id)
                 $carrier_payments[$carrier_id]['loads'][] = ['load' => $load, 'rate' => $rate];
@@ -327,19 +327,20 @@ trait PaymentsAndCollection
                 $item['load']->save();
                 $gross_amount += $item['rate']->carrier_rate;
             }
-            foreach ($payment['expenses'] as $idx => $expense) {
-                $expense_amount += $expense->amount;
-                // If the expense amount is bigger than the gross amount
-                if ($expense_amount > $gross_amount) {
-                    $expense_amount -= $expense->amount;
-                    continue;
+            if (isset($payment['expenses']))
+                foreach ($payment['expenses'] as $idx => $expense) {
+                    $expense_amount += $expense->amount;
+                    // If the expense amount is bigger than the gross amount
+                    if ($expense_amount > $gross_amount) {
+                        $expense_amount -= $expense->amount;
+                        break;
+                    }
+                    // Save the carrier payment id to the expense
+                    $expense->carrier_payment_id = $carrier_payment->id;
+                    $expense->save();
+                    // Remove the expense from the array, the ones not removed end up as the pending expenses
+                    unset($payment['expenses'][$idx]);
                 }
-                // Save the carrier payment id to the expense
-                $expense->carrier_payment_id = $carrier_payment->id;
-                $expense->save();
-                // Remove the expense from the array, the ones not removed end up as the pending expenses
-                unset($payment['expenses'][$idx]);
-            }
             // Save the carrier payment data
             $carrier_payment->gross_amount = $gross_amount;
             $carrier_payment->reductions = $expense_amount;
