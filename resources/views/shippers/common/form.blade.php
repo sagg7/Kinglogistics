@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     {!! Form::label('invoice_email', ucfirst(__('invoice email')), ['class' => 'col-form-label']) !!}
-                    {!! Form::email('invoice_email', $shipper->invoice_email ?? null, ['class' => 'form-control' . ($errors->first('invoice_email') ? ' is-invalid' : '')]) !!}
+                    {!! Form::text('invoice_email', $shipper->invoice_email ?? null, ['class' => 'form-control' . ($errors->first('invoice_email') ? ' is-invalid' : ''), 'data-email' => 'multi']) !!}
                     @error('invoice_email')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
-use App\Models\Paperwork;
-use App\Models\PaperworkFile;
-use App\Models\PaperworkTemplate;
+use App\Rules\EmailArray;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -35,6 +33,7 @@ class CarrierController extends Controller
             'state' => ['nullable','string','max:255'],
             'zip_code' => ['nullable','string','max:255'],
             'owner' => ['nullable','string','max:255'],
+            'invoice_email' => ['nullable', new EmailArray, 'max:255'],
         ]);
     }
 
@@ -88,6 +87,7 @@ class CarrierController extends Controller
         $carrier->zip_code = $request->zip_code;
         $carrier->owner = $request->owner;
         $carrier->inactive = $request->inactive ?? null;
+        $carrier->invoice_email = $request->invoice_email;
         if ($request->password)
             $carrier->password = Hash::make($request->password);
         $carrier->save();

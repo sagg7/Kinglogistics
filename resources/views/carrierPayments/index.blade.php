@@ -41,7 +41,13 @@
                     else
                         return '';
                 };
-                const chargesColumns = [
+                const capitalizeNameFormatter = (params) => {
+                    if (params.value)
+                        return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
+                    else
+                        return '';
+                };
+                const paymentsColumns = [
                     {headerName: 'Date', field: 'date'},
                     {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                     {headerName: 'Subtotal', field: 'gross_amount', valueFormatter: moneyFormatter},
@@ -49,10 +55,11 @@
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                 ];
                 penPaymentsTable = new tableAG({
-                    columns: chargesColumns,
+                    columns: [...paymentsColumns, ...[{headerName: 'Status', field: 'status', valueFormatter: capitalizeNameFormatter}]],
                     menu: [
                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
-                        {text: 'Complete', route: '/carrier/payment/complete', type: 'confirm', icon: 'fas fa-check-circle', menuData: {title: 'Set status as a completed payment?'}},
+                        {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending"', menuData: {title: 'Set status as an approved payment?'}},
+                        {text: 'Send Email & Complete', route: "/carrier/payment/complete", icon: 'fas fa-paper-plane', type: 'confirm', conditional: 'status === "approved"', menuData: {title: 'Confirm sending email to carrier?'}}
                     ],
                     container: 'pendingPaymentsGrid',
                     url: '/carrier/payment/search/pending',
@@ -68,7 +75,7 @@
                         case '#completed-payments':
                             if (!comPaymentsTable)
                                 comPaymentsTable = new tableAG({
-                                    columns: chargesColumns,
+                                    columns: paymentsColumns,
                                     menu: [
                                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
                                     ],

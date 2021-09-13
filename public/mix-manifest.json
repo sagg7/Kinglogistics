@@ -1,5 +1,4 @@
 {
     "/css/app.css": "/css/app.css",
-    "/js/sections/tracking/common.min.js": "/js/sections/tracking/common.min.js",
-    "/js/sections/tracking/history.min.js": "/js/sections/tracking/history.min.js"
+    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js"
 }
