@@ -31,6 +31,8 @@ Route::prefix('shipper')->group(function () {
             ->name('invoice.paymentsSearch');
         Route::get('downloadPDF/{id}', [ShipperInvoiceController::class, 'downloadPDF'])
             ->name('invoice.downloadPaymentPDF');
+        Route::get('downloadXLSX/{id}', [ShipperInvoiceController::class, 'downloadXLSX'])
+            ->name('invoice.downloadPaymentXLSX');
 
         Route::post('complete/{id}', [ShipperInvoiceController::class, 'complete'])
             ->name('invoice.completePayment');

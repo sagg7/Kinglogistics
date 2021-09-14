@@ -273,7 +273,7 @@ class IncidentController extends Controller
             ->toArray();
 
         $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
+        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
         $title = "Violation Report Form";
         $html = view('exports.incidents.pdf', compact('title', 'incident'));
         $mpdf->AddPage('', // L - landscape, P - portrait

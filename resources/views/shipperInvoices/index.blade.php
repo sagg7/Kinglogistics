@@ -40,7 +40,8 @@
                     columns: invoicesColumns,
                     menu: [
                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
-                        {text: 'Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-check-circle', menuData: {title: 'Set status as a completed invoice?'}},
+                        {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
+                        {text: 'Send Email & Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-paper-plane', menuData: {title: 'Confirm sending email to shipper?'}},
                     ],
                     container: 'pendingInvoicesGrid',
                     url: '/shipper/invoice/search/pending',
@@ -59,6 +60,7 @@
                                     columns: invoicesColumns,
                                     menu: [
                                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
+                                        {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
                                     ],
                                     container: 'completedInvoicesGrid',
                                     url: '/shipper/invoice/search/completed',

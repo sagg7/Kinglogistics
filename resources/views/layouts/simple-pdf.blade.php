@@ -19,6 +19,10 @@
                 width: 33.33%;
             }
 
+            table {
+                text-align: center;
+            }
+
             td, th {
                 padding-right: .3em;
                 padding-left: .3em;
@@ -27,6 +31,7 @@
             th {
                 background-color: #000;
                 color: #fff;
+                text-align: center;
             }
 
             h1 {

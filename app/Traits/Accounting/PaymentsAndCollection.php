@@ -211,7 +211,7 @@ trait PaymentsAndCollection
                 try {
                     $pdf = $this->getPDFBinary($item->id);
                     foreach ($emails as $email) {
-                        Mail::to($email)->send(new SendCarrierPayments($pdf, $item->carrier));
+                        Mail::to($email)->send(new SendCarrierPayments($item->carrier, $pdf));
                     }
                 } catch (MpdfException $e) {
                     continue;

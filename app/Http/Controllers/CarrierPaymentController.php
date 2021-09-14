@@ -111,7 +111,7 @@ class CarrierPaymentController extends Controller
         try {
             $pdf = $this->getPDFBinary($payment->id);
             foreach ($emails as $email) {
-                Mail::to($email)->send(new SendCarrierPayments($pdf, $payment->carrier));
+                Mail::to($email)->send(new SendCarrierPayments($payment->carrier, $pdf));
             }
         } catch (MpdfException $e) {
         }

@@ -7,21 +7,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SendCarrierPayments extends Mailable
+class SendShipperInvoices extends Mailable
 {
     use SerializesModels;
 
-    public $carrier;
+    public $shipper;
     public $pdf;
+    public $xlsx;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($carrier, $pdf)
+    public function __construct($shipper, $xlsx, $pdf)
     {
-        $this->carrier = $carrier;
+        $this->shipper = $shipper;
+        $this->xlsx = $xlsx;
         $this->pdf = $pdf;
     }
 
@@ -32,10 +34,12 @@ class SendCarrierPayments extends Mailable
      */
     public function build()
     {
-        return $this->attachData($this->pdf, 'Invoice.pdf', [
+        return $this->attachData($this->xlsx, 'Invoice.xlsx', [
+            'mime' => 'application/xlsx',
+        ])->attachData($this->pdf, 'Invoice.pdf', [
             'mime' => 'application/pdf',
         ])
-            ->subject("Payment - " . $this->carrier->name)
+            ->subject("Invoice - " . $this->shipper->name)
             ->view('mails.emptyMail');
     }
 }
