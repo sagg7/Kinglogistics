@@ -14,13 +14,13 @@
             <thead>
             <tr>
                 <th style="width: 12%;">Load Date</th>
-                <th style="width: 14%;">Driver</th>
+                <th style="width: 20%;">Driver</th>
                 <th style="width: 14%;">Destination</th>
                 <th style="width: 12%;">Sand Ticket&nbsp;#</th>
                 <th style="width: 12%;">Control</th>
-                <th style="width: 12%;">BOL</th>
-                <th style="width: 12%;">Miles</th>
-                <th style="width: 12%;">Rate</th>
+                <th style="width: 10%;">BOL</th>
+                <th style="width: 10%;">Miles</th>
+                <th style="width: 10%;">Rate</th>
             </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                 <td>{{ $load->driver->name }}</td>
                 <td>{{ $load->destination }}</td>
                 <td>{{ $load->sand_ticket }}</td>
-                <td>{{ $load->control }}</td>
+                <td>{{ $load->control_number }}</td>
                 <td>{{ $load->bol }}</td>
                 <td>{{ $load->mileage }}</td>
                 <td>${{ number_format($load->shipper_rate, 2) }}</td>
