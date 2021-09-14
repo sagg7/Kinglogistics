@@ -44,7 +44,7 @@ trait PushNotificationsTrait
 
         $downstreamResponse = FCM::sendTo($token, $option, $notification, $data);
 
-            if ($downstreamResponse->numberFailure() > 0) {
+        if ($downstreamResponse->numberFailure() > 0) {
             foreach ($downstreamResponse->tokensToDelete() as $token) {
                 Device::where('token', $token)->delete();
             }

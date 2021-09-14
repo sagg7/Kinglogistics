@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationResource;
 use App\Models\Driver;
 use App\Models\Message;
-use App\Models\Shipper;
 use App\Traits\Chat\MessagesTrait;
+use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use Illuminate\Http\Request;
 use App\Traits\Notifications\PushNotificationsTrait;
 use App\Enums\DriverAppRoutes;
@@ -17,21 +17,20 @@ use App\Enums\DriverAppRoutes;
 class ChatController extends Controller
 {
 
-    use PushNotificationsTrait, MessagesTrait;
+    use GetSelectionData, PushNotificationsTrait, MessagesTrait;
 
-    public function getConversation(Request $request)
+    public function getChatHistory(Request $request)
     {
-        $driverId = $request->get('driver_id');
-        $driver = $driverId ? Driver::find($driverId) : auth()->user();
+        $driver = auth()->user();
 
-        $messages = $driver
-            ->messages()
-            ->orderBy('id', 'desc')
-            ->paginate(20);
+        $query = Message::where('driver_id', $driver->id)
+            ->orderBy('id', 'desc');
 
-        $conversation = ConversationResource::collection($messages);
+//        $this->readMessages($driver_id, auth()->user()->id);
 
-        return response(['status' => 'ok', 'messages' => $conversation], 200);
+        $messages = $this->selectionData($query, $request->take, $request->page);
+
+        return response(['status' => 'ok', 'data' => $messages]);
     }
 
     public function sendMessageAsUser(Request $request)

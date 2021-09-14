@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\LoadStatusEnum;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -162,6 +163,21 @@ class Driver extends Authenticatable implements CanResetPassword
      * Helpers
      *
      */
+
+    public function hasActiveLoads(): bool
+    {
+        $loadsTotal = $this->loads()->whereNotIn('status', [
+            LoadStatusEnum::UNALLOCATED,
+            LoadStatusEnum::FINISHED,
+        ])->count();
+
+        return $loadsTotal > 0;
+    }
+
+    public function isShiftActive(): bool
+    {
+        return !!Shift::where('driver_id', $this->id)->first();
+    }
 
     public function hasActiveShift(): bool
     {

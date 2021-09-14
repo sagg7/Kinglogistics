@@ -77,7 +77,7 @@ Route::group([
 
         Route::post('user', [ChatController::class, 'sendMessageAsUser']);
         Route::post('driver', [ChatController::class, 'sendMessageAsDriver']);
-        Route::get('conversation', [ChatController::class, 'getConversation']);
+        Route::get('history', [ChatController::class, 'getChatHistory']);
 
     });
 

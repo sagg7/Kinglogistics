@@ -26,9 +26,10 @@ class ShiftController extends Controller
 
         if (!empty($lastLoad)) {
             $payload['last_load'] = [
-                'box_status' => $lastLoad->box_status_init,
-                'box_type_id' => $lastLoad->box_type_id,
-                'box_number' => $lastLoad->box_number
+                'have_box' => true,
+                'box_status' => $lastLoad->box_status_end,
+                'box_type_id' => $lastLoad->box_type_id_end,
+                'box_number' => $lastLoad->box_number_end
             ];
         }
 
@@ -47,12 +48,12 @@ class ShiftController extends Controller
                     'have_chassis' => true,
                     'trailer_number' => $trailer->number,
                     'chassis_type_id' => $trailer->chassis_type_id,
-                // Add relation to chassis_types and retrieve the entry
-            ];
+                    // Add relation to chassis_types and retrieve the entry
+                ];
             }
         }
 
-        return response($payload);
+        return response(['status' => 'ok', 'data' => $payload]);
     }
 
     public function checkStatus()

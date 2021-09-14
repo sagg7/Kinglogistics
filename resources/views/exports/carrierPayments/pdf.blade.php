@@ -8,16 +8,16 @@
         <table class="table mb-4">
             <thead>
             <tr>
-                <th style="width: 11%;">Carrier</th>
-                <th style="width: 11%;">Truck&nbsp;#</th>
+                <th style="width: 16%;">Carrier</th>
+                <th style="width: 7%;">Truck&nbsp;#</th>
                 <th style="width: 8%;">Load Date</th>
-                <th style="width: 10%;">Driver</th>
+                <th style="width: 13%;">Driver</th>
                 <th style="width: 12%;">Destination</th>
-                <th style="width: 10%;">Sand Ticket&nbsp;#</th>
-                <th style="width: 10%;">Control</th>
-                <th style="width: 10%;">BOL</th>
-                <th style="width: 10%;">Miles</th>
-                <th style="width: 8%; text-align: left;">Rate</th>
+                <th style="width: 11%;">Sand&nbsp;Ticket&nbsp;#</th>
+                <th style="width: 9%;">Control</th>
+                <th style="width: 8%;">BOL</th>
+                <th style="width: 8%;">Miles</th>
+                <th style="width: 8%;">Rate</th>
             </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
                 <td>{{ $load->driver->name }}</td>
                 <td>{{ $load->destination }}</td>
                 <td>{{ $load->sand_ticket }}</td>
-                <td>{{ $load->control }}</td>
+                <td>{{ $load->control_number }}</td>
                 <td>{{ $load->bol }}</td>
                 <td>{{ $load->mileage }}</td>
                 <td style="text-align: left;">${{ number_format($load->rate, 2) }}</td>
