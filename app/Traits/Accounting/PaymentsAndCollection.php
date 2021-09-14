@@ -2,6 +2,8 @@
 
 namespace App\Traits\Accounting;
 
+use App\Enums\CarrierPaymentEnum;
+use App\Mail\SendCarrierPayments;
 use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
@@ -14,9 +16,12 @@ use App\Models\Rental;
 use App\Models\ShipperInvoice;
 use App\Models\Trip;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
+    use CarrierPaymentsPDF;
     /**
      * @param $load_mileage
      * @param int $shipper_id
@@ -129,10 +134,8 @@ trait PaymentsAndCollection
                 $shipper_invoices[$shipper_id][$trip_pos]['loops']++;
             }
             // Update the load counter
-            if (!$load->shipper_invoice_id) {
-                $shipper_invoices[$shipper_id][$trip_pos]['load_groups'][$loops]['loads'][] = $load;
-                $shipper_invoices[$shipper_id][$trip_pos]['load_count']++;
-            }
+            $shipper_invoices[$shipper_id][$trip_pos]['load_groups'][$loops]['loads'][] = $load;
+            $shipper_invoices[$shipper_id][$trip_pos]['load_count']++;
         }
         $carbon_now = Carbon::now();
         foreach ($shipper_invoices as $shipper_id => $invoice) {
@@ -160,6 +163,7 @@ trait PaymentsAndCollection
     private function chargeRentals()
     {
         $rentals = Rental::with('trailer')
+            ->where('status', 'rented')
             ->whereNull('finished_at')
             ->get();
 
@@ -198,6 +202,24 @@ trait PaymentsAndCollection
 
     private function carrierPayments()
     {
+        $carrier_payments = CarrierPayment::with('carrier:id,invoice_email,name')
+            ->where('status', CarrierPaymentEnum::APPROVED)
+            ->get();
+        foreach ($carrier_payments as $i => $item) {
+            if ($item->carrier->invoice_email) {
+                $emails = explode(',', $item->carrier->invoice_email);
+                try {
+                    $pdf = $this->getPDFBinary($item->id);
+                    foreach ($emails as $email) {
+                        Mail::to($email)->send(new SendCarrierPayments($pdf, $item->carrier));
+                    }
+                } catch (MpdfException $e) {
+                    continue;
+                }
+            }
+            $item->status = CarrierPaymentEnum::COMPLETED;
+            $item->save();
+        }
         $new_expenses = [];
         $charges = Charge::with('carriers')
             ->get();
@@ -281,9 +303,9 @@ trait PaymentsAndCollection
             ->whereHas('driver')
             ->where('status', 'finished')
             // CONDITION OF AT LEAST ONLY PAST WEEK LOADS
-            ->whereHas('loadStatus', function ($q) {
+            /*->whereHas('loadStatus', function ($q) {
                 $q->whereDate('finished_timestamp', '<=', Carbon::now()->subWeeks(1));
-            })
+            })*/
             ->with([
                 'shipper',
                 'driver.carrier',
@@ -333,7 +355,7 @@ trait PaymentsAndCollection
                     // If the expense amount is bigger than the gross amount
                     if ($expense_amount > $gross_amount) {
                         $expense_amount -= $expense->amount;
-                        break;
+                        continue;
                     }
                     // Save the carrier payment id to the expense
                     $expense->carrier_payment_id = $carrier_payment->id;

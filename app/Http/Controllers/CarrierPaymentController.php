@@ -3,18 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierPaymentEnum;
+use App\Mail\SendCarrierPayments;
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
 use App\Models\CarrierExpense;
+use App\Traits\Accounting\CarrierPaymentsPDF;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
+use Mpdf\MpdfException;
 
 class CarrierPaymentController extends Controller
 {
-    use GetSimpleSearchData;
+    use GetSimpleSearchData, CarrierPaymentsPDF;
     /**
      * Display a listing of the resource.
      *
@@ -101,8 +105,18 @@ class CarrierPaymentController extends Controller
 
     public function complete($id)
     {
-        $payment = CarrierPayment::findOrFail($id);
+        $payment = CarrierPayment::with('carrier:id,invoice_email,name')->findOrFail($id);
+
+        $emails = explode(',', $payment->carrier->invoice_email);
+        try {
+            $pdf = $this->getPDFBinary($payment->id);
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new SendCarrierPayments($pdf, $payment->carrier));
+            }
+        } catch (MpdfException $e) {
+        }
         $payment->status = CarrierPaymentEnum::COMPLETED;
+        $payment->save();
 
         return ['success' => $payment->save()];
     }
@@ -174,7 +188,8 @@ class CarrierPaymentController extends Controller
             ->where(function ($q) use ($type) {
                 switch ($type) {
                     case 'pending':
-                        $q->where('status', 'pending');
+                        $q->where('status', 'pending')
+                            ->orWhere('status', 'approved');
                         break;
                     case 'completed':
                         $q->where('status', 'completed');
@@ -185,16 +200,16 @@ class CarrierPaymentController extends Controller
                 }
             });
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'carrier':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -204,7 +219,7 @@ class CarrierPaymentController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 
     /**
@@ -236,35 +251,7 @@ class CarrierPaymentController extends Controller
      */
     public function downloadPDF($id)
     {
-        $carrierPayment = CarrierPayment::with([
-            'carrier:id,name',
-            'loads.driver.truck',
-            'expenses',
-        ])
-            ->findOrFail($id);
-
-        $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
-
-        $title = $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
-        if ($carrierPayment->status === "charges") {
-            $title = "PAID CHARGES WEEK " . $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
-            $html = view('exports.carrierPayments.chargesPdf', compact('title', 'carrierPayment'));
-            $orientation = 'P';
-        } else {
-            $title = "PAYMENT WEEK " . $title;
-            $html = view('exports.carrierPayments.pdf', compact('title', 'carrierPayment'));
-            $orientation = 'L';
-        }
-        $mpdf->AddPage($orientation, // L - landscape, P - portrait
-            '', '', '', '',
-            5, // margin_left
-            5, // margin right
-            22, // margin top
-            22, // margin bottom
-            3, // margin header
-            0); // margin footer
-        $mpdf->WriteHTML($html);
+        $mpdf = $this->generatePDF($id);
         return $mpdf->Output();
     }
 }
