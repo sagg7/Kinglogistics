@@ -18,12 +18,7 @@
                     event.errors.forEach((error, index) => {
                         errStr += error+'<br>';
                     });
-                    $.alert({
-                        title: 'Error accepting the image!',
-                        content: errStr,
-                        type: 'red',
-                        typeAnimated: true,
-                    });
+                    throwErrorMsg('Error accepting the image!')
                 }
                 listUploadedImages();
             },
@@ -39,6 +34,7 @@
                 clear = uploader.data('clear'),
                 uploadingmessage = uploader.data('uploadingmessage');
             tgtInp.change(function () {
+
                 if (this.files && this.files[0]) {
                     let reader = new FileReader();
                     reader.onload = function (e) {
@@ -64,7 +60,7 @@
     bindDeletePhoto = (buttonId,carouselId) => {
         $('span.deleteImage').click(function (e) {
             e.stopPropagation();
-            let toDelete = $(this).data('imageid'),
+            let toDelete = $(this).data('imageid') ,
                 img = $(this).parent(),
                 container = $(this).parent();
             $.confirm({
@@ -119,19 +115,20 @@
         unbindDeletePhoto();
         let imageUploaded = ImageUploader.uploads;
         imageUploaded.forEach((photo, index) => {
-            let picDiv = `<div class="photo-preview" data-toggle="modal" data-target="#swiperModal" id="photo${photo.picture_id}"
-        style="background-image: url(${photo.picture_path}${photo.picture_name})">
-        <span class="deleteImage" data-imageid="${photo.picture_id}">
+            console.log(photo);
+            let picDiv = `<div class="photo-preview" data-toggle="modal" data-target="#swiperModal" id="photo${photo.id}"
+        style="background-image: url(${photo.url})">
+        <span class="deleteImage" data-imageid="${photo.id}">
         <span class="fas fa-times"></span></span></div>`;
             $('#imagesCollapse .photos-wrapper').prepend(picDiv);
             let carousel = $('#picturesCarousel');
             carousel.trigger('destroy.owl.carousel');
-            carousel.prepend(`<div id="slider-${photo.picture_id}"><img class="owl-lazy" data-src="${photo.picture_path}${photo.picture_slider}" alt="" title="${photo.picture_description}"></div>`);
+            carousel.prepend(`<div id="slider-${photo.id}"><img class="owl-lazy" data-src="${photo.url}" alt="" title="$photo${photo.id}"></div>`);
             initOwlCarousel(carousel);
         });
         imageUploaded.slice().reverse().forEach((photo, index) => {
             let upPicCount = $('.photo-preview', '#imagesCollapse').not('.upload').length
-            $("#photo" + photo.picture_id).click(function () {
+            $("#photo" + photo.id).click(function () {
                 $('#picturesValuacionCarousel').trigger('to.owl.carousel', upPicCount)
             });
         });
@@ -143,14 +140,13 @@
     };
 
     $('#getPhotos').one('click', () => {
-        console.log("dda");
         let picInput = JSON.parse($('#picturesInput').val());
         let picture = {};
         let sliderPhotos = [];
         picInput.forEach((pic) => {
             picture[pic.id] =
                 `<div class="photo-preview" data-toggle="modal" data-target="#swiperModal" id="photo${pic.id}"
-                 style="background-image: url(${pic.picture_path+pic.picture_name})" title="${pic.created_at}">
+                 style="background-image: url(${pic.url})" title="${pic.created_at}">
                 <span class="deleteOrderImage" data-imageid="${pic.id}">
                     <span class="fas fa-times"></span>
                 </span>
@@ -158,9 +154,8 @@
             $('.photos-wrapper', '#imagesCollapse').prepend(picture[pic.id]);
             sliderPhotos.push({
                 id: pic.id,
-                picture_slider: pic.picture_slider,
-                picture_path: pic.picture_path,
-                picture_description: pic.picture_description
+                picture_slider: pic.url,
+                picture_path: pic.url,
             });
         });
         sliderPhotos.slice().reverse().forEach((photo, index) => {

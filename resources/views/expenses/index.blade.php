@@ -22,9 +22,15 @@
                     else
                         return '$0.00';
                 };
+                const dateFormatter = (params) => {
+                    if (params.value)
+                        return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
+                    else
+                        return '';
+                };
                 tbAG = new tableAG({
                     columns: [
-                        {headerName: 'Date', field: 'created_at'},
+                        {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'type', valueFormatter: nameFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],

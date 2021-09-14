@@ -137,6 +137,12 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasMany(RejectedLoad::class);
     }
 
+
+    public function latestRejection(): HasOne
+    {
+        return $this->hasOne(RejectedLoad::class)->latest();
+    }
+
     public function locations(): HasMany
     {
         return $this->hasMany(DriverLocation::class);
@@ -197,5 +203,11 @@ class Driver extends Authenticatable implements CanResetPassword
         }
 
         return $canActivate;
+    }
+
+    public function rejectionCheck(): bool
+    {
+        $now = Carbon::now();
+        return !$this->latestRejection || $now->isAfter($this->latestRejection->created_at->addHours(12));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shipper;
+use App\Rules\EmailArray;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
@@ -34,7 +35,7 @@ class ShipperController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', "unique:shippers,email,$id,id"],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'invoice_email' => ['nullable', 'string', 'email', 'max:255'],
+            'invoice_email' => ['nullable', new EmailArray, 'max:255'],
         ]);
     }
 

@@ -69,14 +69,19 @@ class ChatController extends Controller
         $driver_id= $request->driver_id;
         $content = $request->message;
         $user_id = auth()->user()->id;
+        $image = $request->image;
+
+        if ($image)
+            $image = $this->uploadImage($image, 'chat');
 
         $message = $this->sendMessage(
-            $content,
             $driver_id,
+            $content,
             $user_id,
             null,
             null,
             true,
+            $image,
         );
 
         $driver = Driver::find($driver_id);

@@ -12,6 +12,10 @@ Route::prefix('user')->group(function () {
         ->name('user.store');
     Route::get('search', [UserController::class, 'search'])
         ->name('user.search');
+    Route::get('search', [UserController::class, 'search'])
+        ->name('user.search');
+    /*Route::get('searchActive', [UserController::class, 'staffOnTurn'])
+        ->name('user.searchActive');*/
     Route::get('selection', [UserController::class, 'selection'])
         ->name('user.selection');
     Route::get('edit/{id}', [UserController::class, 'edit'])

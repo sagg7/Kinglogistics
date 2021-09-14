@@ -274,7 +274,10 @@ class PaperworkController extends Controller
     {
         return DB::transaction(function () use ($request, $id, $related_id) {
             $paperwork = Paperwork::findOrFail($id);
-            $template = new PaperworkTemplate();
+            $template = PaperworkTemplate::where('related_id', $related_id)
+                ->where('paperwork_id', $id)
+                ->first()
+                ?: new PaperworkTemplate();
 
             preg_match_all("/{{[^}]*}}/", $paperwork->template, $result);
             $matches = ["/{{/", "/}}/", "/,\s/", "/\"validate\"/", "/\"signature\"/"];
@@ -324,6 +327,8 @@ class PaperworkController extends Controller
 
             if (auth()->guard('web')->check())
                 return redirect()->route('driver.profile');
+            else if (auth()->guard('carrier')->check())
+                return redirect()->route('carrier.profile');
             else
                 return redirect()->route("$paperwork->type.index");
         });

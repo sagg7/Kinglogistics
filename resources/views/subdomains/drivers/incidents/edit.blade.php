@@ -9,7 +9,7 @@
                 {canvas: document.getElementById('driver_signature'), required: true},
             ];
         </script>
-        <script src="{{ asset('js/common/initSignature.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/common/initSignature.min.js?1.0.1') }}"></script>
     @endsection
 
     @section('modals')
@@ -17,7 +17,7 @@
         @include('incidents.common.modals.deleteIncidentType')
     @endsection
 
-    {!! Form::open(['route' => ['incident.update', $incident->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}
+    {!! Form::open(['route' => ['incident.update', $incident->id], 'method' => 'post', 'class' => 'form form-vertical with-sig-pad']) !!}
     @include('subdomains.drivers.incidents.common.form')
     {!! Form::close() !!}
 </x-app-layout>

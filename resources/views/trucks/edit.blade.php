@@ -7,25 +7,25 @@
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
         <script>
             (() => {
-                @if($truck->driver_id)
+                @if($truck->driver)
                 $("#driver_id")
                     .html(`<option value="{{ $truck->driver_id }}">{{ $truck->driver->name }}</option>`)
                     .val({{ $truck->driver_id }})
                     .trigger('change');
                 @endif
-                @if($truck->trailer_id)
+                @if($truck->trailer)
                 $("#trailer_id")
                     .html(`<option value="{{ $truck->trailer_id }}">{{ $truck->trailer->number }}</option>`)
                     .val({{ $truck->trailer_id }})
                     .trigger('change');
                 @endif
-                @if($truck->carrier_id)
+                @if($truck->carrier)
                 $("#carrier_id")
                     .html(`<option value="{{ $truck->carrier_id }}">{{ $truck->carrier->name }}</option>`)
                     .val({{ $truck->carrier_id }})
                     .trigger('change');
                 @endif
-                @if($truck->seller_id)
+                @if($truck->seller)
                 $("#seller_id")
                     .html(`<option value="{{ $truck->seller_id }}">{{ $truck->seller->name }}</option>`)
                     .val({{ $truck->seller_id }})

@@ -95,6 +95,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('invoice_email', ucfirst(__('invoice email')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('invoice_email', $carrier->invoice_email ?? null, ['class' => 'form-control' . ($errors->first('invoice_email') ? ' is-invalid' : ''), 'data-email' => 'multi']) !!}
+                    @error('invoice_email')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
             @if(auth()->guard('web')->check())
                 <hr>

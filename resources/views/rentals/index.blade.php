@@ -46,7 +46,8 @@
                         {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
                     ],
                     menu: [
-                        {text: 'Create Inspection', route: '/inspection/create', icon: 'feather icon-edit'},
+                        {text: 'Create Inspection', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
+                        {text: 'End Rent', route: "/inspection/endInspection", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "rented"'},
                         {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
                         {route: '/rental/delete', type: 'delete'}
                     ],

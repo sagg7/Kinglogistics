@@ -16,4 +16,9 @@ class S3StorageController extends Controller
     {
         return redirect()->to($this->getTemporaryFile($request->url));
     }
+
+    public function getTemporaryUrl(Request $request)
+    {
+        return $this->getTemporaryFile($request->url);
+    }
 }

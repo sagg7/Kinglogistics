@@ -10,4 +10,6 @@ Route::prefix('paperwork')->group(function () {
         ->name('paperwork.pdf');
     Route::post('storeTemplate/{id}/{related_id}', [PaperworkController::class, 'storeTemplate'])
         ->name('paperwork.storeTemplate');
+    Route::post('storeFiles', [PaperworkController::class, 'storeFiles'])
+        ->name('paperwork.storeFiles');
 });

@@ -182,9 +182,8 @@
                                     </div>
                                     <div id="collapsePhotos" class="panel-collapse collapse" role="tabpanel">
                                         <div class="panel-body" style="position: relative;">
-                                            <div class="card bg-secondary shadow border-0">
+                                            <div class="card shadow border-0">
                                                 <div class="card-header bg-transparent pb-5">
-                                                    <div class="text-muted text-center mt-2 mb-3"><small>Add photos</small></div>
                                                     <div class="btn-wrapper text-center">
                                                         {!!Form::open(['route' => 'rental.uploadPhoto',
                                                                 'method'=>'POST','id'=>'hiddenForm','class' =>'hidden','files'=>true,'role'=>'form'])!!}
@@ -244,7 +243,8 @@
         <script>
             $("#inspectionBtn").click(function (e)
             {
-                $("#loading").removeClass("hidden");
+                let submit = $("#inspectionBtn");
+                submit.html("<i class=\"fa fa-spinner fa-spin\"></i> Loading").addClass("disabled");
                 e.preventDefault();
 
                 var formAction = $('form[name=inspectionForm]').attr('action');
@@ -257,24 +257,8 @@
                 })
 
                 if (error != ''){
-                    $.alert({
-                        animation: 'scale',
-                        closeAnimation: 'scale',
-                        animateFromElement: false,
-                        columnClass: 'col-md-6 col-md-offset-3 span6 offset3',
-                        type: 'red',
-                        title: "error",
-                        content: error,
-                        backgroundDismiss: false,
-                        buttons: {
-                            confirm: {
-                                text: 'OK',
-                                btnClass: 'btn-blue',
-                            }
-                        }
-                    });
-                    $("#loading").addClass("hidden");
-
+                    throwErrorMsg(error);
+                    submit.html("Save").removeClass("disabled");
                 } else {
                     $.ajax({
                         type        : 'POST',//    Define the type of HTTP verb we want to use (POST for our form).
@@ -285,26 +269,8 @@
                         dataType    : 'json'// What type of data do we expect back from the server
                         //,encode    : true
                     }).done(function(data) {
-                        $("#loading").addClass("hidden");
-                        $.alert({
-                            animation: 'scale',
-                            closeAnimation: 'scale',
-                            animateFromElement: false,
-                            columnClass: 'col-md-6 col-md-offset-3 span6 offset3',
-                            type: 'blue',
-                            title: "Success!",
-                            content: `Inspection created correctly`,
-                            backgroundDismiss: false,
-                            buttons: {
-                                confirm: {
-                                    text: 'OK',
-                                    btnClass: 'btn-blue',
-                                    action: () => {
-                                        window.location = '{{url('rentals')}}';
-                                    }
-                                }
-                            }
-                        });
+                        submit.html("Save").removeClass("disabled");
+                        throwErrorMsg("Inspection created Correctly", {"title": "Success!", "type": "success", "redirect": "{{url('rental/index')}}"})
                     });
                 }
             });

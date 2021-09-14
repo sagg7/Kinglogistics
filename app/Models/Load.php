@@ -74,6 +74,14 @@ class Load extends Model
         return $this->belongsTo(Trip::class);
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function shipper_invoice(): BelongsTo
+    {
+        return $this->belongsTo(ShipperInvoice::class);
+    }
+
     public function loadStatus(): HasOne
     {
         return $this->hasOne(LoadStatus::class);
@@ -121,6 +129,16 @@ class Load extends Model
     public function latestLocation(): HasOne
     {
         return $this->hasOne(DriverLocation::class)->latest();
+    }
+
+    public function boxInit(): HasOne
+    {
+        return $this->hasOne(BoxType::class, 'id', 'box_type_id_init');
+    }
+
+    public function boxEnd(): HasOne
+    {
+        return $this->hasOne(BoxType::class, 'id', 'box_type_id_end');
     }
 
     public function getNotifiedAtProperty(): ?Carbon

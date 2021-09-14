@@ -33,10 +33,10 @@ class Trailer extends Model
     /**
      * @return BelongsTo
      */
-    public function shipper(): BelongsTo
+    /*public function shipper(): BelongsTo
     {
         return $this->belongsTo(Shipper::class);
-    }
+    }*/
 
     /**
      * @return HasOne

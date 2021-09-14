@@ -24,7 +24,7 @@
                 };
                 tbAG = new tableAG({
                     columns: [
-                        {headerName: 'Date', field: 'created_at'},
+                        {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'type', valueFormatter: nameFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],

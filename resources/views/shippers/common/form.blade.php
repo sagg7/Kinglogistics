@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     {!! Form::label('invoice_email', ucfirst(__('invoice email')), ['class' => 'col-form-label']) !!}
-                    {!! Form::email('invoice_email', $shipper->invoice_email ?? null, ['class' => 'form-control' . ($errors->first('invoice_email') ? ' is-invalid' : '')]) !!}
+                    {!! Form::text('invoice_email', $shipper->invoice_email ?? null, ['class' => 'form-control' . ($errors->first('invoice_email') ? ' is-invalid' : ''), 'data-email' => 'multi']) !!}
                     @error('invoice_email')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
@@ -53,7 +53,7 @@
                 @if(auth()->guard('web')->check())
                 <div class="form-group col-md-6">
                     {!! Form::label('payment_days', ucfirst(__('payment days')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('payment_days[]', $weekdays, $shipper->payment_days, ['class' => 'form-control select2' . ($errors->first('payment_days') ? ' is-invalid' : ''), 'multiple']) !!}
+                    {!! Form::select('payment_days[]', $weekdays, $shipper->payment_days ?? null, ['class' => 'form-control select2' . ($errors->first('payment_days') ? ' is-invalid' : ''), 'multiple']) !!}
                     @error('payment_days')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

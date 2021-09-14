@@ -30,6 +30,8 @@ class TripController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'customer_name' => ['required', 'string', 'max:255'],
             'zone_id' => ['required', 'exists:zones,id'],
+            'shipper_id' => ['required', 'exists:shippers,id'],
+            'rate_id' => ['required', 'exists:rates,id'],
             'origin' => ['required', 'string', 'max:255'],
             'origin_coords' => ['required', 'string', 'max:255'],
             'destination' => ['required', 'string', 'max:255'],
@@ -39,6 +41,9 @@ class TripController extends Controller
             'origin_coords.required' => 'The origin map location is required',
             'destination_coords.required' => 'The destination map location is required',
         ], [
+            'shipper_id' => 'shipper',
+            'zone_id' => 'zone',
+            'rate_id' => 'rate',
         ]);
     }
 
@@ -94,6 +99,7 @@ class TripController extends Controller
 
         $trip->zone_id = $request->zone_id;
         $trip->shipper_id = $shipper;
+        $trip->rate_id = $request->rate_id;
         $trip->name = $request->name;
         $trip->customer_name = $request->customer_name;
         $trip->origin = $request->origin;
@@ -125,7 +131,18 @@ class TripController extends Controller
      */
     public function edit(int $id)
     {
-        $trip = Trip::with('zone:id,name', 'shipper:id,name')
+        $trip = Trip::with([
+            'zone:id,name',
+            'shipper:id,name',
+            'rate' => function ($q) {
+                $q->with('rate_group:id,name')
+                    ->select([
+                        'id',
+                        'zone_id',
+                        'rate_group_id',
+                    ]);
+            }
+        ])
             ->where(function ($q) {
                 if (auth()->guard('shipper'))
                     $q->where('shipper_id', auth()->guard()->user()->id);
@@ -187,8 +204,8 @@ class TripController extends Controller
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
-                    $q->where('shipper_id', auth()->user()->id());
-                else
+                    $q->where('shipper_id', auth()->user()->id);
+                else if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
             });
 

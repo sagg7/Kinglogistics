@@ -3,27 +3,94 @@
         <link rel="stylesheet" href="{{ asset('app-assets/css/pages/app-chat.min.css') }}">
         <style>
             .content.app-content .content-area-wrapper {
-                margin: 0!important;
+                margin: 0 !important;
             }
             .chat-application .chats .chat-body,
             .chat-application .chats .chat-content {
-                margin-left: 0!important;
-                margin-right: 0!important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             .chat-application .chats .chat-body .chat-content {
                 text-align: left;
                 max-width: 85%;
             }
+            .chat-application .chats .chat-body .chat-image {
+                max-width: 250px;
+            }
+            .preview-image {
+                display: block;
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 0;
+                background: #eee;
+                transition: all 300ms ease;
+                bottom: 79px;
+            }
+            .preview-image.open {
+                height: calc(100% - 123px);
+            }
+            .preview-header {
+                top: 0;
+                left: 0;
+            }
+            .preview-image .main {
+                display: none;
+                height: 100%;
+            }
+            .preview-image.open .main {
+                display: block;
+            }
+            .preview-image .preview-header .close-btn {
+                color: gray;
+                font-size: 6em;
+                line-height: 1;
+                margin: -10px 0 -15px 0;
+                padding: 0 0 0 10px;
+            }
+            .preview-image.open .preview-header .close-btn {
+                display: block;
+            }
+            .preview-image .d-flex {
+                height: calc(100% - 80px);
+            }
+            .preview-body,
+            .preview-body .content-body {
+                height: 100%;
+            }
+            .preview-body .content-body {
+                padding: 15px 0;
+            }
+            .preview-image img {
+                max-height: 100%;
+            }
         </style>
     @endsection
 
+    @section("modals")
+        <div class="modal fade" id="imagePreview" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                <div class="modal-content bg-transparent border-0 box-shadow-0" style="max-height: calc(100vh - 3.5rem);">
+                    <div class="modal-header bg-transparent">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center p-5 modal-spinner">
+                            <span class="spinner-border white" role="status" aria-hidden="true"></span>
+                        </div>
+                        <div class="content-body text-center d-none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endsection
     @section("scripts")
         <script>
             const contacts = @json($contacts);
             const userId = {{ auth()->user()->id }};
         </script>
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
-        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js') }}"></script>
+        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.0') }}"></script>
     @endsection
 
     <div class="chat-application">
@@ -152,11 +219,12 @@
                                 <span class="mb-1 start-chat-icon feather icon-message-square"></span>
                                 <h4 class="py-50 px-1 sidebar-toggle start-chat-text">Start Conversation</h4>
                             </div>
-                            <div class="active-chat d-none">
+                            <div class="active-chat d-none position-relative">
                                 <div class="chat_navbar">
                                     <header class="chat_header d-flex justify-content-between align-items-center p-1">
                                         <div class="vs-con-items d-flex align-items-center">
-                                            <div class="sidebar-toggle d-block d-lg-none mr-1"><i class="feather icon-menu font-large-1"></i></div>
+                                            <div class="sidebar-toggle d-block d-lg-none mr-1"><i
+                                                    class="feather icon-menu font-large-1"></i></div>
                                             <!--<div class="avatar user-profile-toggle m-0 m-0 mr-1">
                                                 <img src="" alt="" height="40" width="40" />
                                                 <span class="avatar-status-busy"></span>
@@ -168,14 +236,33 @@
                                 </div>
                                 <div class="user-chats">
                                     <div class="chats">
-                                        <div class="text-center more-data-spinner"><div class="spinner-border"></div></div>
+                                        <div class="text-center more-data-spinner">
+                                            <div class="spinner-border"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="chat-app-form">
                                     <form class="chat-app-input d-flex" action="javascript:void(0);">
+                                        <label for="appendImage" class="btn btn-primary">
+                                            <i class="fas fa-paperclip"></i>
+                                            <input type="file" accept="image/jpeg, image/png" id="appendImage" class="d-none">
+                                        </label>
                                         <input type="text" class="form-control message mr-1 ml-50" id="iconLeft4-1" placeholder="Type your message" maxlength="2000">
                                         <button type="submit" class="btn btn-primary send"><i class="far fa-paper-plane d-lg-none"></i> <span class="d-none d-lg-block">Send</span></button>
                                     </form>
+                                </div>
+                                <div class="preview-image" id="imageToSend" tabindex="-1">
+                                    <div class="main">
+                                        <div class="preview-header">
+                                            <span class="cursor-pointer close-btn">×</span>
+                                            <hr class="mb-0">
+                                        </div>
+                                        <div class="d-flex align-items-center flex-wrap">
+                                            <div class="preview-body col">
+                                                <div class="content-body text-center d-flex align-items-center"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>

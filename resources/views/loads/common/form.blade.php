@@ -12,29 +12,33 @@
                         </span>
                         @enderror
                     </div>
-                @else
-                    <div class="form-group col-md-3">
-                        {!! Form::label('driver', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
-                        {!! Form::text('driver', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver') ? ' is-invalid' : ''), 'readonly']) !!}
-                        @error('driver')
-                        <span class="invalid-feedback" role="alert">
+                @endif
+                <div class="form-group col-md-3">
+                    {!! Form::label('driver', ucfirst(__('Carrier')), ['class' => 'col-form-label']) !!}
+                    @if(isset($load->driver->name))
+                        {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : ''), 'disabled']) !!}
+                    @else
+                        {!! Form::select('driver_id', $available_drivers, $load->driver_id ?? null, ['class' => 'form-control select2' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
+                    @endif
+                    @error('driver_id')
+                    <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
                         </span>
+                    @enderror
+                </div>
+                @if(auth()->guard('web')->check())
+                    <div class="form-group col-md-3">
+                        {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                        {!! Form::select('shipper_id', $shippers, $load->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+                        @error('shipper_id')
+                        <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
                         @enderror
                     </div>
                 @endif
-                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-3">
-                    {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('shipper_id', $shippers, $load->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
-                    @error('shipper_id')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
-                </div>
-                <div class="form-group col-md-3">
-                    {!! Form::label('trip_id', ucfirst(__('trip')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('trip_id', ucfirst(__('job')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('trip_id', [], $load->trip_id ?? null, ['class' => 'form-control' . ($errors->first('trip_id') ? ' is-invalid' : '')]) !!}
                     @error('trip_id')
                     <span class="invalid-feedback" role="alert">
@@ -42,7 +46,6 @@
                     </span>
                     @enderror
                 </div>
-                @endif
             </div>
             <hr>
             <div class="row">
@@ -119,7 +122,7 @@
                     @enderror
                 </div>
                 <div class="form-group col-md-3">
-                    {!! Form::label('control_number', ucfirst(__('control number')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('control_number', ucfirst(__('control starting number')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('control_number', $load->control_number ?? null, ['class' => 'form-control' . ($errors->first('control_number') ? ' is-invalid' : '')]) !!}
                     @error('control_number')
                     <span class="invalid-feedback" role="alert">

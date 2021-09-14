@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LoadUpdate;
 use App\Models\AvailableDriver;
+use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\Shipper;
@@ -24,6 +26,7 @@ class LoadController extends Controller
     {
         return [
             'shippers' => [null => 'Select'] + Shipper::pluck('name', 'id')->toArray(),
+            'available_drivers' => [null => 'Select'] + Driver::pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -34,7 +37,10 @@ class LoadController extends Controller
      */
     public function index()
     {
-        return view('loads.index');
+        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch'))
+            return view('loads.indexDispatch');
+        else
+            return view('loads.index');
     }
 
     /**
@@ -103,13 +109,24 @@ class LoadController extends Controller
             $load_log->type = auth()->guard('shipper')->check() ? 'shipper' : 'user';
             $load_log->save();
             $data['load_log_id'] = $load_log->id;
+            $control_number = (int)$request->control_number;
             for ($i = 0; $i < $request->load_number; $i++) {
-                // Assign available drivers to load
-                $data['driver_id'] = $drivers[$i]->driver_id ?? null;
-                // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
-                $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
+                if (isset($request->driver_id)){ //temporary
+                    $data['driver_id'] = $request->driver_id;
+                    $data['status'] = 'finished';
+                } else {
+                    // Assign available drivers to load
+                    $data['driver_id'] = $drivers[$i]->driver_id ?? null;
+                    // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
+                    $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
+                }
+                $data['control_number'] = $control_number;
 
-                $this->storeUpdate($data);
+                $load = $this->storeUpdate($data);
+
+                $control_number++;
+
+                event(new LoadUpdate($load));
             }
         });
 
@@ -182,6 +199,11 @@ class LoadController extends Controller
      */
     public function destroy(int $id)
     {
+        /**
+         * TODO: Return drivers to available drivers
+         *
+         */
+
         $load = Load::findOrFail($id);
 
         if ($load)
@@ -221,12 +243,13 @@ class LoadController extends Controller
             "loads.origin",
             "loads.destination",
             "loads.driver_id",
+            "loads.status",
         ];
-        $query = Load::with('driver:id,name');
+        $query = Load::with('driver:id,name')
+            ->orderByDesc('date');
 
-        //if (auth()->user()->hasRole('dispatch'))
-        if (true) {
-            $query->with('photos');
+        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
+            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
             $select[] = 'sand_ticket';
             $select[] = 'bol';
         }

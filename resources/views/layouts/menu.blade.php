@@ -217,7 +217,7 @@
                     </li>
                     <li>
                         <a href="/trip/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Trips</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Jobs</span>
                         </a>
                     </li>
                     <li>
@@ -257,7 +257,7 @@
                     </li>
                 </ul>
             </li>
-            @if(auth()->user()->hasRole('admin'))
+            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
                 <li class="nav-item">
                     <a href="/tracking">
                         <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>

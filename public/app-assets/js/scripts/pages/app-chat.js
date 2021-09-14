@@ -6,10 +6,7 @@
 
     if (contacts) {
         contacts.forEach(item => {
-            const time = item.latest_message ?
-                item.latest_message.is_driver_sender ? moment.utc(item.latest_message.created_at).format('h:mm A')
-                    : moment(item.latest_message.created_at).format('h:mm A')
-                : '';
+            const time = item.latest_message ? moment(item.latest_message.created_at).format('h:mm A') : '';
             const element = `<li>` +
                 `<div class="pr-1">` +
                 //`<span class="avatar m-0 avatar-md"><img class="media-object rounded-circle" src="../../../app-assets/images/portrait/small/avatar-s-2.jpg" height="42" width="42" alt="Generic placeholder image">` +
@@ -19,7 +16,7 @@
                 `<div class="user-chat-info" data-userid="${item.id}">` +
                 `<div class="contact-info">` +
                 `<h5 class="font-weight-bold mb-0">${item.name}</h5>` +
-                `<p class="truncate">${item.latest_message ? item.latest_message.content : ''}</p>` +
+                `<p class="truncate">${item.latest_message ? item.latest_message.content ? item.latest_message.content : '<i class="fas fa-camera"></i> Photo' : ''}</p>` +
                 `</div>` +
                 `<div class="contact-meta">` +
                 `<span class="float-right mb-25">${time}</span>` +
@@ -156,11 +153,18 @@
         const original_height = chatsContainer.height();
         const original_scrollTop = chatsContainer.scrollTop();
         messages.forEach((item, count) => {
-            const date = (item.is_driver_sender && !item.newly_received) ? moment.utc(item.created_at) : moment(item.created_at);
-            const time = (item.is_driver_sender && !item.newly_received) ? moment.utc(item.created_at).format('h:mm A') : moment(item.created_at).format('h:mm A');
-            let html = `<div class="chat-content">` +
-                `<p>${item.content}<span class="block text-right line-height-1"><sub>${time}</sub></span></p>` +
-                `</div>`;
+            const date = moment(item.created_at);
+            const time = moment(item.created_at).format('h:mm A');
+            let html = '';
+            const timeSpan = `<span class="block text-right line-height-1"><sub>${time}</sub></span>`;
+            if (item.content) {
+                html = `<p>${item.content}</p>`;
+            }
+            if (item.image) {
+                html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview"><img class="img-fluid" src="${item.image_url}" alt="image"></a>${html}</div>`;
+            }
+            html = `<div class="chat-content" data-message="${item.id}">${html}${timeSpan}</div>`;
+
             const lastChat = prepend ? $(".chat:first-child") : $(".chat:last-child");
             if (prepend) {
                 if (firstDivider.length > 0 && moment(firstDivider.data('date'), 'YYYY/MM/DD').isSame(date, 'date'))
@@ -207,6 +211,27 @@
         const history = activeContact.messages ? activeContact.messages.history : [];
         const chatHeader = $('.chat_header'),
             headerName = chatHeader.find('h6');
+        /*const getBase64FromUrl = async (url) => {
+            const result = new Promise((resolve, reject) => {
+                let canvas = document.createElement('CANVAS');
+                const img = document.createElement('img');
+                img.src = url;
+                img.onload = function () {
+                    canvas.height = img.height;
+                    canvas.width = img.width;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    $('body').append(img).append(canvas);
+                    resolve(canvas.toDataURL('image/png'));
+                    canvas = null;
+                };
+
+                img.onerror = function (error) {
+                    reject(throwErrorMsg('Could not load image, please check that the file is accessible and an image!'));
+                };
+            });
+            return await result;
+        }*/
         headerName.text(activeContact.name);
         if ((history.length === 0 || prepend) && more) {
             if (!lookup) {
@@ -220,13 +245,16 @@
                     },
                     success: (res) => {
                         const result = [...res.results].reverse();
+                        /*result.forEach((item, i) => {
+                            if (item.image_url)
+                                getBase64FromUrl(item.image_url).then(data => { console.log(data); item.image = data});
+                        });*/
                         activeContact.messages = {
                             history: prepend ? [...result, ...history] : [...history, ...result],
                             more: res.pagination.more,
                             page: page + 1,
                         };
                         appendMessages((prepend ? res.results : result), prepend);
-                        console.log('here');
                         if (res.pagination.more)
                             userChat.prepend('<div class="text-center more-data-spinner"><div class="spinner-border"></div></div>');
                     }
@@ -310,43 +338,141 @@
         }
     });
 
-    let sentMessage = {};
+    let sentMessage = null;
     const sendMessage = () => {
+        const formData = new FormData();
+        if (sentMessage)
+            formData.append('message', sentMessage);
+        if (chosenFile.data) {
+            formData.append('image', chosenFile.data);
+            closePreview();
+        }
+        formData.append('driver_id', activeContact.id);
         $.ajax({
             url: '/chat/sendMessage',
             type: 'POST',
-            data: sentMessage,
+            data: formData,
+            contentType: false,
+            processData: false,
             success: (res) => {
                 if (res.success) {
-                    sentMessage = {};
+                    sentMessage = null;
                     activeContact.messages.history.push(res.message);
                 }
             },
             error: () => {
-
+                throwErrorMsg();
             }
         });
     }
+    const addMessageToView = (html) => {
+        html = `<div class="chat-content">${html}</div>`;
+        const lastChat = $(".chat:last-child");
+        if (lastChat.length === 0 || lastChat.hasClass("chat-left")) {
+            html = `<div class="chat"><div class="chat-body">${html}</div></div>`;
+            $(".chats").append(html);
+        } else {
+            lastChat.find(".chat-body").append(html);
+        }
+    };
+    let chosenFile = {};
+    const toSend = $('#imageToSend'),
+        closeBtn = toSend.find('.close-btn'),
+        toSendContent = toSend.find('.content-body');
+    const closePreview = () => {
+        toSend.removeClass('open');
+        chosenFile = {};
+        setTimeout(() => {
+            toSendContent.html('');
+        }, 300);
+    }
+    closeBtn.click(() => {
+        closePreview();
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && toSend.hasClass('open')) {
+            closePreview();
+        }
+    });
+    const sendImage = () => {
+    };
     // Add message to chat
     $('.chat-app-input').submit(() => {
-        const message = $(".message").val();
-        if (message !== "") {
-            let html = `<div class="chat-content"><p>${message}<span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span></p></div>`;
-            const lastChat = $(".chat:last-child");
-            if (lastChat.length === 0 || lastChat.hasClass("chat-left")) {
-                html = `<div class="chat"><div class="chat-body">${html}</div></div>`;
-                $(".chats").append(html);
-            } else {
-                lastChat.find(".chat-body").append(html);
-            }
-            $(".message").val("");
-            $(".user-chats").scrollTop($(".user-chats > .chats").height());
-            sentMessage = {
-                driver_id: activeContact.id,
-                message,
-            };
-            sendMessage();
+        const message = $(".message"),
+            string = message.val();
+        let html = '';
+        if (string !== "") {
+            html = `<p>${string}</p>`;
+            message.val("");
+            sentMessage = string;
         }
+        if (chosenFile.reader) {
+            html = `<div class="chat-image"><a href="#imagePreview" data-toggle="modal" data-target="#imagePreview">` +
+                `<img class="img-fluid" src="${chosenFile.reader.result}" alt="image"></a>${html}`;
+        }
+        if (html === '')
+            return false;
+        html += `<span class="block text-right line-height-1"><sub>${moment().format('h:mm A')}</sub></span>`;
+        addMessageToView(html);
+        $(".user-chats").scrollTop($(".user-chats > .chats").height());
+        sendMessage();
+    });
+    $('#appendImage').change((e) => {
+        const files = $(e.currentTarget);
+        if (files.val() !== '') {
+            const data = files.prop('files')[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(data);
+            reader.onload = () => {
+                toSendContent.html(`<img class="img-fluid mx-auto" src="${reader.result}" alt="image"></a>`);
+                toSendContent.removeClass('d-none');
+                toSend.addClass('open');
+            }
+            chosenFile = {reader, data};
+            files.val('');
+        }
+    });
+    $('#imagePreview').on('show.bs.modal', (e) => {
+        const modal = $(e.currentTarget),
+            modalBody = modal.find('.modal-body'),
+            modalSpinner = modalBody.find('.modal-spinner'),
+            content = modal.find('.content-body'),
+            anchor = $(e.relatedTarget),
+            chat = anchor.closest('.chat-content'),
+            id = chat.data('message'),
+            img = anchor.find('img');
+
+        if (id) {
+            const message = activeContact.messages.history.find(obj => Number(obj.id) === Number(id));
+            $.ajax({
+                url: '/s3storage/getTemporaryUrl',
+                type: 'GET',
+                data: {
+                    url: message.image,
+                },
+                success: (res) => {
+                    content.html(`<img src="${res}" alt="image" class="img-fluid">`);
+                    modalSpinner.addClass('d-none');
+                    content.removeClass('d-none');
+                },
+                error: () => {
+                    throwErrorMsg();
+                }
+            });
+        } else {
+            content.html(`<img src="${img.attr('src')}" alt="image" class="img-fluid">`);
+            modalSpinner.addClass('d-none');
+            content.removeClass('d-none');
+        }
+    }).on('hidden.bs.modal', (e) => {
+        const modal = $(e.currentTarget),
+            modalBody = modal.find('.modal-body'),
+            modalSpinner = modalBody.find('.modal-spinner'),
+            content = modal.find('.content-body');
+
+        content.html(``);
+        modalSpinner.removeClass('d-none');
+        content.addClass('d-none');
     });
     window.Echo.private('chat')
         .listen('NewChatMessage', e => {

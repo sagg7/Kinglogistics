@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Rate;
 use App\Models\RateGroup;
+use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RateController extends Controller
 {
-    use GetSimpleSearchData;
+    use GetSimpleSearchData, GetSelectionData;
 
     /**
      * @param array $data
@@ -154,6 +156,20 @@ class RateController extends Controller
             return ['success' => $rate->delete()];
         else
             return ['success' => false];
+    }
+
+    public function selection(Request $request)
+    {
+        $query = Rate::select([
+            'rates.id',
+            DB::raw("CONCAT(rate_groups.name, ': ', rates.start_mileage, ' - ', rates.end_mileage, ' miles') as text"),
+        ])
+            ->join('rate_groups', 'rate_groups.id', '=', 'rates.rate_group_id')
+            ->where('shipper_id', $request->shipper)
+            ->where('zone_id', $request->zone)
+            ->where("name", "LIKE", "%$request->search%");
+
+        return $this->selectionData($query, $request->take, $request->page);
     }
 
     /**

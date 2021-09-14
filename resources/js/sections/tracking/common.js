@@ -11,7 +11,8 @@
             (data.load.origin ? `<strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` : '') +
             `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
-            `<strong>Truck#:</strong> ${data.truck.number}</p>`;
+            `<strong>Truck#:</strong> ${data.truck.number}</p>` +
+            `<strong>MPH:</strong> 0</p>`;
         const infowindow = new google.maps.InfoWindow({
             content: info,
         });
@@ -21,9 +22,7 @@
             animation: google.maps.Animation.DROP,
             icon: {
                 url: "/images/app/tracking/icons/delivery-truck.svg",
-                scaledSize: new google.maps.Size(50, 50), // scaled size
-                origin: new google.maps.Point(0,0), // origin
-                anchor: new google.maps.Point(0, 0) // anchor
+                scaledSize: new google.maps.Size(40, 40), // scaled size
             },
         };
         const marker = new google.maps.Marker(markerObj);
@@ -31,7 +30,7 @@
             infowindow.open({
                 anchor: marker,
                 map,
-                shouldFocus: false,
+                shouldFocus: true,
             });
         });
         markersArray.push({
@@ -54,6 +53,35 @@
         fullscreenControl: true,
     });
     const bounds = new google.maps.LatLngBounds();
+    if (company) {
+        const info = (company.name ? `<p><strong>Company:</strong> ${company.name}</p>` : '') +
+            (company.contact_phone ? `<p></p><strong>Phone:</strong> ${company.contact_phone}</p>` : '') +
+            (company.email ? `<p></p><strong>Email:</strong> ${company.email}</p>` : '') +
+            (company.address ? `<p></p><strong>Address:</strong> ${company.address}</p>` : '');
+        const infowindow = new google.maps.InfoWindow({
+            content: info,
+        });
+        const coords = company.location.split(","),
+            position = {lat:Number(coords[0]),lng:Number(coords[1])};
+        const markerObj = {
+            position: position,
+            map,
+            animation: google.maps.Animation.DROP,
+            icon: {
+                url: "/images/app/logos/logo-dark-simple.png",
+                scaledSize: new google.maps.Size(35, 35), // scaled size
+            },
+        };
+        const marker = new google.maps.Marker(markerObj);
+        marker.addListener("click", () => {
+            infowindow.open({
+                anchor: marker,
+                map,
+                shouldFocus: true,
+            });
+        });
+        bounds.extend(marker.position);
+    }
     let markersArray = [];
     data.forEach((item) => {
         const location = item.latest_location;

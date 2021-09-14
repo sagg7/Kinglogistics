@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
         // EACH MONDAY AT 3AM GENERATE PAYMENTS AND CHARGES FOR CARRIERS
         $schedule->call(function () {
             $this->carrierPayments();
-        })->weekly()->mondays()->at('03:00');
+        })->weekly()->mondays()->at('00:00');
     }
 
     /**

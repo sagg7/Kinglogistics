@@ -52,8 +52,8 @@ class ChatController extends Controller
             $driver = Driver::find($driverId);
 
             $message = $this->sendMessage(
-                $content,
                 $driverId,
+                $content,
                 $userId,
                 null,
                 null,
@@ -87,8 +87,8 @@ class ChatController extends Controller
         }
 
         $message = $this->sendMessage(
-            $content,
             $driver->id,
+            $content,
             null,
             true,
             null,

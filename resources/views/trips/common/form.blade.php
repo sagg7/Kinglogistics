@@ -39,6 +39,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('rate_id', ucfirst(__('rate')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('rate_id', [], $trip->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('rate_id') ? ' is-invalid' : ''), 'disabled']) !!}
+                    @error('rate_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 @endif
             </div>
             <hr>

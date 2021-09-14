@@ -33,7 +33,9 @@
                 }
                 tbAG = new tableAG({
                     columns: [
+                        {headerName: 'Date', field: 'date'},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
+                        {headerName: 'Description', field: 'description'},
                         {headerName: 'Period', field: 'period', valueFormatter: upperFormatter},
                         {headerName: 'Carriers', field: 'carriers', valueFormatter: carriersFormatter},
                     ],

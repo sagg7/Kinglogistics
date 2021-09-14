@@ -39,4 +39,17 @@ class Rental extends Model
     {
         return $this->belongsTo(Trailer::class);
     }
+
+
+    public function inspectionItems()
+    {
+        return $this->belongsToMany('App\Models\InspectionItem', 'inspection_rental_delivery', 'rental_id', 'inspection_item_id')
+            ->withPivot(['option_value']);
+    }
+
+    public function inspectionItemsReturned()
+    {
+        return $this->belongsToMany('App\Models\InspectionItem', 'inspection_rental_return', 'rental_id', 'inspection_item_id')
+            ->withPivot(['option_value']);
+    }
 }

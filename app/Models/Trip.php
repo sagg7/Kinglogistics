@@ -35,4 +35,12 @@ class Trip extends Model
     {
         return $this->belongsTo(Shipper::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function rate(): BelongsTo
+    {
+        return $this->belongsTo(Rate::class);
+    }
 }

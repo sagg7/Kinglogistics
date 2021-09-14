@@ -2,6 +2,8 @@
 
 namespace App\Traits\Accounting;
 
+use App\Enums\CarrierPaymentEnum;
+use App\Mail\SendCarrierPayments;
 use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
@@ -12,10 +14,14 @@ use App\Models\Loan;
 use App\Models\Rate;
 use App\Models\Rental;
 use App\Models\ShipperInvoice;
+use App\Models\Trip;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
+    use CarrierPaymentsPDF;
     /**
      * @param $load_mileage
      * @param int $shipper_id
@@ -35,14 +41,18 @@ trait PaymentsAndCollection
         $flag = null;
         // If the mileage was not between the mileage of any rate find if it's lower than the lowest mileage
         if (!$rate) {
-            $rate = Rate::where('start_mileage', '>', $load_mileage)
+            $rate = Rate::where('shipper_id', $shipper_id)
+                ->where('zone_id', $zone_id)
+                ->where('start_mileage', '>', $load_mileage)
                 ->orderBy('start_mileage', 'ASC')
                 ->first();
             $flag = 'min';
         }
         // Or if it was not lower, find if it's higher than the highest mileage
         if (!$rate) {
-            $rate = Rate::where('end_mileage', '<', $load_mileage)
+            $rate = Rate::where('shipper_id', $shipper_id)
+                ->where('zone_id', $zone_id)
+                ->where('end_mileage', '<', $load_mileage)
                 ->orderBy('end_mileage', 'DESC')
                 ->first();
             $flag = 'max';
@@ -80,7 +90,8 @@ trait PaymentsAndCollection
         // If no rate has previously been queried
         if (!$rate) {
             // Save the rate to an array to possibly save further queries from happening for the same rate
-            $rates[] = $this->getRate($load_mileage, $shipper_id, $zone_id);
+            $rate = $this->getRate($load_mileage, $shipper_id, $zone_id);
+            $rates[] = $rate;
         }
         return $rate;
     }
@@ -103,47 +114,48 @@ trait PaymentsAndCollection
         $rates = [];
         $shipper_invoices = [];
         foreach ($loads as $load) {
-            $carrier_id = $load->driver->carrier_id;
+            //$carrier_id = $load->driver->carrier_id;
             $shipper_id = $load->shipper_id;
 
-            $rate = $this->handleRates($rates, $load);
-
+            $trip_pos = "trip_$load->trip_id";
             // Shipper invoices
-            if (!isset($shipper_invoices[$shipper_id])) {
-                $shipper_invoices[$shipper_id] = [
+            if (!isset($shipper_invoices[$shipper_id][$trip_pos])) {
+                $rate = Trip::with('rate')->find($load->trip_id)->rate ?? $this->handleRates($rates, $load)['rate'];
+                $shipper_invoices[$shipper_id][$trip_pos] = [
                     'load_count' => 1,
                     'loops' => 0,
+                    'rate' => $rate,
                 ];
             }
-            $loops = $shipper_invoices[$shipper_id]['loops'];
+            $loops = $shipper_invoices[$shipper_id][$trip_pos]['loops'];
             // Limits payments to 40 loads
-            if ($shipper_invoices[$shipper_id]['load_count'] === 40) {
-                $shipper_invoices[$shipper_id]['load_count'] = 0;
-                $shipper_invoices[$shipper_id]['loops']++;
+            if ($shipper_invoices[$shipper_id][$trip_pos]['load_count'] === 40) {
+                $shipper_invoices[$shipper_id][$trip_pos]['load_count'] = 0;
+                $shipper_invoices[$shipper_id][$trip_pos]['loops']++;
             }
             // Update the load counter
-            if (!$load->shipper_invoice_id) {
-                $shipper_invoices[$carrier_id]['load_groups'][$loops]['loads'][] = ['load' => $load, 'rate' => $rate];
-                $shipper_invoices[$shipper_id]['load_count']++;
-            }
+            $shipper_invoices[$shipper_id][$trip_pos]['load_groups'][$loops]['loads'][] = $load;
+            $shipper_invoices[$shipper_id][$trip_pos]['load_count']++;
         }
         $carbon_now = Carbon::now();
         foreach ($shipper_invoices as $shipper_id => $invoice) {
             // Iterate through the load grouping
-            foreach ($invoice['load_groups'] as $iteration => $group) {
-                $shipper_invoice = new ShipperInvoice();
-                $shipper_invoice->date = $carbon_now;
-                $shipper_invoice->shipper_id = $shipper_id;
-                $shipper_invoice->save();
-                $invoice_total = 0;
-                foreach ($group['loads'] as $item) {
-                    $item['load']->shipper_invoice_id = $shipper_invoice->id;
-                    $item['load']->shipper_rate = $item['rate']->shipper_rate;
-                    $item['load']->save();
-                    $invoice_total += $item['rate']->shipper_rate;
+            foreach ($invoice as $trip) {
+                foreach ($trip['load_groups'] as $group) {
+                    $shipper_invoice = new ShipperInvoice();
+                    $shipper_invoice->date = $carbon_now;
+                    $shipper_invoice->shipper_id = $shipper_id;
+                    $shipper_invoice->save();
+                    $invoice_total = 0;
+                    foreach ($group['loads'] as $item) {
+                        $item->shipper_invoice_id = $shipper_invoice->id;
+                        $item->shipper_rate = $trip['rate']->shipper_rate;
+                        $item->save();
+                        $invoice_total += $trip['rate']->shipper_rate;
+                    }
+                    $shipper_invoice->total = $invoice_total;
+                    $shipper_invoice->save();
                 }
-                $shipper_invoice->total = $invoice_total;
-                $shipper_invoice->save();
             }
         }
     }
@@ -151,6 +163,7 @@ trait PaymentsAndCollection
     private function chargeRentals()
     {
         $rentals = Rental::with('trailer')
+            ->where('status', 'rented')
             ->whereNull('finished_at')
             ->get();
 
@@ -189,6 +202,24 @@ trait PaymentsAndCollection
 
     private function carrierPayments()
     {
+        $carrier_payments = CarrierPayment::with('carrier:id,invoice_email,name')
+            ->where('status', CarrierPaymentEnum::APPROVED)
+            ->get();
+        foreach ($carrier_payments as $i => $item) {
+            if ($item->carrier->invoice_email) {
+                $emails = explode(',', $item->carrier->invoice_email);
+                try {
+                    $pdf = $this->getPDFBinary($item->id);
+                    foreach ($emails as $email) {
+                        Mail::to($email)->send(new SendCarrierPayments($pdf, $item->carrier));
+                    }
+                } catch (MpdfException $e) {
+                    continue;
+                }
+            }
+            $item->status = CarrierPaymentEnum::COMPLETED;
+            $item->save();
+        }
         $new_expenses = [];
         $charges = Charge::with('carriers')
             ->get();
@@ -212,6 +243,8 @@ trait PaymentsAndCollection
                 $new_expenses[] = [
                     "amount" => $charge->amount,
                     "description" => $charge->description,
+                    "date" => $charge->date,
+                    "gallons" => $charge->gallons,
                     "non_editable" => true,
                     "carrier_id" => $item->id,
                     "created_at" => $carbon_now,
@@ -270,9 +303,9 @@ trait PaymentsAndCollection
             ->whereHas('driver')
             ->where('status', 'finished')
             // CONDITION OF AT LEAST ONLY PAST WEEK LOADS
-            ->whereHas('loadStatus', function ($q) {
+            /*->whereHas('loadStatus', function ($q) {
                 $q->whereDate('finished_timestamp', '<=', Carbon::now()->subWeeks(1));
-            })
+            })*/
             ->with([
                 'shipper',
                 'driver.carrier',
@@ -284,7 +317,7 @@ trait PaymentsAndCollection
         foreach ($loads as $load) {
             $carrier_id = $load->driver->carrier_id;
             $carriersId[] = $carrier_id;
-            $rate = $this->handleRates($rates, $load);
+            $rate = Trip::with('rate')->find($load->trip_id)->rate ?? $this->handleRates($rates, $load)['rate'];
             // Save the load to the load set and the corresponding rate
             if (!$load->carrier_payment_id)
                 $carrier_payments[$carrier_id]['loads'][] = ['load' => $load, 'rate' => $rate];
@@ -316,19 +349,20 @@ trait PaymentsAndCollection
                 $item['load']->save();
                 $gross_amount += $item['rate']->carrier_rate;
             }
-            foreach ($payment['expenses'] as $idx => $expense) {
-                $expense_amount += $expense->amount;
-                // If the expense amount is bigger than the gross amount
-                if ($expense_amount > $gross_amount) {
-                    $expense_amount -= $expense->amount;
-                    continue;
+            if (isset($payment['expenses']))
+                foreach ($payment['expenses'] as $idx => $expense) {
+                    $expense_amount += $expense->amount;
+                    // If the expense amount is bigger than the gross amount
+                    if ($expense_amount > $gross_amount) {
+                        $expense_amount -= $expense->amount;
+                        continue;
+                    }
+                    // Save the carrier payment id to the expense
+                    $expense->carrier_payment_id = $carrier_payment->id;
+                    $expense->save();
+                    // Remove the expense from the array, the ones not removed end up as the pending expenses
+                    unset($payment['expenses'][$idx]);
                 }
-                // Save the carrier payment id to the expense
-                $expense->carrier_payment_id = $carrier_payment->id;
-                $expense->save();
-                // Remove the expense from the array, the ones not removed end up as the pending expenses
-                unset($payment['expenses'][$idx]);
-            }
             // Save the carrier payment data
             $carrier_payment->gross_amount = $gross_amount;
             $carrier_payment->reductions = $expense_amount;

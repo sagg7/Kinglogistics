@@ -10,6 +10,14 @@
                 <div class="text-center">
                     <h2 class="mb-2">Loads Status</h2>
                 </div>
+                <div class="row text-left">
+                    <div class="col col-sm-6">
+                        <fieldset class="form-group">
+                            <label for="trips">Job</label>
+                            {!! Form::select('trips', [], null, ['class' => 'form-control']) !!}
+                        </fieldset>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead>

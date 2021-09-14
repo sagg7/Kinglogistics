@@ -19,8 +19,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('driver-location-king', function ($user) {
-    // TODO: Check if user is admin
-    return (bool)$user->hasRole('admin');
+    return (bool)$user->hasRole(['admin', 'operations', 'dispatch']);
 });
 
 Broadcast::channel('driver-location-carrier.{locationGroupId}', function ($carrier, $carrier_id) {
@@ -35,7 +34,10 @@ Broadcast::channel('driver-location-shipper.{locationGroupId}', function ($shipp
 });
 
 Broadcast::channel('chat', function ($user) {
-    // TODO: Check if user is admin
-    return (bool)$user->hasRole('admin');
+    return (bool)$user->hasRole(['admin', 'operations', 'dispatch']);
+});
+
+Broadcast::channel('load-status-update', function ($user) {
+    return $user;
 });
 

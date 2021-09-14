@@ -33,8 +33,8 @@ class IncidentController extends Controller
             'sanction' => ['required'],
             'date_submit' => ['required', 'date'],
             'location' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:512'],
-            'excuse' => ['required', 'string', 'max:512'],
+            'description' => ['required', 'string', 'max:1024'],
+            'excuse' => ['required', 'string', 'max:1024'],
         ]);
     }
 
@@ -58,7 +58,10 @@ class IncidentController extends Controller
      */
     public function index()
     {
-        return view('incidents.index');
+        if (auth()->guard('shipper')->check())
+            return view('subdomains.shippers.incidents.index');
+        else
+            return view('incidents.index');
     }
 
     /**
@@ -200,6 +203,18 @@ class IncidentController extends Controller
             "incidents.user_id",
             "incidents.sanction",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check()) {
+                    $q->whereHas("incident_type", function ($q) {
+                        $q->whereNotNull('visible');
+                    })
+                        ->whereHas('trailer', function ($q) {
+                            $q->whereHas('shippers', function ($q) {
+                                $q->where('id', auth()->user()->id);
+                            });
+                        });
+                }
+            })
             ->with([
                 'incident_type:id,name',
                 'carrier:id,name',
@@ -242,6 +257,18 @@ class IncidentController extends Controller
             "user",
             "incident_type",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check()) {
+                    $q->whereHas("incident_type", function ($q) {
+                        $q->whereNotNull('visible');
+                    })
+                        ->whereHas('trailer', function ($q) {
+                            $q->whereHas('shippers', function ($q) {
+                                $q->where('id', auth()->user()->id);
+                            });
+                        });
+                }
+            })
             ->findOrFail($id)
             ->toArray();
 

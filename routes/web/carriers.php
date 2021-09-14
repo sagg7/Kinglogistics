@@ -33,6 +33,8 @@ Route::prefix('carrier')->group(function () {
 
         Route::post('complete/{id}', [CarrierPaymentController::class, 'complete'])
             ->name('carrier.completePayment');
+        Route::post('approve/{id}', [CarrierPaymentController::class, 'approve'])
+            ->name('carrier.approvePayment');
         Route::post('payCharges/{id}', [CarrierPaymentController::class, 'payCharges'])
             ->name('carrier.payCharges');
     });

@@ -16,8 +16,15 @@ class Timezone
      */
     public function handle(Request $request, Closure $next)
     {
-        if (session('timezone'))
-            date_default_timezone_set(session('timezone'));
+        $prefix = $request->route()->action["prefix"];
+        switch ($prefix) {
+            case '/chat':
+                break;
+            default:
+                if (session('timezone'))
+                    date_default_timezone_set(session('timezone'));
+                break;
+        }
         return $next($request);
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('report')->group(function () {
     Route::get('historical', [ReportController::class, 'historical'])
-        ->name('rental.historical');
+        ->name('report.historical');
     Route::get('historicalData', [ReportController::class, 'historicalData'])
-        ->name('rental.historicalData');
+        ->name('report.historicalData');
 });

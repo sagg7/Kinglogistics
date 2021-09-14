@@ -26,6 +26,17 @@
                             <input id="fine" class="form-control" name="fine" type="text">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Show shipper</label>
+                        <div class="vs-checkbox-con vs-checkbox-primary">
+                            {{ Form::checkbox('show_shipper', 1) }}
+                            <span class="vs-checkbox">
+                                <span class="vs-checkbox--check">
+                                    <i class="vs-icon feather icon-check"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
 
                 </div>
 
