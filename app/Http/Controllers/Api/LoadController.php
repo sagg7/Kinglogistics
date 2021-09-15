@@ -184,10 +184,10 @@ class LoadController extends Controller
         $loadId = $request->get('load_id');
 
         // Register load rejection
-        RejectedLoad::create([
+       /* RejectedLoad::create([ // remove for test only
             'load_id' => $loadId,
             'driver_id' => $driver->id,
-        ]);
+        ]);*/
 
         $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
 
