@@ -241,7 +241,7 @@ class CarrierPaymentController extends Controller
                     ->whereNull('carrier_payment_id');
             });
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 
     /**

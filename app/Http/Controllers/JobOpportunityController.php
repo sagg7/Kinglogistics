@@ -161,6 +161,6 @@ class JobOpportunityController extends Controller
             "job_opportunities.title",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

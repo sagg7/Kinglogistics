@@ -196,23 +196,23 @@ class RentalController extends Controller
         ])
             ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number']);
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'carrier':
                     case 'driver':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     case 'trailer':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('number', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'numer',
+                        ];
                         break;
                     default:
                         $searchable[] = $item;
@@ -222,7 +222,7 @@ class RentalController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, []);
     }
 
     /**

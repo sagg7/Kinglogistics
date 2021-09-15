@@ -227,6 +227,6 @@ class TrailerController extends Controller
         ])
             ->with(['trailer_type:id,name']);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

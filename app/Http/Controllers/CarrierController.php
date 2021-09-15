@@ -209,6 +209,6 @@ class CarrierController extends Controller
             "carriers.phone",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

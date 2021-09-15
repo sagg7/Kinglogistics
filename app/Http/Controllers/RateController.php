@@ -194,18 +194,18 @@ class RateController extends Controller
                 'zone:id,name',
             ]);
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'rate_group':
                     case 'shipper':
                     case 'zone':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -215,6 +215,6 @@ class RateController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 }

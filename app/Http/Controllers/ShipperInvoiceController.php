@@ -123,7 +123,7 @@ class ShipperInvoiceController extends Controller
                 $emails = explode(',', $item->shipper->invoice_email);
                 try {
                     $xlsx = Excel::raw(new ShipperInvoiceExport($item->id), \Maatwebsite\Excel\Excel::XLSX);
-                    $pdf = $this->getPDFBinary($item->id);
+                    $pdf = Excel::raw(new ShipperInvoiceExport($item->id), \Maatwebsite\Excel\Excel::MPDF);
                     foreach ($emails as $email) {
                         Mail::to($email)->send(new SendShipperInvoices($item->shipper, $xlsx, $pdf));
                     }

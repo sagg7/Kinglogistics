@@ -166,6 +166,6 @@ class ZoneController extends Controller
             "zones.name",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }
