@@ -88,12 +88,12 @@ class ShiftController extends Controller
         }
 
         // Check if the user can activate its shift, checking current time compared to assigned turn time range
-        if (!$driver->canActiveShift()) {
+        /*if (!$driver->canActiveShift()) { //diable for prefil
             return response([
                 'status' => 'error',
                 'message' => __('Your turn is out of time range')
             ], 400);
-        }
+        }*/
 
         // Create a Shift instance just to retrieve the fillable fields
         $shift = new Shift();
