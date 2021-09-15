@@ -35,6 +35,8 @@ Route::prefix('shipper')->group(function () {
             ->name('invoice.downloadPaymentXLSX');
 
         Route::post('complete/{id}', [ShipperInvoiceController::class, 'complete'])
-            ->name('invoice.completePayment');
+            ->name('invoice.complete');
+        Route::post('completeAll', [ShipperInvoiceController::class, 'completeAll'])
+            ->name('invoice.completeAll');
     });
 });
