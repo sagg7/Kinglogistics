@@ -107,7 +107,7 @@
         allowClear: true,
     });
 
-    $('form').submit((e) => {
+    $('#messageForm').submit((e) => {
         e.preventDefault();
         const form = $(e.currentTarget),
             message = JSON.stringify(quill.getContents());
