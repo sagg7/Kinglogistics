@@ -23,7 +23,7 @@ mix.sass('resources/sass/app.scss', 'public/css')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
     //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
-    .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
+    //.scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
     //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
     //.js('resources/js/app.js', 'public/js')
     // Common
@@ -34,7 +34,7 @@ mix.sass('resources/sass/app.scss', 'public/css')
     //.js('resources/js/common/initSignature.js', 'public/js/common/initSignature.min.js?1.0.0')
     //.js('resources/js/broadcasting-test.js', 'public/js/broadcasting-test.js')
     // Sections
-    //.scripts(['resources/js/sections/safetyMessages/common.js'], 'public/js/sections/safetyMessages/common.min.js')
+    .scripts(['resources/js/sections/safetyMessages/common.js'], 'public/js/sections/safetyMessages/common.min.js')
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
     //.scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
