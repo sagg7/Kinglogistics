@@ -271,6 +271,7 @@ class LoadController extends Controller
         $load = Load::find($loadId);
         $load->customer_reference = $request->get('sand_ticket');
         $load->weight = $request->get('weight');
+        $load->silo_number = $request->get('silo_number');
         $load->tons = floatval($request->get('weight'))/2000;
         $load->update();
 
