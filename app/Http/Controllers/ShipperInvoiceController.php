@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ShipperInvoiceEnum;
+use App\Exports\ShipperInvoiceExport;
+use App\Mail\SendShipperInvoices;
 use App\Models\ShipperInvoice;
+use App\Traits\Accounting\ShipperInvoicesPDF;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
-use Mpdf\Mpdf;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+use Mpdf\MpdfException;
 
 class ShipperInvoiceController extends Controller
 {
-    use GetSimpleSearchData;
+    use GetSimpleSearchData, ShipperInvoicesPDF;
+
     /**
      * Display a listing of the resource.
      *
@@ -17,6 +24,7 @@ class ShipperInvoiceController extends Controller
      */
     public function index()
     {
+
         return view('shipperInvoices.index');
     }
 
@@ -88,10 +96,44 @@ class ShipperInvoiceController extends Controller
 
     public function complete($id)
     {
-        $invoice = ShipperInvoice::findOrFail($id);
-        $invoice->status = 'completed';
+        $payment = ShipperInvoice::with('shipper:id,invoice_email,name')->findOrFail($id);
 
-        return ['success' => $invoice->save()];
+        $emails = explode(',', $payment->shipper->invoice_email);
+        try {
+            $xlsx = Excel::raw(new ShipperInvoiceExport($payment->id), \Maatwebsite\Excel\Excel::XLSX);
+            $pdf = Excel::raw(new ShipperInvoiceExport($id), \Maatwebsite\Excel\Excel::MPDF);
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new SendShipperInvoices($payment->shipper, $xlsx, $pdf));
+            }
+        } catch (MpdfException $e) {
+        }
+        $payment->status = ShipperInvoiceEnum::COMPLETED;
+        $payment->save();
+
+        return ['success' => $payment->save()];
+    }
+
+    public function completeAll()
+    {
+        $invoices = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->where('status', ShipperInvoiceEnum::PENDING)
+            ->get();
+        foreach ($invoices as $item) {
+            if ($item->shipper->invoice_email) {
+                $emails = explode(',', $item->shipper->invoice_email);
+                try {
+                    $xlsx = Excel::raw(new ShipperInvoiceExport($item->id), \Maatwebsite\Excel\Excel::XLSX);
+                    $pdf = Excel::raw(new ShipperInvoiceExport($item->id), \Maatwebsite\Excel\Excel::MPDF);
+                    foreach ($emails as $email) {
+                        Mail::to($email)->send(new SendShipperInvoices($item->shipper, $xlsx, $pdf));
+                    }
+                } catch (MpdfException $e) {
+                    continue;
+                }
+            }
+            $item->status = ShipperInvoiceEnum::COMPLETED;
+            $item->save();
+        }
     }
 
     /**
@@ -119,16 +161,16 @@ class ShipperInvoiceController extends Controller
                 }
             });
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'shipper':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -138,7 +180,7 @@ class ShipperInvoiceController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 
     /**
@@ -148,27 +190,11 @@ class ShipperInvoiceController extends Controller
      */
     public function downloadPDF($id)
     {
-        $shipperInvoice = ShipperInvoice::with([
-            'shipper:id,name',
-            'loads.driver.truck',
-        ])
-            ->findOrFail($id);
+        return (new ShipperInvoiceExport($id, \Maatwebsite\Excel\Excel::MPDF))->download();
+    }
 
-        $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
-
-        $title = "Shipper Invoice - " . $shipperInvoice->date->format('m/d/Y');
-        $html = view('exports.shipperInvoices.pdf', compact('title', 'shipperInvoice'));
-        $orientation = 'L';
-        $mpdf->AddPage($orientation, // L - landscape, P - portrait
-            '', '', '', '',
-            5, // margin_left
-            5, // margin right
-            22, // margin top
-            22, // margin bottom
-            3, // margin header
-            0); // margin footer
-        $mpdf->WriteHTML($html);
-        return $mpdf->Output();
+    public function downloadXLSX($id)
+    {
+        return (new ShipperInvoiceExport($id))->download();
     }
 }

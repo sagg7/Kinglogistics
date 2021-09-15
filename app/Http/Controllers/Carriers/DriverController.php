@@ -205,22 +205,22 @@ class DriverController extends Controller
             ->where('carrier_id', auth()->user()->id)
             ->with('truck:driver_id,number', 'zone:id,name');
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'zone':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     case 'truck':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('number', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'number',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -230,6 +230,6 @@ class DriverController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 }

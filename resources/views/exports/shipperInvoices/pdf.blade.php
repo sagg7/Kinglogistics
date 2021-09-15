@@ -5,7 +5,7 @@
         <h6>Date Invoiced: {{ $shipperInvoice->date->format('m/d/Y') }}</h6>
     </div>
     <div class="text-center">
-        <h3><strong>{{ strtoupper($shipperInvoice->shipper->name) }}</strong></h3>
+        <h3><strong>{{ $broker->name }}</strong></h3>
         <h3>WEEK ENDING: {{ $shipperInvoice->date->endOfWeek()->format('m/d/Y') }}</h3>
         <h3>INVOICE #: {{ $shipperInvoice->id }}</h3>
     </div>

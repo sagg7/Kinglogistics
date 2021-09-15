@@ -11,9 +11,7 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var penChargesTable,
-                comChargesTable,
-                penInvoicesTable,
+            var penInvoicesTable,
                 comInvoicesTable;
             (() => {
                 const moneyFormatter = (params) => {
@@ -40,7 +38,8 @@
                     columns: invoicesColumns,
                     menu: [
                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
-                        {text: 'Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-check-circle', menuData: {title: 'Set status as a completed invoice?'}},
+                        {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
+                        {text: 'Send Email & Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-paper-plane', menuData: {title: 'Confirm sending email to shipper?'}},
                     ],
                     container: 'pendingInvoicesGrid',
                     url: '/shipper/invoice/search/pending',
@@ -59,6 +58,7 @@
                                     columns: invoicesColumns,
                                     menu: [
                                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
+                                        {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
                                     ],
                                     container: 'completedInvoicesGrid',
                                     url: '/shipper/invoice/search/completed',
@@ -67,11 +67,46 @@
                             break;
                     }
                 });
+                $('#completeAll').click((e) => {
+                    e.preventDefault();
+                    if (penInvoicesTable.dataSource.data.rows.length > 0)
+                        confirmMsg({
+                            config: {title: 'Send emails for all pending invoices and set status as complete?'},
+                            onConfirm: () => {
+                                $.ajax({
+                                    url: '/shipper/invoice/completeAll',
+                                    type: 'POST',
+                                    success: () => {
+                                        penInvoicesTable.updateSearchQuery();
+                                        if (comInvoicesTable)
+                                            comInvoicesTable.updateSearchQuery();
+                                    },
+                                    error: () => {
+                                        throwErrorMsg();
+                                    }
+                                });
+                            }
+                        });
+                    else
+                        throwErrorMsg('There are no pending invoices');
+                });
             })();
         </script>
     @endsection
     @component('components.nav-pills-form', ['pills' => [['name' => 'Pending Invoices', 'pane' => 'pending-invoices'],['name' => 'Completed Invoices', 'pane' => 'completed-invoices']]])
         <div role="tabpanel" class="tab-pane active" id="pending-invoices" aria-labelledby="pending-invoices" aria-expanded="true">
+            <div class="row">
+                <div class="col-6 offset-6">
+                    <div class="dropdown float-right">
+                        <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                            <a class="dropdown-item" id="completeAll"><i class="fas fa-paper-plane"></i> Send Emails & Complete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="pendingInvoicesGrid"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="completed-invoices" aria-labelledby="pending-invoices" aria-expanded="true">

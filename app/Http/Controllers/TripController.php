@@ -95,7 +95,7 @@ class TripController extends Controller
         else
             $trip = new Trip();
 
-        $shipper = auth()->guard('shipper') ? auth()->guard()->user()->id : $request->shipper_id;
+        $shipper = auth()->guard('shipper')->check() ? auth()->guard()->user()->id : $request->shipper_id;
 
         $trip->zone_id = $request->zone_id;
         $trip->shipper_id = $shipper;
@@ -144,8 +144,8 @@ class TripController extends Controller
             }
         ])
             ->where(function ($q) {
-                if (auth()->guard('shipper'))
-                    $q->where('shipper_id', auth()->guard()->user()->id);
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
             })
             ->findOrFail($id);
         $params = compact('trip') + $this->createEditParams();
@@ -245,17 +245,17 @@ class TripController extends Controller
                 break;
         }
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'zone':
                     case 'shipper':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -265,6 +265,6 @@ class TripController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 }

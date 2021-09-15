@@ -1,7 +1,7 @@
 <x-pdf-layout>
     <x-slot name="title">{{ $title }}</x-slot>
     <div class="text-center">
-        <h3>{{ strtoupper($carrierPayment->carrier->name) }}</h3>
+        <h3><strong>{{ strtoupper($carrierPayment->carrier->name) }}</strong></h3>
         <h3>{{ $title }}</h3>
     </div>
     <div>
@@ -32,7 +32,7 @@
                 <td>{{ $load->control_number }}</td>
                 <td>{{ $load->bol }}</td>
                 <td>{{ $load->mileage }}</td>
-                <td>${{ number_format($load->rate, 2) }}</td>
+                <td style="text-align: left;">${{ number_format($load->rate, 2) }}</td>
             </tr>
             @endforeach
             <tr>
@@ -41,19 +41,19 @@
             <tr>
                 <td colspan="8"></td>
                 <td style="text-align: right; padding-right: 10px;">Subtotal</td>
-                <td>${{ number_format($carrierPayment->gross_amount, 2) }}</td>
+                <td style="text-align: left;">${{ number_format($carrierPayment->gross_amount, 2) }}</td>
             </tr>
             @foreach($carrierPayment->expenses as $expense)
             <tr>
                 <td colspan="6"></td>
                 <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $expense->description }}</td>
-                <td>$({{ number_format($expense->amount, 2) }})</td>
+                <td style="text-align: left;">$({{ number_format($expense->amount, 2) }})</td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="6"></td>
                 <td colspan="3" style="text-align: right; padding-right: 10px;"><strong>Total</strong></td>
-                <td><strong>${{ number_format($carrierPayment->total, 2) }}</strong></td>
+                <td style="text-align: left;"><strong>${{ number_format($carrierPayment->total, 2) }}</strong></td>
             </tr>
             </tbody>
         </table>

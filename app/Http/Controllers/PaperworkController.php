@@ -167,7 +167,7 @@ class PaperworkController extends Controller
         ])
             ->where('type', $type);
 
-        return $this->simpleSearchData($query, $request, "where", true);
+        return $this->multiTabSearchData($query, $request);
     }
 
     public function storeFiles(Request $request)
@@ -386,7 +386,7 @@ class PaperworkController extends Controller
         $title = $paperwork->name;
 
         $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
+        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
         $html = view('exports.paperwork.template', compact('title', 'html'));
         $mpdf->AddPage('', // L - landscape, P - portrait
             '', '', '', '',

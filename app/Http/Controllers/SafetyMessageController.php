@@ -24,6 +24,7 @@ class SafetyMessageController extends Controller
         return Validator::make($data, [
             'carrier' => ['required', 'exists:carriers,id'],
             'zone' => ['required', 'exists:zones,id'],
+            'driver' => ['nullable', 'exists:drivers,id'],
             'title' => ['required', 'max:255'],
             'message' => ['required'],
         ]);
@@ -186,6 +187,6 @@ class SafetyMessageController extends Controller
             "safety_messages.title",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

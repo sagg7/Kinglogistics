@@ -222,19 +222,19 @@ class IncidentController extends Controller
                 'user:id,name',
             ]);
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'carrier':
                     case 'driver':
                     case 'user':
                     case 'incident_type':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -244,7 +244,7 @@ class IncidentController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 
     public function downloadPDF($id)
@@ -273,7 +273,7 @@ class IncidentController extends Controller
             ->toArray();
 
         $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/logo.png') . ' alt="Logo"></div>');
+        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
         $title = "Violation Report Form";
         $html = view('exports.incidents.pdf', compact('title', 'incident'));
         $mpdf->AddPage('', // L - landscape, P - portrait

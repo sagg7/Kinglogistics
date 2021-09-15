@@ -2,33 +2,35 @@
 
 namespace App\Traits\Accounting;
 
-use App\Models\CarrierPayment;
+use App\Models\Broker;
+use App\Models\ShipperInvoice;
 use Mpdf\Mpdf;
 
-trait CarrierPaymentsPDF
+trait ShipperInvoicesPDF
 {
+    protected $broker_id;
+
+    public function __construct()
+    {
+        $this->broker_id = 1;
+    }
+
     private function generatePDF($id)
     {
-        $carrierPayment = CarrierPayment::with([
-            'carrier:id,name',
+        $shipperInvoice = ShipperInvoice::with([
+            'shipper:id,name',
             'loads.driver.truck',
-            'expenses',
         ])
             ->findOrFail($id);
+
+        $broker = Broker::findOrFail($this->broker_id);
 
         $mpdf = new Mpdf();
         $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
 
-        $title = $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
-        if ($carrierPayment->status === "charges") {
-            $title = "PAID CHARGES WEEK " . $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
-            $html = view('exports.carrierPayments.chargesPdf', compact('title', 'carrierPayment'));
-            $orientation = 'P';
-        } else {
-            $title = "PAYMENT WEEK " . $title;
-            $html = view('exports.carrierPayments.pdf', compact('title', 'carrierPayment'));
-            $orientation = 'L';
-        }
+        $title = "Shipper Invoice - " . $shipperInvoice->shipper->name ."  - " . $shipperInvoice->date->format('m/d/Y');
+        $html = view('exports.shipperInvoices.pdf', compact('title', 'shipperInvoice', 'broker'));
+        $orientation = 'L';
         $mpdf->AddPage($orientation, // L - landscape, P - portrait
             '', '', '', '',
             5, // margin_left

@@ -181,6 +181,6 @@ class IncidentTypeController extends Controller
         if (auth()->guard('shipper')->check())
             $query->where('shipper_id', auth()->user()->id);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

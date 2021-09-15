@@ -4,7 +4,7 @@
         <script>
             const guard = 'carrier';
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.1') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.2') }}"></script>
     @endsection
 
     @section('modals')

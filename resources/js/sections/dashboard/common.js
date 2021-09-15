@@ -93,7 +93,7 @@
         e.preventDefault();
         e.stopPropagation();
         const heading = $(e.currentTarget),
-            id = heading.attr('id').split('_')[0];
+            id = heading.attr('id').split('_summary')[0];
         const status = loadSummary.find(obj => obj.status === id);
         if (status)
                 showStatusModal(status);

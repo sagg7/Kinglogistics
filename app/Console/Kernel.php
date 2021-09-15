@@ -29,7 +29,8 @@ class Kernel extends ConsoleKernel
         // DAILY CHECK IF NEEDED TO BE
         $schedule->call(function () {
             $this->chargeRentals();
-        })->daily()->at('02:00');
+            $this->shipperInvoices();
+        })->daily()->at('00:00');
 
         // EACH MONDAY AT 3AM GENERATE PAYMENTS AND CHARGES FOR CARRIERS
         $schedule->call(function () {

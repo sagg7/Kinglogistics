@@ -176,6 +176,6 @@ class LoadTypeController extends Controller
             "load_types.name",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

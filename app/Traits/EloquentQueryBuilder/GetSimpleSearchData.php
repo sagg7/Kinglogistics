@@ -47,14 +47,14 @@ trait GetSimpleSearchData
         return response()->json($params);
     }
 
-    private function multiTabSearchData($query, $request, $relationships = [])
+    private function multiTabSearchData($query, $request, $relationships = [], $mainStatement = 'where')
     {
         // Skip-Take data
         $take = $request->endRow;
         $current = $request->startRow / $take;
         $skip = $take * $current;
 
-        $query->where(function ($q) use ($request, $relationships) {
+        $query->$mainStatement(function ($q) use ($request, $relationships) {
             if ($request->filterModel)
                 foreach ($request->filterModel as $key => $item) {
                     $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
