@@ -171,6 +171,6 @@ class TrailerTypeController extends Controller
             "trailer_types.name",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }

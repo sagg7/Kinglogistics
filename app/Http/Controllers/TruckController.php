@@ -254,22 +254,22 @@ class TruckController extends Controller
             })
             ->with(['driver:id,name', 'trailer:id,number']);
 
+        $relationships = [];
         if ($request->searchable) {
             $searchable = [];
-            $statement = "whereHas";
             foreach ($request->searchable as $item) {
                 switch ($item) {
                     case 'driver':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('name', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'name',
+                        ];
                         break;
                     case 'trailer':
-                        $query->$statement($item, function ($q) use ($request) {
-                            $q->where('number', 'LIKE', "%$request->search%");
-                        });
-                        $statement = "orWhereHas";
+                        $relationships[] = [
+                            'relation' => $item,
+                            'column' => 'number',
+                        ];
                         break;
                     default:
                         $searchable[count($searchable) + 1] = $item;
@@ -279,6 +279,6 @@ class TruckController extends Controller
             $request->searchable = $searchable;
         }
 
-        return $this->simpleSearchData($query, $request, 'orWhere');
+        return $this->multiTabSearchData($query, $request, $relationships);
     }
 }

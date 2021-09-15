@@ -167,7 +167,7 @@ class PaperworkController extends Controller
         ])
             ->where('type', $type);
 
-        return $this->simpleSearchData($query, $request, "where", true);
+        return $this->multiTabSearchData($query, $request);
     }
 
     public function storeFiles(Request $request)

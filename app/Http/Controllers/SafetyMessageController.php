@@ -187,6 +187,6 @@ class SafetyMessageController extends Controller
             "safety_messages.title",
         ]);
 
-        return $this->simpleSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request);
     }
 }
