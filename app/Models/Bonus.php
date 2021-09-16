@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Charge extends Model
+class Bonus extends Model
 {
     use HasFactory;
 
@@ -22,8 +22,8 @@ class Charge extends Model
     /**
      * @return BelongsTo
      */
-    public function charge_type(): BelongsTo
+    public function bonus_type(): BelongsTo
     {
-        return $this->belongsTo(ChargeType::class);
+        return $this->belongsTo(BonusType::class);
     }
 }

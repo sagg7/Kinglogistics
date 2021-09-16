@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChargeController;
+use App\Http\Controllers\ChargeTypeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('charge')->group(function () {
@@ -22,4 +23,13 @@ Route::prefix('charge')->group(function () {
         ->name('charge.update');
     Route::post('delete/{id}', [ChargeController::class, 'destroy'])
         ->name('charge.delete');
+
+    Route::prefix('type')->group(function () {
+        Route::post('store', [ChargeTypeController::class, 'store'])
+            ->name('chargeType.store');
+        Route::get('selection', [ChargeTypeController::class, 'selection'])
+            ->name('chargeType.selection');
+        Route::post('delete/{id?}', [ChargeTypeController::class, 'destroy'])
+            ->name('chargeType.delete');
+    });
 });

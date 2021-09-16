@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Carrier;
-use App\Models\Charge;
-use App\Models\ChargeType;
+use App\Models\Bonus;
+use App\Models\BonusType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class ChargeController extends Controller
+class BonusController extends Controller
 {
     use GetSimpleSearchData;
 
@@ -22,8 +21,7 @@ class ChargeController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'type' => ['required', 'exists:charge_types,id'],
-            'period' => ['required'],
+            'type' => ['required', 'exists:bonus_types,id'],
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
@@ -36,8 +34,7 @@ class ChargeController extends Controller
     private function createEditParams(): array
     {
         return [
-            'periods' => [null => '', 'single' => 'Single', 'weekly' => 'Weekly'],
-            'types' => [null => ''] + ChargeType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + BonusType::pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -50,21 +47,19 @@ class ChargeController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $charge = Charge::findOrFail($id);
+                $bonus = Bonus::findOrFail($id);
             else
-                $charge = new Charge();
+                $bonus = new Bonus();
 
-            $charge->charge_type_id = $request->type;
-            $charge->amount = $request->amount;
-            $charge->description = $request->description;
-            $charge->period = $request->period;
-            $charge->date = $request->date;
-            $charge->gallons = $request->gallons;
-            $charge->save();
+            $bonus->bonus_type_id = $request->type;
+            $bonus->amount = $request->amount;
+            $bonus->description = $request->description;
+            $bonus->date = $request->date;
+            $bonus->save();
 
-            $charge->carriers()->sync($request->carriers);
+            $bonus->carriers()->sync($request->carriers);
 
-            return $charge;
+            return $bonus;
         });
     }
 
@@ -75,7 +70,7 @@ class ChargeController extends Controller
      */
     public function index()
     {
-        return view('charges.index');
+        return view('bonuses.index');
     }
 
     /**
@@ -86,14 +81,7 @@ class ChargeController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-        return view('charges.create', $params);
-    }
-
-    public function diesel()
-    {
-        $carriers = Carrier::pluck('name', 'id')->toArray();
-        $params = compact('carriers');
-        return view('charges.diesel', $params);
+        return view('bonuses.create', $params);
     }
 
     /**
@@ -109,34 +97,7 @@ class ChargeController extends Controller
         $request->date = $request->date_submit;
         $this->storeUpdate($request);
 
-        return redirect()->route('charge.index');
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function storeDiesel(Request $request)
-    {
-        foreach ($request->diesel as $carrier_id => $item) {
-
-            if (!$item || !is_numeric($item))
-                continue;
-            $innerRequest = new Request();
-            $innerRequest->setMethod('POST');
-            $innerRequest->request->add(['carriers' => [$carrier_id]]);
-            $innerRequest->request->add(['amount' => $item]);
-            $innerRequest->request->add(['period' => 'single']);
-            $innerRequest->request->add(['date' => $request->date[$carrier_id]]);
-            $innerRequest->request->add(['gallons' => $request->gallons[$carrier_id]]);
-            $innerRequest->request->add(['description' => 'Diesel charge.']);
-
-            //$this->validator($innerRequest->toArray());
-
-            $this->storeUpdate($innerRequest);
-        }
-
-        return redirect()->route('charge.index');
+        return redirect()->route('bonus.index');
     }
 
     /**
@@ -158,9 +119,9 @@ class ChargeController extends Controller
      */
     public function edit(int $id)
     {
-        $charge = Charge::findOrFail($id);
-        $params = compact('charge') + $this->createEditParams();
-        return view('charges.edit', $params);
+        $bonus = Bonus::findOrFail($id);
+        $params = compact('bonus') + $this->createEditParams();
+        return view('bonuses.edit', $params);
     }
 
     /**
@@ -178,7 +139,7 @@ class ChargeController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('charge.index');
+        return redirect()->route('bonus.index');
     }
 
     /**
@@ -189,7 +150,7 @@ class ChargeController extends Controller
      */
     public function destroy(int $id)
     {
-        $expense = Charge::findOrFail($id);
+        $expense = Bonus::findOrFail($id);
 
         if ($expense)
             return ['success' => $expense->delete()];
@@ -205,11 +166,11 @@ class ChargeController extends Controller
     {
         switch ($item) {
             case 'carriers':
-            case 'charge_type':
-                    $array = [
-                        'relation' => $item,
-                        'column' => 'name',
-                    ];
+            case 'bonus_type':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
                 break;
             default:
                 $array = null;
@@ -225,17 +186,16 @@ class ChargeController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Charge::select([
-            "charges.id",
-            "charges.charge_type_id",
-            "charges.amount",
-            "charges.period",
-            "charges.description",
-            DB::raw('DATE_FORMAT(charges.date, \'%m-%d-%Y\') AS date'),
+        $query = Bonus::select([
+            "bonuses.id",
+            "bonuses.bonus_type_id",
+            "bonuses.amount",
+            "bonuses.description",
+            DB::raw('DATE_FORMAT(bonuses.date, \'%m-%d-%Y\') AS date'),
         ])
             ->with([
                 'carriers:id,name',
-                'charge_type:id,name',
+                'bonus_type:id,name',
             ]);
 
         if ($request->searchable) {
