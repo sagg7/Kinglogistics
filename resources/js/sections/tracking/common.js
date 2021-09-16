@@ -9,7 +9,7 @@
         const info = (data.shippers.name ? `<p><strong>Shipper:</strong> ${data.shippers.name}</p>` : '') +
             `<p><strong>Status:</strong> ${capitalizeStatus(data.status)}<br>` +
             (data.load.origin ? `<strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` : '') +
-            `<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
+            //`<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
             `<strong>Truck#:</strong> ${data.truck.number}</p>` +
             `<strong>MPH:</strong> 0</p>`;
