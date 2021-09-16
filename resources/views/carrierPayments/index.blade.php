@@ -89,7 +89,7 @@
                                 penChargesTable = new tableAG({
                                     columns: [
                                         {headerName: 'Carrier', field: 'name'},
-                                        {headerName: 'Amount', field: 'amount', filter:false, valueFormatter: expensesFormatter},
+                                        {headerName: 'Amount', field: 'amount', filter:false, sortable: false, valueFormatter: expensesFormatter},
                                     ],
                                     menu: [
                                         {text: 'List', route: '#view-expenses', icon: 'far fa-eye', modal: true},

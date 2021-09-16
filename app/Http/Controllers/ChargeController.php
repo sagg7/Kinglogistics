@@ -194,6 +194,27 @@ class ChargeController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'carriers':
+                    $array = [
+                        'relation' => $item,
+                        'column' => 'name',
+                    ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -208,28 +229,13 @@ class ChargeController extends Controller
         ])
             ->with('carriers:id,name');
 
-        $relationships = [];
         if ($request->searchable) {
-            $searchable = [];
             foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'carriers':
-                        if (strtolower($request->search) == "all")
-                            $query->whereDoesntHave('carriers');
-                        else
-                            $relationships[] = [
-                                'relation' => $item,
-                                'column' => 'name',
-                            ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
+                if ($item === 'carriers' && strtolower($request->search) == "all")
+                    $query->whereDoesntHave('carriers');
             }
-            $request->searchable = $searchable;
         }
 
-        return $this->multiTabSearchData($query, $request, $relationships, 'orWhere');
+        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
     }
 }

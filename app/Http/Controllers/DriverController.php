@@ -7,6 +7,7 @@ use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
+use function Clue\StreamFilter\fun;
 
 class DriverController extends Controller
 {
@@ -48,6 +49,42 @@ class DriverController extends Controller
             ->with('truck.trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);
+    }
+
+    /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'shift':
+            case 'zone':
+            case 'carrier':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            case 'truck':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'number',
+                ];
+                break;
+            case 'latest_load':
+                $array = [
+                    'relation' => 'latestLoad',
+                    'result_relation' => $item,
+                    'column' => 'status',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
     }
 
     /**
@@ -102,38 +139,6 @@ class DriverController extends Controller
                 break;
         }
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'zone':
-                    case 'carrier':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    case 'truck':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'number',
-                        ];
-                        break;
-                    case 'latest_load':
-                        $relationships[] = [
-                            'relation' => 'latestLoad',
-                            'column' => 'status',
-                        ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, $relationships);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

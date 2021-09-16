@@ -192,6 +192,32 @@ class DriverController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'zone':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            case 'truck':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'number',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -205,31 +231,6 @@ class DriverController extends Controller
             ->where('carrier_id', auth()->user()->id)
             ->with('truck:driver_id,number', 'zone:id,name');
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'zone':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    case 'truck':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'number',
-                        ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, $relationships);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

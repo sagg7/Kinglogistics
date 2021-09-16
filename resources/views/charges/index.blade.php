@@ -37,7 +37,7 @@
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                         {headerName: 'Description', field: 'description'},
                         {headerName: 'Period', field: 'period', valueFormatter: upperFormatter},
-                        {headerName: 'Carriers', field: 'carriers', valueFormatter: carriersFormatter},
+                        {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
                         {text: 'Edit', route: '/charge/edit', icon: 'feather icon-edit'},
