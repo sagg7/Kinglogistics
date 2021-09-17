@@ -173,6 +173,29 @@ class RateController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'rate_group':
+            case 'shipper':
+            case 'zone':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -194,27 +217,6 @@ class RateController extends Controller
                 'zone:id,name',
             ]);
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'rate_group':
-                    case 'shipper':
-                    case 'zone':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, $relationships);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

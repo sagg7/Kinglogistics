@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Expense;
-use App\Models\ExpenseType;
+use App\Models\Bonus;
+use App\Models\BonusType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class ExpenseController extends Controller
+class BonusController extends Controller
 {
     use GetSimpleSearchData;
 
@@ -22,7 +21,8 @@ class ExpenseController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'type' => ['required', 'exists:expense_types,id'],
+            'type' => ['required', 'exists:bonus_types,id'],
+            'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
         ]);
@@ -34,31 +34,33 @@ class ExpenseController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + ExpenseType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + BonusType::pluck('name', 'id')->toArray(),
         ];
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return Expense
+     * @return mixed
      */
-    private function storeUpdate(Request $request, $id = null): Expense
+    private function storeUpdate(Request $request, $id = null)
     {
-        if ($id)
-            $expense = Expense::findOrFail($id);
-        else
-            $expense = new Expense();
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $bonus = Bonus::findOrFail($id);
+            else
+                $bonus = new Bonus();
 
-        $expense->type_id = $request->type;
-        $expense->amount = $request->amount;
-        $expense->description = $request->description;
-        $expense->date = Carbon::parse($request->date_submit);
-        $expense->note = $request->note;
-        $expense->user_id = auth()->user()->id;
-        $expense->save();
+            $bonus->bonus_type_id = $request->type;
+            $bonus->amount = $request->amount;
+            $bonus->description = $request->description;
+            $bonus->date = $request->date;
+            $bonus->save();
 
-        return $expense;
+            $bonus->carriers()->sync($request->carriers);
+
+            return $bonus;
+        });
     }
 
     /**
@@ -68,7 +70,7 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-        return view('expenses.index');
+        return view('bonuses.index');
     }
 
     /**
@@ -79,31 +81,32 @@ class ExpenseController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-        return view('expenses.create', $params);
+        return view('bonuses.create', $params);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
         $this->validator($request->all())->errors();
-
+        $request->date = $request->date_submit;
         $this->storeUpdate($request);
 
-        return redirect()->route('expense.index');
+        return redirect()->route('bonus.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Expense  $expense
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Expense $expense)
+    public function show(int $id)
     {
         //
     }
@@ -111,41 +114,43 @@ class ExpenseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Expense  $expense
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(int $id)
     {
-        $expense = Expense::findOrFail($id);
-        $params = compact('expense') + $this->createEditParams();
-        return view('expenses.edit', $params);
+        $bonus = Bonus::findOrFail($id);
+        $params = compact('bonus') + $this->createEditParams();
+        return view('bonuses.edit', $params);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Expense  $expense
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        $this->validator($request->all())->errors();
+        $this->validator($request->all())->validate();
+        $request->date = $request->date_submit;
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('expense.index');
+        return redirect()->route('bonus.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Expense  $expense
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(int $id)
     {
-        $expense = Expense::findOrFail($id);
+        $expense = Bonus::findOrFail($id);
 
         if ($expense)
             return ['success' => $expense->delete()];
@@ -160,7 +165,8 @@ class ExpenseController extends Controller
     private function getRelationArray($item): ?array
     {
         switch ($item) {
-            case 'type':
+            case 'carriers':
+            case 'bonus_type':
                 $array = [
                     'relation' => $item,
                     'column' => 'name',
@@ -180,15 +186,25 @@ class ExpenseController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Expense::select([
-            "expenses.id",
-            "expenses.type_id",
-            "expenses.amount",
-            DB::raw('DATE_FORMAT(date, \'%m-%d-%Y\') AS date'),
-
+        $query = Bonus::select([
+            "bonuses.id",
+            "bonuses.bonus_type_id",
+            "bonuses.amount",
+            "bonuses.description",
+            DB::raw('DATE_FORMAT(bonuses.date, \'%m-%d-%Y\') AS date'),
         ])
-            ->with('type:id,name');
+            ->with([
+                'carriers:id,name',
+                'bonus_type:id,name',
+            ]);
 
-        return $this->multiTabSearchData($query, $request, 'getRelationArray');
+        if ($request->searchable) {
+            foreach ($request->searchable as $item) {
+                if ($item === 'carriers' && strtolower($request->search) === "all")
+                    $query->whereDoesntHave('carriers');
+            }
+        }
+
+        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
     }
 }

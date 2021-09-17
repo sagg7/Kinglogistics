@@ -93,6 +93,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/bonus/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Bonuses</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/loan/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Loans</span>
                         </a>

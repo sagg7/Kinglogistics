@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Carrier;
 use App\Models\Charge;
+use App\Models\ChargeType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ class ChargeController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
+            'type' => ['required', 'exists:charge_types,id'],
             'period' => ['required'],
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
@@ -35,6 +37,7 @@ class ChargeController extends Controller
     {
         return [
             'periods' => [null => '', 'single' => 'Single', 'weekly' => 'Weekly'],
+            'types' => [null => ''] + ChargeType::pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -51,6 +54,7 @@ class ChargeController extends Controller
             else
                 $charge = new Charge();
 
+            $charge->charge_type_id = $request->type;
             $charge->amount = $request->amount;
             $charge->description = $request->description;
             $charge->period = $request->period;
@@ -101,7 +105,7 @@ class ChargeController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request->all())->validate();
+        $this->validator($request->all())->errors();
         $request->date = $request->date_submit;
         $this->storeUpdate($request);
 
@@ -194,6 +198,28 @@ class ChargeController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'carriers':
+            case 'charge_type':
+                    $array = [
+                        'relation' => $item,
+                        'column' => 'name',
+                    ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -201,35 +227,24 @@ class ChargeController extends Controller
     {
         $query = Charge::select([
             "charges.id",
+            "charges.charge_type_id",
             "charges.amount",
             "charges.period",
             "charges.description",
             DB::raw('DATE_FORMAT(charges.date, \'%m-%d-%Y\') AS date'),
         ])
-            ->with('carriers:id,name');
+            ->with([
+                'carriers:id,name',
+                'charge_type:id,name',
+            ]);
 
-        $relationships = [];
         if ($request->searchable) {
-            $searchable = [];
             foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'carriers':
-                        if (strtolower($request->search) == "all")
-                            $query->whereDoesntHave('carriers');
-                        else
-                            $relationships[] = [
-                                'relation' => $item,
-                                'column' => 'name',
-                            ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
+                if ($item === 'carriers' && strtolower($request->search) === "all")
+                    $query->whereDoesntHave('carriers');
             }
-            $request->searchable = $searchable;
         }
 
-        return $this->multiTabSearchData($query, $request, $relationships, 'orWhere');
+        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
     }
 }

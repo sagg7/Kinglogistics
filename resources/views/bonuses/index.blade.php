@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Charge</x-slot>
+    <x-slot name="crumb_section">Bonus</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -15,9 +15,6 @@
                         return params.value.name;
                     else
                         return '';
-                };
-                const upperFormatter = (params) => {
-                    return  params.value ? `${params.value.replace(/^\w/, (c) => c.toUpperCase())}` : '';
                 };
                 const moneyFormatter = (params) => {
                     if (params.value)
@@ -40,23 +37,22 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'date'},
-                        {headerName: 'Type', field: 'charge_type', valueFormatter: nameFormatter},
+                        {headerName: 'Type', field: 'bonus_type', valueFormatter: nameFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                         {headerName: 'Description', field: 'description'},
-                        {headerName: 'Period', field: 'period', valueFormatter: upperFormatter},
                         {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
-                        {text: 'Edit', route: '/charge/edit', icon: 'feather icon-edit'},
-                        {route: '/charge/delete', type: 'delete'}
+                        {text: 'Edit', route: '/bonus/edit', icon: 'feather icon-edit'},
+                        {route: '/bonus/delete', type: 'delete'}
                     ],
                     container: 'myGrid',
-                    url: '/charge/search',
+                    url: '/bonus/search',
                     tableRef: 'tbAG',
                 });
             })();
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/charge/create', 'text' => 'Create Charge']])@endcomponent
+    @component('components.aggrid-index', ['create_btn' => ['url' => '/bonus/create', 'text' => 'Create Bonus']])@endcomponent
 </x-app-layout>

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Traits\EloquentQueryBuilder\agFilter;
 use App\Traits\EloquentQueryBuilder\EloquentFiltering;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
+use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    use agFilter, EloquentFiltering, GetSelectionData;
+    use agFilter, EloquentFiltering, GetSelectionData, GetSimpleSearchData;
     /**
      * @param array $data
      * @param int|null $id
@@ -199,64 +200,41 @@ class UserController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'role':
+                $array = [
+                    'relation' => 'role',
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function search(Request $request)
     {
-        // Skip-Take data
-        $take = $request->endRow;
-        $current = $request->startRow / $take;
-        $skip = $take * $current;
-
         $query = User::select([
             "users.id",
             "users.name",
             "users.email",
             "users.phone",
-            //"users.created_at as date",
         ])
             ->with('roles:name');
 
-        if ($request->filterModel)
-            foreach ($request->filterModel as $key => $item) {
-                $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
-                $statement = $filterArr['statement'];
-
-                $query->where(function ($q) use ($filterArr, $statement, $key) {
-                    $q->$statement($key, $filterArr['comparative'], $filterArr['string']);
-
-                    /*if ($key === 'name')
-                        $q->orWhere("last_name", $filterArr['comparative'], $filterArr['string']);*/
-                });
-            }
-
-        if ($request->searchable)
-            $query->where(function ($q) use ($request) {
-                foreach ($request->searchable as $i => $item) {
-                    ($i == 0) ? $statement = "where" : $statement = "orWhere";
-                    $q->$statement($item, 'LIKE', "%$request->search%");
-                    /*if ($item === "name")
-                        $this->searchNameLastName($q, $request->search);*/
-                }
-            });
-
-        if ($request->sortModel) {
-            $column = $request->sortModel[0]['colId'];
-            $dir = $request->sortModel[0]['sort'];
-            $query->orderBy($column, $dir);
-        }
-
-        $total = $query->count();
-        $query = $query->skip($skip)->take($take);
-        $result = $query->get();
-
-        $params = [
-            'rows' => $result,
-            'lastRow' => $total,
-        ];
-
-        return response()->json($params);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
     /**
@@ -265,17 +243,11 @@ class UserController extends Controller
      */
     public function staffOnTurn(Request $request)
     {
-        // Skip-Take data
-        $take = $request->endRow;
-        $current = $request->startRow / $take;
-        $skip = $take * $current;
-
         $query = User::select([
             "users.id",
             "users.name",
             "users.email",
             "users.phone",
-            //"users.created_at as date",
         ])
             ->with('roles:name');
         $now = Carbon::now();
@@ -293,44 +265,6 @@ class UserController extends Controller
                     ->whereTime('turn_end', '>', $timeString);
             });
 
-        if ($request->filterModel)
-            foreach ($request->filterModel as $key => $item) {
-                $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
-                $statement = $filterArr['statement'];
-
-                $query->where(function ($q) use ($filterArr, $statement, $key) {
-                    $q->$statement($key, $filterArr['comparative'], $filterArr['string']);
-
-                    /*if ($key === 'name')
-                        $q->orWhere("last_name", $filterArr['comparative'], $filterArr['string']);*/
-                });
-            }
-
-        if ($request->searchable)
-            $query->where(function ($q) use ($request) {
-                foreach ($request->searchable as $i => $item) {
-                    ($i == 0) ? $statement = "where" : $statement = "orWhere";
-                    $q->$statement($item, 'LIKE', "%$request->search%");
-                    /*if ($item === "name")
-                        $this->searchNameLastName($q, $request->search);*/
-                }
-            });
-
-        if ($request->sortModel) {
-            $column = $request->sortModel[0]['colId'];
-            $dir = $request->sortModel[0]['sort'];
-            $query->orderBy($column, $dir);
-        }
-
-        $total = $query->count();
-        $query = $query->skip($skip)->take($take);
-        $result = $query->get();
-
-        $params = [
-            'rows' => $result,
-            'lastRow' => $total,
-        ];
-
-        return response()->json($params);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

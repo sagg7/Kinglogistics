@@ -36,6 +36,7 @@
                                 {
                                     headerName: 'Shift', field: 'shift',
                                     filter: false,
+                                    sortable: false,
                                     valueFormatter: (params) => {
                                         return params.value ? 'Active' : 'Inactive';
                                     }

@@ -17,7 +17,7 @@
                     const info = (res.shipper.name ? `<p><strong>Shipper:</strong> ${res.shipper.name}</p>` : '') +
                         `<p><strong>Status:</strong> ${capitalizeStatus(res.status)}<br>` +
                         (res.origin ? `<strong>Origin:</strong> ${res.origin}<br><strong>Destination:</strong> ${res.destination}</p>` : '') +
-                        `<p><strong>Carrier:</strong> ${markerData.carrier.name}<br>` +
+                        //`<p><strong>Carrier:</strong> ${markerData.carrier.name}<br>` +
                         `<strong>Driver:</strong> ${markerData.driver.name}<br>` +
                         `<strong>Truck#:</strong> ${res.truck.number}</p>` +
                         `<strong>Coords:</strong> ${markerData.coords}</p>`;

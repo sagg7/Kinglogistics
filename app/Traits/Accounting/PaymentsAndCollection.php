@@ -142,19 +142,21 @@ trait PaymentsAndCollection
             // Iterate through the load grouping
             foreach ($invoice as $trip) {
                 foreach ($trip['load_groups'] as $group) {
-                    $shipper_invoice = new ShipperInvoice();
-                    $shipper_invoice->date = $carbon_now;
-                    $shipper_invoice->shipper_id = $shipper_id;
-                    $shipper_invoice->save();
-                    $invoice_total = 0;
-                    foreach ($group['loads'] as $item) {
-                        $item->shipper_invoice_id = $shipper_invoice->id;
-                        $item->shipper_rate = $trip['rate']->shipper_rate;
-                        $item->save();
-                        $invoice_total += $trip['rate']->shipper_rate;
+                    if (count($group['loads']) > 0) {
+                        $shipper_invoice = new ShipperInvoice();
+                        $shipper_invoice->date = $carbon_now;
+                        $shipper_invoice->shipper_id = $shipper_id;
+                        $shipper_invoice->save();
+                        $invoice_total = 0;
+                        foreach ($group['loads'] as $item) {
+                            $item->shipper_invoice_id = $shipper_invoice->id;
+                            $item->shipper_rate = $trip['rate']->shipper_rate;
+                            $item->save();
+                            $invoice_total += $trip['rate']->shipper_rate;
+                        }
+                        $shipper_invoice->total = $invoice_total;
+                        $shipper_invoice->save();
                     }
-                    $shipper_invoice->total = $invoice_total;
-                    $shipper_invoice->save();
                 }
             }
         }

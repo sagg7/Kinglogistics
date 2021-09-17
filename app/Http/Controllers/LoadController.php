@@ -229,6 +229,26 @@ class LoadController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'driver':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -245,8 +265,10 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.status",
         ];
-        $query = Load::with('driver:id,name')
-            ->orderByDesc('date');
+        $query = Load::with('driver:id,name');
+        if (!$request->sortModel) {
+            $query->orderByDesc('date');
+        }
 
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
@@ -256,25 +278,6 @@ class LoadController extends Controller
 
         $query->select($select);
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'driver':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    default:
-                        $searchable[] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, $relationships);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

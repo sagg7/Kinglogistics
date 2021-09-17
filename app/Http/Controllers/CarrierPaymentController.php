@@ -169,6 +169,27 @@ class CarrierPaymentController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'carrier':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @param $type
      * @return \Illuminate\Http\JsonResponse
@@ -200,26 +221,7 @@ class CarrierPaymentController extends Controller
                 }
             });
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'carrier':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    default:
-                        $searchable[count($searchable) + 1] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, $relationships);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
     /**
