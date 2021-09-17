@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bonus;
+use App\Models\Carrier;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
