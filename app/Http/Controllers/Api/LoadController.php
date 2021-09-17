@@ -52,6 +52,14 @@ class LoadController extends Controller
     public function storeLoad(Request $request)
     {
         $driver = auth()->user();
+
+        if ($driver->hasActiveLoads()) {
+            return response([
+                'status' => 'error',
+                'message' => __('Finish your current load to create a new one.')
+            ], 403);
+        }
+
         $data = $request->all();
         $loadStatus = LoadStatusEnum::ACCEPTED;
 
@@ -272,7 +280,7 @@ class LoadController extends Controller
         $load->customer_reference = $request->get('sand_ticket');
         $load->weight = $request->get('weight');
         $load->silo_number = $request->get('silo_number');
-        $load->tons = floatval($request->get('weight'))/2000;
+        $load->tons = floatval($request->get('weight')) / 2000;
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
