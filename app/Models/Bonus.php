@@ -16,7 +16,7 @@ class Bonus extends Model
      */
     public function carriers(): BelongsToMany
     {
-        return $this->belongsToMany(Carrier::class);
+        return $this->belongsToMany(Carrier::class)->withPivot(['carrier_payment_id']);
     }
 
     /**

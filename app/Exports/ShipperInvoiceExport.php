@@ -173,7 +173,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
             ],
         ];
         $content = [];
-        for ($i = 1; $i < 41; $i++) {
+        for ($i = 0; $i < 40; $i++) {
             $load = $this->invoice->loads[$i] ?? null;
             if ($load)
                 $content[] = [

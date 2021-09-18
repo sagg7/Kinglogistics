@@ -4,6 +4,7 @@ namespace App\Traits\Accounting;
 
 use App\Enums\CarrierPaymentEnum;
 use App\Mail\SendCarrierPayments;
+use App\Models\Bonus;
 use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
@@ -207,7 +208,7 @@ trait PaymentsAndCollection
         $carrier_payments = CarrierPayment::with('carrier:id,invoice_email,name')
             ->where('status', CarrierPaymentEnum::APPROVED)
             ->get();
-        foreach ($carrier_payments as $i => $item) {
+        foreach ($carrier_payments as $item) {
             if ($item->carrier->invoice_email) {
                 $emails = explode(',', $item->carrier->invoice_email);
                 try {
@@ -324,6 +325,8 @@ trait PaymentsAndCollection
             if (!$load->carrier_payment_id)
                 $carrier_payments[$carrier_id]['loads'][] = ['load' => $load, 'rate' => $rate];
         }
+        if (!(count($carrier_payments) > 0))
+            return;
         // Get all pending expenses
         $expenses = CarrierExpense::whereNull('carrier_payment_id')
             ->whereIn('carrier_id', $carriersId)
@@ -332,6 +335,30 @@ trait PaymentsAndCollection
             ->get();
         foreach ($expenses as $expense) {
             $carrier_payments[$expense->carrier_id]['expenses'][] = $expense;
+        }
+        $bonuses = Bonus::with('carriers')
+            ->where(function ($q) {
+                $q->whereDoesntHave('carriers')
+                    ->whereNull('carrier_payment_id');
+            })
+            ->orWhereHas('carriers', function ($q) {
+                $q->whereNull('carrier_payment_id');
+            })
+            ->get();
+        foreach ($bonuses as $bonus) {
+            if (count($bonus->carriers) === 0) {
+                // All carriers are queried only if at least one of the bonuses is for all carriers, and it's not queried again
+                if (count($all_carriers) === 0)
+                    $all_carriers = Carrier::get();
+                // Set the selected carriers as all carriers
+                $selected_carriers = $all_carriers;
+            } else {
+                // Set the selected carriers as the ones designated on the bonus
+                $selected_carriers = $bonus->carriers;
+            }
+            foreach ($selected_carriers as $carrier) {
+                $carrier_payments[$carrier->id]['bonuses'][] = $bonus;
+            }
         }
         // Iterate through the carrier payments array to generate the payments
         foreach ($carrier_payments as $carrier_id => $payment) {
@@ -351,6 +378,21 @@ trait PaymentsAndCollection
                 $item['load']->save();
                 $gross_amount += $item['rate']->carrier_rate;
             }
+            if (isset($payment['bonuses']))
+                foreach ($payment['bonuses'] as $bonus) {
+                    if (count($bonus->carriers) === 0) {
+                        // If all carriers selected on bonus, set the carrier payment id on the main table
+                        $bonus->carrier_payment_id = $carrier_payment->id;
+                        $bonus->save();
+                    } else {
+                        // Else save the carrier payment id on the pivot table
+                        foreach ($bonus->carriers as $item) {
+                            $item->pivot->carrier_payment_id = $carrier_payment->id;
+                            $item->pivot->save();
+                        }
+                    }
+                    $gross_amount += $bonus->amount;
+                }
             if (isset($payment['expenses']))
                 foreach ($payment['expenses'] as $idx => $expense) {
                     $expense_amount += $expense->amount;
