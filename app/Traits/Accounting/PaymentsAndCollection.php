@@ -346,17 +346,7 @@ trait PaymentsAndCollection
             })
             ->get();
         foreach ($bonuses as $bonus) {
-            if (count($bonus->carriers) === 0) {
-                // All carriers are queried only if at least one of the bonuses is for all carriers, and it's not queried again
-                if (count($all_carriers) === 0)
-                    $all_carriers = Carrier::get();
-                // Set the selected carriers as all carriers
-                $selected_carriers = $all_carriers;
-            } else {
-                // Set the selected carriers as the ones designated on the bonus
-                $selected_carriers = $bonus->carriers;
-            }
-            foreach ($selected_carriers as $carrier) {
+            foreach ($bonus->carriers as $carrier) {
                 $carrier_payments[$carrier->id]['bonuses'][] = $bonus;
             }
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bonus;
 use App\Models\BonusType;
+use App\Models\Carrier;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,10 @@ class BonusController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $bonus = Bonus::findOrFail($id);
+                $bonus = Bonus::whereHas('carriers', function ($q) {
+                    $q->whereNull('carrier_payment_id');
+                })
+                    ->findOrFail($id);
             else
                 $bonus = new Bonus();
 
@@ -57,7 +61,8 @@ class BonusController extends Controller
             $bonus->date = $request->date;
             $bonus->save();
 
-            $bonus->carriers()->sync($request->carriers);
+            $carriers = $request->carriers ?? Carrier::pluck('id')->toArray();
+            $bonus->carriers()->sync($carriers);
 
             return $bonus;
         });
@@ -194,7 +199,10 @@ class BonusController extends Controller
             DB::raw('DATE_FORMAT(bonuses.date, \'%m-%d-%Y\') AS date'),
         ])
             ->with([
-                'carriers:id,name',
+                'carriers' => function ($q) {
+                    $q->select('id','name')
+                        ->skip(0)->take(3);
+                },
                 'bonus_type:id,name',
             ]);
 
