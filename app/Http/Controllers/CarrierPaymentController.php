@@ -121,6 +121,7 @@ class CarrierPaymentController extends Controller
                     $expense->fill($item);
                     $expense->carrier_id = $carrier_id;
                     $expense->carrier_payment_id = $carrierPayment->id;
+                    $expense->non_editable = true;
                     $expense->save();
                 } else if (isset($item["delete"])) {
                     // In case of removing expense
