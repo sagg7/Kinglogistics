@@ -99,7 +99,8 @@ trait PaymentsAndCollection
 
     private function shipperInvoices()
     {
-        $loads = Load::whereNull('shipper_invoice_id')
+        $loads = Load::join('drivers', 'drivers.id', '=', 'driver_id')
+            ->whereNull('shipper_invoice_id')
             ->whereHas('driver')
             ->whereHas('shipper', function($q) {
                 // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
@@ -110,7 +111,7 @@ trait PaymentsAndCollection
                 'shipper',
                 'trip',
             ])
-            ->get();
+            ->orderBy('drivers.carrier_id')->orderBy('driver_id')->orderBy('loads.date')->get('loads.*');
 
         $rates = [];
         $shipper_invoices = [];
@@ -150,9 +151,10 @@ trait PaymentsAndCollection
                         $shipper_invoice->save();
                         $invoice_total = 0;
                         foreach ($group['loads'] as $item) {
-                            $item->shipper_invoice_id = $shipper_invoice->id;
-                            $item->shipper_rate = $trip['rate']->shipper_rate;
-                            $item->save();
+                            $load = Load::find($item->id);
+                            $load->shipper_invoice_id = $shipper_invoice->id;
+                            $load->shipper_rate = $trip['rate']->shipper_rate;
+                            $load->save();
                             $invoice_total += $trip['rate']->shipper_rate;
                         }
                         $shipper_invoice->total = $invoice_total;

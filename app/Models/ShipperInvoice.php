@@ -28,6 +28,6 @@ class ShipperInvoice extends Model
      */
     public function loads(): HasMany
     {
-        return $this->hasMany(Load::class);
+        return $this->hasMany(Load::class)->orderBy('driver_id')->orderBy('loads.date');
     }
 }
