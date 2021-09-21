@@ -269,13 +269,28 @@ class LoadController extends Controller
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
-
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
-            $select[] = 'sand_ticket';
+            $select[] = 'customer_reference';
             $select[] = 'bol';
+        } else {
+            if(isset($request->searchable)){
+                $array = $request->searchable;
+                array_push($array, 'customer_reference');
+                array_push($array, 'customer_po');
+                array_push($array, 'bol');
+                $request->searchable = $array;
+            }
         }
 
+        if (str_contains($request->search, 'transit')){
+            $request->search = 'location';
+        }
+
+        if(strpos($request->search, '/')){
+            $date = explode('/', $request->search);
+            $request->search = $date[2].'-'.$date[0].'-'.$date[1];
+        }
         $query->select($select);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');

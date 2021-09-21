@@ -82,7 +82,7 @@
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                         {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'Sand ticket', field: 'sand_ticket', editable: true, valueFormatter: emptyFormatter},
+                        {headerName: 'Customer Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
