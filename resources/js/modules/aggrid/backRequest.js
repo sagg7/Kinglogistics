@@ -87,7 +87,7 @@ OptionsRenderer.prototype.init = (params) => {
         $(`#pop-${popId}`).popover({
             html: true,
             content,
-            trigger: 'focus',
+            trigger: 'click',
         }).on('shown.bs.popover', function (e) {
             let pop = $('.popover'),
                 del = pop.find('.delete'),
@@ -107,6 +107,14 @@ OptionsRenderer.prototype.init = (params) => {
             confirm.click((e) => {
                 e.preventDefault();
                 OptionsRenderer.prototype.confirmationFunction(confirm.attr('href'), params.api.gridCore.gridOptions.components.tableRef, menuData);
+            });
+            $('body').on('click', function (e) {
+                $('[id^=pop-]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    }
+                });
             });
         });
     });
