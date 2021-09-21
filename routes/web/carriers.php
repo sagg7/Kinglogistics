@@ -26,6 +26,8 @@ Route::prefix('carrier')->group(function () {
     Route::prefix('payment')->group(function () {
         Route::get('/', [CarrierPaymentController::class, 'index'])
             ->name('carrier.payments');
+        Route::get('edit/{id}', [CarrierPaymentController::class, 'edit'])
+            ->name('carrier.paymentEdit');
         Route::get('search/{type}', [CarrierPaymentController::class, 'search'])
             ->name('carrier.paymentsSearch');
         Route::get('downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])

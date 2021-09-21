@@ -26,9 +26,9 @@
                     if (params.value) {
                         let carriers = '';
                         params.value.forEach((item, idx) => {
-                            carriers += `${item.name}`;
                             if (idx > 0)
-                                carriers += ',';
+                                carriers += ', ';
+                            carriers += `${item.name}`;
                         });
                         return carriers !== '' ? carriers : 'All';
                     } else

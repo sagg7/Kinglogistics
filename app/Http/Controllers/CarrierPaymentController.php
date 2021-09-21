@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\CarrierPaymentEnum;
 use App\Mail\SendCarrierPayments;
+use App\Models\Bonus;
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
 use App\Models\CarrierExpense;
+use App\Models\Expense;
 use App\Traits\Accounting\CarrierPaymentsPDF;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
@@ -64,12 +66,20 @@ class CarrierPaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\CarrierPayment  $carrierPayment
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(CarrierPayment $carrierPayment)
+    public function edit(int $id)
     {
-        //
+        // TODO: CHECK RELATIONSHIPS
+        $carrierPayment = CarrierPayment::with([
+            'bonuses.bonus_type',
+            'expenses.type',
+        ])
+            ->findOrFail($id);
+
+        $params = compact('carrierPayment');
+        return view('carrierPayments.edit', $params);
     }
 
     /**
@@ -79,9 +89,44 @@ class CarrierPaymentController extends Controller
      * @param  \App\Models\CarrierPayment  $carrierPayment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CarrierPayment $carrierPayment)
+    public function update(Request $request, int $id)
     {
-        //
+        DB::transaction(function () use ($id, $request) {
+            $carrierPayment = CarrierPayment::with([
+                'bonuses',
+                'expenses',
+            ])
+                ->findOrFail($id);
+
+            $carrier_id = $carrierPayment->carrier_id;
+
+            foreach ($request->bonuses as $item) {
+                if (!$item["id"]) {
+                    // In case of adding new bonus
+                    $bonus = new Bonus();
+                    $bonus->fill($item);
+                    $bonus->save();
+                    $bonus->carriers()->sync([$carrier_id => ['carrier_payment_id' => $carrierPayment->id]]);
+                } else if (isset($item["delete"])) {
+                    // In case of removing bonus
+                    $bonus = Bonus::find($item["id"]);
+                    $bonus->carriers()->detach($carrier_id);
+                }
+            }
+
+            foreach ($request->expenses as $item) {
+                if (!$item["id"]) {
+                    // In case of adding new expense
+                    $expense = new Expense();
+                    $expense->fill($item);
+                    $expense->save();
+                } else if (isset($item["delete"])) {
+                    // In case of removing expense
+                    $expense = Expense::find($item["id"]);
+                    $expense->delete();
+                }
+            }
+        });
     }
 
     /**
