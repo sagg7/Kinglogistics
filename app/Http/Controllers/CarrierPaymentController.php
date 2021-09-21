@@ -8,7 +8,6 @@ use App\Models\Bonus;
 use App\Models\Carrier;
 use App\Models\CarrierPayment;
 use App\Models\CarrierExpense;
-use App\Models\Expense;
 use App\Traits\Accounting\CarrierPaymentsPDF;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
@@ -91,7 +90,7 @@ class CarrierPaymentController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        DB::transaction(function () use ($id, $request) {
+        return DB::transaction(function () use ($id, $request) {
             $carrierPayment = CarrierPayment::with([
                 'bonuses',
                 'expenses',
@@ -101,7 +100,7 @@ class CarrierPaymentController extends Controller
             $carrier_id = $carrierPayment->carrier_id;
 
             foreach ($request->bonuses as $item) {
-                if (!$item["id"]) {
+                if (!isset($item["id"])) {
                     // In case of adding new bonus
                     $bonus = new Bonus();
                     $bonus->fill($item);
@@ -111,21 +110,31 @@ class CarrierPaymentController extends Controller
                     // In case of removing bonus
                     $bonus = Bonus::find($item["id"]);
                     $bonus->carriers()->detach($carrier_id);
+                    $bonus->carriers()->count() > 0 ?: $bonus->delete();
                 }
             }
 
             foreach ($request->expenses as $item) {
-                if (!$item["id"]) {
+                if (!isset($item["id"])) {
                     // In case of adding new expense
-                    $expense = new Expense();
+                    $expense = new CarrierExpense();
                     $expense->fill($item);
+                    $expense->carrier_id = $carrier_id;
+                    $expense->carrier_payment_id = $carrierPayment->id;
                     $expense->save();
                 } else if (isset($item["delete"])) {
                     // In case of removing expense
-                    $expense = Expense::find($item["id"]);
+                    $expense = CarrierExpense::find($item["id"]);
                     $expense->delete();
                 }
             }
+
+            $carrierPayment->gross_amount = $request->subtotal;
+            $carrierPayment->reductions = $request->reductions;
+            $carrierPayment->total = $request->total;
+            $carrierPayment->save();
+
+            return ['success' => true];
         });
     }
 

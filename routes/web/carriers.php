@@ -25,19 +25,21 @@ Route::prefix('carrier')->group(function () {
 
     Route::prefix('payment')->group(function () {
         Route::get('/', [CarrierPaymentController::class, 'index'])
-            ->name('carrier.payments');
+            ->name('carrierPayment.index');
         Route::get('edit/{id}', [CarrierPaymentController::class, 'edit'])
-            ->name('carrier.paymentEdit');
+            ->name('carrierPayment.edit');
+        Route::post('update/{id}', [CarrierPaymentController::class, 'update'])
+            ->name('carrierPayment.update');
         Route::get('search/{type}', [CarrierPaymentController::class, 'search'])
-            ->name('carrier.paymentsSearch');
+            ->name('carrierPayment.search');
         Route::get('downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
-            ->name('carrier.downloadPaymentPDF');
+            ->name('carrierPayment.downloadPaymentPDF');
 
         Route::post('complete/{id}', [CarrierPaymentController::class, 'complete'])
-            ->name('carrier.completePayment');
+            ->name('carrierPayment.completePayment');
         Route::post('approve/{id}', [CarrierPaymentController::class, 'approve'])
-            ->name('carrier.approvePayment');
+            ->name('carrierPayment.approvePayment');
         Route::post('payCharges/{id}', [CarrierPaymentController::class, 'payCharges'])
-            ->name('carrier.payCharges');
+            ->name('carrierPayment.payCharges');
     });
 });

@@ -57,7 +57,7 @@
                 penPaymentsTable = new tableAG({
                     columns: [...paymentsColumns, ...[{headerName: 'Status', field: 'status', valueFormatter: capitalizeNameFormatter}]],
                     menu: [
-                        {text: 'Edit', route: '/carrier/payment/edit', icon: 'fas fa-file-pdf'},
+                        {text: 'Edit', route: '/carrier/payment/edit', icon: 'feather icon-edit'},
                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
                         {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending"', menuData: {title: 'Set status as an approved payment?'}},
                         {text: 'Send Email & Complete', route: "/carrier/payment/complete", icon: 'fas fa-paper-plane', type: 'confirm', conditional: 'status === "approved"', menuData: {title: 'Confirm sending email to carrier?'}}
