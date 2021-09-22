@@ -11,7 +11,7 @@
             const guard = 'carrier';
         </script>
         <script src="{{ asset('js/sections/tracking/common.min.js?1.0.3') }}"></script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.2') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.3') }}"></script>
     @endsection
 
     @section('modals')

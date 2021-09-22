@@ -17,6 +17,12 @@
                             {!! Form::select('trips', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>
+                    <div class="col col-sm-6">
+                        <fieldset class="form-group">
+                            <label for="driver">Driver</label>
+                            {!! Form::select('driver', [], null, ['class' => 'form-control']) !!}
+                        </fieldset>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
