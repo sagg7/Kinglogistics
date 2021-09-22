@@ -7,6 +7,7 @@ use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
+use App\Models\LoadStatus;
 use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -14,10 +15,11 @@ use App\Traits\Load\GenerateLoads;
 use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\Storage\FileUpload;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload;
 
     /**
      * @return array
@@ -294,5 +296,23 @@ class LoadController extends Controller
         $query->select($select);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    public function replacePhoto(Request $request, $id, $type){
+        $load_status = LoadStatus::where('load_id', $id)->first();
+
+        $new_voucher = $this->uploadImage($request->replacement, "loads/$load_status->id",50);
+        if ($type == "to_location") {
+            $load_status->to_location_voucher = $new_voucher;
+        } else {
+            $load_status->finished_voucher = $new_voucher;
+        }
+
+        if ($load_status->save()){
+            return ['success' => true];
+        } else {
+            return ['success' => false];
+        }
+
     }
 }
