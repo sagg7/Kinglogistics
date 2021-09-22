@@ -11,6 +11,10 @@ class DriverLocation extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'date' => 'date:m/d/Y',
+    ];
+
     public $fillable = [
         'latitude',
         'longitude',

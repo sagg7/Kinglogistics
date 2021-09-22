@@ -48,24 +48,58 @@
             position: data.position,
             map,
             animation: google.maps.Animation.DROP,
+            zIndex: 100,
             icon: {
                 url: "/images/app/tracking/icons/delivery-truck.svg",
                 scaledSize: new google.maps.Size(40, 40), // scaled size
             },
         };
         const marker = new google.maps.Marker(markerObj);
+        let polyMarkers = [];
+        if (Object.entries(data.poly.drivenPath).length > 0) {
+            const polyArray = data.poly.drivenPath.getPath().getArray();
+            polyArray.forEach((item, i) => {
+                const info = data.poly.info[i];
+                if ((i + 1) < polyArray.length) {
+                    const lat = item.lat(),
+                        lng = item.lng();
+                    const markerObj = {
+                        position: {lat,lng},
+                        map,
+                        animation: google.maps.Animation.DROP,
+                    };
+                    const marker = new google.maps.Marker(markerObj);
+                    const content = `<strong>Date:</strong> ${moment(info.date).format('MM/DD/YYYY HH:mm:ss')}<br>` +
+                        `<strong>Coords:</strong> ${lat}, ${lng}<br>` +
+                        `<strong>MPH:</strong> 0`;
+                    const infowindow = new google.maps.InfoWindow({
+                        content,
+                    });
+                    marker.infowindow = infowindow;
+                    marker.addListener("click", () => {
+                        infowindow.open({
+                            anchor: marker,
+                            map,
+                            shouldFocus: true,
+                        });
+                    });
+                    polyMarkers.push(marker);
+                }
+            });
+        }
         markersArray.push({
             driver: data.driver,
             carrier: data.carrier,
             load: {id: data.load},
             coords: `${data.position.lat}, ${data.position.lng}`,
             marker,
+            poly: data.poly,
+            polyMarkers,
         });
         const arrPos = markersArray.length - 1;
         marker.addListener("click", () => {
             getInfoWindow(arrPos);
         });
-
         return marker;
     };
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -123,13 +157,19 @@
         markersArray.forEach(item => {
             if (item.driver.id !== driver_id) {
                 item.marker.setMap(null);
+                if (item.poly.drivenPath)
+                    item.poly.drivenPath.setMap(null);
             } else {
                 item.marker.setMap(map);
+                if (item.poly.drivenPath)
+                    item.poly.drivenPath.setMap(map);
             }
         });
     }).on('select2:unselect', () => {
         markersArray.forEach(item => {
             item.marker.setMap(map);
+            if (item.poly.drivenPath)
+                item.poly.drivenPath.setMap(map);
         });
     });
     let data = [];
@@ -152,10 +192,16 @@
                 });
                 if (foundPath) {
                     foundPath.data.push(position);
+                    foundPath.markersInfo.push({
+                        date: location.created_at,
+                    })
                 } else {
                     loadPath.push({
                         id: location.load_id,
                         data: [position],
+                        markersInfo: [{
+                            date: location.created_at,
+                        }],
                         driver: {
                             id: item.id,
                             name: item.name,
@@ -170,8 +216,9 @@
             });
             loadPath.forEach(path => {
                 const pathData = path.data;
+                let drivenPath = {};
                 if (pathData.length > 1) {
-                    const drivenPath = new google.maps.Polyline({
+                    drivenPath = new google.maps.Polyline({
                         path: pathData,
                         geodesic: true,
                         strokeColor: "#FF0000",
@@ -185,6 +232,10 @@
                     driver: path.driver,
                     carrier: path.carrier,
                     load: path.id,
+                    poly: {
+                        drivenPath,
+                        info: path.markersInfo,
+                    },
                 };
                 addMarker(markerData);
             });

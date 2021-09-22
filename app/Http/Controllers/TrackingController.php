@@ -46,12 +46,13 @@ class TrackingController extends Controller
                         $q->whereHas('parentLoad', function ($q) use ($user_id, $start, $end) {
                             $q->whereHas('trip', function ($q) use ($user_id, $start, $end) {
                                 $q->where('shipper_id', $user_id);
-                            })
-                                ->whereBetween('date', [$start, $end]);
-                        });
+                            });
+                        })
+                            ->whereBetween('created_at', [$start, $end]);
                     });
                 }
             })
+            ->withTrashed()
             ->get();
     }
 
