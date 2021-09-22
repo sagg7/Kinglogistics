@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\CarrierPaymentController;
+use App\Http\Controllers\Carriers\DashboardController;
 use App\Http\Controllers\Carriers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,10 +39,10 @@ Route::middleware('auth:carrier')->group(function () {
     Route::get('carrier/payment/downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
         ->name('carrier.downloadPaymentPDF');
 
-    Route::get('/dashboard', function () {
-        return view('subdomains.carriers.dashboard');
-    })
-        ->name('dashboard');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])
+            ->name('dashboard');
+    });
 
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'profile'])
