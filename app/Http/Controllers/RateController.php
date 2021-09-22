@@ -6,13 +6,14 @@ use App\Models\Rate;
 use App\Models\RateGroup;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Load\RecalculateTotals;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RateController extends Controller
 {
-    use GetSimpleSearchData, GetSelectionData;
+    use GetSimpleSearchData, GetSelectionData, RecalculateTotals;
 
     /**
      * @param array $data
@@ -49,21 +50,35 @@ class RateController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Rate
     {
-        if ($id)
-            $rate = Rate::findOrFail($id);
-        else
-            $rate = new Rate();
+        return DB::transaction(function () use ($request, $id) {
+            $ratesValuesChanged = false;
+            if ($id) {
+                $rate = Rate::findOrFail($id);
+                if (($rate->shipper_rate != $request->shipper_rate) ||
+                    ($rate->carrier_rate != $request->carrier_rate)) {
+                    $ratesValuesChanged = true;
+                }
+            } else
+                $rate = new Rate();
 
-        $rate->rate_group_id = $request->rate_group;
-        $rate->shipper_id = $request->shipper;
-        $rate->zone_id = $request->zone;
-        $rate->start_mileage = $request->start_mileage;
-        $rate->end_mileage = $request->end_mileage;
-        $rate->shipper_rate = $request->shipper_rate;
-        $rate->carrier_rate = $request->carrier_rate;
-        $rate->save();
+            $rate->rate_group_id = $request->rate_group;
+            $rate->shipper_id = $request->shipper;
+            $rate->zone_id = $request->zone;
+            $rate->start_mileage = $request->start_mileage;
+            $rate->end_mileage = $request->end_mileage;
+            $rate->shipper_rate = $request->shipper_rate;
+            $rate->carrier_rate = $request->carrier_rate;
+            $rate->save();
 
-        return $rate;
+            if ($ratesValuesChanged) {
+                $rate->load(['trips']);
+                foreach ($rate->trips as $trip) {
+                    $this->byRateChange($trip, $rate->id);
+                }
+            }
+
+            return $rate;
+        });
     }
 
     /**

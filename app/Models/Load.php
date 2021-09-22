@@ -83,6 +83,14 @@ class Load extends Model
         return $this->belongsTo(ShipperInvoice::class);
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function carrier_payment(): BelongsTo
+    {
+        return $this->belongsTo(CarrierPayment::class);
+    }
+
     public function loadStatus(): HasOne
     {
         return $this->hasOne(LoadStatus::class);

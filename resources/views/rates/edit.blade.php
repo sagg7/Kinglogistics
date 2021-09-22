@@ -7,11 +7,11 @@
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
         <script>
             (() => {
-                $("#shipper_id")
+                $("#shipper")
                     .html(`<option value="{{ $rate->shipper_id }}">{{ $rate->shipper->name }}</option>`)
                     .val({{ $rate->shipper_id }})
                     .trigger('change');
-                $("#zone_id")
+                $("#zone")
                     .html(`<option value="{{ $rate->zone_id }}">{{ $rate->zone->name }}</option>`)
                     .val({{ $rate->zone_id }})
                     .trigger('change');

@@ -12,6 +12,13 @@ class CarrierExpense extends Model
 
     protected $casts = [
         'created_at' => 'date:m/d/Y',
+        'date' => 'date:m/d/Y',
+    ];
+
+    protected $fillable = [
+        'amount',
+        'description',
+        'date',
     ];
 
     /**
