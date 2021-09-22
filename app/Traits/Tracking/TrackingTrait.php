@@ -7,7 +7,7 @@ use App\Models\Driver;
 
 trait TrackingTrait
 {
-    public function getTrackingData()
+    private function getTrackingData()
     {
         $user_id = auth()->user()->id;
 
