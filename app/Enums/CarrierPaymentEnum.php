@@ -5,9 +5,10 @@ namespace App\Enums;
 abstract class CarrierPaymentEnum
 {
 
-    public const PENDING = 'pending';
     public const APPROVED = 'approved';
-    public const COMPLETED = 'completed';
+    public const DAILY = 'daily';
     public const CHARGES = 'charges';
+    public const COMPLETED = 'completed';
+    public const PENDING = 'pending';
 
 }

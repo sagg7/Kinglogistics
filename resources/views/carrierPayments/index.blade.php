@@ -14,6 +14,7 @@
             var penChargesTable,
                 comChargesTable,
                 penPaymentsTable,
+                dailyPaymentsTable,
                 comPaymentsTable;
             (() => {
                 const moneyFormatter = (params) => {
@@ -54,24 +55,34 @@
                     {headerName: 'Reductions', field: 'reductions', valueFormatter: moneyFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                 ];
-                penPaymentsTable = new tableAG({
+                const pendingTable = {
                     columns: [...paymentsColumns, ...[{headerName: 'Status', field: 'status', valueFormatter: capitalizeNameFormatter}]],
                     menu: [
                         {text: 'Edit', route: '/carrier/payment/edit', icon: 'feather icon-edit'},
                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
-                        {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending"', menuData: {title: 'Set status as an approved payment?'}},
+                        {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || params.data.status === "daily"', menuData: {title: 'Set status as an approved payment?'}},
                         {text: 'Send Email & Complete', route: "/carrier/payment/complete", icon: 'fas fa-paper-plane', type: 'confirm', conditional: 'status === "approved"', menuData: {title: 'Confirm sending email to carrier?'}}
                     ],
+                };
+                penPaymentsTable = new tableAG(_.merge(pendingTable, {
                     container: 'pendingPaymentsGrid',
                     url: '/carrier/payment/search/pending',
-                    tableRef: 'penPaymentsTable',
-                });
+                    tableRef: 'penPaymentsTable'
+                }));
                 let charges = [];
                 $('.nav-pills .nav-link').click((e) => {
                     const link = $(e.currentTarget),
                         href = link.attr('href');
                     switch (href) {
                         case '#pending-payments':
+                            break;
+                        case '#daily-payments':
+                            if (!dailyPaymentsTable)
+                                dailyPaymentsTable = new tableAG(_.merge(pendingTable, {
+                                    container: 'dailyPaymentsGrid',
+                                    url: '/carrier/payment/search/daily',
+                                    tableRef: 'dailyPaymentsTable'
+                                }));
                             break;
                         case '#completed-payments':
                             if (!comPaymentsTable)
@@ -148,17 +159,20 @@
             })();
         </script>
     @endsection
-    @component('components.nav-pills-form', ['pills' => [['name' => 'Pending Payments', 'pane' => 'pending-payments'],['name' => 'Completed Payments', 'pane' => 'completed-payments'],['name' => 'Pending Charges', 'pane' => 'pending-charges'],['name' => 'Completed Charges', 'pane' => 'completed-charges']]])
-        <div role="tabpanel" class="tab-pane active" id="pending-payments" aria-labelledby="pending-payments" aria-expanded="true">
+    @component('components.nav-pills-form', ['pills' => [['name' => 'Pending Payments', 'pane' => 'pending-payments'],['name' => 'Daily Pay', 'pane' => 'daily-payments'],['name' => 'Completed Payments', 'pane' => 'completed-payments'],['name' => 'Pending Charges', 'pane' => 'pending-charges'],['name' => 'Completed Charges', 'pane' => 'completed-charges']]])
+        <div role="tabpanel" class="tab-pane active" id="pending-payments">
             <div id="pendingPaymentsGrid"></div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="completed-payments" aria-labelledby="pending-charges" aria-expanded="true">
+        <div role="tabpanel" class="tab-pane" id="daily-payments">
+            <div id="dailyPaymentsGrid"></div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="completed-payments">
             <div id="completedPaymentsGrid"></div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="pending-charges" aria-labelledby="completed-payments" aria-expanded="true">
+        <div role="tabpanel" class="tab-pane" id="pending-charges">
             <div id="pendingChargesGrid"></div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="completed-charges" aria-labelledby="completed-charges" aria-expanded="true">
+        <div role="tabpanel" class="tab-pane" id="completed-charges">
             <div id="completedChargesGrid"></div>
         </div>
     @endcomponent

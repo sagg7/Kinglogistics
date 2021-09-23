@@ -4,6 +4,7 @@ class simpleTableAG {
         this.pinnedBottomFunction = properties.pinnedBottomFunction ? properties.pinnedBottomFunction : () => {};
         this.onTotalCalc = properties.onTotalCalc;
         this.onRemoveRow = properties.onRemoveRow;
+        this.removeValidation = properties.removeValidation;
 
         this.id = properties.id;
         this.columns = properties.columns;
