@@ -23,6 +23,8 @@ class CreateBonusesTable extends Migration
             $table->timestamps();
 
             $table->foreign('bonus_type_id')->references('id')->on('bonus_types')->onUpdate('cascade')->onDelete('cascade');
+
+            // This line also should be commented, drops a not found column error when migrates
             //$table->foreign('carrier_payment_id')->references('id')->on('carrier_payments')->onUpdate('cascade')->onDelete('cascade');
         });
     }

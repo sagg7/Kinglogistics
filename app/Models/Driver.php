@@ -158,6 +158,11 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasOne(Shift::class);
     }
 
+    public function safetyMessages(): BelongsToMany
+    {
+        return $this->belongsToMany(SafetyMessage::class);
+    }
+
     /**
      *
      * Helpers
