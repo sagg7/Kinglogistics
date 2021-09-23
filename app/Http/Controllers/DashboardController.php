@@ -33,6 +33,9 @@ class DashboardController extends Controller
                 if ($request->trip) {
                     $q->where('trip_id', $request->trip);
                 }
+                if ($request->driver) {
+                    $q->where('driver_id', $request->driver);
+                }
             })
             ->with([
                 'driver' => function ($q) {

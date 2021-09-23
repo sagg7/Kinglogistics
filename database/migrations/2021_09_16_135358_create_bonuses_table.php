@@ -15,7 +15,7 @@ class CreateBonusesTable extends Migration
     {
         Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bonus_type_id');
+            $table->unsignedBigInteger('bonus_type_id')->nullable();
             //$table->unsignedBigInteger('carrier_payment_id')->nullable()->comment('When carriers relationship is null, it means it\'s for all carriers, thus the carrier payment id is stored in the main table, otherwise the relations is on the pivot table');
             $table->double('amount');
             $table->string('description', 512)->nullable();
@@ -23,8 +23,9 @@ class CreateBonusesTable extends Migration
             $table->timestamps();
 
             $table->foreign('bonus_type_id')->references('id')->on('bonus_types')->onUpdate('cascade')->onDelete('cascade');
+
             // This line also should be commented, drops a not found column error when migrates
-            $table->foreign('carrier_payment_id')->references('id')->on('carrier_payments')->onUpdate('cascade')->onDelete('cascade');
+            //$table->foreign('carrier_payment_id')->references('id')->on('carrier_payments')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

@@ -34,9 +34,12 @@ class ExpenseTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): CarrierExpenseType
     {
         if ($id)
-            $type = CarrierExpenseType::findOrFail($id);
-        else
+            $type = CarrierExpenseType::where('carrier_id', auth()->user()->id)
+                ->findOrFail($id);
+        else {
             $type = new CarrierExpenseType();
+            $type->carrier_id = auth()->user()->id;
+        }
 
         $type->name = $request->name;
         $type->save();
@@ -70,7 +73,8 @@ class ExpenseTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $type = CarrierExpenseType::findOrFail($id);
+        $type = CarrierExpenseType::where('carrier_id', auth()->user()->id)
+            ->findOrFail($id);
 
         if ($type) {
             $message = '';
@@ -90,10 +94,11 @@ class ExpenseTypeController extends Controller
      */
     public function selection(Request $request): array
     {
-        $query = CarrierExpenseType::select([
-            'id',
-            'name as text',
-        ])
+        $query = CarrierExpenseType::where('carrier_id', auth()->user()->id)
+            ->select([
+                'id',
+                'name as text',
+            ])
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);

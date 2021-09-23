@@ -100,7 +100,8 @@ class ShiftController extends Controller
         $payload = $request->all($shift->getFillable());
 
         // Check if exists unallocated loads and auto assign to driver
-        $load = $this->autoAssignUnallocatedLoad($driver);
+        $load = null;
+//        $load = $this->autoAssignUnallocatedLoad($driver);
 
         // Starts shift for this driver
         $this->startShift($driver, $payload, $load);

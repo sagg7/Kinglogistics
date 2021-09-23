@@ -7,6 +7,7 @@ use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
+use App\Models\LoadStatus;
 use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -14,10 +15,11 @@ use App\Traits\Load\GenerateLoads;
 use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\Storage\FileUpload;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload;
 
     /**
      * @return array
@@ -269,15 +271,48 @@ class LoadController extends Controller
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
-
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
-            $select[] = 'sand_ticket';
+            $select[] = 'customer_reference';
             $select[] = 'bol';
+        } else {
+            if(isset($request->searchable)){
+                $array = $request->searchable;
+                array_push($array, 'customer_reference');
+                array_push($array, 'customer_po');
+                array_push($array, 'bol');
+                $request->searchable = $array;
+            }
         }
 
+        if (str_contains($request->search, 'transit')){
+            $request->search = 'location';
+        }
+
+        if(strpos($request->search, '/')){
+            $date = explode('/', $request->search);
+            $request->search = $date[2].'-'.$date[0].'-'.$date[1];
+        }
         $query->select($select);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    public function replacePhoto(Request $request, $id, $type){
+        $load_status = LoadStatus::where('load_id', $id)->first();
+
+        $new_voucher = $this->uploadImage($request->replacement, "loads/$load_status->id",50);
+        if ($type == "to_location") {
+            $load_status->to_location_voucher = $new_voucher;
+        } else {
+            $load_status->finished_voucher = $new_voucher;
+        }
+
+        if ($load_status->save()){
+            return ['success' => true];
+        } else {
+            return ['success' => false];
+        }
+
     }
 }

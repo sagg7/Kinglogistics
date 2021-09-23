@@ -5,7 +5,7 @@
                 <div class="form-group col-md-3">
                     {!! Form::label('rate_group', ucfirst(__('rate group')), ['class' => 'col-form-label']) !!}
                     <div class="input-group">
-                        {!! Form::select('rate_group', $rate_groups, $rate->rate_group ?? null, ['class' => 'form-control' . ($errors->first('rate_group') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('rate_group', $rate_groups, $rate->rate_group_id ?? null, ['class' => 'form-control' . ($errors->first('rate_group') ? ' is-invalid' : '')]) !!}
                         <div class="input-group-append">
                             <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addRateGroup"><i class="fas fa-plus"></i></button>
                         </div>

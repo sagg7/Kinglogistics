@@ -1,9 +1,12 @@
 (() => {
     const tripSel = $('[name=trips]');
+    const driverSel = $('[name=driver]');
     let trip = null;
+    let driver = null;
     const loadSummary = [];
     const summaryArea = $('#loads-summary');
     const summaryTable = summaryArea.find('table');
+    const activeDrivers = [];
     const getLoadsData = () => {
         summaryTable.find('h2').text(0);
         $.ajax({
@@ -11,6 +14,7 @@
             type: 'GET',
             data: {
                 trip,
+                driver,
             },
             success: (res) => {
                 if (res.loads) {
@@ -24,7 +28,25 @@
                             count: value.count,
                             data: value.data,
                         });
+                        if (driverSel.is(':empty')) {
+                            value.data.forEach((item) => {
+                                const driver = activeDrivers.find(obj => Number(obj.id) === Number(item.driver.id));
+                                if (!driver)
+                                    activeDrivers.push({
+                                        id: item.driver.id,
+                                        name: item.driver.name,
+                                    })
+                            });
+                        }
                     });
+                    if (driverSel.is(':empty')) {
+                        activeDrivers.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+                        let html = '<option></option>';
+                        activeDrivers.forEach(item => {
+                            html += `<option value="${item.id}">${item.name}</option>`;
+                        });
+                        driverSel.html(html);
+                    }
                 }
             },
             error: () => {
@@ -53,6 +75,19 @@
         })
         .on('select2:unselect', (e) => {
             trip = null;
+            getLoadsData();
+        });
+    driverSel.select2({
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            driver = e.params.data.id;
+            loadSummary.length = 0;
+            getLoadsData();
+        })
+        .on('select2:unselect', (e) => {
+            driver = null;
             getLoadsData();
         });
     getLoadsData();

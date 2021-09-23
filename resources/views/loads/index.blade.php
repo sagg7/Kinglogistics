@@ -29,7 +29,7 @@
                     ],
                     menu: [
                         {text: 'Show', route: '/load/show', icon: 'feather icon-eye'},
-                            @if(auth()->guard('web')->check())
+                        @if(auth()->guard('web')->check())
                         {text: 'Edit', route: '/load/edit', icon: 'feather icon-edit'},
                         {route: '/load/delete', type: 'delete'}
                         @endif

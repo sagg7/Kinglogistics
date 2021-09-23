@@ -195,6 +195,7 @@ trait PaymentsAndCollection
                     "description" => "Rental for trailer " . $rental->trailer->number,
                     "non_editable" => true,
                     "carrier_id" => $rental->carrier_id,
+                    "date" => $today,
                     "created_at" => $today,
                     "updated_at" => $today,
                 ];

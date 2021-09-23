@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Bonus extends Model
 {
+    protected $casts = [
+        'date' => 'date:m/d/Y',
+    ];
+
+    protected $fillable = [
+        'amount',
+        'description',
+        'date',
+    ];
+
     use HasFactory;
 
     /**

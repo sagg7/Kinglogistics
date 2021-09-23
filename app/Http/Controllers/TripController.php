@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CarrierPaymentEnum;
+use App\Enums\ShipperInvoiceEnum;
 use App\Models\Trip;
 use App\Models\Zone;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Load\RecalculateTotals;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TripController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData;
+    use GetSelectionData, GetSimpleSearchData, RecalculateTotals;
 
     /**
      * @return array
@@ -90,26 +93,31 @@ class TripController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Trip
     {
-        if ($id)
-            $trip = Trip::findOrFail($id);
-        else
-            $trip = new Trip();
+        return DB::transaction(function () use ($request, $id) {
+            if ($id) {
+                $trip = Trip::findOrFail($id);
+                if ($trip->rate_id != $request->rate_id) {
+                    $this->byRateChange($trip, $request->rate_id);
+                }
+            } else
+                $trip = new Trip();
 
-        $shipper = auth()->guard('shipper')->check() ? auth()->guard()->user()->id : $request->shipper_id;
+            $shipper = auth()->guard('shipper')->check() ? auth()->guard()->user()->id : $request->shipper_id;
 
-        $trip->zone_id = $request->zone_id;
-        $trip->shipper_id = $shipper;
-        $trip->rate_id = $request->rate_id;
-        $trip->name = $request->name;
-        $trip->customer_name = $request->customer_name;
-        $trip->origin = $request->origin;
-        $trip->origin_coords = $request->origin_coords;
-        $trip->destination = $request->destination;
-        $trip->destination_coords = $request->destination_coords;
-        $trip->mileage = $request->mileage;
-        $trip->save();
+            $trip->zone_id = $request->zone_id;
+            $trip->shipper_id = $shipper;
+            $trip->rate_id = $request->rate_id;
+            $trip->name = $request->name;
+            $trip->customer_name = $request->customer_name;
+            $trip->origin = $request->origin;
+            $trip->origin_coords = $request->origin_coords;
+            $trip->destination = $request->destination;
+            $trip->destination_coords = $request->destination_coords;
+            $trip->mileage = $request->mileage;
+            $trip->save();
 
-        return $trip;
+            return $trip;
+        });
     }
 
     /**
@@ -140,6 +148,8 @@ class TripController extends Controller
                         'id',
                         'zone_id',
                         'rate_group_id',
+                        'start_mileage',
+                        'end_mileage',
                     ]);
             }
         ])
