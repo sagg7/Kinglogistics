@@ -52,6 +52,6 @@
                 </table>
             </div>
         </div>
-        {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
+        {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block submit-ajax', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->
 </div> <!-- end card -->

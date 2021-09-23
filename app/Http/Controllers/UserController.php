@@ -36,7 +36,7 @@ class UserController extends Controller
     private function createEditParams()
     {
         return [
-            'roles' => [null => 'Select'] + Role::pluck('name', 'id')->toArray(),
+            'roles' => [null => 'Select'] + Role::orderBy('name')->pluck('name', 'id')->toArray(),
         ];
     }
 

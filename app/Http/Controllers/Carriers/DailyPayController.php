@@ -3,19 +3,26 @@
 namespace App\Http\Controllers\Carriers;
 
 use App\Enums\CarrierPaymentEnum;
+use App\Enums\LoadStatusEnum;
+use App\Enums\RoleSlugs;
 use App\Http\Controllers\Controller;
+use App\Mail\SendCarrierPayments;
 use App\Models\CarrierPayment;
 use App\Models\Load;
+use App\Models\User;
+use App\Traits\Accounting\CarrierPaymentsPDF;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\RecalculateTotals;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Mpdf\MpdfException;
 
 class DailyPayController extends Controller
 {
-    use RecalculateTotals, GetSimpleSearchData;
+    use RecalculateTotals, GetSimpleSearchData, CarrierPaymentsPDF;
 
     private function validator(array $data)
     {
@@ -87,6 +94,20 @@ class DailyPayController extends Controller
             }
 
             $this->recalculateCarrierPayment($carrierPayment);
+
+            if (!$id) {
+                $accountantDirectors = User::whereHas('roles', function ($q) {
+                    $q->where('slug', RoleSlugs::ACCOUNTANT_DIRECTOR);
+                })
+                    ->get();
+                try {
+                    $pdf = $this->getPDFBinary($carrierPayment->id);
+                    foreach ($accountantDirectors as $item) {
+                        Mail::to($item->email)->send(new SendCarrierPayments($carrierPayment->carrier, $pdf, "Daily Pay Request"));
+                    }
+                } catch (MpdfException $e) {
+                }
+            }
         });
 
         return view('subdomains.carriers.accounting.dailyPay.index');
@@ -111,6 +132,7 @@ class DailyPayController extends Controller
                 })
                     ->orWhereNull('carrier_payment_id');
             })
+            ->where('status', LoadStatusEnum::FINISHED)
             ->with('driver:id,name')
             ->get()->toArray();
     }
