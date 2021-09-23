@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SafetyMessage;
+use App\Notifications\SafetyAdvice;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\QuillEditor\QuillFormatter;
@@ -65,6 +66,10 @@ class SafetyMessageController extends Controller
             $message->save();
 
             $message->drivers()->sync($request->drivers);
+
+            $message->drivers->each(function($driver) use ($message) {
+                $driver->notify(new SafetyAdvice($driver, $message));
+            });
 
             return $message;
         });

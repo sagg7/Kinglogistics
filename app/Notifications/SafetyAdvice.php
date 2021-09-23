@@ -8,23 +8,22 @@ use App\Traits\Notifications\PushNotificationsTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class SafetyAdvice extends Notification implements IPushNotification
+class SafetyAdvice extends Notification
 {
-    use Queueable, PushNotificationsTrait;
+    use Queueable;
 
     private $driver;
-    private $advice;
+    private $message;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($driver, $advice)
+    public function __construct($driver, $message)
     {
         $this->driver = $driver;
-        $this->advice = $advice;
-        $this->sendPushNotification();
+        $this->message = $message;
     }
 
     /**
@@ -60,37 +59,11 @@ class SafetyAdvice extends Notification implements IPushNotification
         return $this->notificationData();
     }
 
-    public function notificationBody()
-    {
-        return [
-            'title' => 'Safety advice',
-            'message' => 'Read the next information carefully!'
-        ];
-    }
-
     public function notificationData()
     {
         return [
-            'advice' => $this->advice,
+            'message' => $this->message,
         ];
-    }
-
-    public function sendPushNotification()
-    {
-        $tokens = $this->getUserDevices($this->driver);
-
-        if (!count($tokens))
-            return;
-
-        $notification = $this->notificationBody();
-
-        $this->sendNotification(
-            $notification['title'],
-            $notification['message'],
-            $tokens,
-            DriverAppRoutes::NOTIFICATIONS . '?id=' . 0,
-            $this->notificationData()
-        );
     }
 
 }
