@@ -18,7 +18,7 @@ class Load extends Model
 
     protected $fillable = [
         'control_number',
-        'sand_ticket',
+        'customer_reference',
         'bol',
     ];
 
