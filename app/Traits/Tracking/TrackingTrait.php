@@ -47,11 +47,11 @@ trait TrackingTrait
                 },
                 'carrier:id,name',
                 'truck:id,number,driver_id',
+                'shift',
             ])
             /*->whereHas('latestLocation', function ($q) {
                 $q->where('status', '!=', 'finished');
             })*/
-            ->whereHas("shift")
             ->whereNull("inactive")
             ->where(function ($q) use ($user_id) {
                 if (auth()->guard('carrier')->check())
