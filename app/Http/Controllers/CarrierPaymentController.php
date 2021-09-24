@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
+use function PHPUnit\Framework\isNan;
 
 class CarrierPaymentController extends Controller
 {
@@ -99,36 +100,38 @@ class CarrierPaymentController extends Controller
 
             $carrier_id = $carrierPayment->carrier_id;
 
-            foreach ($request->bonuses as $item) {
-                if (!isset($item["id"])) {
-                    // In case of adding new bonus
-                    $bonus = new Bonus();
-                    $bonus->fill($item);
-                    $bonus->save();
-                    $bonus->carriers()->sync([$carrier_id => ['carrier_payment_id' => $carrierPayment->id]]);
-                } else if (isset($item["delete"])) {
-                    // In case of removing bonus
-                    $bonus = Bonus::find($item["id"]);
-                    $bonus->carriers()->detach($carrier_id);
-                    $bonus->carriers()->count() > 0 ?: $bonus->delete();
+            if ($request->bonuses)
+                foreach ($request->bonuses as $item) {
+                    if (isNan((int)$item["id"])) {
+                        // In case of adding new bonus
+                        $bonus = new Bonus();
+                        $bonus->fill($item);
+                        $bonus->save();
+                        $bonus->carriers()->sync([$carrier_id => ['carrier_payment_id' => $carrierPayment->id]]);
+                    } else if (isset($item["delete"])) {
+                        // In case of removing bonus
+                        $bonus = Bonus::find($item["id"]);
+                        $bonus->carriers()->detach($carrier_id);
+                        $bonus->carriers()->count() > 0 ?: $bonus->delete();
+                    }
                 }
-            }
 
-            foreach ($request->expenses as $item) {
-                if (!isset($item["id"])) {
-                    // In case of adding new expense
-                    $expense = new CarrierExpense();
-                    $expense->fill($item);
-                    $expense->carrier_id = $carrier_id;
-                    $expense->carrier_payment_id = $carrierPayment->id;
-                    $expense->non_editable = true;
-                    $expense->save();
-                } else if (isset($item["delete"])) {
-                    // In case of removing expense
-                    $expense = CarrierExpense::find($item["id"]);
-                    $expense->delete();
+            if ($request->expenses)
+                foreach ($request->expenses as $item) {
+                    if (isNan((int)$item["id"])) {
+                        // In case of adding new expense
+                        $expense = new CarrierExpense();
+                        $expense->fill($item);
+                        $expense->carrier_id = $carrier_id;
+                        $expense->carrier_payment_id = $carrierPayment->id;
+                        $expense->non_editable = true;
+                        $expense->save();
+                    } else if (isset($item["delete"])) {
+                        // In case of removing expense
+                        $expense = CarrierExpense::find($item["id"]);
+                        $expense->delete();
+                    }
                 }
-            }
 
             $carrierPayment->gross_amount = $request->subtotal;
             $carrierPayment->reductions = $request->reductions;
@@ -187,7 +190,7 @@ class CarrierPaymentController extends Controller
             $carrier_payment = new CarrierPayment();
             $carrier_payment->date = Carbon::now();
             $carrier_payment->carrier_id = $carrier_id;
-            $carrier_payment->status = 'charges';
+            $carrier_payment->status = CarrierPaymentEnum::CHARGES;
             $carrier_payment->save();
 
             $reductions = 0;
@@ -214,8 +217,9 @@ class CarrierPaymentController extends Controller
     {
         switch ($type) {
             default:
-            case 'pending':
-            case 'completed':
+            case CarrierPaymentEnum::PENDING:
+            case CarrierPaymentEnum::COMPLETED:
+            case CarrierPaymentEnum::DAILY:
             case 'completedCharges':
                 return $this->searchCarrierPayments($request, $type);
             case 'pendingCharges':
@@ -263,15 +267,18 @@ class CarrierPaymentController extends Controller
             ->with('carrier:id,name')
             ->where(function ($q) use ($type) {
                 switch ($type) {
-                    case 'pending':
-                        $q->where('status', 'pending')
-                            ->orWhere('status', 'approved');
+                    case CarrierPaymentEnum::PENDING:
+                        $q->where('status', CarrierPaymentEnum::PENDING)
+                            ->orWhere('status', CarrierPaymentEnum::APPROVED);
                         break;
-                    case 'completed':
-                        $q->where('status', 'completed');
+                    case CarrierPaymentEnum::COMPLETED:
+                        $q->where('status', CarrierPaymentEnum::COMPLETED);
+                        break;
+                    case CarrierPaymentEnum::DAILY:
+                        $q->where('status', CarrierPaymentEnum::DAILY);
                         break;
                     case 'completedCharges':
-                        $q->where('status', 'charges');
+                        $q->where('status', CarrierPaymentEnum::CHARGES);
                         break;
                 }
             });

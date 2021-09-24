@@ -1,5 +1,8 @@
 function RemoveBtnRenderer() {}
 RemoveBtnRenderer.prototype.deleteFunction = (grid, id, type) => {
+    if (window[grid].removeValidation)
+        if (!window[grid].removeValidation({id, type}))
+            return false;
     _.pull(window[grid].rowData, _.find(window[grid].rowData, {id, type}));
     // Save the new data into the table
     window[grid].gridOptions.api.setRowData(window[grid].rowData);

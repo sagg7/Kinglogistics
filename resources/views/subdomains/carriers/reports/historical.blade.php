@@ -7,7 +7,7 @@
     @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
-        <script src="{{ asset('js/modules/aggrid/simpleTable.min.js') }}"></script>
+        <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/section/reports/appointmentHistory.min.js') }}"></script>
         <script>
             let _aggrid;

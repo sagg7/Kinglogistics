@@ -84,6 +84,7 @@ Route::group([
     Route::group([
         'prefix' => 'safety'
     ], function () {
+        Route::get('{id}', [SafetyAdvicesController::class, 'find']);
         Route::post('send-advice', [SafetyAdvicesController::class, 'sendAdvice']);
     });
 
@@ -97,7 +98,9 @@ Route::group([
         'prefix' => 'notifications'
     ], function () {
         Route::get('', [DriverNotificationsController::class, 'index']);
-        Route::get('advices', [DriverNotificationsController::class, 'getSafetyAdvicesList']);
+        Route::get('advices', [DriverNotificationsController::class, 'getSafetyAdvicesNotifications']);
+        Route::get('unread-advices', [DriverNotificationsController::class, 'getUnreadSafetyAdvicesNotifications']);
+        Route::get('advice/{id}', [DriverNotificationsController::class, 'getSafetyAdvice']);
         Route::post('mark-as-read', [DriverNotificationsController::class, 'markNotificationAsRead']);
     });
 

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Expense</x-slot>
+    <x-slot name="crumb_section">Daily Pay</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -25,20 +25,21 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'date'},
-                        {headerName: 'Type', field: 'type', valueFormatter: nameFormatter},
-                        {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
+                        {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                        {headerName: 'Subtotal', field: 'gross_amount', valueFormatter: moneyFormatter},
+                        {headerName: 'Reductions', field: 'reductions', valueFormatter: moneyFormatter},
+                        {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                     ],
                     menu: [
-                        {text: 'Edit', route: '/expense/edit', icon: 'feather icon-edit'},
-                        {route: '/expense/delete', type: 'delete'}
+                        {text: 'Edit', route: '/dailyPay/edit', icon: 'feather icon-edit'},
                     ],
                     container: 'myGrid',
-                    url: '/expense/search',
+                    url: '/dailyPay/search',
                     tableRef: 'tbAG',
                 });
             })();
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense']])@endcomponent
+    @component('components.aggrid-index', ['create_btn' => ['url' => '/dailyPay/create', 'text' => 'Create Daily Pay Request']])@endcomponent
 </x-app-layout>

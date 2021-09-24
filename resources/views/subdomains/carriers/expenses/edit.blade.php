@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">expense</x-slot>
+    <x-slot name="crumb_section">Expense</x-slot>
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section("scripts")

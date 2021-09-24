@@ -1,3 +1,5 @@
 {
-    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js"
+    "/js/modules/aggrid/simpleTable.min.js": "/js/modules/aggrid/simpleTable.min.js",
+    "/js/modules/aggrid/common.min.js": "/js/modules/aggrid/common.min.js",
+    "/js/sections/carrierPayments/editPayment.min.js": "/js/sections/carrierPayments/editPayment.min.js"
 }

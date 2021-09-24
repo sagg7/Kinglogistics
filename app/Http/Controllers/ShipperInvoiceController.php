@@ -173,8 +173,8 @@ class ShipperInvoiceController extends Controller
             ->with('shipper:id,name')
             ->where(function ($q) use ($type) {
                 switch ($type) {
-                    case 'pending':
-                    case 'completed':
+                    case ShipperInvoiceEnum::PENDING:
+                    case ShipperInvoiceEnum::COMPLETED:
                         $q->where('status', $type);
                         break;
                     default:

@@ -7,16 +7,30 @@
         reductions = Number(reductionsInp.val()),
         total = Number(totalInp.val());
     const calculateTotal = (obj) => {
+        console.log(obj);
         const amount = Number(obj.amount);
         switch (obj.type) {
+            case 'remove':
             case 'reduce':
-                if (total - amount < 0)
+                if (total - amount < 0) {
+                    throwErrorMsg('The total quantity must be bigger than $0');
                     return false;
-                reductions += amount;
+                }
+                if (obj.type === 'increase')
+                    reductions += amount;
+                else {
+                    console.log(subtotal);
+                    subtotal -= amount;
+                    console.log(subtotal);
+                }
                 total -= amount;
                 break;
+            case 'increase':
             case 'add':
-                subtotal += amount;
+                if (obj.type === 'increase')
+                    reductions -= amount;
+                else
+                    subtotal += amount;
                 total += amount;
                 break;
         }
@@ -87,6 +101,21 @@
             },
             autoHeight: true,
             rowData,
+            removeValidation: (params) => {
+                console.log(params, 'here too');
+                switch (params.type) {
+                    case 'bonus':
+                        const bonus = bonuses.find(obj => obj.id === params.id);
+                        if (total - bonus.amount < 0) {
+                            throwErrorMsg('The total quantity must be bigger than $0');
+                            return false;
+                        }
+                        break;
+                    case 'expense':
+                        break;
+                }
+                return true;
+            },
             onRemoveRow: (params) => {
                 let element = {},
                     id = null;
@@ -96,14 +125,15 @@
                         element = expenses[id];
                         if (isNaN(Number(params.id)))
                             expenses.splice(id, 1);
-                        calculateTotal({type: 'add', amount: element.amount});
+                        calculateTotal({type: 'increase', amount: element.amount});
                         break;
                     case 'bonus':
                         id = bonuses.findIndex(obj => obj.id === params.id);
                         element = bonuses[id];
+                        if (!calculateTotal({type: 'remove', amount: element.amount}))
+                            return false;
                         if (isNaN(Number(params.id)))
                             bonuses.splice(id, 1);
-                        calculateTotal({type: 'reduce', amount: element.amount});
                         break;
                     default:
                         return;
@@ -152,18 +182,19 @@
             date: dateInp.val(),
             description: descInp.val(),
         };
-        rowData.push(_.merge(obj, {type}));
-        fillTable();
         switch (type) {
             case 'bonus':
                 bonuses.push(obj);
                 calculateTotal({type: 'add', amount: obj.amount});
                 break;
             case 'expense':
+                if (!calculateTotal({type: 'reduce', amount: obj.amount}))
+                    return false;
                 expenses.push(obj);
-                calculateTotal({type: 'reduce', amount: obj.amount});
                 break;
         }
+        rowData.push(_.merge(obj, {type}));
+        fillTable();
         amountInp.val('');
         descInp.val('');
         typeSel.val('').trigger('change');

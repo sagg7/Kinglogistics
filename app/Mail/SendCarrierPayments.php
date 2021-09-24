@@ -13,16 +13,18 @@ class SendCarrierPayments extends Mailable
 
     public $carrier;
     public $pdf;
+    public $subject;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($carrier, $pdf)
+    public function __construct($carrier, $pdf, $subject = null)
     {
         $this->carrier = $carrier;
         $this->pdf = $pdf;
+        $this->subject = $subject;
     }
 
     /**
@@ -35,7 +37,7 @@ class SendCarrierPayments extends Mailable
         return $this->attachData($this->pdf, 'Invoice.pdf', [
             'mime' => 'application/pdf',
         ])
-            ->subject("Payment - " . $this->carrier->name)
+            ->subject(($this->subject ?: "Payment") . " - " . $this->carrier->name)
             ->view('mails.emptyMail');
     }
 }

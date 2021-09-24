@@ -4,10 +4,72 @@ namespace App\Traits\Load;
 
 use App\Enums\CarrierPaymentEnum;
 use App\Enums\ShipperInvoiceEnum;
+use App\Models\CarrierPayment;
 use App\Models\Rate;
+use App\Models\ShipperInvoice;
 
 trait RecalculateTotals
 {
+    private function recalculateCarrierPayment(CarrierPayment $carrierPayment)
+    {
+        $carrierPayment->load(['expenses', 'bonuses', 'loads']);
+        $gross_amount = 0;
+        $reductions = 0;
+        // Flag to check if the carrier payment loads have been reassgined to another payment
+        $emptyLoads = count($carrierPayment->loads) === 0;
+        foreach ($carrierPayment->loads as $load) {
+            $gross_amount += $load->rate;
+        }
+        foreach ($carrierPayment->bonuses as $bonus) {
+            if ($emptyLoads) {
+                // If all the loads were reassigned, set the bonuses relation as null, so they can be reassigned
+                // in the future to a new payment
+                $bonus->pivot->carrier_payment_id = null;
+                $bonus->pivot->save();
+            } else {
+                $gross_amount += $bonus->amount;
+            }
+        }
+        foreach ($carrierPayment->expenses as $expense) {
+            if ($emptyLoads) {
+                // If all the loads were reassigned, set the expenses relation as null, so they can be reassigned
+                // in the future to a new payment
+                $expense->carrier_payment_id = null;
+                $expense->save();
+            } else {
+                $reductions += $expense->amount;
+                // If the change has caused that the reductions amount is bigger than the gross amount
+                // then remove this expense from the payment setting the relation as null
+                if ($reductions > $gross_amount) {
+                    $reductions -= $expense->amount;
+                    $expense->carrier_payment_id = null;
+                    $expense->save();
+                }
+            }
+        }
+        if ($emptyLoads) {
+            // Delete the carrier payment if there are no loads
+            $carrierPayment->delete();
+        } else {
+            // Set the new recalculated values to the carrier payment
+            $carrierPayment->gross_amount = $gross_amount;
+            $carrierPayment->reductions = $reductions;
+            $carrierPayment->total = $gross_amount - $reductions;
+            $carrierPayment->save();
+        }
+    }
+
+    private function recalculateShipperInvoices(ShipperInvoice $shipperInvoice)
+    {
+        $shipperInvoice->load(['loads']);
+        $total = 0;
+        foreach ($shipperInvoice->loads as $load) {
+            $total += $load->shipper_rate;
+        }
+        $shipperInvoice->total = $total;
+        $shipperInvoice->save();
+    }
+
     private function byRateChange($trip, $rate_id)
     {
         $trip->load(['loads' => function ($q) {
@@ -57,31 +119,10 @@ trait RecalculateTotals
             }
         }
         foreach ($carrier_payments as $item) {
-            $item->load(['expenses', 'bonuses', 'loads']);
-            $gross_amount = 0;
-            $reductions = 0;
-            foreach ($item->loads as $load) {
-                $gross_amount += $load->rate;
-            }
-            foreach ($item->bonuses as $bonus) {
-                $gross_amount += $bonus->amount;
-            }
-            foreach ($item->expenses as $expense) {
-                $reductions += $expense->amount;
-            }
-            $item->gross_amount = $gross_amount;
-            $item->reductions = $reductions;
-            $item->total = $gross_amount - $reductions;
-            $item->save();
+            $this->recalculateCarrierPayment($item);
         }
         foreach ($shipper_invoices as $item) {
-            $item->load(['loads']);
-            $total = 0;
-            foreach ($item->loads as $load) {
-                $total += $load->shipper_rate;
-            }
-            $item->total = $total;
-            $item->save();
+            $this->recalculateShipperInvoices($item);
         }
     }
 }
