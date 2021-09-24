@@ -96,6 +96,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('diesel_card', ucfirst(__('diesel card')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('diesel_card', $truck->diesel_card ?? null, ['class' => 'form-control' . ($errors->first('diesel_card') ? ' is-invalid' : ''), auth()->guard('web')->check() ?: 'readonly']) !!}
+                    @error('diesel_card')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
             <hr>
             <div class="row">

@@ -34,6 +34,7 @@ class TruckController extends Controller
             'make' => ['nullable', 'string', 'max:255'],
             'model' => ['nullable', 'string', 'max:255'],
             'year' => ['nullable', 'numeric', 'max:' . (date('Y') + 1)],
+            'diesel_card' => ['nullable', 'string', 'max:255'],
         ];
 
         if (auth()->guard('web')->check()) {
@@ -95,7 +96,6 @@ class TruckController extends Controller
                 $truck = Truck::findOrFail($id);
             else {
                 $truck = new Truck();
-                $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
             }
 
             $trailer = Trailer::whereHas('truck')
@@ -105,6 +105,7 @@ class TruckController extends Controller
                 $trailer->truck->trailer_id = null;
                 $trailer->truck->save();
             }
+            $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
             $truck->trailer_id = $request->trailer_id;
             $truck->driver_id = $request->driver_id;
             $truck->number = $request->number;
@@ -113,6 +114,8 @@ class TruckController extends Controller
             $truck->make = $request->make;
             $truck->model = $request->model;
             $truck->year = $request->year;
+            if ($request->diesel_card)
+                $truck->diesel_card = $request->diesel_card;
             $truck->inactive = $request->inactive ?? null;
             if ($request->seller_id)
                 $truck->seller_id = $request->seller_id;
