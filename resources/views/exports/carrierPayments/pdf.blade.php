@@ -43,11 +43,18 @@
                 <td style="text-align: right; padding-right: 10px;">Subtotal</td>
                 <td style="text-align: left;">${{ number_format($carrierPayment->gross_amount, 2) }}</td>
             </tr>
-            @foreach($carrierPayment->expenses as $expense)
+            @foreach($bonuses as $bonus)
             <tr>
                 <td colspan="6"></td>
-                <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $expense->description }}</td>
-                <td style="text-align: left;">$({{ number_format($expense->amount, 2) }})</td>
+                <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $bonus["name"] }}</td>
+                <td style="text-align: left;">${{ number_format($bonus["amount"], 2) }}</td>
+            </tr>
+            @endforeach
+            @foreach($expenses as $expense)
+            <tr>
+                <td colspan="6"></td>
+                <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $expense["name"] }}</td>
+                <td style="text-align: left;">$({{ number_format($expense["amount"], 2) }})</td>
             </tr>
             @endforeach
             <tr>

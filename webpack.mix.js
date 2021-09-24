@@ -24,8 +24,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     // Modules
     //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
     //.scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
-    .scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
-    .scripts(['resources/js/modules/aggrid/common.js'], 'public/js/modules/aggrid/common.min.js')
+    //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
+    //.scripts(['resources/js/modules/aggrid/common.js'], 'public/js/modules/aggrid/common.min.js')
     //.js('resources/js/app.js', 'public/js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')

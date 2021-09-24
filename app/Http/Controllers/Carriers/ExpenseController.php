@@ -38,7 +38,8 @@ class ExpenseController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + CarrierExpenseType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + CarrierExpenseType::where('carrier_id', auth()->user()->id)
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 

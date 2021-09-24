@@ -12,9 +12,34 @@ trait CarrierPaymentsPDF
         $carrierPayment = CarrierPayment::with([
             'carrier:id,name',
             'loads.driver.truck',
-            'expenses',
+            'expenses.type',
+            'bonuses.bonus_type',
         ])
             ->findOrFail($id);
+
+        $expenses = [];
+        foreach ($carrierPayment->expenses as $item) {
+            if (!isset($expenses[$item->type_id]))
+                $expenses[$item->type_id] = [
+                    'name' => $item->type->name ?? '',
+                    'amount' => (double)$item->amount,
+                ];
+            else
+                $expenses[$item->type_id]['amount'] += (double)$item->amount;
+        }
+        $expenses = array_values($expenses);
+
+        $bonuses = [];
+        foreach ($carrierPayment->bonuses as $item) {
+            if (!isset($bonuses[$item->bonus_type_id]))
+                $bonuses[$item->bonus_type_id] = [
+                    'name' => $item->bonus_type->name ?? '',
+                    'amount' => (double)$item->amount,
+                ];
+            else
+                $bonuses[$item->bonus_type_id]['amount'] += (double)$item->amount;
+        }
+        $bonuses = array_values($bonuses);
 
         $mpdf = new Mpdf();
         $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
@@ -26,7 +51,7 @@ trait CarrierPaymentsPDF
             $orientation = 'P';
         } else {
             $title = "PAYMENT WEEK " . $title;
-            $html = view('exports.carrierPayments.pdf', compact('title', 'carrierPayment'));
+            $html = view('exports.carrierPayments.pdf', compact('title', 'carrierPayment', 'expenses', 'bonuses'));
             $orientation = 'L';
         }
         $mpdf->AddPage($orientation, // L - landscape, P - portrait

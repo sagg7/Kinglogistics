@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\CarrierPaymentEnum;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
+use App\Models\BonusType;
 use App\Models\Carrier;
+use App\Models\CarrierExpenseType;
 use App\Models\CarrierPayment;
 use App\Models\CarrierExpense;
 use App\Traits\Accounting\CarrierPaymentsPDF;
@@ -64,6 +66,13 @@ class CarrierPaymentController extends Controller
     }
 
     /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param int $id
@@ -71,14 +80,14 @@ class CarrierPaymentController extends Controller
      */
     public function edit(int $id)
     {
-        // TODO: CHECK RELATIONSHIPS
         $carrierPayment = CarrierPayment::with([
             'bonuses.bonus_type',
             'expenses.type',
         ])
             ->findOrFail($id);
-
-        $params = compact('carrierPayment');
+        $bonusTypes = BonusType::pluck('name', 'id')->toArray();
+        $expenseTypes = CarrierExpenseType::whereNull('carrier_id')->pluck('name', 'id')->toArray();
+        $params = compact('carrierPayment', 'bonusTypes', 'expenseTypes');
         return view('carrierPayments.edit', $params);
     }
 
@@ -102,10 +111,13 @@ class CarrierPaymentController extends Controller
 
             if ($request->bonuses)
                 foreach ($request->bonuses as $item) {
-                    if (isNan((int)$item["id"])) {
+                    if (!is_numeric($item["id"])) {
                         // In case of adding new bonus
                         $bonus = new Bonus();
-                        $bonus->fill($item);
+                        $bonus->bonus_type_id = $item["objType"];
+                        $bonus->amount = $item["amount"];
+                        $bonus->description = $item["description"];
+                        $bonus->date = Carbon::createFromFormat('m/d/Y', $item["date"]);
                         $bonus->save();
                         $bonus->carriers()->sync([$carrier_id => ['carrier_payment_id' => $carrierPayment->id]]);
                     } else if (isset($item["delete"])) {
@@ -118,10 +130,13 @@ class CarrierPaymentController extends Controller
 
             if ($request->expenses)
                 foreach ($request->expenses as $item) {
-                    if (isNan((int)$item["id"])) {
+                    if (!is_numeric($item["id"])) {
                         // In case of adding new expense
                         $expense = new CarrierExpense();
-                        $expense->fill($item);
+                        $expense->type_id = $item["objType"];
+                        $expense->amount = $item["amount"];
+                        $expense->description = $item["description"];
+                        $expense->date = Carbon::createFromFormat('m/d/Y', $item["date"]);
                         $expense->carrier_id = $carrier_id;
                         $expense->carrier_payment_id = $carrierPayment->id;
                         $expense->non_editable = true;
