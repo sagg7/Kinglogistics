@@ -16,9 +16,11 @@
                         //{headerName: 'Preview', field: 'preview'},
                     ],
                     menu: [
-                        //{text: 'Show', route: '/jobOpportunity/show', icon: 'feather icon-eye'},
+                        {text: 'Show', route: '/jobOpportunity/show', icon: 'feather icon-eye'},
+                        @if(auth()->guard('web')->check())
                         {text: 'Edit', route: '/jobOpportunity/edit', icon: 'feather icon-edit'},
                         {route: '/jobOpportunity/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/jobOpportunity/search',

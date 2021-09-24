@@ -78,11 +78,44 @@
                 </a>
             </li>
             <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-hand-holding-usd"></i><span class="menu-title" data-i18n="User">Job Opportunities</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/jobOpportunity/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/jobOpportunity/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-chart-bar"></i><span class="menu-title" data-i18n="User">Reports</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/report/historical">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Historical</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="navigation-header">
+                <span>Safety</span>
+            </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/incident/create">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/incident/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
                 </ul>

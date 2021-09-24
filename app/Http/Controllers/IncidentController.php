@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Driver;
 use App\Models\Incident;
 use App\Models\IncidentType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -10,7 +11,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\Mpdf;
 
 class IncidentController extends Controller
@@ -26,14 +26,14 @@ class IncidentController extends Controller
     {
         return Validator::make($data, [
             'incident_type_id' => ['required', 'exists:incident_types,id'],
-            'carrier_id' => ['required', 'exists:carriers,id'],
+            'carrier_id' => ['sometimes', 'required', 'exists:carriers,id'],
             'driver_id' => ['required', 'exists:drivers,id'],
             'truck_id' => ['required', 'exists:trucks,id'],
             'trailer_id' => ['required', 'exists:trailers,id'],
             'sanction' => ['required'],
             'date_submit' => ['required', 'date'],
             'location' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:1024'],
+            'description' => ['sometimes', 'required', 'string', 'max:1024'],
             'excuse' => ['required', 'string', 'max:1024'],
         ]);
     }
@@ -43,11 +43,15 @@ class IncidentController extends Controller
      */
     private function createEditParams(): array
     {
+        $drivers = auth()->guard('carrier')->check()
+            ? [null => ''] + Driver::where('carrier_id', auth()->user()->id)->pluck('name', 'id')->toArray()
+            : [];
         return [
             'incident_types' => [null => ''] + IncidentType::select(DB::raw("IF(fine IS NOT NULL, CONCAT(name, ' - ', CONCAT('$', FORMAT(fine, 2))), name) as text"), 'id')
                     ->pluck('text', 'id')
                     ->toArray(),
             'sanctions' => [null => '', 'warning' => 'Warning', 'fine' => 'Fine', 'termination' => 'Termination'],
+            'drivers' => $drivers,
         ];
     }
 
@@ -82,38 +86,41 @@ class IncidentController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Incident
     {
-        if ($id)
-            $incident = Incident::findOrFail($id);
-        else {
-            $incident = new Incident();
-            $incident->user_id = auth()->user()->id;
-        }
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $incident = Incident::findOrFail($id);
+            else {
+                $incident = new Incident();
+                $incident->user_id = auth()->user()->id;
+            }
 
-        $incident->incident_type_id = $request->incident_type_id;
-        $incident->carrier_id = $request->carrier_id;
-        $incident->driver_id = $request->driver_id;
-        $incident->truck_id = $request->truck_id;
-        $incident->trailer_id = $request->trailer_id;
-        $incident->sanction = $request->sanction;
-        $incident->date = Carbon::parse($request->date_submit);
-        $incident->location = $request->location;
-        $incident->description = trim($request->description);
-        $incident->excuse = trim($request->excuse);
-        $incident->refuse_sign = $request->refuse_sign ?? null;
-        $incident->save();
+            $incident->incident_type_id = $request->incident_type_id;
+            $incident->carrier_id = auth()->guard('carrier')->check() ? auth()->user()->id : $request->carrier_id;
+            $incident->driver_id = $request->driver_id;
+            $incident->truck_id = $request->truck_id;
+            $incident->trailer_id = $request->trailer_id;
+            $incident->sanction = $request->sanction;
+            $incident->date = Carbon::parse($request->date_submit);
+            $incident->location = $request->location;
+            $incident->description = trim($request->description);
+            $incident->excuse = trim($request->excuse);
+            $incident->refuse_sign = $request->refuse_sign ?? null;
+            if (!$id)
+                $incident->save();
 
-        if ($request->sanction === "termination") {
-            $incident->driver->inactive = 1;
-            $incident->driver->save();
-        }
+            if ($request->sanction === "termination") {
+                $incident->driver->inactive = 1;
+                $incident->driver->save();
+            }
 
-        if (!$id) {
-            $incident->safety_signature = $this->uploadImage($request->safety_signature, "safety/incident/$incident->id/safety");
-            $incident->driver_signature = $this->uploadImage($request->driver_signature, "safety/incident/$incident->id/driver");
+            if ($request->safety_signature)
+                $incident->safety_signature = $this->uploadImage($request->safety_signature, "safety/incident/$incident->id/safety");
+            if ($request->driver_signature)
+                $incident->driver_signature = $this->uploadImage($request->driver_signature, "safety/incident/$incident->id/driver");
             $incident->save();
-        }
 
-        return $incident;
+            return $incident;
+        });
     }
 
 
@@ -125,6 +132,7 @@ class IncidentController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         $this->validator($request->all())->validate();
 
         $this->storeUpdate($request);
@@ -238,6 +246,8 @@ class IncidentController extends Controller
                             });
                         });
                 }
+                if (auth()->guard('carrier')->check())
+                    $q->where('carrier_id', auth()->user()->id);
             })
             ->with([
                 'incident_type:id,name',

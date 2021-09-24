@@ -20,9 +20,10 @@ class Incident extends Model
      * @param $value
      * @return string
      */
-    public function getSafetySignatureAttribute($value): string
+    public function getSafetySignatureAttribute($value)
     {
-        return $this->getTemporaryFile($value);
+        if ($value)
+            return $this->getTemporaryFile($value);
     }
 
     /**

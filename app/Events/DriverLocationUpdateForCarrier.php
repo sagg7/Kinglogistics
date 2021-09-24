@@ -40,7 +40,8 @@ class DriverLocationUpdateForCarrier implements ShouldBroadcast
                 'name' => $this->driver->name,
                 'truck' => [
                     'number' => $this->driver->truck->number,
-                ]
+                ],
+                'shift' => $this->driver->shift->id,
             ],
             'carrier' => [
                 'id' => $this->carrier->id,

@@ -26,15 +26,15 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'incident_type', valueFormatter: nameFormatter},
-                        {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                        @if(auth()->guard('web')->check()){headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},@endif
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                         {headerName: 'Safety User', field: 'user', valueFormatter: nameFormatter},
                         {headerName: 'Sanction', field: 'sanction', valueFormatter: capitalizeNameFormatter},
                     ],
                     menu: [
-                        {text: 'Edit', route: '/incident/edit', icon: 'feather icon-edit'},
+                        @if(auth()->guard('web')->check()){text: 'Edit', route: '/incident/edit', icon: 'feather icon-edit'},@endif
                         {text: 'PDF', route: '/incident/downloadPDF', icon: 'fas fa-file-pdf'},
-                        {route: '/incident/delete', type: 'delete'}
+                        @if(auth()->guard('web')->check()){route: '/incident/delete', type: 'delete'}@endif
                     ],
                     container: 'myGrid',
                     url: '/incident/search',

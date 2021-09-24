@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('jobOpportunity')->group(function () {
     Route::get('index', [JobOpportunityController::class, 'index'])
         ->name('jobOpportunity.index');
+    Route::get('show/{id}', [JobOpportunityController::class, 'show'])
+        ->name('jobOpportunity.show');
     Route::get('create', [JobOpportunityController::class, 'create'])
         ->name('jobOpportunity.create');
     Route::post('store', [JobOpportunityController::class, 'store'])
-        ->name('jobOpportunity.store');
-    Route::get('store', [JobOpportunityController::class, 'store'])
         ->name('jobOpportunity.store');
     Route::get('search', [JobOpportunityController::class, 'search'])
         ->name('jobOpportunity.search');

@@ -3,12 +3,19 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/incidents/common.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/incidents/common.min.js?1.0.1') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
         <script>
+            @if(auth()->guard('carrier')->check())
+            const carrierId = {{ auth()->user()->id }};
+            @endif
             const canvases = [
+                @if(!$incident->safety_signature)
                 {canvas: document.getElementById('safety_signature'), required: true},
+                @endif
+                @if(!$incident->driver_signature)
                 {canvas: document.getElementById('driver_signature')},
+                @endif
             ];
             (() => {
                 $("#carrier_id")

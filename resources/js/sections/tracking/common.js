@@ -16,12 +16,19 @@
         const infowindow = new google.maps.InfoWindow({
             content: info,
         });
+        let iconUrl = "/images/app/tracking/icons/";
+        if (!data.driver.shift)
+            iconUrl += "truck-red.svg";
+        else if (data.load.origin)
+            iconUrl += "truck-green.svg";
+        else
+            iconUrl += "delivery-truck.svg";
         let markerObj = {
             position: markerPosition,
             map,
             animation: google.maps.Animation.DROP,
             icon: {
-                url: "/images/app/tracking/icons/delivery-truck.svg",
+                url: iconUrl,
                 scaledSize: new google.maps.Size(40, 40), // scaled size
             },
         };
@@ -93,6 +100,7 @@
             driver: {
                 id: item.id,
                 name: item.name,
+                shift: item.shift ? item.shift.id : null,
             },
             truck: {
                 number: truck.number,

@@ -1,12 +1,13 @@
 (() => {
-    let carrier = null;
-    const driverSel = $('#driver_id'),
+    let carrier = typeof carrierId !== "undefined" ? carrierId : null;
+    const carrierSel = $('#carrier_id'),
+        driverSel = $('#driver_id'),
         truckSel = $('#truck_id'),
         trailerSel = $('#trailer_id'),
         dateInp = $('#date'),
         date = initPickadate(dateInp).pickadate('picker');
     date.set('select', dateInp.val(), {format: 'yyyy/mm/dd'});
-    $('#carrier_id').select2({
+    carrierSel.select2({
         ajax: {
             url: '/carrier/selection',
             data: (params) => {
@@ -31,35 +32,44 @@
             trailerSel.val('').trigger('change');
             driverSel.prop('disabled', true).trigger('change');
         });
-    driverSel.select2({
-        ajax: {
-            url: '/driver/selection',
-            data: (params) => {
-                return {
-                    search: params.term,
-                    page: params.page || 1,
-                    take: 15,
-                    carrier,
-                };
-            },
-        },
+    const driverObj = {
         placeholder: 'Select',
         allowClear: true,
-    })
+    };
+    if (carrierSel.lengt > 0) {
+        _.merge(driverObj, {
+            ajax: {
+                url: '/driver/selection',
+                data: (params) => {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        take: 15,
+                        carrier,
+                    };
+                },
+            },
+        });
+    }
+    driverSel.select2(driverObj)
         .on('select2:select', (res) => {
-            const driver = res.params.data,
-                truck = driver.truck,
-                trailer = truck.trailer;
-            truckSel.html(`<option value="${truck.id}">${truck.number}</option>`)
-                .val(`${truck.id}`)
-                .trigger('change');
-            trailerSel.html(`<option value="${trailer.id}">${trailer.number}</option>`)
-                .val(`${trailer.id}`)
-                .trigger('change');
+            if (carrierSel.lengt > 0) {
+                const driver = res.params.data,
+                    truck = driver.truck,
+                    trailer = truck.trailer;
+                truckSel.html(`<option value="${truck.id}">${truck.number}</option>`)
+                    .val(`${truck.id}`)
+                    .trigger('change');
+                trailerSel.html(`<option value="${trailer.id}">${trailer.number}</option>`)
+                    .val(`${trailer.id}`)
+                    .trigger('change');
+            }
         })
         .on('select2:unselect', () => {
-            truckSel.val('').trigger('change');
-            trailerSel.val('').trigger('change');
+            if (carrierSel.lengt > 0) {
+                truckSel.val('').trigger('change');
+                trailerSel.val('').trigger('change');
+            }
         });
     truckSel.select2({
         ajax: {
@@ -90,7 +100,7 @@
         placeholder: 'Select',
         allowClear: true,
     });
-    if (!driverSel.val())
+    if (!driverSel.val() && carrierSel.length > 0)
         driverSel.prop('disabled', true).trigger('change');
     $('#incident_type_id').select2({
         placeholder: 'Select',
