@@ -6,9 +6,11 @@
                     {!! Form::label('incident_type_id', ucfirst(__('incident type')), ['class' => 'col-form-label']) !!}
                     <div class="input-group">
                         {!! Form::select('incident_type_id', $incident_types, $incident->incident_type_id ?? null, ['class' => 'form-control' . ($errors->first('incident_type_id') ? ' is-invalid' : '')]) !!}
+                        @if(auth()->guard('web')->check())
                         <div class="input-group-append">
                             <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addIncidentType"><i class="fas fa-plus"></i></button>
                         </div>
+                        @endif
                         @error('incident_type_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
@@ -43,6 +45,7 @@
                     </span>
                     @enderror
                 </div>
+                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-3">
                     {!! Form::label('carrier_id', ucfirst(__('carrier')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('carrier_id', [], $incident->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
@@ -52,9 +55,10 @@
                     </span>
                     @enderror
                 </div>
+                @endif
                 <div class="form-group col-md-3">
                     {!! Form::label('driver_id', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
-                    {!! Form::select('driver_id', [], $incident->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
+                    {!! Form::select('driver_id', $drivers, $incident->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
                     @error('driver_id')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
@@ -79,6 +83,7 @@
                     </span>
                     @enderror
                 </div>
+                @if(auth()->guard('web')->check())
                 <div class="form-group col-md-6">
                     {!! Form::label('description', ucfirst(__('description')), ['class' => 'col-form-label']) !!}
                     {!! Form::textarea('description', $incident->description ?? null, ['class' => 'form-control' . ($errors->first('description') ? ' is-invalid' : ''), 'rows' => 5]) !!}
@@ -88,7 +93,8 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-6">
+                @endif
+                <div class="form-group @if(auth()->guard('carrier')->check()){{ "col-md-12" }}@else{{ "col-md-6" }}@endif">
                     {!! Form::label('excuse', ucfirst(__('driver excuse')), ['class' => 'col-form-label']) !!}
                     {!! Form::textarea('excuse', $incident->excuse ?? null, ['class' => 'form-control' . ($errors->first('excuse') ? ' is-invalid' : ''), 'rows' => 5]) !!}
                     @error('excuse')
@@ -97,50 +103,42 @@
                     </span>
                     @enderror
                 </div>
-                @if(!isset($incident))
-                <div class="form-group col-md-6 text-center">
-                    <label class="col-form-label" for="safety_signature">Safety Signature</label>
-                    <div>
-                        <canvas class="d-block mx-auto" id="safety_signature"></canvas>
-                        <button type="button" class="btn btn-outline-danger mt-1">Clear</button>
-                    </div>
-                </div>
-                <div class="form-group col-md-6 text-center">
-                    <label class="col-form-label d-block" for="driver_signature">Driver Signature</label>
-                    <div>
-                        <canvas class="d-block mx-auto" id="driver_signature"></canvas>
-                        <button type="button" class="btn btn-outline-danger mt-1">Clear</button>
-                    </div>
-                    <fieldset class="d-inline-block mx-auto">
-                        <div class="vs-checkbox-con vs-checkbox-primary">
-                            {{ Form::checkbox('refuse_sign', 1, $carrier->refuse_sign ?? null) }}
-                            <span class="vs-checkbox">
-                                <span class="vs-checkbox--check">
-                                    <i class="vs-icon feather icon-check"></i>
-                                </span>
-                            </span>
-                            {!! Form::label('refuse_sign', ucfirst(__('refuse to sign')), ['class' => 'col-form-label']) !!}
-                        </div>
-                    </fieldset>
-                </div>
-                @else
+                @if(isset($incident) || auth()->guard('web')->check())
                     <div class="form-group col-md-6 text-center">
-                        <img src="{{ $incident->safety_signature }}" alt="Safety Signature" id="safety_signature">
-                        <label class="col-form-label d-block" for="safety_signature">Safety Signature</label>
-                    </div>
-                    <div class="form-group col-md-6 text-center">
-                        @if($incident->driver_signature)
-                            <img src="{{ $incident->driver_signature }}" alt="Driver Signature" id="driver_signature">
+                        <label class="col-form-label" for="safety_signature">Safety Signature</label>
+                        @if(isset($incident) && $incident->safety_signature)
+                            <img src="{{ $incident->safety_signature }}" alt="Safety Signature" id="safety_signature">
                         @else
                             <div>
-                                <canvas class="d-block mx-auto" id="driver_signature"></canvas>
+                                <canvas class="d-block mx-auto" id="safety_signature"></canvas>
+                                <button type="button" class="btn btn-outline-danger mt-1">Clear</button>
                             </div>
                         @endif
-                        <label class="col-form-label d-block" for="driver_signature">Driver Signature</label>
                     </div>
                 @endif
+                <div class="form-group col-md-6 text-center">
+                    <label class="col-form-label d-block" for="driver_signature">Driver Signature</label>
+                    @if(isset($incident) && $incident->driver_signature)
+                        <img src="{{ $incident->driver_signature }}" alt="Driver Signature" id="driver_signature">
+                    @else
+                        <div>
+                            <canvas class="d-block mx-auto" id="driver_signature"></canvas>
+                            <button type="button" class="btn btn-outline-danger mt-1">Clear</button>
+                        </div>
+                        <fieldset class="d-inline-block mx-auto">
+                            <div class="vs-checkbox-con vs-checkbox-primary">
+                                {{ Form::checkbox('refuse_sign', 1, $carrier->refuse_sign ?? null) }}
+                                <span class="vs-checkbox">
+                                    <span class="vs-checkbox--check">
+                                        <i class="vs-icon feather icon-check"></i>
+                                    </span>
+                                </span>
+                                {!! Form::label('refuse_sign', ucfirst(__('refuse to sign')), ['class' => 'col-form-label']) !!}
+                            </div>
+                        </fieldset>
+                    @endif
+                </div>
             </div>
-        </div>
-        {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
-    </div> <!-- end card-body -->
-</div> <!-- end card -->
+            {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
+        </div> <!-- end card-body -->
+    </div> <!-- end card -->
