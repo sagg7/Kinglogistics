@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\JobOpportunity;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\QuillEditor\QuillFormatter;
+use App\Traits\QuillEditor\QuillHtmlRendering;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class JobOpportunityController extends Controller
 {
-    use GetSimpleSearchData, FileUpload, QuillFormatter;
+    use GetSimpleSearchData, FileUpload, QuillFormatter, QuillHtmlRendering;
 
     /**
      * @param array $data
@@ -98,7 +99,21 @@ class JobOpportunityController extends Controller
      */
     public function show(int $id)
     {
-        //
+        $opportunity = JobOpportunity::with('carriers:id,name')
+            ->where(function ($q) {
+                if (auth()->guard('carrier')->check()) {
+                    $q->whereHas('carriers', function ($q) {
+                        $q->where('carrier_id', auth()->user()->id);
+                    });
+                }
+            })
+            ->findOrFail($id);
+
+        $opportunity->html = $this->renderHtmlString($opportunity->message);
+
+        $params = compact('opportunity');
+
+        return view('jobOpportunities.show', $params);
     }
 
     /**
@@ -159,7 +174,14 @@ class JobOpportunityController extends Controller
         $query = JobOpportunity::select([
             "job_opportunities.id",
             "job_opportunities.title",
-        ]);
+        ])
+            ->where(function ($q) {
+                if (auth()->guard('carrier')->check()) {
+                    $q->whereHas('carriers', function ($q) {
+                        $q->where('carrier_id', auth()->user()->id);
+                    });
+                }
+            });
 
         return $this->multiTabSearchData($query, $request);
     }
