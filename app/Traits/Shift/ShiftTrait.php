@@ -13,8 +13,6 @@ trait ShiftTrait
 
     public function startShift($driver, $payload, $load)
     {
-        if ($payload['box_type_id'] == null)
-            $payload['box_type_id'] = 8; //set in others
         // Create and assign the shift to provided driver
         $driver->shift()->create($payload);
 
