@@ -11,6 +11,10 @@ class Loan extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $casts = [
+        'date' => 'date:m/d/Y',
+    ];
+
     /**
      * @return BelongsTo
      */

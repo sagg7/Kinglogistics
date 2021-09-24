@@ -6,7 +6,7 @@
         <script src="{{ asset('js/sections/loans/common.min.js') }}"></script>
         <script>
             (() => {
-                $("#carrier_id")
+                $("#carrier")
                     .html(`<option value="{{ $loan->carrier_id }}">{{ $loan->carrier->name }}</option>`)
                     .val({{ $loan->carrier_id }})
                     .trigger('change');

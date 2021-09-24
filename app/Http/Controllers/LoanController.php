@@ -24,6 +24,7 @@ class LoanController extends Controller
             'fee_percentage' => ['required', 'numeric'],
             'installments' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
+            'date_submit' => ['required', 'date'],
         ]);
     }
 
@@ -44,6 +45,7 @@ class LoanController extends Controller
         $loan->fee_percentage = $request->fee_percentage;
         $loan->installments = $request->installments;
         $loan->description = $request->description;
+        $loan->date = $request->date;
         $loan->save();
 
         return $loan;
@@ -78,6 +80,7 @@ class LoanController extends Controller
     public function store(Request $request)
     {
         $this->validator($request->all())->validate();
+        $request->date = $request->date_submit;
 
         $this->storeUpdate($request);
 
@@ -105,7 +108,7 @@ class LoanController extends Controller
     {
         $loan = Loan::findOrFail($id);
         $params = compact('loan');
-        return view('loans.create', $params);
+        return view('loans.edit', $params);
     }
 
     /**
@@ -118,6 +121,7 @@ class LoanController extends Controller
     public function update(Request $request, int $id)
     {
         $this->validator($request->all())->validate();
+        $request->date = $request->date_submit;
 
         $this->storeUpdate($request, $id);
 

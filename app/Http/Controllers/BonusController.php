@@ -26,6 +26,7 @@ class BonusController extends Controller
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
+            'date' => ['required', 'date'],
         ]);
     }
 
@@ -98,8 +99,9 @@ class BonusController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request->all())->errors();
         $request->date = $request->date_submit;
+        $this->validator($request->all())->errors();
+
         $this->storeUpdate($request);
 
         return redirect()->route('bonus.index');
@@ -139,8 +141,8 @@ class BonusController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $this->validator($request->all())->validate();
         $request->date = $request->date_submit;
+        $this->validator($request->all())->validate();
 
         $this->storeUpdate($request, $id);
 
@@ -196,7 +198,7 @@ class BonusController extends Controller
             "bonuses.bonus_type_id",
             "bonuses.amount",
             "bonuses.description",
-            DB::raw('DATE_FORMAT(bonuses.date, \'%m-%d-%Y\') AS date'),
+            "bonuses.date",
         ])
             ->with([
                 'carriers' => function ($q) {

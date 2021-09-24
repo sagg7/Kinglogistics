@@ -1,5 +1,8 @@
 (() => {
-    const carrierSel = $('#carrier');
+    const carrierSel = $('#carrier'),
+        dateInp = $('#date'),
+        date = initPickadate(dateInp).pickadate('picker');
+    date.set('select', dateInp.val(), {format: 'yyyy/mm/dd'});
 
     carrierSel.select2({
         ajax: {
