@@ -16,6 +16,12 @@
                     else
                         return '';
                 };
+                const depositFormatter = (params) => {
+                    if (params.value ? params.value.active_rental ? params.value.active_rental.deposit_is_paid : false : false) {
+                        return numeral(params.value.active_rental.deposit).format('$0,0.00');
+                    } else
+                        return '';
+                };
                 const trailerFormatter = (params) => {
                     if (params.value)
                         return params.value.number;
@@ -29,6 +35,7 @@
                         {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
                         {headerName: 'Plate', field: 'plate'},
                         {headerName: 'VIN', field: 'vin'},
+                        {headerName: 'Deposit', field: 'driver', filter:false, sortable: false, valueFormatter: depositFormatter},
                     ],
                     menu: [
                         {text: 'Edit', route: '/truck/edit', icon: 'feather icon-edit'},

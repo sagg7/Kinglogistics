@@ -279,7 +279,13 @@ class TruckController extends Controller
                 if (auth()->guard('carrier')->check())
                     $q->where("carrier_id", auth()->user()->id);
             })
-            ->with(['driver:id,name', 'trailer:id,number']);
+            ->with([
+                'driver' => function ($q) {
+                    $q->with('active_rental:driver_id,deposit,deposit_is_paid')
+                        ->select('id', 'name');
+                },
+                'trailer:id,number',
+            ]);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

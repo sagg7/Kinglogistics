@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\LoadStatusEnum;
+use App\Enums\RentalStatusEnums;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,6 +51,14 @@ class Driver extends Authenticatable implements CanResetPassword
     public function rentals(): HasMany
     {
         return $this->hasMany(Rental::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function active_rental(): HasOne
+    {
+        return $this->hasOne(Rental::class)->where('status', '!=', RentalStatusEnums::FINISHED);
     }
 
     /**
