@@ -29,7 +29,7 @@
                 <td>{{ $load->date->format('m/d/Y') }}</td>
                 <td>{{ $load->driver->name }}</td>
                 <td>{{ $load->destination }}</td>
-                <td>{{ $load->sand_ticket }}</td>
+                <td>{{ $load->customer_reference }}</td>
                 <td>{{ $load->control_number }}</td>
                 <td>{{ $load->bol }}</td>
                 <td>{{ $load->mileage }}</td>

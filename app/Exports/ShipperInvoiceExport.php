@@ -180,7 +180,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
                     $load->date->format('m/d/Y'),
                     $load->driver->name,
                     $load->destination,
-                    $load->sand_ticket,
+                    $load->customer_reference,
                     $load->control_number,
                     $load->bol,
                     $load->mileage,
