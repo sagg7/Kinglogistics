@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="crumb_section">Payments</x-slot>
-    <x-slot name="crumb_subsection">Edit</x-slot>
+    <x-slot name="crumb_subsection">Edit - {{ $carrierPayment->carrier->name }}</x-slot>
 
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
