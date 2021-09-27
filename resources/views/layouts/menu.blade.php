@@ -263,13 +263,20 @@
                 </ul>
             </li>
             @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
-                <li class="nav-item">
-                    <a href="/tracking">
-                        <i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
+                <li class="nav-item has-sub">
+                    <a href="#"><i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span></a>
+                    <ul class="menu-content">
+                        <li>
+                            <a href="/tracking">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Real time</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/tracking/history">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">History</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             @endif
             <li class="navigation-header">

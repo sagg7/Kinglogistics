@@ -1,3 +1,4 @@
 {
-    "/js/sections/carrierPayments/editPayment.min.js": "/js/sections/carrierPayments/editPayment.min.js"
+    "/js/sections/tracking/common.min.js": "/js/sections/tracking/common.min.js",
+    "/js/sections/tracking/history.min.js": "/js/sections/tracking/history.min.js"
 }
