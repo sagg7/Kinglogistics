@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Carriers\DailyPayController;
+use App\Http\Controllers\Carriers\LoanController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('dailyPay')->group(function () {
@@ -18,4 +19,11 @@ Route::prefix('dailyPay')->group(function () {
         ->name('dailyPay.update');
     Route::post('delete/{id}', [DailyPayController::class, 'destroy'])
         ->name('dailyPay.delete');
+});
+
+Route::prefix('loan')->group(function () {
+    Route::get('index', [LoanController::class, 'index'])
+        ->name('loans.index');
+    Route::get('search', [LoanController::class, 'search'])
+        ->name('loans.search');
 });

@@ -177,6 +177,7 @@ class tableAG {
         this.constructColumns();
         this.page = 0;
         this.dataSource = null;
+        this.searchQueryParams = properties.searchQueryParams ? properties.searchQueryParams : {};
         let columnDefs = this.columnDefs;
         this.gridOptions = {
             columnDefs,
@@ -329,10 +330,12 @@ class tableAG {
         }
     }*/
 
-    updateSearchQuery(val) {
+    updateSearchQuery(params = {}) {
         let dsPar = {url: this.url};
-        if (val !== '')
-            dsPar.params = {search: val};
+        if (this.searchQueryParams)
+            dsPar.params = _.merge(params, this.searchQueryParams)
+        else
+            dsPar.params = params;
         let ds = new DataSource(dsPar);
         this.dataSource = ds;
         this.gridOptions.api.setServerSideDatasource(ds);
@@ -357,10 +360,10 @@ class tableAG {
         let filter = section.find(`.ag-grid-filter`);
         filter.on("keyup", (e) => {
             if (e.which === 13)
-                this.updateSearchQuery(filter.val());
+                this.updateSearchQuery({search: filter.val()});
         });
         filter.parent().find("button").click(() => {
-            this.updateSearchQuery(filter.val());
+            this.updateSearchQuery({search: filter.val()});
         });
 
         /*** CHANGE DATA PER PAGE ***/

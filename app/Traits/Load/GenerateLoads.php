@@ -10,6 +10,7 @@ use App\Notifications\LoadAssignment;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 trait GenerateLoads
@@ -103,9 +104,17 @@ trait GenerateLoads
                 }
             }
             $load->notes = $data["notes"] ?? null;
+
             if (isset($data['status']))
                 $load->status = $data["status"];
             $load->save();
+
+            /**
+             * As the ID's in data property are Strings, we must reload the load to automatically convert the ids to valid int types
+             * This small fix were added to avoid type issues in the mobile app.
+             * */
+            $load = Load::find($load->id);
+            $load->notified_at = Carbon::now()->format('Y-m-d H:i:s');
 
             if (isset($data["driver_id"])) {
                 // Send push notification message to Driver
