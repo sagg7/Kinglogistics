@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Expense extends Model
+class Income extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,6 +20,6 @@ class Expense extends Model
      */
     public function type(): BelongsTo
     {
-        return $this->belongsTo(ExpenseType::class);
+        return $this->belongsTo(IncomeType::class);
     }
 }

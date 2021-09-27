@@ -184,7 +184,7 @@ class ExpenseController extends Controller
             "expenses.id",
             "expenses.type_id",
             "expenses.amount",
-            DB::raw('DATE_FORMAT(date, \'%m-%d-%Y\') AS date'),
+            "date",
 
         ])
             ->with('type:id,name');

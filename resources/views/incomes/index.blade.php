@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Expense</x-slot>
+    <x-slot name="crumb_section">Income</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -35,16 +35,16 @@
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],
                     menu: [
-                        {text: 'Edit', route: '/expense/edit', icon: 'feather icon-edit'},
-                        {route: '/expense/delete', type: 'delete'}
+                        {text: 'Edit', route: '/income/edit', icon: 'feather icon-edit'},
+                        {route: '/income/delete', type: 'delete'}
                     ],
                     container: 'myGrid',
-                    url: '/expense/search',
+                    url: '/income/search',
                     tableRef: 'tbAG',
                 });
             })();
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense']])@endcomponent
+    @component('components.aggrid-index', ['create_btn' => ['url' => '/income/create', 'text' => 'Create Income']])@endcomponent
 </x-app-layout>

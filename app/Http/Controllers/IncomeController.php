@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Carriers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\CarrierExpense;
-use App\Models\CarrierExpenseType;
+use App\Models\Income;
+use App\Models\IncomeType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class ExpenseController extends Controller
+class IncomeController extends Controller
 {
     use GetSimpleSearchData;
 
@@ -23,12 +22,9 @@ class ExpenseController extends Controller
     private function validator(array $data, int $id = null)
     {
         return Validator::make($data, [
-            'type' => ['required', 'exists:carrier_expense_types,id'],
-            'truck_id' => ['nullable', 'exists:trucks,id'],
+            'type' => ['required', 'exists:income_types,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
-            'mileage' => ['nullable', 'numeric'],
-            'gallons' => ['nullable', 'numeric'],
         ]);
     }
 
@@ -38,37 +34,31 @@ class ExpenseController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + CarrierExpenseType::where('carrier_id', auth()->user()->id)
-                    ->pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + IncomeType::pluck('name', 'id')->toArray(),
         ];
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return CarrierExpense
+     * @return Income
      */
-    private function storeUpdate(Request $request, $id = null): CarrierExpense
+    private function storeUpdate(Request $request, $id = null): Income
     {
         if ($id)
-            $expense = CarrierExpense::where('carrier_id', auth()->user()->id)
-                ->whereNull('carrier_payment_id')
-                ->findOrFail($id);
-        else {
-            $expense = new CarrierExpense();
-            $expense->carrier_id = auth()->user()->id;
-        }
+            $income = Income::findOrFail($id);
+        else
+            $income = new Income();
 
-        $expense->type_id = $request->type;
-        $expense->amount = $request->amount;
-        $expense->truck_id = $request->truck_id;
-        $expense->description = $request->description;
-        $expense->date = Carbon::parse($request->date_submit);
-        $expense->mileage = $request->mileage;
-        $expense->gallons = $request->gallons;
-        $expense->save();
+        $income->type_id = $request->type;
+        $income->amount = $request->amount;
+        $income->description = $request->description;
+        $income->date = Carbon::parse($request->date_submit);
+        $income->note = $request->note;
+        $income->user_id = auth()->user()->id;
+        $income->save();
 
-        return $expense;
+        return $income;
     }
 
     /**
@@ -78,7 +68,7 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-        return view('subdomains.carriers.expenses.index');
+        return view('incomes.index');
     }
 
     /**
@@ -89,7 +79,7 @@ class ExpenseController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-        return view('subdomains.carriers.expenses.create', $params);
+        return view('incomes.create', $params);
     }
 
     /**
@@ -104,16 +94,16 @@ class ExpenseController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('carrierExpense.index');
+        return redirect()->route('income.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param  \App\Models\Income  $income
      * @return \Illuminate\Http\Response
      */
-    public function show(int $id)
+    public function show(Income $income)
     {
         //
     }
@@ -121,48 +111,44 @@ class ExpenseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
+     * @param  \App\Models\Income  $income
      * @return \Illuminate\Http\Response
      */
     public function edit(int $id)
     {
-        $expense = CarrierExpense::with('truck')
-            ->where('carrier_id', auth()->user()->id)
-            ->findOrFail($id);
-        $params = compact('expense') + $this->createEditParams();
-        return view('subdomains.carriers.expenses.edit', $params);
+        $income = Income::findOrFail($id);
+        $params = compact('income') + $this->createEditParams();
+        return view('incomes.edit', $params);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Income  $income
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
-        $this->validator($request->all())->validate();
+        $this->validator($request->all())->errors();
 
         $this->storeUpdate($request, $id);
 
-        return redirect()->route('carrierExpense.index');
+        return redirect()->route('income.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param  \App\Models\Income  $income
      * @return \Illuminate\Http\Response
      */
     public function destroy(int $id)
     {
-        $expense = CarrierExpense::where('carrier_id', auth()->user()->id)
-            ->whereNull('carrier_payment_id')
-            ->findOrFail($id);
+        $income = Income::findOrFail($id);
 
-        if ($expense)
-            return ['success' => $expense->delete()];
+        if ($income)
+            return ['success' => $income->delete()];
         else
             return ['success' => false];
     }
@@ -194,14 +180,14 @@ class ExpenseController extends Controller
      */
     public function search(Request $request)
     {
-        $query = CarrierExpense::select([
-            "carrier_expenses.id",
-            "carrier_expenses.type_id",
-            "carrier_expenses.amount",
+        $query = Income::select([
+            "incomes.id",
+            "incomes.type_id",
+            "incomes.amount",
             "date",
+
         ])
-            ->with('type:id,name')
-            ->where('carrier_id', auth()->user()->id);
+            ->with('type:id,name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

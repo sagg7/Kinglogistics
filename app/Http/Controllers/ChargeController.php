@@ -231,7 +231,7 @@ class ChargeController extends Controller
             "charges.amount",
             "charges.period",
             "charges.description",
-            DB::raw('DATE_FORMAT(charges.date, \'%m-%d-%Y\') AS date'),
+            "date",
         ])
             ->with([
                 'carriers:id,name',

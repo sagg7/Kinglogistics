@@ -47,6 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
     require __DIR__.'/web/s3storage.php';
     require __DIR__.'/web/tracking.php';
     require __DIR__.'/web/expenses.php';
+    require __DIR__.'/web/incomes.php';
     require __DIR__.'/web/brokers.php';
     require __DIR__.'/web/bonuses.php';
 
