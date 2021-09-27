@@ -15,7 +15,7 @@
                     throwErrorMsg('The total quantity must be bigger than $0');
                     return false;
                 }
-                if (obj.type === 'increase')
+                if (obj.type === 'reduce')
                     reductions += amount;
                 else {
                     subtotal -= amount;
