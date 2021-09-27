@@ -36,6 +36,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $this->carrierPayments();
         })->weekly()->mondays()->at('00:00');
+
+        // EACH MONDAY AT 8AM SEND EMAILS FOR CARRIERS
+        $schedule->call(function () {
+            $this->emailPayments();
+        })->weekly()->mondays()->at('08:00');
     }
 
     /**
