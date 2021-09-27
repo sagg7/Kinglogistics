@@ -262,4 +262,9 @@
             }
         })
     });
+    $('#deleteBonusTypeModal').on('show.bs.modal', (e) => {
+        let options = $('#bonus_type').html(),
+            select = $('#delete_type');
+        deleteHandler(select,options,false);
+    });
 })();

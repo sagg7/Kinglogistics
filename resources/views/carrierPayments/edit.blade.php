@@ -14,8 +14,15 @@
             const bonuses = @json($carrierPayment->bonuses);
             const expenses = @json($carrierPayment->expenses);
         </script>
-        <script src="{{ asset('js/sections/carrierPayments/editPayment.min.js?1.0.1') }}"></script>
+        <script src="{{ asset('js/sections/carrierPayments/editPayment.min.js?1.0.2') }}"></script>
+        <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
     @endsection
+
+    @section('modals')
+        @include('common.modals.typeModal', ['id' => 'bonusTypeModal', 'name' => 'Bonus Type', 'route' => 'bonusType.store', 'selectId' => 'bonus_type', 'deleteTypeModalId' => 'deleteBonusTypeModal'])
+        @include('common.modals.deleteTypeModal', ['id' => 'deleteBonusTypeModal', 'name' => 'Bonus Type', 'route' => 'bonusType.delete', 'selectId' => 'bonus_type'])
+    @endsection
+
 
     <div class="card">
         <div class="card-body">
@@ -26,9 +33,12 @@
                         {!! Form::select('type', ['bonus' => 'Bonus', 'expense' => 'Expense'], null, ['class' => 'form-control']) !!}
                     </div>
                     <div class="form-group col-md-4">
-                        <div id="bonus-type-container">
-                            {!! Form::label('bonus_type', ucfirst(__('bonus type')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('bonus_type', ucfirst(__('bonus type')), ['class' => 'col-form-label']) !!}
+                        <div class="input-group" id="bonus-type-container">
                             {!! Form::select('bonus_type', $bonusTypes, null, ['class' => 'form-control']) !!}
+                            <div class="input-group-append">
+                                <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#bonusTypeModal"><i class="fas fa-plus"></i></button>
+                            </div>
                         </div>
                         <div class="d-none" id="expense-type-container">
                             {!! Form::label('expense_type', ucfirst(__('expense type')), ['class' => 'col-form-label']) !!}

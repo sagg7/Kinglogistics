@@ -61,10 +61,11 @@ const select2Lang = {
             }
         });
     },
-    deleteHandler = (select, options) => {
+    deleteHandler = (select, options, remove = true) => {
         select.html(options);
         select.find('option:selected').prop('selected', false);
-        select.find('option:first').remove();
+        if (remove)
+            select.find('option:first').remove();
         select.prepend('<option selected disabled></option>');
     },
     removeAjaxLoaders = () => {
