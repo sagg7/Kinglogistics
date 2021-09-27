@@ -20,7 +20,7 @@
                     `<strong>Driver:</strong> ${markerData.driver.name}<br>` +
                     `<strong>Truck#:</strong> ${res.truck.number}</p>` +
                     `<strong>Coords:</strong> ${markerData.coords}</p>` +
-                    `<strong>Date:</strong> ${moment(markerData.poly.info.date).format('MM/DD/YYYY HH:mm:ss')}<br>`;
+                    `<strong>Date:</strong> ${moment(markerData.poly.info.date).format('MM/DD/YYYY HH:mm')}<br>`;
                 infowindow.setContent(info);
                 markerData.infowindow = infowindow;
             },

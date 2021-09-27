@@ -13,7 +13,7 @@
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
             `<strong>Truck#:</strong> ${data.truck.number}</p>` +
             `<strong>MPH:</strong> 0</p>` +
-            `<strong>Date:</strong> ${moment(data.date).format('MM/DD/YYYY HH:mm:ss')}<br>`;
+            `<strong>Date:</strong> ${moment(data.date).format('MM/DD/YYYY HH:mm')}<br>`;
         const infowindow = new google.maps.InfoWindow({
             content: info,
         });
