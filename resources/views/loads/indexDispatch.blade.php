@@ -7,8 +7,10 @@
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
+        <link href="{{ asset('js/modules/slim/slim.min.css') }}" rel="stylesheet">
     @endsection
     @section("scripts")
+        <script src="{{ asset('js/modules/slim/slim.kickstart.min.js') }}"></script>
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
@@ -135,25 +137,34 @@
                         img = anchor.find('img');
                         content.html(`<form id="replace-form" action="{{ url('load/replacePhoto') }}/${img.attr('customid')}" method="POST"">
                                 <div class="row">
-                                <div class="file-group col-md-9">
-                                <label for="replacement"
-                                       class="btn form-control btn-warning btn-block">
-                                    <i class="fas fa-file"></i><span class="file-name">Replace File</span>
-                                    <input type="file" name="replacement" id="replacement" accept="image/*" hidden>
-                                </label>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
+                                    <div class="file-group col-md-9">
+                                        <label for="replacement"
+                                               class="btn form-control btn-warning btn-block">
+                                            <i class="fas fa-file"></i><span class="file-name">Replace File</span>
+                                            <input type="file" name="replacement" id="replacement" accept="image/*" hidden>
+                                        </label>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group-append col-md-3">
+                                        <button type="submit" class="btn btn-block btn-success">submit</button>
+                                    </div>
                                 </div>
-                                </div>
-                                <div class="input-group-append col-md-3">
-                                    <button type="submit" class="btn btn-block btn-success">submit</button>
-                                </div>
-                                </form>
-                            </div>
-                        <img src="${img.attr('src')}" alt="photo" class="img-fluid">`);
+                            </form>
+                            <div class="slim" id="editImg"
+                                 data-service="{{ url('load/replacePhoto') }}/${img.attr('customid')}"
+                                 data-ratio="3:2"
+                                 data-size="600,400"
+                                 data-max-file-size="2">
+                                 <img src="${img.attr('src')}" alt="photo">
+                                <input type="file" name="slim[]"/>
+                            </div>`);
                     modalSpinner.addClass('d-none');
                     content.removeClass('d-none');
                     initUpload();
+                    var cropper = new Slim(document.getElementById('editImg'));
+                    //cropper.load(img.attr('src'));
                 });
                 window.Echo.private('load-status-update')
                     .listen('LoadUpdate', res => {
@@ -227,6 +238,5 @@
             }
         </script>
     @endsection
-
     <x-aggrid-index></x-aggrid-index>
 </x-app-layout>
