@@ -164,6 +164,7 @@ trait PaymentsAndCollection
                         // Create commission expense
                         $expense = new Expense();
                         $expense->amount = (1.5 * $invoice_total) / 100;
+                        $expense->type_id = 1; // Hardcoded value that represents the "Invoice Commission"
                         $expense->description = "Invoice commission";
                         $expense->date = Carbon::now();
                         $expense->shipper_invoice_id = $shipper_invoice->id;
