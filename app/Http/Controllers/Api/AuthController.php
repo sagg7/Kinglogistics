@@ -55,7 +55,7 @@ class AuthController extends Controller
             $this->endShift($driver);
         }
 
-        $driver->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return ["message" => "Logged out"];
     }
