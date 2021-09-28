@@ -3,7 +3,16 @@
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/charges/common.min.js') }}"></script>
+        <script>
+            (() => {
+                const dateInp = $('.pickadate-months-year');
+                $.each(dateInp, (i, item) => {
+                    const inp = $(item);
+                    const date = initPickadate(inp).pickadate('picker');
+                    date.set('select', inp.val(), {format: 'yyyy/mm/dd'});
+                });
+            })();
+        </script>
     @endsection
 
     {!! Form::open(['route' => 'charge.storeDiesel', 'method' => 'post', 'class' => 'form form-vertical']) !!}
@@ -51,7 +60,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="basic-addon3"><i class="fas fa-calendar-alt"></i></span>
                                             </div>
-                                            {!! Form::text("date[$id]",date('Y-m-d'),['class' => 'form-control pickadate-months-year']) !!}
+                                            {!! Form::text("date[$id]",null,['class' => 'form-control pickadate-months-year']) !!}
                                         </div>
                                     </td>
                                 </tr>
