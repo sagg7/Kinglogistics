@@ -193,26 +193,23 @@ class LoadController extends Controller
         $loadId = $request->get('load_id');
 
         // Register load rejection
-        /* RejectedLoad::create([ // remove for test only
-             'load_id' => $loadId,
-             'driver_id' => $driver->id,
-         ]);*/
-
-        $load = Load::find($loadId);
-
-        if ($load->status !== LoadStatusEnum::REQUESTED) {
-            return response([
-                'status' => 'error',
-                'message' => 'This load cannot be rejected.',
-                'load_status' => $load->status,
-            ], 403);
-        }
-
-        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
+       /* RejectedLoad::create([ // remove for test only
+            'load_id' => $loadId,
+            'driver_id' => $driver->id,
+        ]);*/
 
         // Remove the driver from this load
+        $load = Load::where('status', LoadStatusEnum::REQUESTED)->find($loadId);
+        if (!$load) {
+            return response([
+                'status' => 'error',
+                'message' => __("You're unable to rejected this load at the current status")
+            ], 400);
+        }
         $load->driver_id = null;
         $load->update();
+
+        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 

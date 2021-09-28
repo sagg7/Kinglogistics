@@ -96,7 +96,9 @@ class ShipperInvoiceController extends Controller
 
     public function complete($id)
     {
-        $payment = ShipperInvoice::with('shipper:id,invoice_email,name')->findOrFail($id);
+        $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->where('status', ShipperInvoiceEnum::PENDING)
+            ->findOrFail($id);
 
         $emails = explode(',', $payment->shipper->invoice_email);
         try {
@@ -134,6 +136,41 @@ class ShipperInvoiceController extends Controller
             $item->status = ShipperInvoiceEnum::COMPLETED;
             $item->save();
         }
+        return ['success' => true];
+    }
+
+    public function pending($id)
+    {
+        // Return invoice from completed to pending
+        $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->where('status', ShipperInvoiceEnum::COMPLETED)
+            ->findOrFail($id);
+
+        $payment->status = ShipperInvoiceEnum::PENDING;
+        $payment->save();
+
+        return ['success' => $payment->save()];
+    }
+
+    public function pay($id)
+    {
+        // Invoice status from completed to paid
+        $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->where('status', ShipperInvoiceEnum::COMPLETED)
+            ->findOrFail($id);
+
+        $payment->status = ShipperInvoiceEnum::PAID;
+        $payment->save();
+
+        return ['success' => $payment->save()];
+    }
+
+    public function payAll()
+    {
+        ShipperInvoice::where('status', ShipperInvoiceEnum::COMPLETED)
+            ->update(['status' => ShipperInvoiceEnum::PAID]);
+
+        return ['success' => true];
     }
 
     /**
@@ -175,6 +212,7 @@ class ShipperInvoiceController extends Controller
                 switch ($type) {
                     case ShipperInvoiceEnum::PENDING:
                     case ShipperInvoiceEnum::COMPLETED:
+                    case ShipperInvoiceEnum::PAID:
                         $q->where('status', $type);
                         break;
                     default:

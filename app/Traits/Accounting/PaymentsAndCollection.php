@@ -9,6 +9,7 @@ use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
 use App\Models\Charge;
+use App\Models\Expense;
 use App\Models\Incident;
 use App\Models\Load;
 use App\Models\Loan;
@@ -159,6 +160,13 @@ trait PaymentsAndCollection
                         }
                         $shipper_invoice->total = $invoice_total;
                         $shipper_invoice->save();
+                        // Create commission expense
+                        $expense = new Expense();
+                        $expense->amount = (1.5 * $invoice_total) / 100;
+                        $expense->description = "Invoice commission";
+                        $expense->date = Carbon::now();
+                        $expense->shipper_invoice_id = $shipper_invoice->id;
+                        $expense->save();
                     }
                 }
             }
@@ -208,24 +216,6 @@ trait PaymentsAndCollection
 
     private function carrierPayments()
     {
-        $carrier_payments = CarrierPayment::with('carrier:id,invoice_email,name')
-            ->where('status', CarrierPaymentEnum::APPROVED)
-            ->get();
-        foreach ($carrier_payments as $item) {
-            if ($item->carrier->invoice_email) {
-                $emails = explode(',', $item->carrier->invoice_email);
-                try {
-                    $pdf = $this->getPDFBinary($item->id);
-                    foreach ($emails as $email) {
-                        Mail::to($email)->send(new SendCarrierPayments($item->carrier, $pdf));
-                    }
-                } catch (MpdfException $e) {
-                    continue;
-                }
-            }
-            $item->status = CarrierPaymentEnum::COMPLETED;
-            $item->save();
-        }
         $new_expenses = [];
         $charges = Charge::with('carriers')
             ->get();
@@ -405,6 +395,27 @@ trait PaymentsAndCollection
             $carrier_payment->reductions = $expense_amount;
             $carrier_payment->total = $gross_amount - $expense_amount;
             $carrier_payment->save();
+        }
+    }
+
+    private function emailPayments(){
+        $carrier_payments = CarrierPayment::with('carrier:id,invoice_email,name')
+            ->where('status', CarrierPaymentEnum::APPROVED)
+            ->get();
+        foreach ($carrier_payments as $item) {
+            if ($item->carrier->invoice_email) {
+                $emails = explode(',', $item->carrier->invoice_email);
+                try {
+                    $pdf = $this->getPDFBinary($item->id);
+                    foreach ($emails as $email) {
+                        Mail::to($email)->send(new SendCarrierPayments($item->carrier, $pdf));
+                    }
+                } catch (MpdfException $e) {
+                    continue;
+                }
+            }
+            $item->status = CarrierPaymentEnum::COMPLETED;
+            $item->save();
         }
     }
 }

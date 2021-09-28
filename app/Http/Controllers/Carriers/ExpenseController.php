@@ -198,7 +198,7 @@ class ExpenseController extends Controller
             "carrier_expenses.id",
             "carrier_expenses.type_id",
             "carrier_expenses.amount",
-            DB::raw('DATE_FORMAT(date, \'%m-%d-%Y\') AS date'),
+            "date",
         ])
             ->with('type:id,name')
             ->where('carrier_id', auth()->user()->id);

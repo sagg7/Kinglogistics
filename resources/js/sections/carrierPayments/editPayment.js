@@ -15,7 +15,7 @@
                     throwErrorMsg('The total quantity must be bigger than $0');
                     return false;
                 }
-                if (obj.type === 'increase')
+                if (obj.type === 'reduce')
                     reductions += amount;
                 else {
                     subtotal -= amount;
@@ -261,5 +261,10 @@
                 throwErrorMsg();
             }
         })
+    });
+    $('#deleteBonusTypeModal').on('show.bs.modal', (e) => {
+        let options = $('#bonus_type').html(),
+            select = $('#delete_type');
+        deleteHandler(select,options,false);
     });
 })();

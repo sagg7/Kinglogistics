@@ -83,6 +83,7 @@ class CarrierPaymentController extends Controller
         $carrierPayment = CarrierPayment::with([
             'bonuses.bonus_type',
             'expenses.type',
+            'carrier:id,name',
         ])
             ->findOrFail($id);
         $bonusTypes = BonusType::pluck('name', 'id')->toArray();

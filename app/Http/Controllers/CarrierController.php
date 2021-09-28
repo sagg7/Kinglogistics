@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
+use App\Models\CarrierEquipment;
 use App\Rules\EmailArray;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
@@ -207,6 +208,18 @@ class CarrierController extends Controller
             "carriers.name",
             "carriers.email",
             "carriers.phone",
+        ]);
+
+        return $this->multiTabSearchData($query, $request);
+    }
+
+    public function searchEquipment(Request $request)
+    {
+        $query = CarrierEquipment::select([
+            "carrier_equipment.id",
+            "carrier_equipment.name",
+            "carrier_equipment.status",
+            "carrier_equipment.description",
         ]);
 
         return $this->multiTabSearchData($query, $request);

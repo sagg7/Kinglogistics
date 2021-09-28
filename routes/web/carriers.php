@@ -42,4 +42,9 @@ Route::prefix('carrier')->group(function () {
         Route::post('payCharges/{id}', [CarrierPaymentController::class, 'payCharges'])
             ->name('carrierPayment.payCharges');
     });
+
+    Route::prefix('equipment')->group(function () {
+        Route::get('search', [CarrierController::class, 'searchEquipment'])
+            ->name('equipment.search');
+    });
 });

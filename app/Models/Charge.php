@@ -11,6 +11,10 @@ class Charge extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'date' => 'date:m/d/Y',
+    ];
+
     /**
      * @return BelongsToMany
      */
