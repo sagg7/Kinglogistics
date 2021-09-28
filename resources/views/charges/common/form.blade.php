@@ -25,6 +25,18 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-4 d-none" id="custom-period">
+                    {!! Form::label('custom_weeks', ucfirst(__('custom weeks')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('custom_weeks', $charge->custom_weeks ?? null, ['class' => 'form-control' . ($errors->first('custom_weeks') ? ' is-invalid' : ''), 'disabled']) !!}
+                    @error('custom_weeks')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+            </div>
+            <hr>
+            <div class="row">
                 <div class="form-group col-md-4">
                     <fieldset>
                         {!! Form::label('amount', ucfirst(__('amount')), ['class' => 'col-form-label']) !!}
@@ -41,7 +53,7 @@
                         </div>
                     </fieldset>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <fieldset>
                         {!! Form::label('date', ucfirst(__('date')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
@@ -57,7 +69,7 @@
                         </div>
                     </fieldset>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     {!! Form::label('carriers', ucfirst(__('carriers')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('carriers[]', [], $charge->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carriers') ? ' is-invalid' : ''), 'multiple']) !!}
                     @error('carriers')

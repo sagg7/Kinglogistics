@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PeriodEnum;
 use App\Models\Carrier;
 use App\Models\Charge;
 use App\Models\ChargeType;
@@ -27,6 +28,7 @@ class ChargeController extends Controller
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
+            'custom_weeks' => ['sometimes', 'required', 'numeric'],
         ]);
     }
 
@@ -36,7 +38,7 @@ class ChargeController extends Controller
     private function createEditParams(): array
     {
         return [
-            'periods' => [null => '', 'single' => 'Single', 'weekly' => 'Weekly'],
+            'periods' => [null => '', PeriodEnum::SINGLE => 'Single', PeriodEnum::WEEKLY => 'Weekly', PeriodEnum::CUSTOM => 'Custom Weeks'],
             'types' => [null => ''] + ChargeType::pluck('name', 'id')->toArray(),
         ];
     }
@@ -50,7 +52,8 @@ class ChargeController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $charge = Charge::findOrFail($id);
+                $charge = Charge::whereNull('paid_weeks')
+                    ->findOrFail($id);
             else
                 $charge = new Charge();
 
@@ -60,6 +63,7 @@ class ChargeController extends Controller
             $charge->period = $request->period;
             $charge->date = $request->date;
             $charge->gallons = $request->gallons;
+            $charge->custom_weeks = $request->custom_weeks;
             $charge->save();
 
             $charge->carriers()->sync($request->carriers);
@@ -105,7 +109,7 @@ class ChargeController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request->all())->errors();
+        $this->validator($request->all())->validate();
         $request->date = $request->date_submit;
         $this->storeUpdate($request);
 
@@ -206,10 +210,10 @@ class ChargeController extends Controller
         switch ($item) {
             case 'carriers':
             case 'charge_type':
-                    $array = [
-                        'relation' => $item,
-                        'column' => 'name',
-                    ];
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
                 break;
             default:
                 $array = null;

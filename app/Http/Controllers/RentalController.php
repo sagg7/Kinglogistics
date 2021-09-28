@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PeriodEnum;
 use App\Models\InspectionCategory;
 use App\Models\InspectionRentalDelivery;
 use App\Models\InspectionRentalReturned;
@@ -47,7 +48,7 @@ class RentalController extends Controller
     private function createEditParams(): array
     {
         return [
-            'periods' => [null => '', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'annual' => 'Annual'],
+            'periods' => [null => '', PeriodEnum::WEEKLY => 'Weekly', PeriodEnum::MONTHLY => 'Monthly', PeriodEnum::ANNUAL => 'Annual'],
         ];
     }
 

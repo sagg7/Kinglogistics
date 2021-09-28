@@ -36,7 +36,8 @@ class LoanController extends Controller
     private function storeUpdate(Request $request, $id = null): Loan
     {
         if ($id)
-            $loan = Loan::findOrFail($id);
+            $loan = Loan::whereNull('is_paid')
+                ->findOrFail($id);
         else
             $loan = new Loan();
 

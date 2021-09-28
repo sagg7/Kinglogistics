@@ -3,6 +3,7 @@
 namespace App\Traits\Accounting;
 
 use App\Enums\CarrierPaymentEnum;
+use App\Enums\PeriodEnum;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
 use App\Models\Carrier;
@@ -187,13 +188,13 @@ trait PaymentsAndCollection
             if (!$last_date)
                 $last_date = $rental->created_at;
             switch ($rental->period) {
-                case 'weekly':
+                case PeriodEnum::WEEKLY:
                     $last_date->addWeek();
                     break;
-                case 'monthly':
+                case PeriodEnum::MONTHLY:
                     $last_date->addMonth();
                     break;
-                case 'annual':
+                case PeriodEnum::ANNUAL:
                     $last_date->addYear();
                     break;
             }
@@ -234,10 +235,30 @@ trait PaymentsAndCollection
                 // Set the selected carriers as the ones designated on the charge
                 $selected_carriers = $charge->carriers;
             }
+
+            $amount = $charge->amount;
+            switch ($charge->period) {
+                // If the charge period was "single" it only happens once and it's deleted
+                case PeriodEnum::SINGLE:
+                    $charge->delete();
+                    break;
+                case PeriodEnum::CUSTOM:
+                    // Update the number of paid weeks
+                    $charge->paid_weeks++;
+                    // Set the charge amount divided by the number of weeks
+                    $amount /= $charge->custom_weeks;
+                    // If the charge is fully paid, delete it
+                    if ($charge->paid_weeks === $charge->custom_weeks)
+                        $charge->delete();
+                    else // Else just update the paid weeks amount
+                        $charge->save();
+                    break;
+            }
+
             // Loop through all the carriers and create the corresponding expense array
             foreach ($selected_carriers as $item) {
                 $new_expenses[] = [
-                    "amount" => $charge->amount,
+                    "amount" => $amount,
                     "description" => $charge->description,
                     "date" => $charge->date,
                     "gallons" => $charge->gallons,
@@ -247,9 +268,6 @@ trait PaymentsAndCollection
                     "updated_at" => $carbon_now,
                 ];
             }
-            // If the charge period was "single" it only happens once and it's deleted
-            if ($charge->period === "single")
-                $charge->delete();
         }
         // Query all pending loans
         $loans = Loan::with('carrier')
