@@ -38,5 +38,11 @@ Route::prefix('shipper')->group(function () {
             ->name('invoice.complete');
         Route::post('completeAll', [ShipperInvoiceController::class, 'completeAll'])
             ->name('invoice.completeAll');
+        Route::post('pay/{id}', [ShipperInvoiceController::class, 'pay'])
+            ->name('invoice.pay');
+        Route::post('payAll', [ShipperInvoiceController::class, 'payAll'])
+            ->name('invoice.payAll');
+        Route::post('pending/{id}', [ShipperInvoiceController::class, 'pending'])
+            ->name('invoice.pending');
     });
 });

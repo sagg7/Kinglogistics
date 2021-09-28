@@ -43,14 +43,19 @@ class TrackingController extends Controller
             ->where(function ($q) use ($user_id, $start, $end) {
                 if (auth()->guard('shipper')->check()) {
                     $q->whereHas('locations', function ($q) use ($user_id, $start, $end) {
-                        $q->whereHas('parentLoad', function ($q) use ($user_id, $start, $end) {
-                            $q->whereHas('trip', function ($q) use ($user_id, $start, $end) {
+                        $q->whereHas('parentLoad', function ($q) use ($user_id) {
+                            $q->whereHas('trip', function ($q) use ($user_id) {
                                 $q->where('shipper_id', $user_id);
                             });
                         })
                             ->whereBetween('created_at', [$start, $end]);
                     });
+                } else if (auth()->guard('carrier')->check()) {
+                    $q->where('carrier_id', auth()->user()->id);
                 }
+                $q->whereHas('locations', function ($q) {
+                    $q->whereNotNull('load_id');
+                });
             })
             ->withTrashed()
             ->get();

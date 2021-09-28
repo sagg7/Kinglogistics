@@ -12,7 +12,8 @@
             //`<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
             `<strong>Truck#:</strong> ${data.truck.number}</p>` +
-            `<strong>MPH:</strong> 0</p>`;
+            `<strong>MPH:</strong> 0</p>` +
+            `<strong>Date:</strong> ${moment(data.date).format('MM/DD/YYYY HH:mm')}<br>`;
         const infowindow = new google.maps.InfoWindow({
             content: info,
         });
@@ -122,6 +123,7 @@
                 destination: load.destination,
             },
             status: location.status,
+            date: moment(location.created_at).format('MM/DD/YYYY HH:mm'),
         }
         const marker = addMarker(data);
         bounds.extend(marker.position);
@@ -133,6 +135,7 @@
 
     window.Echo.private(channel)
         .listen(echoEvent, e => {
+            e.date = moment().format('MM/DD/YYYY HH:mm');
             let markerData = markersArray.find(o => o.driver.id === e.driver.id)
             if (markerData) {
                 markerData.marker.setPosition({lat: Number(e.coords.latitude), lng: Number(e.coords.longitude)});

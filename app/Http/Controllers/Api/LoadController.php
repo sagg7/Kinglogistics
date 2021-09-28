@@ -198,12 +198,18 @@ class LoadController extends Controller
             'driver_id' => $driver->id,
         ]);*/
 
-        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
-
         // Remove the driver from this load
-        $load = Load::find($loadId);
+        $load = Load::where('status', LoadStatusEnum::REQUESTED)->find($loadId);
+        if (!$load) {
+            return response([
+                'status' => 'error',
+                'message' => __("You're unable to rejected this load at the current status")
+            ], 400);
+        }
         $load->driver_id = null;
         $load->update();
+
+        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 

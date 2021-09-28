@@ -9,6 +9,7 @@ use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
 use App\Models\Charge;
+use App\Models\Expense;
 use App\Models\Incident;
 use App\Models\Load;
 use App\Models\Loan;
@@ -159,6 +160,13 @@ trait PaymentsAndCollection
                         }
                         $shipper_invoice->total = $invoice_total;
                         $shipper_invoice->save();
+                        // Create commission expense
+                        $expense = new Expense();
+                        $expense->amount = (1.5 * $invoice_total) / 100;
+                        $expense->description = "Invoice commission";
+                        $expense->date = Carbon::now();
+                        $expense->shipper_invoice_id = $shipper_invoice->id;
+                        $expense->save();
                     }
                 }
             }

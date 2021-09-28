@@ -24,8 +24,11 @@ OptionsRenderer.prototype.confirmationFunction = (route, table, data) => {
                 success: (res) => {
                     if (!res.success)
                         throwErrorMsg(res.msg);
-                    else
+                    else {
                         window[table].updateSearchQuery();
+                        if (data.afterConfirmFunction)
+                            data.afterConfirmFunction();
+                    }
                 },
                 error: () => {
                     throwErrorMsg();
@@ -45,7 +48,9 @@ OptionsRenderer.prototype.init = (params) => {
         content = `<ul class="list-group list-group-flush">`,
         menuData = {};
 
-    params.colDef.menuData.forEach((item) => {
+    params.colDef.menuData.forEach((item, i) => {
+        const itemId = OptionsRenderer.prototype.guidGenerator();
+        params.colDef.menuData[i].item_id = itemId;
         if (item.type) {
             let classId = '',
                 icon = '',
@@ -73,11 +78,11 @@ OptionsRenderer.prototype.init = (params) => {
                     break;
             }
             menuData = item.menuData;
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}"><i class="${icon}"></i> ${text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${icon}"></i> ${text}</a></li>`;
         } else if (item.modal)
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${item.route}/${params.data.id}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
         else
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1" href="${item.route}/${params.data.id}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
     });
 
     content += `</ul>`;
@@ -89,24 +94,33 @@ OptionsRenderer.prototype.init = (params) => {
             content,
             trigger: 'click',
         }).on('shown.bs.popover', function (e) {
-            let pop = $('.popover'),
-                del = pop.find('.delete'),
-                confirm = pop.find('.confirm'),
-                modal = pop.find('.open-modal');
-            modal.click((e) => {
-                let btn = $(e.currentTarget),
-                    href = btn.attr('href').split("/"),
-                    modal = href[0],
-                    id = href[1];
-                params.api.gridCore.gridOptions.components.OptionModalFunc(modal, id);
-            });
-            del.click(function (e) {
-                e.preventDefault();
-                OptionsRenderer.prototype.deleteFunction(del.attr('href'), params.api.gridCore.gridOptions.components.tableRef);
-            });
-            confirm.click((e) => {
-                e.preventDefault();
-                OptionsRenderer.prototype.confirmationFunction(confirm.attr('href'), params.api.gridCore.gridOptions.components.tableRef, menuData);
+            params.colDef.menuData.forEach((item, i) => {
+                const option = $(`#${item.item_id}`);
+                switch (item.type) {
+                    default:
+                        break;
+                    case 'modal':
+                        option.click((e) => {
+                            let btn = $(e.currentTarget),
+                                href = btn.attr('href').split("/"),
+                                modal = href[0],
+                                id = href[1];
+                            params.api.gridCore.gridOptions.components.OptionModalFunc(modal, id);
+                        });
+                        break;
+                    case 'delete':
+                        option.click(function (e) {
+                            e.preventDefault();
+                            OptionsRenderer.prototype.deleteFunction(option.attr('href'), params.api.gridCore.gridOptions.components.tableRef);
+                        });
+                        break;
+                    case 'confirm':
+                        option.click((e) => {
+                            e.preventDefault();
+                            OptionsRenderer.prototype.confirmationFunction(option.attr('href'), params.api.gridCore.gridOptions.components.tableRef, item.menuData);
+                        });
+                        break;
+                }
             });
             $('body').on('click', function (e) {
                 $('[id^=pop-]').each(function () {

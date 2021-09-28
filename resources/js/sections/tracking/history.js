@@ -4,44 +4,30 @@
             string = "in transit";
         return string.charAt(0).toUpperCase()  + string.slice(1)
     };
-    const getInfoWindow = (markerArrPos) => {
+    const getInfoWindow = (markerArrPos, infowindow) => {
         const markerData = markersArray[markerArrPos];
-        if (!markerData.infowindow) {
-            $.ajax({
-                url: '/tracking/getPinLoadData',
-                type: 'GET',
-                data: {
-                    load: markerData.load.id,
-                },
-                success: (res) => {
-                    const info = (res.shipper.name ? `<p><strong>Shipper:</strong> ${res.shipper.name}</p>` : '') +
-                        `<p><strong>Status:</strong> ${capitalizeStatus(res.status)}<br>` +
-                        (res.origin ? `<strong>Origin:</strong> ${res.origin}<br><strong>Destination:</strong> ${res.destination}</p>` : '') +
-                        //`<p><strong>Carrier:</strong> ${markerData.carrier.name}<br>` +
-                        `<strong>Driver:</strong> ${markerData.driver.name}<br>` +
-                        `<strong>Truck#:</strong> ${res.truck.number}</p>` +
-                        `<strong>Coords:</strong> ${markerData.coords}</p>`;
-                    const infowindow = new google.maps.InfoWindow({
-                        content: info,
-                    });
-                    markerData.infowindow = infowindow;
-                    infowindow.open({
-                        anchor: markerData.marker,
-                        map,
-                        shouldFocus: true,
-                    });
-                },
-                error: () => {
-                    throwErrorMsg();
-                }
-            });
-        } else {
-            markerData.infowindow.open({
-                anchor: markerData.marker,
-                map,
-                shouldFocus: true,
-            });
-        }
+        $.ajax({
+            url: '/tracking/getPinLoadData',
+            type: 'GET',
+            data: {
+                load: markerData.load.id,
+            },
+            success: (res) => {
+                const info = (res.shipper.name ? `<p><strong>Shipper:</strong> ${res.shipper.name}</p>` : '') +
+                    `<p><strong>Status:</strong> ${capitalizeStatus(res.status)}<br>` +
+                    (res.origin ? `<strong>Origin:</strong> ${res.origin}<br><strong>Destination:</strong> ${res.destination}</p>` : '') +
+                    //`<p><strong>Carrier:</strong> ${markerData.carrier.name}<br>` +
+                    `<strong>Driver:</strong> ${markerData.driver.name}<br>` +
+                    `<strong>Truck#:</strong> ${res.truck.number}</p>` +
+                    `<strong>Coords:</strong> ${markerData.coords}</p>` +
+                    `<strong>Date:</strong> ${moment(markerData.poly.info.date).format('MM/DD/YYYY HH:mm')}<br>`;
+                infowindow.setContent(info);
+                markerData.infowindow = infowindow;
+            },
+            error: () => {
+                throwErrorMsg();
+            }
+        });
     }
     const addMarker = (data) => {
         let markerObj = {
@@ -69,7 +55,7 @@
                         animation: google.maps.Animation.DROP,
                     };
                     const marker = new google.maps.Marker(markerObj);
-                    const content = `<strong>Date:</strong> ${moment(info.date).format('MM/DD/YYYY HH:mm:ss')}<br>` +
+                    const content = `<strong>Date:</strong> ${moment(info.date).format('MM/DD/YYYY HH:mm')}<br>` +
                         `<strong>Coords:</strong> ${lat}, ${lng}<br>` +
                         `<strong>MPH:</strong> 0`;
                     const infowindow = new google.maps.InfoWindow({
@@ -98,7 +84,24 @@
         });
         const arrPos = markersArray.length - 1;
         marker.addListener("click", () => {
-            getInfoWindow(arrPos);
+            const markerData = markersArray[arrPos];
+            if (!markerData.infowindow) {
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<div class="p-2"><div class="spinner-border text-secondary" role="status"></div></div>`,
+                });
+                infowindow.open({
+                    anchor: marker,
+                    map,
+                    shouldFocus: true,
+                });
+                getInfoWindow(arrPos, infowindow);
+            } else {
+                markerData.infowindow.open({
+                    anchor: markerData.marker,
+                    map,
+                    shouldFocus: true,
+                });
+            }
         });
         return marker;
     };

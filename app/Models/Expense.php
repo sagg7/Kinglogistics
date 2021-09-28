@@ -12,7 +12,7 @@ class Expense extends Model
     use HasFactory, SoftDeletes;
 
     protected $casts = [
-        'created_at' => 'date:m/d/Y',
+        'date' => 'date:m/d/Y',
     ];
 
     /**

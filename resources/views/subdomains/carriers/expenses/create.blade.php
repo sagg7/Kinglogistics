@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/subdomains/carriers/expenses/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/subdomains/carriers/expenses/common.min.js?1.0.1') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
     @endsection
 
