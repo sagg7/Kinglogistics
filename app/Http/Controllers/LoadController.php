@@ -12,14 +12,16 @@ use App\Models\Shipper;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
+use App\Traits\Storage\S3Functions;
 use App\Traits\Turn\DriverTurn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\Storage\FileUpload;
+use Illuminate\Support\Facades\Storage;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload, S3Functions;
 
     /**
      * @return array
@@ -299,6 +301,8 @@ class LoadController extends Controller
     }
 
     public function replacePhoto(Request $request, $id, $type){
+
+
         $load_status = LoadStatus::where('load_id', $id)->first();
 
         $new_voucher = $this->uploadImage($request->replacement, "loads/$load_status->id",50);
@@ -309,10 +313,63 @@ class LoadController extends Controller
         }
 
         if ($load_status->save()){
-            return ['success' => true];
+            return [
+                        "status"=>"false",
+                        "name"=>"uid_filename.jpg",
+                        "path"=>"path/uid_filename.jpg"
+                    ];
         } else {
-            return ['success' => false];
+            return [
+                "status"=>"success",
+                "name"=>"uid_filename.jpg",
+                "path"=>"path/uid_filename.jpg"
+            ];
         }
 
     }
+
+    function deleteDirectory($dir) {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+
+        }
+
+        return rmdir($dir);
+    }
+
+    public function loadPhoto($id, $type){
+        $load_status = LoadStatus::where('load_id', $id)->first();
+
+        $path = "app/public/loads/";
+        $this->deleteDirectory($path);
+
+        if ($type == "to_location") {
+            $url = $this->getTemporaryFile("$load_status->to_location_voucher");
+            $contents = file_get_contents($url);
+            $name = substr($url, strrpos($url, '/') + 1);
+            Storage::put("public/loads/".$load_status->load_id."/to_location.jpg", $contents);
+            return asset("storage/loads/".$load_status->load_id."/to_location.jpg");
+        } else {
+            $url = $this->getTemporaryFile("$load_status->finished_voucher");
+            $contents = file_get_contents($url);
+            $name = substr($url, strrpos($url, '/') + 1);
+            Storage::put("public/loads/".$load_status->load_id."/finished.jpg", $contents);
+            return asset("storage/loads/".$load_status->load_id."/finished.jpg");
+        }
+    }
+
 }

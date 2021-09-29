@@ -26,6 +26,8 @@ Route::prefix('load')->group(function () {
         ->name('load.partialUpdate');
     Route::post('replacePhoto/{id}/{type}', [LoadController::class, 'replacePhoto'])
         ->name('load.replacePhoto');
+    Route::post('loadPhoto/{id}/{type}', [LoadController::class, 'loadPhoto'])
+        ->name('load.loadPhoto');
     Route::post('delete/{id}', [LoadController::class, 'destroy'])
         ->name('load.delete');
 });

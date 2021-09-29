@@ -154,17 +154,48 @@
                             </form>
                             <div class="slim" id="editImg"
                                  data-service="{{ url('load/replacePhoto') }}/${img.attr('customid')}"
+                                 data-fetcher="fetch.php"
                                  data-ratio="3:2"
+                                 data-push="true"
+                                 data-download="true"
                                  data-size="600,400"
                                  data-max-file-size="2">
-                                 <img src="${img.attr('src')}" alt="photo">
                                 <input type="file" name="slim[]"/>
+                            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                             </div>`);
                     modalSpinner.addClass('d-none');
                     content.removeClass('d-none');
                     initUpload();
-                    var cropper = new Slim(document.getElementById('editImg'));
-                    //cropper.load(img.attr('src'));
+
+                    var cropper = new Slim(document.getElementById('editImg'),{
+                        crop: {
+                            x: 0,
+                            y: 0,
+                            width: 100,
+                            height: 200
+                        },
+                        service: `{{ url('load/replacePhoto') }}/${img.attr('customid')}`,
+                        download: false,
+                        willSave: function(data, ready) {
+                            ready(data);
+                        },
+                        willRequest : handleRequest,
+                        label: 'Drop your image here.',
+                        buttonConfirmLabel: 'Ok'
+                    });
+
+                    $.ajax({
+                        url: "{{ url('load/loadPhoto/') }}/"+img.attr('customid'),
+                        type: 'POST',
+                        success: (res) => {
+                            console.log(res);
+                            cropper.load(res);
+                        },
+                        error: () => {
+                            // ajaxAlert('Ocurrió un error procesando la operación');
+                        }
+                    });
+
                 });
                 window.Echo.private('load-status-update')
                     .listen('LoadUpdate', res => {
@@ -177,6 +208,12 @@
                         }
                     });
             })();
+
+
+            function handleRequest(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                xhr.setRequestHeader('csrf-token', '{{ csrf_token() }}');
+            }
 
             function initUpload() {
 
