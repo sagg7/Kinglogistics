@@ -66,6 +66,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/payment/index">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Payments</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/dailyPay/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Daily Pay</span>
                         </a>

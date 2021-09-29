@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Carriers\CarrierPaymentsController;
 use App\Http\Controllers\Carriers\DailyPayController;
 use App\Http\Controllers\Carriers\LoanController;
 use Illuminate\Support\Facades\Route;
@@ -26,4 +27,13 @@ Route::prefix('loan')->group(function () {
         ->name('loans.index');
     Route::get('search', [LoanController::class, 'search'])
         ->name('loans.search');
+});
+
+Route::prefix('payment')->group(function () {
+    Route::get('index', [CarrierPaymentsController::class, 'index'])
+        ->name('payment.index');
+    Route::get('search', [CarrierPaymentsController::class, 'search'])
+        ->name('payment.search');
+    Route::get('downloadPDF/{id}', [CarrierPaymentsController::class, 'downloadPDF'])
+        ->name('payment.downloadPaymentPDF');
 });
