@@ -50,14 +50,25 @@ class DashboardController extends Controller
                 },
                 'truck:id,number',
                 'shipper:id,name',
+                'load_type:id,name',
             ])
             ->get([
                 'id',
+                'date',
                 'origin',
                 'destination',
+                'control_number',
+                'customer_name',
+                'customer_po',
+                'customer_reference',
+                'weight',
+                'tons',
+                'silo_number',
+                'mileage',
                 'shipper_id',
                 'driver_id',
                 'truck_id',
+                'load_type_id',
                 'status',
             ]);
 

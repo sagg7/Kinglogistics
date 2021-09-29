@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Expense</x-slot>
+    <x-slot name="crumb_section">Expenses</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")

@@ -1,6 +1,3 @@
 {
-    "/js/sections/expenses/common.min.js": "/js/sections/expenses/common.min.js",
-    "/js/sections/incomes/common.min.js": "/js/sections/incomes/common.min.js",
-    "/js/sections/charges/common.min.js": "/js/sections/charges/common.min.js",
-    "/js/sections/subdomains/carriers/expenses/common.min.js": "/js/sections/subdomains/carriers/expenses/common.min.js"
+    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js"
 }
