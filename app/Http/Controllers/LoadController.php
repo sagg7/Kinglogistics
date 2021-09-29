@@ -302,10 +302,9 @@ class LoadController extends Controller
 
     public function replacePhoto(Request $request, $id, $type){
 
-
         $load_status = LoadStatus::where('load_id', $id)->first();
 
-        $new_voucher = $this->uploadImage($request->replacement, "loads/$load_status->id",50);
+        $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",50);
         if ($type == "to_location") {
             $load_status->to_location_voucher = $new_voucher;
         } else {

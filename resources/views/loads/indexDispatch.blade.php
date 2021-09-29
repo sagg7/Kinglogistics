@@ -135,23 +135,7 @@
                         anchor = $(e.relatedTarget),
                         modalSpinner = modalBody.find('.modal-spinner'),
                         img = anchor.find('img');
-                        content.html(`<form id="replace-form" action="{{ url('load/replacePhoto') }}/${img.attr('customid')}" method="POST"">
-                                <div class="row">
-                                    <div class="file-group col-md-9">
-                                        <label for="replacement"
-                                               class="btn form-control btn-warning btn-block">
-                                            <i class="fas fa-file"></i><span class="file-name">Replace File</span>
-                                            <input type="file" name="replacement" id="replacement" accept="image/*" hidden>
-                                        </label>
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="input-group-append col-md-3">
-                                        <button type="submit" class="btn btn-block btn-success">submit</button>
-                                    </div>
-                                </div>
-                            </form>
+                        content.html(`
                             <div class="slim" id="editImg"
                                  data-service="{{ url('load/replacePhoto') }}/${img.attr('customid')}"
                                  data-fetcher="fetch.php"
@@ -161,7 +145,6 @@
                                  data-size="600,400"
                                  data-max-file-size="2">
                                 <input type="file" name="slim[]"/>
-                            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                             </div>`);
                     modalSpinner.addClass('d-none');
                     content.removeClass('d-none');
