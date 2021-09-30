@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\Bonus;
 use App\Models\Carrier;
 use App\Models\Load;
@@ -88,5 +89,6 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
+        //ProcessPaymentsAndCollection::dispatch()->afterCommit();
     }
 }
