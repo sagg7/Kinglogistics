@@ -262,7 +262,7 @@
                     </li>
                 </ul>
             </li>
-            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
+            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
                 <li class="nav-item has-sub">
                     <a href="#"><i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span></a>
                     <ul class="menu-content">
@@ -277,6 +277,9 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
                 </li>
             @endif
             <li class="navigation-header">
