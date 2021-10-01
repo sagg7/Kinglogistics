@@ -346,7 +346,7 @@ class tableAG {
     }*/
 
     updateSearchQuery(params = {}) {
-        let dsPar = {url: this.url};
+        let dsPar = {url: this.url, successCallback: this.successCallback};
         if (this.searchQueryParams)
             dsPar.params = _.merge(params, this.searchQueryParams)
         else
