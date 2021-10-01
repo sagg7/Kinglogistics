@@ -89,9 +89,59 @@
                 PhotosRenderer.prototype.getGui = () => {
                     return this.eGui;
                 }
-                const reference = {};
-                const control = {};
-                const bol = {};
+                let reference = {};
+                let control = {};
+                let bol = {};
+                const checkDuplicates = (type = null) => {
+                    if (!type || type === 'control_number')
+                        control = {};
+                    if (!type || type === 'customer_reference')
+                        reference = {};
+                    if (!type || type === 'bol')
+                        bol = {};
+                    tbLoad.dataSource.data.rows.forEach(item => {
+                        if (!type || type === 'control_number') {
+                            if (item.control_number)
+                                if (!control[item.control_number])
+                                    control[item.control_number] = 1;
+                                else
+                                    control[item.control_number]++;
+                        }
+                        if (!type || type === 'customer_reference') {
+                            if (item.customer_reference)
+                                if (!reference[item.customer_reference])
+                                    reference[item.customer_reference] = 1;
+                                else
+                                    reference[item.customer_reference]++;
+                        }
+                        if (!type || type === 'bol') {
+                            if (item.bol)
+                                if (!bol[item.bol])
+                                    bol[item.bol] = 1;
+                                else
+                                    bol[item.bol]++;
+                        }
+                    });
+                    if (!type || type === 'control_number') {
+                        tbLoad.columnDefs[3].cellClass = params => {
+                            if (params.value && control[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    if (!type || type === 'customer_reference') {
+                        tbLoad.columnDefs[4].cellClass = params => {
+                            if (params.value && reference[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    if (!type || type === 'bol') {
+                        tbLoad.columnDefs[5].cellClass = params => {
+                            if (params.value && bol[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    tbLoad.gridOptions.api.setColumnDefs(tbLoad.columnDefs);
+                }
                 tbLoad = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'date'},
@@ -106,6 +156,7 @@
                         PhotosRenderer: PhotosRenderer,
                         undoRedoCellEditing: true,
                         onCellEditingStopped: function (event) {
+                            checkDuplicates(event.colDef.field);
                             if (event.value === '' || typeof event.value === "undefined") {
                                 tbLoad.gridOptions.api.undoCellEditing();
                                 return;
@@ -129,39 +180,7 @@
                     url: '/load/search',
                     tableRef: 'tbActive',
                     successCallback: (params) => {
-                        params.rows.forEach(item => {
-                            control.length = 0;
-                            reference.length = 0;
-                            bol.length = 0;
-                            if (item.control_number)
-                                if (!control[item.control_number])
-                                    control[item.control_number] = 1;
-                                else
-                                    control[item.control_number]++;
-                            if (item.customer_reference)
-                                if (!reference[item.customer_reference])
-                                    reference[item.customer_reference] = 1;
-                                else
-                                    reference[item.customer_reference]++;
-                            if (item.bol)
-                                if (!bol[item.bol])
-                                    bol[item.bol] = 1;
-                                else
-                                    bol[item.bol]++;
-                        });
-                        tbLoad.columnDefs[3].cellClass = params => {
-                            if (params.value && control[params.value] > 1)
-                                return 'bg-danger';
-                        }
-                        tbLoad.columnDefs[4].cellClass = params => {
-                            if (params.value && reference[params.value] > 1)
-                                return 'bg-danger';
-                        }
-                        tbLoad.columnDefs[5].cellClass = params => {
-                            if (params.value && bol[params.value] > 1)
-                                return 'bg-danger';
-                        }
-                        tbLoad.gridOptions.api.setColumnDefs(tbLoad.columnDefs);
+                        checkDuplicates();
                     }
                 });
 

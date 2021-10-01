@@ -166,11 +166,11 @@ class DataSource {
                     this.ajax.abort();
             },
             success: (res) => {
+                this.data = res;
                 // call the success callback
                 params.successCallback(res.rows, res.lastRow);
                 if (this.successCallback)
                     this.successCallback(res);
-                this.data = res;
             },
             error: () => {
                 // inform the grid request failed
