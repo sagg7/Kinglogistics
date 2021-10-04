@@ -280,9 +280,8 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
-            $query->orderBy('finished_timestamp', 'desc');
-
-            
+            if(empty($request->sortModel))
+                $query->orderBy('finished_timestamp', 'desc');
         } else {
             if(isset($request->searchable)){
                 $array = $request->searchable;
