@@ -274,9 +274,12 @@ class LoadController extends Controller
             $query->orderByDesc('date');
         }
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
-            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher');
+            $query->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id');
+            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
             $select[] = 'customer_reference';
             $select[] = 'bol';
+            $select[] = 'accepted_timestamp';
+            $select[] = 'finished_timestamp';
         } else {
             if(isset($request->searchable)){
                 $array = $request->searchable;

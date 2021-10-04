@@ -92,7 +92,8 @@
                 }
                 tbActive = new tableAG({
                     columns: [
-                        {headerName: 'Date', field: 'date'},
+                        {headerName: 'Accepted at', field: 'accepted_timestamp'},
+                        {headerName: 'Finished at', field: 'finished_timestamp'},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                         {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
