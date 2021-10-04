@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Driver;
 use App\Models\SafetyMessage;
 use App\Notifications\SafetyAdvice;
 use App\Traits\Driver\DriverParams;
@@ -11,6 +12,7 @@ use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class SafetyMessageController extends Controller
 {
@@ -23,8 +25,8 @@ class SafetyMessageController extends Controller
     private function validator(array $data)
     {
         return Validator::make($data, [
-            'carrier' => ['required', 'exists:carriers,id'],
-            'zone' => ['required', 'exists:zones,id'],
+            'carrier' => ['nullable', 'exists:carriers,id'],
+            'zone' => ['nullable', 'exists:zones,id'],
             'driver' => ['nullable', 'exists:drivers,id'],
             'title' => ['required', 'max:255'],
             'message' => ['required'],
@@ -64,6 +66,20 @@ class SafetyMessageController extends Controller
             $message->message = $html;
             $message->message_json = $content->ops;
             $message->save();
+
+
+            if(empty($request->drivers)){
+                $drivers = Driver::whereNull('inactive');
+                if (!empty($message->carrier_id))
+                    $drivers->where('carrier_id', $message->carrier_id);
+                if (!empty($message->zone_id))
+                    $drivers->where('zone_id', $message->zone_id);
+                if (!empty($message->turn_id))
+                    $drivers->where('turn_id', $message->turn_id);
+
+
+                $request->drivers = $drivers->pluck('id')->toArray();
+            }
 
             $message->drivers()->sync($request->drivers);
 

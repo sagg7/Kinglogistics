@@ -44,6 +44,39 @@ trait ShipperInvoicesPDF
         return $mpdf;
     }
 
+    private function generatePicturesPdf($id)
+    {
+        $shipperInvoice = ShipperInvoice::with([
+            'shipper:id,name',
+            'loads.loadStatus',
+        ])
+            ->findOrFail($id);
+
+        $broker = Broker::findOrFail($this->broker_id);
+        $photos = [];
+        foreach ($shipperInvoice->loads as $load){
+            $photos[] = $this->getTemporaryFile("$load->finished_voucher");
+            $photos[] = $this->getTemporaryFile("$load->to_location_voucher");
+        }
+        $mpdf = new Mpdf();
+        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
+
+        $title = "Shipper Invoice - " . $shipperInvoice->shipper->name ."  - " . $shipperInvoice->date->format('m/d/Y');
+        $html = view('exports.shipperInvoices.invoicePictures', compact('title', 'shipperInvoice', 'broker', 'photos'));
+        $orientation = 'L';
+        $mpdf->AddPage($orientation, // L - landscape, P - portrait
+            '', '', '', '',
+            5, // margin_left
+            5, // margin right
+            22, // margin top
+            22, // margin bottom
+            3, // margin header
+            0); // margin footer
+        $mpdf->WriteHTML($html);
+
+        return $mpdf;
+    }
+
     /**
      * @param $id
      * @return string
@@ -52,6 +85,17 @@ trait ShipperInvoicesPDF
     private function getPDFBinary($id)
     {
         $mpdf = $this->generatePDF($id);
+        return $mpdf->Output('', 'S');
+    }
+
+    /**
+     * @param $id
+     * @return string
+     * @throws \Mpdf\MpdfException
+     */
+    private function getStatementPhotos($id)
+    {
+        $mpdf = $this->generatePicturesPdf($id);
         return $mpdf->Output('', 'S');
     }
 }
