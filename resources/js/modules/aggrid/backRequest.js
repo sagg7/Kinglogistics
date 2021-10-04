@@ -50,7 +50,7 @@ OptionsRenderer.prototype.init = (params) => {
 
     params.colDef.menuData.forEach((item, i) => {
         const itemId = OptionsRenderer.prototype.guidGenerator();
-        params.colDef.menuData[i].item_id = itemId;
+        params.data.menuId ? params.data.menuId.push({id: itemId, type: item.type}) : params.data.menuId = [{id: itemId, type: item.type}];
         if (item.type) {
             let classId = '',
                 icon = '',
@@ -95,7 +95,8 @@ OptionsRenderer.prototype.init = (params) => {
             trigger: 'click',
         }).on('shown.bs.popover', function (e) {
             params.colDef.menuData.forEach((item, i) => {
-                const option = $(`#${item.item_id}`);
+                const menuId = params.data.menuId.find(obj => obj.type === item.type);
+                const option = $(`#${menuId.id}`);
                 switch (item.type) {
                     default:
                         break;
@@ -165,11 +166,11 @@ class DataSource {
                     this.ajax.abort();
             },
             success: (res) => {
+                this.data = res;
                 // call the success callback
                 params.successCallback(res.rows, res.lastRow);
                 if (this.successCallback)
                     this.successCallback(res);
-                this.data = res;
             },
             error: () => {
                 // inform the grid request failed
@@ -345,7 +346,7 @@ class tableAG {
     }*/
 
     updateSearchQuery(params = {}) {
-        let dsPar = {url: this.url};
+        let dsPar = {url: this.url, successCallback: this.successCallback};
         if (this.searchQueryParams)
             dsPar.params = _.merge(params, this.searchQueryParams)
         else

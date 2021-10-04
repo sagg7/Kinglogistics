@@ -15,15 +15,14 @@
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
         <script defer>
-            var tbActive = null,
-                tbFinished = null;
+            var tbLoad = null;
             (() => {
                 class FrontDataSource {
                     constructor(data) {
                         this.load = data.load;
                     }
                     getRows(params) {
-                        const current = tbActive.dataSource.data;
+                        const current = tbLoad.dataSource.data;
                         const idx = current.rows.findIndex(obj => Number(obj.id) === Number(this.load.id));
                         if (idx) {
                             /*switch (this.load.status) {
@@ -90,7 +89,60 @@
                 PhotosRenderer.prototype.getGui = () => {
                     return this.eGui;
                 }
-                tbActive = new tableAG({
+                let reference = {};
+                let control = {};
+                let bol = {};
+                const checkDuplicates = (type = null) => {
+                    if (!type || type === 'control_number')
+                        control = {};
+                    if (!type || type === 'customer_reference')
+                        reference = {};
+                    if (!type || type === 'bol')
+                        bol = {};
+                    tbLoad.dataSource.data.rows.forEach(item => {
+                        if (!type || type === 'control_number') {
+                            if (item.control_number)
+                                if (!control[item.control_number])
+                                    control[item.control_number] = 1;
+                                else
+                                    control[item.control_number]++;
+                        }
+                        if (!type || type === 'customer_reference') {
+                            if (item.customer_reference)
+                                if (!reference[item.customer_reference])
+                                    reference[item.customer_reference] = 1;
+                                else
+                                    reference[item.customer_reference]++;
+                        }
+                        if (!type || type === 'bol') {
+                            if (item.bol)
+                                if (!bol[item.bol])
+                                    bol[item.bol] = 1;
+                                else
+                                    bol[item.bol]++;
+                        }
+                    });
+                    if (!type || type === 'control_number') {
+                        tbLoad.columnDefs[3].cellClass = params => {
+                            if (params.value && control[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    if (!type || type === 'customer_reference') {
+                        tbLoad.columnDefs[4].cellClass = params => {
+                            if (params.value && reference[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    if (!type || type === 'bol') {
+                        tbLoad.columnDefs[5].cellClass = params => {
+                            if (params.value && bol[params.value] > 1)
+                                return 'bg-danger';
+                        }
+                    }
+                    tbLoad.gridOptions.api.setColumnDefs(tbLoad.columnDefs);
+                }
+                tbLoad = new tableAG({
                     columns: [
                         {headerName: 'Accepted at', field: 'accepted_timestamp'},
                         {headerName: 'Finished at', field: 'finished_timestamp'},
@@ -105,8 +157,9 @@
                         PhotosRenderer: PhotosRenderer,
                         undoRedoCellEditing: true,
                         onCellEditingStopped: function (event) {
+                            checkDuplicates(event.colDef.field);
                             if (event.value === '' || typeof event.value === "undefined") {
-                                tbActive.gridOptions.api.undoCellEditing();
+                                tbLoad.gridOptions.api.undoCellEditing();
                                 return;
                             }
                             const formData = new FormData();
@@ -118,7 +171,7 @@
                                 contentType: false,
                                 processData: false,
                                 error: () => {
-                                    tbActive.gridOptions.api.undoCellEditing();
+                                    tbLoad.gridOptions.api.undoCellEditing();
                                     throwErrorMsg();
                                 }
                             });
@@ -127,6 +180,9 @@
                     container: 'myGrid',
                     url: '/load/search',
                     tableRef: 'tbActive',
+                    successCallback: (params) => {
+                        checkDuplicates();
+                    }
                 });
 
                 $('#view-photo').on('show.bs.modal', function(e) {
@@ -172,7 +228,6 @@
                         url: "{{ url('load/loadPhoto/') }}/"+img.attr('customid'),
                         type: 'POST',
                         success: (res) => {
-                            console.log(res);
                             cropper.load(res);
                         },
                         error: () => {
@@ -183,11 +238,11 @@
                 });
                 window.Echo.private('load-status-update')
                     .listen('LoadUpdate', res => {
-                        if (tbActive) {
-                            const find = tbActive.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
+                        if (tbLoad) {
+                            const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
                             if (find) {
                                 const frontData = new FrontDataSource({load: res.load});
-                                tbActive.gridOptions.api.setServerSideDatasource(frontData);
+                                tbLoad.gridOptions.api.setServerSideDatasource(frontData);
                             }
                         }
                     });
@@ -228,7 +283,6 @@
                 const table = $('#file-uploads'),
                     tbody = table.find('tbody');
                 $('#replace-form').submit((e) => {
-                    console.log("eee");
                     e.preventDefault();
                     const form = $(e.currentTarget),
                         url = form.attr('action');

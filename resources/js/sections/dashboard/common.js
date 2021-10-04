@@ -30,12 +30,12 @@
                         });
                         if (driverSel.is(':empty')) {
                             value.data.forEach((item) => {
-                                const driver = activeDrivers.find(obj => Number(obj.id) === Number(item.driver.id));
-                                if (!driver)
+                                const driver = item.driver ? activeDrivers.find(obj => Number(obj.id) === Number(item.driver.id)) : null;
+                                if (!driver && driver !== null)
                                     activeDrivers.push({
                                         id: item.driver.id,
                                         name: item.driver.name,
-                                    })
+                                    });
                             });
                         }
                     });
