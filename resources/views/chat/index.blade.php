@@ -83,6 +83,28 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="multiMessage" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                <div class="modal-content border-0 box-shadow-0" style="max-height: calc(100vh - 3.5rem);">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="multi-chat-form">
+                            <div class="form-group">
+                                {!! Form::label('multi_contacts', ucfirst(__('contacts')), ['class' => 'col-form-label']) !!}
+                                {!! Form::select('multi_contacts', [], null, ['class' => 'form-control', 'multiple']) !!}
+                            </div>
+                            <div class="form-group">
+                                {!! Form::label('multi_messages', ucfirst(__('message')), ['class' => 'col-form-label']) !!}
+                                {!! Form::textarea('multi_messages', null, ['class' => 'form-control', 'rows' => 5, 'maxlength' => 512]) !!}
+                            </div>
+                            {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block submit-ajax', 'type' => 'submit']) !!}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endsection
     @section("scripts")
         <script>
@@ -90,7 +112,7 @@
             const userId = {{ auth()->user()->id }};
         </script>
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
-        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.1') }}"></script>
     @endsection
 
     <div class="chat-application">
@@ -180,7 +202,7 @@
                         <span class="sidebar-close-icon">
                             <i class="feather icon-x"></i>
                         </span>
-                        <div class="chat-fixed-search">
+                        <div class="chat-fixed-search" style="z-index: 10;">
                             <div class="d-flex align-items-center">
                                 <!--<div class="sidebar-profile-toggle position-relative d-inline-flex">
                                     <div class="avatar">
@@ -195,6 +217,14 @@
                                         <i class="feather icon-search"></i>
                                     </div>
                                 </fieldset>
+                                <div class="dropdown">
+                                    <button class="btn p-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-bars" style="margin-left: .2rem;"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                        <a class="dropdown-item" href="#multiMessage" data-toggle="modal" data-target="#multiMessage"> Send mass message</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div id="users-list" class="chat-user-list list-group position-relative">

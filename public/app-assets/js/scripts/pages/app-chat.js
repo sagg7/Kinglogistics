@@ -2,8 +2,13 @@
     "use strict";
     const usersList = $('#users-list'),
         chatList = $('#chats-list'),
-        contactsList = $('#contacts-list');
+        contactsList = $('#contacts-list'),
+        multiContacts = $('#multi_contacts'),
+        multiMessages = $('#multi_messages');
 
+    multiContacts.select2({
+        placeholder: 'Select',
+    })
     if (contacts) {
         contacts.forEach(item => {
             const time = item.latest_message ? moment(item.latest_message.created_at).format('h:mm A') : '';
@@ -29,6 +34,7 @@
             } else {
                 contactsList.append(element);
             }
+            multiContacts.append(`<option value="${item.id}">${item.name}</option>`);
         });
     }
 
@@ -165,7 +171,6 @@
             }
             html = `<div class="chat-content" data-message="${item.id}">${html}${timeSpan}</div>`;
 
-            const lastChat = prepend ? $(".chat:first-child") : $(".chat:last-child");
             if (prepend) {
                 if (firstDivider.length > 0 && moment(firstDivider.data('date'), 'YYYY/MM/DD').isSame(date, 'date'))
                     firstDivider.remove();
@@ -179,6 +184,7 @@
                 userChat.append(divider);
                 currentDate = date;
             }
+            const lastChat = prepend ? $(".chat:first-child") : $(".chat:last-child");
             if (lastChat.length === 0 || (lastChat.hasClass("chat-left") && !item.is_driver_sender) || !lastChat.hasClass("chat-left") && item.is_driver_sender) {
                 html = `<div class="chat ${item.is_driver_sender ? 'chat-left' : ''}">` +
                     `<div class="chat-body">` + html + `</div>` +
@@ -339,15 +345,22 @@
     });
 
     let sentMessage = null;
-    const sendMessage = () => {
+    const sendMessage = (drivers = null, message = null) => {
         const formData = new FormData();
-        if (sentMessage)
-            formData.append('message', sentMessage);
-        if (chosenFile.data) {
-            formData.append('image', chosenFile.data);
-            closePreview();
+        if (!drivers && !message) {
+            if (sentMessage)
+                message = sentMessage;
+            if (chosenFile.data) {
+                formData.append('image', chosenFile.data);
+                closePreview();
+            }
+            drivers = [activeContact.id];
         }
-        formData.append('driver_id', activeContact.id);
+        formData.append('message', message);
+        drivers.forEach(id => {
+            formData.append('drivers[]', id);
+        });
+        const fromMulti = drivers.length > 1;
         $.ajax({
             url: '/chat/sendMessage',
             type: 'POST',
@@ -356,13 +369,25 @@
             processData: false,
             success: (res) => {
                 if (res.success) {
-                    sentMessage = null;
-                    activeContact.messages.history.push(res.message);
+                    if (fromMulti) {
+                        res.messages.forEach(message => {
+                            organizeMessages(Number(message.driver_id), message, 'sent');
+                        });
+                        $('#multiMessage').modal('hide');
+                        multiContacts.val('').trigger('change');
+                        multiMessages.val('');
+                    } else {
+                        sentMessage = null;
+                        activeContact.messages.history.push(res.messages[0]);
+                    }
                 }
             },
             error: () => {
                 throwErrorMsg();
             }
+        }).always(() => {
+            if (fromMulti)
+                $('#multi-chat-form').find('button').html('Submit').prop('disabled', false);
         });
     }
     const addMessageToView = (html) => {
@@ -394,7 +419,30 @@
             closePreview();
         }
     });
-    const sendImage = () => {
+    const organizeMessages = (contactId, message, type) => {
+        const showPreview = () => {
+            const menu = $(`.user-chat-info[data-userid="${contactId}"]`),
+                preview = menu.find('.truncate');
+            preview.text(message.content.substring(0, 100));
+            if (type === 'received') {
+                const meta = menu.find('.contact-meta'),
+                    badge = meta.find('.badge');
+                if (badge.length > 0) {
+                    badge.text(Number(badge.text()) + 1);
+                } else {
+                    meta.append(`<span class="badge badge-primary badge-pill float-right">1</span>`);
+                }
+            }
+        };
+        if (activeContact.id === contactId) {
+            appendMessages([message]);
+            showPreview();
+        } else {
+            const contact = contacts.find(obj => Number(obj.id) === Number(contactId));
+            if (contact.messages)
+                contact.messages.history.push(message);
+            showPreview();
+        }
     };
     // Add message to chat
     $('.chat-app-input').submit(() => {
@@ -416,6 +464,13 @@
         addMessageToView(html);
         $(".user-chats").scrollTop($(".user-chats > .chats").height());
         sendMessage();
+    });
+
+    $('#multi-chat-form').submit((e) => {
+        e.preventDefault();
+        const message = multiMessages.val();
+        const drivers = multiContacts.val();
+        sendMessage(drivers, message);
     });
     $('#appendImage').change((e) => {
         const files = $(e.currentTarget);
@@ -478,23 +533,7 @@
         .listen('NewChatMessage', e => {
             const message = e.message;
             message.newly_received = true;
-            if (activeContact.id === message.driver_id) {
-                appendMessages([message]);
-            } else {
-                const contact = contacts.find(obj => Number(obj.id) === Number(message.driver_id));
-                if (contact.messages)
-                    contact.messages.history.push(message);
-                const menu = $(`.user-chat-info[data-userid="${message.driver_id}"]`),
-                    preview = menu.find('.truncate'),
-                    meta = menu.find('.contact-meta'),
-                    badge = meta.find('.badge');
-                preview.text(message.content.substring(0, 100));
-                if (badge.length > 0) {
-                    badge.text(Number(badge.text()) + 1);
-                } else {
-                    meta.append(`<span class="badge badge-primary badge-pill float-right">1</span>`);
-                }
-            }
+            organizeMessages(Number(message.driver_id), message, 'received');
         });
 })(jQuery);
 

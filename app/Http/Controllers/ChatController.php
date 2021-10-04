@@ -66,37 +66,41 @@ class ChatController extends Controller
 
     public function sendMessageAsUser(Request $request)
     {
-        $driver_id= $request->driver_id;
+        $drivers = $request->drivers;
         $content = $request->message;
         $user_id = auth()->user()->id;
         $image = $request->image;
 
-        if ($image)
-            $image = $this->uploadImage($image, 'chat');
+        $messages = [];
+        foreach ($drivers as $driver_id) {
+            if ($image)
+                $image = $this->uploadImage($image, 'chat');
 
-        $message = $this->sendMessage(
-            $driver_id,
-            $content,
-            $user_id,
-            null,
-            null,
-            true,
-            $image,
-        );
+            $message = $this->sendMessage(
+                $driver_id,
+                $content,
+                $user_id,
+                null,
+                null,
+                true,
+                $image,
+            );
 
-        $driver = Driver::find($driver_id);
+            $driver = Driver::find($driver_id);
 
-        $driverDevices = $this->getUserDevices($driver);
+            $driverDevices = $this->getUserDevices($driver);
 
-        $this->sendNotification(
-            'Message from King',
-            $content,
-            $driverDevices,
-            DriverAppRoutes::CHAT,
-            $message,
-            DriverAppRoutes::CHAT_ID,
-        );
+            $this->sendNotification(
+                'Message from King',
+                $content,
+                $driverDevices,
+                DriverAppRoutes::CHAT,
+                $message,
+                DriverAppRoutes::CHAT_ID,
+            );
+            $messages[] = $message;
+        }
 
-        return ['success' => true, 'message' => $message];
+        return ['success' => true, 'messages' => $messages];
     }
 }
