@@ -185,6 +185,68 @@
                     }
                 });
 
+                const handleRequest = (xhr) => {
+                    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                    xhr.setRequestHeader('csrf-token', '{{ csrf_token() }}');
+                }
+
+                const initUpload = () => {
+                    $('input[type=file]').change((e) => {
+                        const target = e.currentTarget,
+                            inp = $(target),
+                            label = inp.closest('label').find('.file-name'),
+                            group = inp.closest('.file-group'),
+                            rmvBtn = group.find('.remove-file'),
+                            file = target.files[0];
+                        if (file) {
+                            label.text(file.name);
+                            group.addClass('input-group');
+                            rmvBtn.removeClass('d-none');
+                        } else {
+                            label.text('Upload File');
+                            group.removeClass('input-group');
+                            rmvBtn.addClass('d-none');
+                        }
+                    });
+                    $('.remove-file').click((e) => {
+                        const btn = $(e.currentTarget),
+                            group = btn.closest('.file-group'),
+                            inp = group.find('input[type=file]');
+                        inp.val('').trigger('change');
+                    });
+
+                    const table = $('#file-uploads'),
+                        tbody = table.find('tbody');
+                    $('#replace-form').submit((e) => {
+                        e.preventDefault();
+                        const form = $(e.currentTarget),
+                            url = form.attr('action');
+                        let formData = new FormData(form[0]);
+                        const btn = $(e.originalEvent.submitter),
+                            btnText = btn.text();
+                        btn.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+                        btn.prop('disabled', true);
+                        $.ajax({
+                            url,
+                            type: 'POST',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: (res) => {
+                                if (res.success) {
+                                    throwErrorMsg("Image replaced Correctly", {"title": "Success!", "type": "success", "redirect": "{{url('load/index')}}"})
+                                } else
+                                    throwErrorMsg();
+                            },
+                            error: () => {
+                                throwErrorMsg();
+                            }
+                        }).always(() => {
+                            btn.text(btnText).prop('disabled', false);
+                        });
+                    });
+                }
+
                 $('#view-photo').on('show.bs.modal', function(e) {
                     const modal = $(e.currentTarget),
                         modalBody = modal.find('.modal-body'),
@@ -246,72 +308,67 @@
                             }
                         }
                     });
-            })();
 
-
-            function handleRequest(xhr) {
-                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-                xhr.setRequestHeader('csrf-token', '{{ csrf_token() }}');
-            }
-
-            function initUpload() {
-
-                $('input[type=file]').change((e) => {
-                    const target = e.currentTarget,
-                        inp = $(target),
-                        label = inp.closest('label').find('.file-name'),
-                        group = inp.closest('.file-group'),
-                        rmvBtn = group.find('.remove-file'),
-                        file = target.files[0];
-                    if (file) {
-                        label.text(file.name);
-                        group.addClass('input-group');
-                        rmvBtn.removeClass('d-none');
-                    } else {
-                        label.text('Upload File');
-                        group.removeClass('input-group');
-                        rmvBtn.addClass('d-none');
-                    }
-                });
-                $('.remove-file').click((e) => {
-                    const btn = $(e.currentTarget),
-                        group = btn.closest('.file-group'),
-                        inp = group.find('input[type=file]');
-                    inp.val('').trigger('change');
+                const dateRange = $('#dateRange');
+                dateRange.daterangepicker({
+                    format: 'YYYY/MM/DD',
+                    startDate: moment().startOf('month'),
+                    endDate: moment().endOf('month'),
+                }, (start, end, label) => {
+                    tbLoad.searchQueryParams = _.merge(
+                        tbLoad.searchQueryParams,
+                        {
+                            start: start.format('YYYY/MM/DD'),
+                            end: end.format('YYYY/MM/DD'),
+                        });
+                    tbLoad.updateSearchQuery();
                 });
 
-                const table = $('#file-uploads'),
-                    tbody = table.find('tbody');
-                $('#replace-form').submit((e) => {
-                    e.preventDefault();
-                    const form = $(e.currentTarget),
-                        url = form.attr('action');
-                    let formData = new FormData(form[0]);
-                    const btn = $(e.originalEvent.submitter),
-                        btnText = btn.text();
-                    btn.html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-                    btn.prop('disabled', true);
-                    $.ajax({
-                        url,
-                        type: 'POST',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        success: (res) => {
-                            if (res.success) {
-                                throwErrorMsg("Image replaced Correctly", {"title": "Success!", "type": "success", "redirect": "{{url('load/index')}}"})
-                            } else
-                                throwErrorMsg();
+                $('#shipper').select2({
+                    ajax: {
+                        url: '/shipper/selection',
+                        data: (params) => {
+                            return {
+                                search: params.term,
+                                page: params.page || 1,
+                                take: 15,
+                            };
                         },
-                        error: () => {
-                            throwErrorMsg();
-                        }
-                    }).always(() => {
-                        btn.text(btnText).prop('disabled', false);
-                    });
+                    },
+                    placeholder: 'Select',
+                    allowClear: true,
+                }).on('select2:select', (e) => {
+                    tbLoad.searchQueryParams = _.merge(
+                        tbLoad.searchQueryParams,
+                        {
+                            shipper: e.params.data.id,
+                        });
+                    tbLoad.updateSearchQuery();
+                }).on('select2:unselect', () => {
+                    tbLoad.searchQueryParams.shipper = null;
+                    tbLoad.updateSearchQuery();
                 });
-            }
+            })();
         </script>
     @endsection
+
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <fieldset class="form-group col-6">
+                        {!! Form::label('dateRange', 'Select Dates', ['class' => 'col-form-label']) !!}
+                        {!! Form::text('dateRange', null, ['class' => 'form-control']) !!}
+                    </fieldset>
+
+                    <fieldset class="form-group col-6">
+                        {!! Form::label('shipper', 'Shipper', ['class' => 'col-form-label']) !!}
+                        {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-aggrid-index></x-aggrid-index>
 </x-app-layout>

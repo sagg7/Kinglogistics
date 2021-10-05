@@ -14,6 +14,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Storage\S3Functions;
 use App\Traits\Turn\DriverTurn;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\Storage\FileUpload;
@@ -258,6 +259,9 @@ class LoadController extends Controller
      */
     public function search(Request $request)
     {
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+
         $select = [
             "loads.id",
             "loads.date",
@@ -269,7 +273,12 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.status",
         ];
-        $query = Load::with('driver:id,name');
+        $query = Load::with('driver:id,name')
+            ->whereBetween('date', [$start, $end])
+            ->where(function ($q) use ($request) {
+                if ($request->shipper)
+                    $q->where('shipper_id', $request->shipper);
+            });
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
