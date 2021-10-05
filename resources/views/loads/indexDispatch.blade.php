@@ -123,19 +123,19 @@
                         }
                     });
                     if (!type || type === 'control_number') {
-                        tbLoad.columnDefs[3].cellClass = params => {
+                        tbLoad.columnDefs[4].cellClass = params => {
                             if (params.value && control[params.value] > 1)
                                 return 'bg-danger';
                         }
                     }
                     if (!type || type === 'customer_reference') {
-                        tbLoad.columnDefs[4].cellClass = params => {
+                        tbLoad.columnDefs[5].cellClass = params => {
                             if (params.value && reference[params.value] > 1)
                                 return 'bg-danger';
                         }
                     }
                     if (!type || type === 'bol') {
-                        tbLoad.columnDefs[5].cellClass = params => {
+                        tbLoad.columnDefs[6].cellClass = params => {
                             if (params.value && bol[params.value] > 1)
                                 return 'bg-danger';
                         }
