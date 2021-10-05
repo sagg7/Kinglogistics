@@ -125,19 +125,19 @@
                     if (!type || type === 'control_number') {
                         tbLoad.columnDefs[4].cellClass = params => {
                             if (params.value && control[params.value] > 1)
-                                return 'bg-danger';
+                                return 'bg-danger text-white';
                         }
                     }
                     if (!type || type === 'customer_reference') {
                         tbLoad.columnDefs[5].cellClass = params => {
                             if (params.value && reference[params.value] > 1)
-                                return 'bg-danger';
+                                return 'bg-danger text-white';
                         }
                     }
                     if (!type || type === 'bol') {
                         tbLoad.columnDefs[6].cellClass = params => {
                             if (params.value && bol[params.value] > 1)
-                                return 'bg-danger';
+                                return 'bg-danger text-white';
                         }
                     }
                     tbLoad.gridOptions.api.setColumnDefs(tbLoad.columnDefs);
