@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\LoadUpdate;
+use App\Exports\LoadsExport;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
@@ -19,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Excel;
 
 class LoadController extends Controller
 {
@@ -383,6 +385,37 @@ class LoadController extends Controller
             Storage::put("public/loads/".$load_status->load_id."/finished.jpg", $contents);
             return asset("storage/loads/".$load_status->load_id."/finished.jpg");
         }
+    }
+
+    public function DownloadExcelReport(Request $request) {
+       // $request->endRow = 0;
+       // $request->startRow = 1000;
+        $dates = explode(" - ", $request->dateRange);
+
+        $request->merge(["start"=>str_replace("/","-",$dates[0])]);
+        $request->merge(["end"=>str_replace("/","-",$dates[1])]);
+        $request->merge(["endRow"=>1000]);
+        $request->merge(["startRow"=>0]);
+        //$result = $this->search($request);
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        $result = Driver::select('name', 'id')
+           /* ->whereHas('trailer', function ($q) use ($request) {                      ///checar que todos tengan trailer
+                        $q->whereHas('shippers', function ($q) use ($request) {
+                            $q->where('id', $request->shipper);
+                        });
+                    })*/
+            ->with('loads', function ($q) use ($start, $end,  $request) {
+                    $q->whereBetween('date', [$start, $end])
+                        ->with('loadStatus');
+                    if (!empty($request->shipper)) //quitar cuando todos tengan trailer
+                        $q->where("shipper_id", "$request->shipper");
+                })->orderBy("name");
+        //return $result;
+
+        return (new LoadsExport($result->get()))->download('Dispatch Report.xlsx');
+
+
     }
 
 }

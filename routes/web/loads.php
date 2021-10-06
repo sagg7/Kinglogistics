@@ -28,6 +28,8 @@ Route::prefix('load')->group(function () {
         ->name('load.replacePhoto');
     Route::post('loadPhoto/{id}/{type}', [LoadController::class, 'loadPhoto'])
         ->name('load.loadPhoto');
+    Route::get('DownloadExcelReport', [LoadController::class, 'DownloadExcelReport'])
+        ->name('load.DownloadExcelReport');
     Route::post('delete/{id}', [LoadController::class, 'destroy'])
         ->name('load.delete');
 });

@@ -349,6 +349,37 @@
                     tbLoad.updateSearchQuery();
                 });
             })();
+
+            function downloadDispatch(){
+                    var query = {
+                        dateRange: dateRange.value,
+                        shipper: $("#shipper").val(),
+                    }
+
+                    window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
+                /*$.ajax({
+                    url: "{{url("load/DownloadExcelReport")}}",
+                    type: 'GET',
+                    data: {
+                        dateRange: dateRange.value,
+                        shipper: $("#shipper").val(),
+                    },
+                    success: (res) => {
+                        if (res.success)
+                            window.location = '/jobOpportunity/index';
+                        else
+                            throwErrorMsg();
+                    },
+                    error: (res) => {
+                        let errors = `<ul class="text-left">`;
+                        Object.values(res.responseJSON.errors).forEach((error) => {
+                            errors += `<li>${error}</li>`;
+                        });
+                        errors += `</ul>`;
+                        throwErrorMsg(errors, {timer: false});
+                    },
+                });*/
+            }
         </script>
     @endsection
 
@@ -356,7 +387,7 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="row">
-                    <fieldset class="form-group col-6">
+                    <fieldset class="form-group col-5">
                         {!! Form::label('dateRange', 'Select Dates', ['class' => 'col-form-label']) !!}
                         {!! Form::text('dateRange', null, ['class' => 'form-control']) !!}
                     </fieldset>
@@ -364,6 +395,17 @@
                     <fieldset class="form-group col-6">
                         {!! Form::label('shipper', 'Shipper', ['class' => 'col-form-label']) !!}
                         {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                    </fieldset>
+
+                    <fieldset class="form-group col-1">
+                        <div class="dropdown float-right">
+                            <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-paper-plane"></i> Download Dispatch Report</a>
+                            </div>
+                        </div>
                     </fieldset>
                 </div>
             </div>
