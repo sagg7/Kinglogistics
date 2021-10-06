@@ -277,7 +277,7 @@
                             height: 200
                         },
                         service: `{{ url('load/replacePhoto') }}/${img.attr('customid')}`,
-                        download: false,
+                        download: true,
                         willSave: function(data, ready) {
                             ready(data);
                         },
