@@ -237,4 +237,11 @@ class ShipperInvoiceController extends Controller
     {
         return (new ShipperInvoiceExport($id))->download();
     }
+
+    public function downloadPhotos($id)
+    {
+
+        $mpdf = $this->generatePicturesPdf($id);
+        return $mpdf->Output();
+    }
 }

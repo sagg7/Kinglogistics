@@ -33,6 +33,8 @@ Route::prefix('shipper')->group(function () {
             ->name('invoice.downloadPaymentPDF');
         Route::get('downloadXLSX/{id}', [ShipperInvoiceController::class, 'downloadXLSX'])
             ->name('invoice.downloadPaymentXLSX');
+        Route::get('downloadPhotos/{id}', [ShipperInvoiceController::class, 'downloadPhotos'])
+            ->name('invoice.downloadPhotos');
 
         Route::post('complete/{id}', [ShipperInvoiceController::class, 'complete'])
             ->name('invoice.complete');

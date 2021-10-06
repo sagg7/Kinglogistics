@@ -4,10 +4,13 @@ namespace App\Traits\Accounting;
 
 use App\Models\Broker;
 use App\Models\ShipperInvoice;
+use App\Traits\Storage\S3Functions;
 use Mpdf\Mpdf;
 
 trait ShipperInvoicesPDF
 {
+    use S3Functions;
+
     protected $broker_id;
 
     public function __construct()
@@ -54,16 +57,19 @@ trait ShipperInvoicesPDF
 
         $broker = Broker::findOrFail($this->broker_id);
         $photos = [];
+
         foreach ($shipperInvoice->loads as $load){
-            $photos[] = $this->getTemporaryFile("$load->finished_voucher");
-            $photos[] = $this->getTemporaryFile("$load->to_location_voucher");
+            if(isset($load->loadStatus)){
+                $photos[] = $this->getTemporaryFile($load->loadStatus->finished_voucher);
+                $photos[] = $this->getTemporaryFile($load->loadStatus->to_location_voucher);
+            }
         }
         $mpdf = new Mpdf();
-        $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
+        //$mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
 
         $title = "Shipper Invoice - " . $shipperInvoice->shipper->name ."  - " . $shipperInvoice->date->format('m/d/Y');
         $html = view('exports.shipperInvoices.invoicePictures', compact('title', 'shipperInvoice', 'broker', 'photos'));
-        $orientation = 'L';
+        $orientation = 'P';
         $mpdf->AddPage($orientation, // L - landscape, P - portrait
             '', '', '', '',
             5, // margin_left

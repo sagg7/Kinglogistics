@@ -40,6 +40,7 @@
                     menu: [
                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
                         {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
+                        {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
                         {text: 'Send Email & Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-paper-plane',
                             menuData: {
                                 title: 'Confirm sending email to shipper?',
@@ -107,6 +108,7 @@
                             break;
                     }
                 });
+
                 $('#completeAll').click((e) => {
                     e.preventDefault();
                     if (penInvoicesTable.dataSource.data.rows.length > 0)
@@ -130,6 +132,7 @@
                     else
                         throwErrorMsg('There are no pending invoices');
                 });
+
                 $('#payAll').click((e) => {
                     e.preventDefault();
                     if (comInvoicesTable.dataSource.data.rows.length > 0)
