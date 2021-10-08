@@ -87,7 +87,7 @@ class LoadsExport implements FromArray, ShouldAutoSize, WithStyles, WithColumnWi
         foreach ($drivers as $driver){
             $array = [];
             $cont = 0;
-            foreach ($driver->loads as $load){
+            foreach ($driver->loadStatus as $load){
                 if ($load)
                     $array[] = $load->customer_reference;
                     $cont++;

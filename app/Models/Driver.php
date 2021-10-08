@@ -68,6 +68,13 @@ class Driver extends Authenticatable implements CanResetPassword
     {
         return $this->hasMany(Load::class);
     }
+    /**
+     * @return HasMany
+     */
+    public function loadStatus(): HasMany
+    {
+        return $this->hasMany(Load::class)->join('load_statuses', 'loads.id','=','load_statuses.load_id');
+    }
 
     /**
      * @return HasOne
@@ -224,4 +231,5 @@ class Driver extends Authenticatable implements CanResetPassword
         $now = Carbon::now();
         return !$this->latestRejection || $now->isAfter($this->latestRejection->created_at->addHours(12));
     }
+
 }

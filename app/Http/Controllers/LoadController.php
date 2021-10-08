@@ -405,17 +405,13 @@ class LoadController extends Controller
                             $q->where('id', $request->shipper);
                         });
                     })*/
-            ->whereHas('loads', function ($q) use ($start, $end,  $request) {
-               $q->whereHas('loadStatus', function ($s) use ($start, $end,  $request) {
-                   $s->whereBetween('finished_timestamp', [$start, $end]);
-               });
+            ->with('loadStatus', function ($q) use ($start, $end,  $request) {
+                $q->whereBetween('finished_timestamp', [$start, $end]);
                     if (!empty($request->shipper)) //quitar cuando todos tengan trailer
                         $q->where("shipper_id", "$request->shipper");
-                })
-            ->with('loads', function ($q) use ($start, $end,  $request) {
-                $q->with('loadStatus');
-            })->orderBy("name");
-                //echo($result->get());
+            })
+            ->orderBy("name");
+
         return (new LoadsExport($result->get()))->download('Dispatch Report.xlsx');
 
 
