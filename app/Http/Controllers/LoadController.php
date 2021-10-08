@@ -276,7 +276,8 @@ class LoadController extends Controller
             "loads.status",
         ];
         $query = Load::with('driver:id,name')
-            ->whereBetween('date', [$start, $end])
+            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->whereBetween('finished_timestamp', [$start, $end])
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
@@ -285,7 +286,6 @@ class LoadController extends Controller
             $query->orderByDesc('date');
         }
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
-            $query->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id');
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
             $select[] = 'customer_reference';
             $select[] = 'bol';
