@@ -72,7 +72,8 @@ class Load extends Model
      */
     public function trip(): BelongsTo
     {
-        return $this->belongsTo(Trip::class);
+        return $this->belongsTo(Trip::class)
+            ->withTrashed();
     }
 
     /**

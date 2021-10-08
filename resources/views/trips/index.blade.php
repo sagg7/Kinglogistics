@@ -61,7 +61,7 @@
         <div class="card-content">
 
             <div class="card-header">
-                <a href="/trip/create" class="btn btn-primary">Create Trip</a>
+                <a href="/trip/create" class="btn btn-primary">Create Job</a>
             </div>
             <hr>
 
