@@ -5,6 +5,7 @@ namespace App\Traits\Load;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
+use App\Models\LoadStatus;
 use App\Models\Trip;
 use App\Notifications\LoadAssignment;
 use App\Traits\Accounting\PaymentsAndCollection;
@@ -108,6 +109,12 @@ trait GenerateLoads
             if (isset($data['status']))
                 $load->status = $data["status"];
             $load->save();
+            if (!$id){
+                $loadStatus = new LoadStatus();
+                $loadStatus->load_id = $load->id;
+                $loadStatus->unallocated_timestamp = Carbon::now()->format('Y-m-d H:i:s');
+                $loadStatus->save();
+            }
 
             /**
              * As the ID's in data property are Strings, we must reload the load to automatically convert the ids to valid int types
