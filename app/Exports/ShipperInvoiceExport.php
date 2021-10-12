@@ -179,7 +179,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
                 $content[] = [
                     $load->date->format('m/d/Y'),
                     $load->driver->name,
-                    $load->destination,
+                    $load->trip->name,
                     $load->customer_reference,
                     $load->control_number,
                     $load->bol,
