@@ -8,9 +8,9 @@
         <table class="table mb-4">
             <thead>
             <tr>
-                <th style="width: 2%;">#</th>
-                <th style="width: 16%;">Carrier</th>
-                <th style="width: 7%;">Truck&nbsp;#</th>
+                <th style="width: 5%;">#</th>
+                <th style="width: 15%;">Carrier</th>
+                <th style="width: 6%;">Truck&nbsp;#</th>
                 <th style="width: 8%;">Load Date</th>
                 <th style="width: 13%;">Driver</th>
                 <th style="width: 12%;">Destination</th>
