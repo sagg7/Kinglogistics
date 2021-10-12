@@ -8,12 +8,13 @@
         <table class="table mb-4">
             <thead>
             <tr>
+                <th style="width: 2%;">#</th>
                 <th style="width: 16%;">Carrier</th>
                 <th style="width: 7%;">Truck&nbsp;#</th>
                 <th style="width: 8%;">Load Date</th>
                 <th style="width: 13%;">Driver</th>
                 <th style="width: 12%;">Destination</th>
-                <th style="width: 11%;">Sand&nbsp;Ticket&nbsp;#</th>
+                <th style="width: 9%;">Sand&nbsp;Ticket&nbsp;#</th>
                 <th style="width: 9%;">Control</th>
                 <th style="width: 8%;">BOL</th>
                 <th style="width: 8%;">Miles</th>
@@ -21,8 +22,9 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($carrierPayment->loads as $load)
+            @foreach($carrierPayment->loads as $key => $load)
             <tr>
+                <td>{{ $key+1 }}</td>
                 <td>{{ $carrierPayment->carrier->name }}</td>
                 <td>{{ $load->driver->truck->number ?? null }}</td>
                 <td>{{ $load->date->format('m/d/Y') }}</td>
