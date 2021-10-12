@@ -27,7 +27,7 @@
                 <td>{{ $load->driver->truck->number ?? null }}</td>
                 <td>{{ $load->date->format('m/d/Y') }}</td>
                 <td>{{ $load->driver->name }}</td>
-                <td>{{ $load->destination }}</td>
+                <td>{{ $load->trip->name}}</td>
                 <td>{{ $load->customer_reference }}</td>
                 <td>{{ $load->control_number }}</td>
                 <td>{{ $load->bol }}</td>
