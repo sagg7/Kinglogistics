@@ -140,7 +140,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
     {
         return [
             'A' => 11,
-            'B' => 16,
+            'B' => 20,
             'C' => 18,
             'D' => 11,
             'E' => 11,
