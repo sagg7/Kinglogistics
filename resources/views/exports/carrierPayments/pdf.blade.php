@@ -13,12 +13,12 @@
                 <th style="width: 6%;">Truck&nbsp;#</th>
                 <th style="width: 8%;">Load Date</th>
                 <th style="width: 13%;">Driver</th>
-                <th style="width: 12%;">Destination</th>
+                <th style="width: 15%;">Destination</th>
                 <th style="width: 9%;">Sand&nbsp;Ticket&nbsp;#</th>
                 <th style="width: 9%;">Control</th>
-                <th style="width: 8%;">BOL</th>
-                <th style="width: 8%;">Miles</th>
-                <th style="width: 8%;">Rate</th>
+                <th style="width: 7%;">BOL</th>
+                <th style="width: 7%;">Miles</th>
+                <th style="width: 7%;">Rate</th>
             </tr>
             </thead>
             <tbody>
