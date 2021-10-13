@@ -140,7 +140,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
     {
         return [
             'A' => 11,
-            'B' => 16,
+            'B' => 20,
             'C' => 18,
             'D' => 11,
             'E' => 11,
@@ -159,7 +159,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
             ["Date Invoiced: " . $this->invoice->date->format('m/d/Y')],
             [$this->broker->name],
             ["Account Payable: RTS Financial Services PO Box 840267 Dallas, TX 75284-0267"], // TODO: ADD PO BOX DATA
-            ["WEEK ENDING: " . $this->invoice->date->endOfWeek()->format('m/d/Y')],
+            ["WEEK ENDING: " . $this->invoice->date->subDays(2)->endOfWeek()->format('m/d/Y')],
             ["INVOICE #: " . $this->invoice->id],
             [
                 "LOAD DATE",
@@ -179,7 +179,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
                 $content[] = [
                     $load->date->format('m/d/Y'),
                     $load->driver->name,
-                    $load->destination,
+                    $load->trip->name,
                     $load->customer_reference,
                     $load->control_number,
                     $load->bol,

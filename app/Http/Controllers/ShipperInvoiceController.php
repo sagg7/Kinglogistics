@@ -241,7 +241,26 @@ class ShipperInvoiceController extends Controller
     public function downloadPhotos($id)
     {
 
-        $mpdf = $this->generatePicturesPdf($id);
-        return $mpdf->Output();
+        //$mpdf = $this->generatePicturesPdf($id);
+        //return $mpdf->Output();
+
+        $shipperInvoice = ShipperInvoice::with([
+            'shipper:id,name',
+            'loads.loadStatus',
+        ])
+            ->findOrFail($id);
+
+        $photos = [];
+
+        foreach ($shipperInvoice->loads as $load){
+            if(isset($load->loadStatus)){
+                $photos[] = $this->getTemporaryFile($load->loadStatus->finished_voucher);
+                $photos[] = $this->getTemporaryFile($load->loadStatus->to_location_voucher);
+            }
+        }
+
+        $title = "Shipper Invoice - " . $shipperInvoice->shipper->name ."  - " . $shipperInvoice->date->format('m/d/Y');
+        return view('exports.shipperInvoices.invoicePictures', compact('title', 'shipperInvoice', 'photos', 'id'));
+
     }
 }
