@@ -159,7 +159,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
             ["Date Invoiced: " . $this->invoice->date->format('m/d/Y')],
             [$this->broker->name],
             ["Account Payable: RTS Financial Services PO Box 840267 Dallas, TX 75284-0267"], // TODO: ADD PO BOX DATA
-            ["WEEK ENDING: " . $this->invoice->date->endOfWeek()->format('m/d/Y')],
+            ["WEEK ENDING: " . $this->invoice->date->subDays(2)->endOfWeek()->format('m/d/Y')],
             ["INVOICE #: " . $this->invoice->id],
             [
                 "LOAD DATE",
