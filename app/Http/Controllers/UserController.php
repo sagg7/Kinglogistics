@@ -208,7 +208,7 @@ class UserController extends Controller
         switch ($item) {
             case 'role':
                 $array = [
-                    'relation' => 'role',
+                    'relation' => 'roles',
                     'column' => 'name',
                 ];
                 break;
@@ -264,6 +264,9 @@ class UserController extends Controller
                     ->whereTime('turn_start', '<=', $timeString)
                     ->whereTime('turn_end', '>', $timeString);
             });
+
+        if ($request->all)
+            return $query->get();
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

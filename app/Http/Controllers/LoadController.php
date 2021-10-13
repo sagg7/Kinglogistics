@@ -276,7 +276,7 @@ class LoadController extends Controller
             "loads.status",
         ];
         $query = Load::with('driver:id,name')
-            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->leftjoin('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
@@ -291,23 +291,52 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
-            if(empty($request->sortModel))
+            if (empty($request->sortModel))
                 $query->orderBy('finished_timestamp', 'desc');
         } else {
-            if(isset($request->searchable)){
+            if (isset($request->searchable)) {
                 $array = $request->searchable;
-                array_push($array, 'customer_reference');
-                array_push($array, 'customer_po');
-                array_push($array, 'bol');
+                $array[] = 'customer_reference';
+                $array[] = 'customer_po';
+                $array[] = 'bol';
                 $request->searchable = $array;
             }
         }
 
-        if (str_contains($request->search, 'transit')){
+        switch ($request->search) {
+            case "#duplicate":
+                $query->where(function ($q) {
+                    $q->whereIn('customer_reference', function ($q) {
+                        $q->select('customer_reference')
+                            ->from('loads')
+                            ->where('customer_reference', '!=', '')
+                            ->groupBy('customer_reference')
+                            ->havingRaw('count(*) > 1');
+                    })->orWhereIn('control_number', function ($q) {
+                        $q->select('control_number')
+                            ->from('loads')
+                            ->where('control_number', '!=', '')
+                            ->groupBy('control_number')
+                            ->havingRaw('count(*) > 1');
+                    })->orWhereIn('bol', function ($q) {
+                        $q->select('bol')
+                            ->from('loads')
+                            ->where('bol', '!=', '')
+                            ->groupBy('bol')
+                            ->havingRaw('count(*) > 1');
+                    });
+                });
+                $request->searchable = null;
+                break;
+            default:
+                break;
+        }
+
+        if (str_contains($request->search, 'transit')) {
             $request->search = 'location';
         }
 
-        if(strpos($request->search, '/')){
+        if (strpos($request->search, '/')) {
             $date = explode('/', $request->search);
             $request->search = $date[2].'-'.$date[0].'-'.$date[1];
         }
