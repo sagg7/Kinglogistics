@@ -11,13 +11,19 @@
                     <h2 class="mb-2">Loads Status</h2>
                 </div>
                 <div class="row text-left">
-                    <div class="col col-sm-6">
+                    <div class="col col-sm-4">
+                        <fieldset class="form-group">
+                            <label for="shipper">Shipper</label>
+                            {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                        </fieldset>
+                    </div>
+                    <div class="col col-sm-4">
                         <fieldset class="form-group">
                             <label for="trips">Job</label>
                             {!! Form::select('trips', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>
-                    <div class="col col-sm-6">
+                    <div class="col col-sm-4">
                         <fieldset class="form-group">
                             <label for="driver">Driver</label>
                             {!! Form::select('driver', [], null, ['class' => 'form-control']) !!}

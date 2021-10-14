@@ -11,7 +11,7 @@
             const guard = 'web';
         </script>
         <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.5') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.6') }}"></script>
         <script defer>
             let tbOnCall = null;
             (() => {
