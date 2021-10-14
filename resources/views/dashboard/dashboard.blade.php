@@ -71,6 +71,55 @@
                 });
             })();
             (() => {
+                const barChart = (chartId, barSeries, config) => {
+                    // Column Chart
+                    // ----------------------------------
+                    const options = {
+                        chart: {
+                            height: 350,
+                            type: 'bar',
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                endingShape: 'flat',
+                                columnWidth: '55%',
+                            },
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            show: true,
+                            width: 2,
+                            colors: ['transparent']
+                        },
+                        series: barSeries,
+                        legend: {
+                            offsetY: -10
+                        },
+                        xaxis: {
+                            categories: [''],
+                        },
+                        fill: {
+                            opacity: 1
+
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function (val) {
+                                    return Number(val);
+                                }
+                            }
+                        }
+                    }
+                    _.merge(options, config);
+                    const barChart = new ApexCharts(
+                        document.querySelector(`#${chartId}`),
+                        options
+                    );
+                    barChart.render();
+                };
                 $.ajax({
                     url: '/driver/search',
                     type: 'GET',
@@ -88,58 +137,43 @@
                             name: 'Out of Shift',
                             data: [res.outOfShift],
                         }];
-                        // Column Chart
-                        // ----------------------------------
-                        const options = {
-                            chart: {
-                                height: 350,
-                                type: 'bar',
-                            },
+                        const config = {
                             colors: [chartColorsObj.primary, chartColorsObj.success, chartColorsObj.danger],
-                            plotOptions: {
-                                bar: {
-                                    horizontal: false,
-                                    endingShape: 'flat',
-                                    columnWidth: '55%',
-                                },
-                            },
-                            dataLabels: {
-                                enabled: false
-                            },
-                            stroke: {
-                                show: true,
-                                width: 2,
-                                colors: ['transparent']
-                            },
-                            series: barSeries,
-                            legend: {
-                                offsetY: -10
-                            },
-                            xaxis: {
-                                categories: [''],
-                            },
                             yaxis: {
                                 title: {
                                     text: 'Number of drivers'
                                 },
                             },
-                            fill: {
-                                opacity: 1
-
-                            },
-                            tooltip: {
-                                y: {
-                                    formatter: function (val) {
-                                        return Number(val);
-                                    }
-                                }
-                            }
                         }
-                        const barChart = new ApexCharts(
-                            document.querySelector("#driversChart"),
-                            options
-                        );
-                        barChart.render();
+                        barChart('driversChart', barSeries, config);
+                    }
+                });
+
+                $.ajax({
+                    url: '/trailer/search',
+                    type: 'GET',
+                    data: {
+                        graph: true,
+                    },
+                    success: (res) => {
+                        const barSeries = [{
+                            name: 'Total',
+                            data: [res.all],
+                        }, {
+                            name: 'In Use',
+                            data: [res.available],
+                        }, {
+                            name: 'Available',
+                            data: [res.rented],
+                        }];
+                        const config = {
+                            yaxis: {
+                                title: {
+                                    text: 'Number of trailers'
+                                },
+                            },
+                        }
+                        barChart('trailersChart', barSeries, config);
                     }
                 });
             })();
@@ -171,6 +205,15 @@
                 <div class="card-body">
                     <div class="card-content">
                         <div id="driversChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div id="trailersChart"></div>
                     </div>
                 </div>
             </div>

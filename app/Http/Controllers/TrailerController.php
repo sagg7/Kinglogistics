@@ -228,9 +228,12 @@ class TrailerController extends Controller
             ->with(['trailer_type:id,name']);
 
         if ($request->graph) {
-            $all = $query->count();
-            $available = $query->where('status', 'available')->count();
-            $rented = $query->where('status', 'rented')->count();
+            $all = clone $query;
+            $all = $all->count();
+            $available = clone $query;
+            $available = $available->where('status', 'available')->count();
+            $rented = clone $query;
+            $rented = $rented->where('status', 'rented')->count();
             return compact('all', 'available', 'rented');
         }
 
