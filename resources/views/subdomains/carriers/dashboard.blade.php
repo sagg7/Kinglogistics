@@ -10,7 +10,7 @@
             const company = @json($tracking["company"]);
             const guard = 'carrier';
         </script>
-        <script src="{{ asset('js/sections/tracking/common.min.js?1.0.5') }}"></script>
+        <script src="{{ asset('js/sections/tracking/common.min.js?1.0.6') }}"></script>
         <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.5') }}"></script>
     @endsection
 

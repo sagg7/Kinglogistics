@@ -104,7 +104,7 @@
                 shift: item.shift ? item.shift.id : null,
             },
             truck: {
-                number: truck.number,
+                number: truck ? truck.number : null,
             },
             carrier: {
                 id: carrier.id,
