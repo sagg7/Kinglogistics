@@ -18,6 +18,7 @@ class DriverLocationUpdateForShipper implements ShouldBroadcast
     public $driver;
     public $shipper;
     public $coords;
+    public $speed;
     public $status;
 
     /**
@@ -25,12 +26,14 @@ class DriverLocationUpdateForShipper implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($driver, $shipper, $locationGroup, $coords)
+    public function __construct($driver, $shipper, $locationGroup, $coords, $speed, $status)
     {
         $this->driver = $driver;
         $this->shipper = $shipper;
         $this->locationGroup = $locationGroup;
         $this->coords = $coords;
+        $this->speed = $speed;
+        $this->status = $status;
     }
 
     public function broadcastWith()
@@ -49,6 +52,8 @@ class DriverLocationUpdateForShipper implements ShouldBroadcast
                 'name' => $this->shipper->name,
             ],
             'coords' => $this->coords,
+            'speed' => $this->speed,
+            'status' => $this->status,
         ];
     }
 
