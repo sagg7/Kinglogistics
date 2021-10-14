@@ -276,7 +276,7 @@ class LoadController extends Controller
             "loads.status",
         ];
         $query = Load::with('driver:id,name')
-            ->leftjoin('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
