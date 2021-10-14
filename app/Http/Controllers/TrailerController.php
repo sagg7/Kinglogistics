@@ -213,7 +213,7 @@ class TrailerController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
     public function search(Request $request)
     {
@@ -226,6 +226,13 @@ class TrailerController extends Controller
             "trailers.trailer_type_id",
         ])
             ->with(['trailer_type:id,name']);
+
+        if ($request->graph) {
+            $all = $query->count();
+            $available = $query->where('status', 'available')->count();
+            $rented = $query->where('status', 'rented')->count();
+            return compact('all', 'available', 'rented');
+        }
 
         return $this->multiTabSearchData($query, $request);
     }
