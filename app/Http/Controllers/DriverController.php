@@ -87,40 +87,8 @@ class DriverController extends Controller
         return $array;
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function search(Request $request, $type)
+    private function filterByType($query, $type)
     {
-        $query = Driver::select([
-            "drivers.id",
-            "drivers.name",
-            "drivers.zone_id",
-            "drivers.carrier_id",
-        ])
-            ->whereNull('inactive')
-            ->where(function ($q) {
-                if (auth()->guard('shipper')->check())
-                    $q->whereHas('truck', function ($q) {
-                        $q->whereHas('trailer', function ($q) {
-                            $q->whereHas('shippers', function ($q) {
-                                $q->where('id', auth()->user()->id);
-                            });
-                        });
-                    });
-            })
-            ->with([
-                'truck:driver_id,number',
-                'zone:id,name',
-                'carrier:id,name',
-                'latestLoad' => function ($q) {
-                    $q->where('status', '!=', 'finished')
-                        ->select('status', 'driver_id');
-                },
-                'shift:id,driver_id',
-            ]);
-
         switch ($type)
         {
             case 'active':
@@ -132,12 +100,73 @@ class DriverController extends Controller
                 });
                 break;
             case 'inactive':
-                $query->whereDoesntHave('shift');
+                $query->where(function ($q) {
+                    $q->whereDoesntHave('shift')
+                        ->orWhereHas('turn', function ($q) {
+                            $this->filterByInactiveTurn($q);
+                        });
+                });
                 break;
             case 'awaiting':
                 $query->whereHas('availableDriver');
                 break;
         }
+
+        return $query;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request, $type = null)
+    {
+        $query = Driver::select([
+            "drivers.id",
+            "drivers.name",
+            "drivers.zone_id",
+            "drivers.carrier_id",
+            "drivers.turn_id",
+        ])
+            ->whereNull('inactive')
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check())
+                    $q->whereHas('truck', function ($q) {
+                        $q->whereHas('trailer', function ($q) {
+                            $q->whereHas('shippers', function ($q) {
+                                $q->where('id', auth()->user()->id);
+                            });
+                        });
+                    });
+            });
+
+        if ($request->graph) {
+            $all = $query->get();
+            $onShift = 0;
+            $outOfShift = 0;
+            foreach ($all as $item) {
+                if ($item->shift)
+                    $onShift++;
+                else
+                    $outOfShift++;
+            }
+            $active = $this->filterByType($query, 'active')->count();
+
+            return compact('onShift', 'outOfShift', 'active');
+        } else {
+            $query->with([
+                'truck:driver_id,number',
+                'zone:id,name',
+                'carrier:id,name',
+                'latestLoad' => function ($q) {
+                    $q->where('status', '!=', 'finished')
+                        ->select('status', 'driver_id');
+                },
+                'shift:id,driver_id',
+            ]);
+        }
+
+        $query = $this->filterByType($query, $type);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

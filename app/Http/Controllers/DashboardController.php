@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessPaymentsAndCollection;
-use App\Models\Bonus;
-use App\Models\Carrier;
 use App\Models\Load;
-use App\Traits\Accounting\PaymentsAndCollection;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    use PaymentsAndCollection;
     public function index()
     {
         return view('dashboard.dashboard');

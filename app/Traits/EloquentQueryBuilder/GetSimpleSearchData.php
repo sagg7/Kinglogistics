@@ -139,11 +139,9 @@ trait GetSimpleSearchData
             array_multisort($sorting, $sortAfterQuery['direction'], $result);
         }
 
-        $params = [
+        return [
             'rows' => $result,
             'lastRow' => $total,
         ];
-
-        return response()->json($params);
     }
 }

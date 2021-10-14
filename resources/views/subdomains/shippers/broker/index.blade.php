@@ -83,7 +83,6 @@
                             break;
                         case 'equipment':
                             pane = $('#pane-equipment');
-                            console.log(pane, pane.is(':empty'));
                             if (pane.is(':empty'))
                                 $.ajax({
                                     url: '/company/equipment',
