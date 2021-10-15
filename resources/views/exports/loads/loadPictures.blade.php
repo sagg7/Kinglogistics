@@ -14,10 +14,10 @@
                     </p>
             </div>
             <div style="width:50%; float: left;">
-                <img src="{{$load['finished']}}" style="width:100%; height:auto; display: block; page-break-after:always; max-height: 200mm;">
+                <img src="{{$load['ticket']}}" style="width:100%; height:auto; display: block; page-break-after:always; max-height: 200mm;">
             </div>
             <div style="width:50%; float: right;">
-                <img src="{{$load['ticket']}}" style="width:100%; height:auto; display: block; page-break-after:always; max-height: 200mm;">
+                <img src="{{$load['finished']}}" style="width:100%; height:auto; display: block; page-break-after:always; max-height: 200mm;">
             </div>
         </div>
 
