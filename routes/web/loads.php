@@ -28,6 +28,8 @@ Route::prefix('load')->group(function () {
         ->name('load.partialUpdate');
     Route::post('markAsInspected/{id}', [LoadController::class, 'markAsInspected'])
         ->name('load.markAsInspected');
+    Route::post('unmarkAsInspected/{id}', [LoadController::class, 'unmarkAsInspected'])
+        ->name('load.unmarkAsInspected');
     Route::post('replacePhoto/{id}/{type}', [LoadController::class, 'replacePhoto'])
         ->name('load.replacePhoto');
     Route::post('loadPhoto/{id}/{type}', [LoadController::class, 'loadPhoto'])

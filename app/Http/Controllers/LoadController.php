@@ -215,6 +215,17 @@ class LoadController extends Controller
     }
 
     /**
+     * @param int $id
+     * @return mixed
+     */
+    public function unmarkAsInspected(int $id)
+    {
+        $load = Load::findOrFail($id);
+        $load->inspected = null;
+        return ["success" => $load->update()];
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param int $id

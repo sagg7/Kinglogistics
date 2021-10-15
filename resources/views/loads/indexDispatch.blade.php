@@ -169,7 +169,28 @@
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
                     menu: [
-                        {text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null', menuData: {title: 'Confirm marking load as inspected?'}},
+                        {
+                            text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
+                            menuData: {
+                                title: 'Confirm marking load as inspected?',
+                                stopReloadOnConfirm: true,
+                                afterConfirmFunction: (params) => {
+                                    params.node.data.inspected = 1;
+                                    params.api.redrawRows();
+                                }
+                            },
+                        },
+                        {
+                            text: 'Unmark as inspected', route: '/load/unmarkAsInspected', icon: 'feather icon-x-circle', type: 'confirm', conditional: 'inspected !== null',
+                            menuData: {
+                                title: 'Confirm unmarking load as inspected?',
+                                stopReloadOnConfirm: true,
+                                afterConfirmFunction: (params) => {
+                                    params.node.data.inspected = null;
+                                    params.api.redrawRows();
+                                }
+                            }
+                        },
                     ],
                     gridOptions: {
                         PhotosRenderer: PhotosRenderer,

@@ -7,7 +7,7 @@ OptionsRenderer.prototype.guidGenerator = () => {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
-OptionsRenderer.prototype.confirmationFunction = (route, table, data) => {
+OptionsRenderer.prototype.confirmationFunction = (route, table, data, params = null) => {
     Swal.fire({
         title: data.title,
         showCancelButton: true,
@@ -25,9 +25,10 @@ OptionsRenderer.prototype.confirmationFunction = (route, table, data) => {
                     if (!res.success)
                         throwErrorMsg(res.msg);
                     else {
-                        window[table].updateSearchQuery();
+                        if (!data.stopReloadOnConfirm)
+                            window[table].updateSearchQuery();
                         if (data.afterConfirmFunction)
-                            data.afterConfirmFunction();
+                            data.afterConfirmFunction(params);
                     }
                 },
                 error: () => {
@@ -48,9 +49,10 @@ OptionsRenderer.prototype.init = (params) => {
         content = `<ul class="list-group list-group-flush">`,
         menuData = {};
 
+    params.data.menuId = [];
     params.colDef.menuData.forEach((item, i) => {
         const itemId = OptionsRenderer.prototype.guidGenerator();
-        params.data.menuId ? params.data.menuId.push({id: itemId, type: item.type}) : params.data.menuId = [{id: itemId, type: item.type}];
+        params.data.menuId.push({id: itemId, type: item.type});
         if (item.type) {
             let classId = '',
                 icon = '',
@@ -93,9 +95,9 @@ OptionsRenderer.prototype.init = (params) => {
             html: true,
             content,
             trigger: 'click',
-        }).on('shown.bs.popover', function (e) {
+        }).on('shown.bs.popover', (e) => {
             params.colDef.menuData.forEach((item, i) => {
-                const menuId = params.data.menuId.find(obj => obj.type === item.type);
+                const menuId = params.data.menuId[i];
                 const option = $(`#${menuId.id}`);
                 switch (item.type) {
                     default:
@@ -118,7 +120,7 @@ OptionsRenderer.prototype.init = (params) => {
                     case 'confirm':
                         option.click((e) => {
                             e.preventDefault();
-                            OptionsRenderer.prototype.confirmationFunction(option.attr('href'), params.api.gridCore.gridOptions.components.tableRef, item.menuData);
+                            OptionsRenderer.prototype.confirmationFunction(option.attr('href'), params.api.gridCore.gridOptions.components.tableRef, item.menuData, params);
                         });
                         break;
                 }
