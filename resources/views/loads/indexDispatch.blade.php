@@ -198,7 +198,7 @@
                     },
                     container: 'myGrid',
                     url: '/load/search',
-                    tableRef: 'tbActive',
+                    tableRef: 'tbLoad',
                     successCallback: (params) => {
                         checkDuplicates();
                     }

@@ -211,7 +211,7 @@ class LoadController extends Controller
     {
         $load = Load::findOrFail($id);
         $load->inspected = 1;
-        return $load->update();
+        return ["success" => $load->update()];
     }
 
     /**
