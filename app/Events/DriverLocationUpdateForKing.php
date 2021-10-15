@@ -16,6 +16,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
 
     public $driver;
     public $coords;
+    public $speed;
     public $status;
 
     /**
@@ -23,10 +24,11 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($driver, $coords, $status)
+    public function __construct($driver, $coords, $speed, $status)
     {
         $this->driver = $driver;
         $this->coords = $coords;
+        $this->speed = $speed;
         $this->status = $status;
     }
 
@@ -50,6 +52,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcast
                 ->map
                 ->only('id', 'name'),
             'coords' => $this->coords,
+            'speed' => $this->speed,
             'status' => $this->status
         ];
     }
