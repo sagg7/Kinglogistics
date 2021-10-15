@@ -473,8 +473,7 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
-            if (empty($request->sortModel))
-                $query->orderBy('finished_timestamp', 'desc');
+            $query->orderBy('finished_timestamp', 'desc');
 
         $photos = [];
         $loads = [];
@@ -487,6 +486,8 @@ class LoadController extends Controller
                 'bol'=>$load->bol,
                 'finished' => (isset($load->loadStatus->finished_voucher)) ? $this->getTemporaryFile($load->loadStatus->finished_voucher) : "NO IMAGE",
                 'ticket' => (isset($load->loadStatus->to_location_voucher)) ? $this->getTemporaryFile($load->loadStatus->to_location_voucher) : "NO IMAGE",
+                'finished_timestamp' => $load->loadStatus->finished_timestamp,
+                'status' => $load->status,
             ];
         }
         return view('exports.loads.loadPictures', compact('loads'));
