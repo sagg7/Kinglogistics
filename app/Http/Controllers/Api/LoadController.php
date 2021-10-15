@@ -7,6 +7,7 @@ use App\Enums\LoadStatusEnum;
 use App\Exceptions\ShiftNotActiveException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
+use App\Http\Resources\Drivers\LoadStatusResource;
 use App\Http\Resources\Helpers\KeyValueResource;
 use App\Models\AppConfig;
 use App\Models\AvailableDriver;
@@ -170,7 +171,7 @@ class LoadController extends Controller
     public function accept(Request $request)
     {
         $driver = auth()->user();
-        $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
 
         $load = Load::find($request->get('load_id'));
         $shift = $driver->shift;
@@ -184,7 +185,11 @@ class LoadController extends Controller
         $load->box_number_init = $shift->box_number;
         $load->update();
 
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ACCEPTED]);
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::ACCEPTED,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
     }
 
     public function reject(Request $request)
@@ -193,10 +198,10 @@ class LoadController extends Controller
         $loadId = $request->get('load_id');
 
         // Register load rejection
-       /* RejectedLoad::create([ // remove for test only
-            'load_id' => $loadId,
-            'driver_id' => $driver->id,
-        ]);*/
+        /* RejectedLoad::create([ // remove for test only
+             'load_id' => $loadId,
+             'driver_id' => $driver->id,
+         ]);*/
 
         // Remove the driver from this load
         $load = Load::where('status', LoadStatusEnum::REQUESTED)->find($loadId);
@@ -248,18 +253,23 @@ class LoadController extends Controller
             'status' => 'ok',
             'message' => $message,
             'reached_max_rejections' => false,
-            'load_status' => LoadStatusEnum::UNALLOCATED
+            'load_status' => LoadStatusEnum::UNALLOCATED,
+            'load_status_details' => new LoadStatusResource($load->loadStatus)
         ]);
 
     }
 
     public function loading(Request $request)
     {
-        $load = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::LOADING);
+        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::LOADING);
 
         // Do required stuff for "Loading" event
 
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::LOADING]);
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::LOADING,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
     }
 
     public function toLocation(Request $request)
@@ -272,7 +282,11 @@ class LoadController extends Controller
         $load->customer_po = $request->get('customer_po');
         $load->update();
 
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::TO_LOCATION]);
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::TO_LOCATION,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
     }
 
     public function arrived(Request $request)
@@ -305,16 +319,24 @@ class LoadController extends Controller
         $loadStatus->update();
 
 
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::ARRIVED]);
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::ARRIVED,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
     }
 
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
 
-        $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
-
-        return response(['status' => 'ok', 'load_status' => LoadStatusEnum::UNLOADING]);
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::UNLOADING,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
     }
 
     public function finished(Request $request)
@@ -350,7 +372,8 @@ class LoadController extends Controller
         return response([
             'status' => 'ok',
             'can_keep_shift' => $driver->canActiveShift(),
-            'load_status' => LoadStatusEnum::FINISHED
+            'load_status' => LoadStatusEnum::FINISHED,
+            'load_status_details' => new LoadStatusResource($loadStatus)
         ]);
     }
 

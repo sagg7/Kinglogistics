@@ -30,6 +30,17 @@ class LoadStatus extends Model
         'finished_voucher_image_url'
     ];
 
+    protected $casts = [
+        'unallocated_timestamp' => 'datetime',
+        'requested_timestamp' => 'datetime',
+        'accepted_timestamp' => 'datetime',
+        'loading_timestamp' => 'datetime',
+        'to_location_timestamp' => 'datetime',
+        'arrived_timestamp' => 'datetime',
+        'unloading_timestamp' => 'datetime',
+        'finished_timestamp' => 'datetime',
+    ];
+
     /**
      * Establish a relationship with the Load model, has to be named like "parentLoad" due overlapping "load()" Laravel method.
      *
@@ -50,7 +61,7 @@ class LoadStatus extends Model
         return !empty($this->to_location_voucher) ? $this->getTemporaryFile($this->to_location_voucher) : null;
     }
 
-    public function getFinishedVoucherImageUrlAttribute(): ?string
+        public function getFinishedVoucherImageUrlAttribute(): ?string
     {
         return !empty($this->finished_voucher) ? $this->getTemporaryFile($this->finished_voucher) : null;
     }
