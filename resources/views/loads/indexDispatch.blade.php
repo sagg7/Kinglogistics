@@ -433,7 +433,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
-                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
+                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()" _blank><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>
                         </div>
                     </fieldset>
