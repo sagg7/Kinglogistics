@@ -28,7 +28,7 @@ trait TrackingTrait
         $data = Driver::whereNull("drivers.inactive")
             ->where(function ($q) use ($user_id) {
                 if (auth()->guard('carrier')->check())
-                    $q->where('carrier_id', $user_id);
+                    $q->where('drivers.carrier_id', $user_id);
             })
             //->whereHas('locations')
             ->with([
