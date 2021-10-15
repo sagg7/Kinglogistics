@@ -1,7 +1,6 @@
 <x-pdf-layout>
         <script>
             window.onload = function() {
-                console.log("eeeee");
                 setTimeout("window.print();", 1050);
                 setTimeout("window.history.back()",1051);
             }
