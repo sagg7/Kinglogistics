@@ -22,6 +22,8 @@ Route::prefix('load')->group(function () {
         ->name('load.edit');
     Route::post('update/{id}', [LoadController::class, 'update'])
         ->name('load.update');
+    Route::get('pictureReport', [LoadController::class, 'pictureReport'])
+        ->name('load.pictureReport');
     Route::post('partialUpdate/{id}', [LoadController::class, 'partialUpdate'])
         ->name('load.partialUpdate');
     Route::post('markAsInspected/{id}', [LoadController::class, 'markAsInspected'])

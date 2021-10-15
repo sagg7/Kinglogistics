@@ -267,6 +267,7 @@
                 }
 
                 $('#view-photo').on('show.bs.modal', function(e) {
+
                     const modal = $(e.currentTarget),
                         modalBody = modal.find('.modal-body'),
                         content = modal.find('.content-body'),
@@ -399,6 +400,15 @@
                     },
                 });*/
             }
+
+            function openPicReport() {
+                var query = {
+                    dateRange: dateRange.value,
+                    shipper: $("#shipper").val(),
+                }
+
+                window.location = "{{url("load/pictureReport")}}?" + $.param(query);
+            }
         </script>
     @endsection
 
@@ -422,7 +432,8 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-paper-plane"></i> Download Dispatch Report</a>
+                                <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
+                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>
                         </div>
                     </fieldset>

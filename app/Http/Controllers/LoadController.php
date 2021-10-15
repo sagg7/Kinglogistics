@@ -452,7 +452,7 @@ class LoadController extends Controller
                         });
                     })*/
             ->with('loadStatus', function ($q) use ($start, $end,  $request) {
-                $q->whereBetween('finished_timestamp', [$start, $end]);
+                    $q->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
                     if (!empty($request->shipper)) //quitar cuando todos tengan trailer
                         $q->where("shipper_id", "$request->shipper");
             })
@@ -463,4 +463,50 @@ class LoadController extends Controller
 
     }
 
+    public function pictureReport(Request $request){
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+
+        $select = [
+            "loads.id",
+            "loads.control_number",
+            "loads.origin",
+            "loads.destination",
+            "loads.driver_id",
+            "loads.trip_id",
+            "loads.status",
+        ];
+        $query = Load::with('driver:id,name')
+            ->with('trip:id,name')
+            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
+            ->where(function ($q) use ($request) {
+                if ($request->shipper)
+                    $q->where('shipper_id', $request->shipper);
+            });
+
+            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
+            $select[] = 'customer_reference';
+            $select[] = 'bol';
+            $select[] = 'accepted_timestamp';
+            $select[] = 'finished_timestamp';
+            $query->orderBy('finished_timestamp', 'desc');
+
+        $photos = [];
+        $loads = [];
+        foreach ($query->select($select)->get() as $key => $load){
+            $loads[] = [
+                'driverName'=> $load->driver->name,
+                'job'=> $load->trip->name,
+                'control_number'=> $load->control_number,
+                'customer_reference'=> $load->customer_reference,
+                'bol'=>$load->bol,
+                'finished' => (isset($load->loadStatus->finished_voucher)) ? $this->getTemporaryFile($load->loadStatus->finished_voucher) : "NO IMAGE",
+                'ticket' => (isset($load->loadStatus->to_location_voucher)) ? $this->getTemporaryFile($load->loadStatus->to_location_voucher) : "NO IMAGE",
+                'finished_timestamp' => $load->loadStatus->finished_timestamp,
+                'status' => $load->status,
+            ];
+        }
+        return view('exports.loads.loadPictures', compact('loads'));
+    }
 }
