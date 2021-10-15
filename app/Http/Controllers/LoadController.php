@@ -191,11 +191,27 @@ class LoadController extends Controller
         //return abort(404);
     }
 
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return mixed
+     */
     public function partialUpdate(Request $request, int $id)
     {
         $load = Load::findOrFail($id);
         $load->fill($request->all());
         return $load->update();
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public function markAsInspected(int $id)
+    {
+        $load = Load::findOrFail($id);
+        $load->inspected = 1;
+        return ["success" => $load->update()];
     }
 
     /**
@@ -274,10 +290,10 @@ class LoadController extends Controller
             "loads.destination",
             "loads.driver_id",
             "loads.status",
+            "loads.inspected",
         ];
         $query = Load::with('driver:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
-            ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
@@ -286,7 +302,8 @@ class LoadController extends Controller
             $query->orderByDesc('date');
         }
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
-            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
+            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
+                ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
             $select[] = 'customer_reference';
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';

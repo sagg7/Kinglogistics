@@ -89,6 +89,20 @@
                 PhotosRenderer.prototype.getGui = () => {
                     return this.eGui;
                 }
+                function StatusBarRenderer() {}
+                StatusBarRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    let colorClass;
+                    if (params.value)
+                        colorClass = 'bg-success';
+                    else
+                        colorClass = 'bg-warning';
+
+                    this.eGui.innerHTML = `<div class="text-center ${colorClass} colors-container" style="width: 4px;">&nbsp;</div>`;
+                }
+                StatusBarRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
                 let reference = {};
                 let control = {};
                 let bol = {};
@@ -144,6 +158,7 @@
                 }
                 tbLoad = new tableAG({
                     columns: [
+                        {headerName: '', field: 'inspected', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
                         {headerName: 'Accepted at', field: 'accepted_timestamp'},
                         {headerName: 'Finished at', field: 'finished_timestamp'},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
@@ -153,8 +168,12 @@
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
+                    menu: [
+                        {text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null', menuData: {title: 'Confirm marking load as inspected?'}},
+                    ],
                     gridOptions: {
                         PhotosRenderer: PhotosRenderer,
+                        StatusBarRenderer: StatusBarRenderer,
                         undoRedoCellEditing: true,
                         onCellEditingStopped: function (event) {
                             checkDuplicates(event.colDef.field);
@@ -179,7 +198,7 @@
                     },
                     container: 'myGrid',
                     url: '/load/search',
-                    tableRef: 'tbActive',
+                    tableRef: 'tbLoad',
                     successCallback: (params) => {
                         checkDuplicates();
                     }
