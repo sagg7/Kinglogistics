@@ -464,8 +464,10 @@ class LoadController extends Controller
     }
 
     public function pictureReport(Request $request){
-        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
-        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        $dates = explode(" - ", $request->dateRange);
+
+        $start = str_replace("/","-",$dates[0]) ? Carbon::parse(str_replace("/","-",$dates[0])) : Carbon::now()->startOfMonth();
+        $end = str_replace("/","-",$dates[1]) ? Carbon::parse(str_replace("/","-",$dates[1]))->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         $select = [
             "loads.id",
