@@ -435,7 +435,7 @@ class LoadController extends Controller
                         });
                     })*/
             ->with('loadStatus', function ($q) use ($start, $end,  $request) {
-                $q->whereBetween('finished_timestamp', [$start, $end]);
+                    $q->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
                     if (!empty($request->shipper)) //quitar cuando todos tengan trailer
                         $q->where("shipper_id", "$request->shipper");
             })
