@@ -105,6 +105,7 @@ trait PaymentsAndCollection
     private function shipperInvoices()
     {
         DB::transaction(function () {
+            $carbon_now = Carbon::now();
             $loads = Load::join('drivers', 'drivers.id', '=', 'driver_id')
                 ->whereNull('shipper_invoice_id')
                 ->whereHas('driver')
@@ -112,9 +113,11 @@ trait PaymentsAndCollection
                     // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
                     $q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
                 })*/
-                /*->whereHas('loadStatus', function ($q) {
-                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
-                })*/
+                ->whereHas('loadStatus', function ($q) use ($carbon_now) {
+                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
+                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
+                })
+                ->whereNotNull('inspected')
                 //->whereDate('date', '<=', $this->customDate)
                 ->where('status', 'finished')
                 ->with([
@@ -149,7 +152,6 @@ trait PaymentsAndCollection
                 $shipper_invoices[$shipper_id][$trip_pos]['load_groups'][$loops]['loads'][] = $load;
                 $shipper_invoices[$shipper_id][$trip_pos]['load_count']++;
             }
-            $carbon_now = Carbon::now();
             foreach ($shipper_invoices as $shipper_id => $invoice) {
                 // Iterate through the load grouping
                 foreach ($invoice as $trip) {
@@ -175,7 +177,7 @@ trait PaymentsAndCollection
                             $expense->amount = (1.5 * $invoice_total) / 100;
                             $expense->type_id = 1; // Hardcoded value that represents the "Invoice Commission"
                             $expense->description = "Invoice commission";
-                            $expense->date = Carbon::now();
+                            $expense->date = $carbon_now;
                             $expense->shipper_invoice_id = $shipper_invoice->id;
                             $expense->save();
                         }
@@ -331,9 +333,11 @@ trait PaymentsAndCollection
                 ->whereHas('driver')
                 ->where('status', 'finished')
                 // CONDITION OF AT LEAST ONLY PAST WEEK LOADS
-                /*->whereHas('loadStatus', function ($q) {
-                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
-                })*/
+                ->whereHas('loadStatus', function ($q) use ($carbon_now) {
+                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
+                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
+                })
+                ->whereNotNull('inspected')
                 //->whereDate('date', '<=', $this->customDate)
                 ->with([
                     'shipper',

@@ -219,12 +219,13 @@ class tableAG {
             //localeText: this.constructLocale(),
             onGridReady: function (params) {
                 setTimeout(() => {
+                    params.columnApi.autoSizeAllColumns();
                     params.api.sizeColumnsToFit();
                 }, 300)
 
                 let rtime,
                     timeout = false,
-                    delta = 450;
+                    delta = 550;
 
                 window.addEventListener('resize', function () {
                     rtime = new Date();
@@ -239,6 +240,7 @@ class tableAG {
                         setTimeout(resizeEnd, delta);
                     } else {
                         timeout = false;
+                        params.columnApi.autoSizeAllColumns();
                         params.api.sizeColumnsToFit();
                     }
                 }
@@ -358,6 +360,7 @@ class tableAG {
 
     changePageSize(value) {
         this.gridOptions.api.paginationSetPageSize(Number(value));
+        this.gridOptions.columnApi.autoSizeAllColumns();
         this.gridOptions.api.sizeColumnsToFit();
     }
 
@@ -395,6 +398,7 @@ class tableAG {
 
         /*** INIT TABLE ***/
         new agGrid.Grid(gridTable, this.gridOptions);
+        this.gridOptions.columnApi.autoSizeAllColumns();
         this.gridOptions.api.sizeColumnsToFit();
 
         /*** SET OR REMOVE PINNED DEPENDING ON DEVICE SIZE ***/
