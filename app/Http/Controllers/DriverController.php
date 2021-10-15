@@ -117,7 +117,7 @@ class DriverController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
     public function search(Request $request, $type = null)
     {

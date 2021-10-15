@@ -48,7 +48,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loans/common.js'], 'public/js/sections/loans/common.min.js')
     //.scripts(['resources/js/sections/tracking/common.js'], 'public/js/sections/tracking/common.min.js')
     //.scripts(['resources/js/sections/tracking/history.js'], 'public/js/sections/tracking/history.min.js')
-    //.scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
+    .scripts(['resources/js/sections/dashboard/common.js'], 'public/js/sections/dashboard/common.min.js')
     //.scripts(['resources/js/sections/trips/common.js'], 'public/js/sections/trips/common.min.js')
     //.scripts(['resources/js/sections/carrierPayments/editPayment.js'], 'public/js/sections/carrierPayments/editPayment.min.js')
     // Subdomains
@@ -59,5 +59,5 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/subdomains/carriers/profile/equipment/common.js'], 'public/js/sections/subdomains/carriers/profile/equipment/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
-    .scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
+    //.scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
     ;

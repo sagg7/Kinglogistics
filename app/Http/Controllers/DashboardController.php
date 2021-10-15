@@ -25,6 +25,9 @@ class DashboardController extends Controller
                     $q->whereHas('driver', function ($q) {
                         $q->where('carrier_id', auth()->user()->id);
                     });
+                if ($request->shipper) {
+                    $q->where('shipper_id', $request->shipper);
+                }
                 if ($request->trip) {
                     $q->where('trip_id', $request->trip);
                 }

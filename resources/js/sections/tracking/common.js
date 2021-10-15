@@ -11,7 +11,7 @@
             (data.load.origin ? `<strong>Origin:</strong> ${data.load.origin}<br><strong>Destination:</strong> ${data.load.destination}</p>` : '') +
             //`<p><strong>Carrier:</strong> ${data.carrier.name}<br>` +
             `<strong>Driver:</strong> ${data.driver.name}<br>` +
-            `<strong>Truck#:</strong> ${data.truck.number}</p>` +
+            (data.truck.number ? `<strong>Truck#:</strong> ${data.truck.number}` : '') + '</p>' +
             `<strong>MPH:</strong> 0</p>` +
             `<strong>Date:</strong> ${moment(data.date).format('MM/DD/YYYY HH:mm')}<br>`;
         const infowindow = new google.maps.InfoWindow({
@@ -92,10 +92,6 @@
     }
     let markersArray = [];
     data.forEach((item) => {
-        const location = item.latest_location;
-        const load = location.parent_load ? location.parent_load : {};
-        const shipper = load.shipper ? load.shipper : {};
-        const truck = load.truck ? load.truck : item.truck;
         const carrier = item.carrier;
         const data = {
             driver: {
@@ -104,26 +100,26 @@
                 shift: item.shift ? item.shift.id : null,
             },
             truck: {
-                number: truck.number,
+                number: item.truck_number ? item.truck_number : null,
             },
             carrier: {
                 id: carrier.id,
                 name: carrier.name,
             },
             shippers: {
-                id: shipper.id,
-                name: shipper.name,
+                id: item.shipper_id,
+                name: item.shipper_name,
             },
             coords: {
-                latitude: Number(location.latitude),
-                longitude: Number(location.longitude),
+                latitude: Number(item.latitude),
+                longitude: Number(item.longitude),
             },
             load: {
-                origin: load.origin,
-                destination: load.destination,
+                origin: item.origin,
+                destination: item.destination,
             },
-            status: location.status,
-            date: moment(location.created_at).format('MM/DD/YYYY HH:mm'),
+            status: item.location_status,
+            date: moment(item.location_date).format('MM/DD/YYYY HH:mm'),
         }
         const marker = addMarker(data);
         bounds.extend(marker.position);

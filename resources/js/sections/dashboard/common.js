@@ -1,6 +1,8 @@
 (() => {
+    const shipperSel = $('[name=shipper]');
     const tripSel = $('[name=trips]');
     const driverSel = $('[name=driver]');
+    let shipper = null;
     let trip = null;
     let driver = null;
     const loadSummary = [];
@@ -13,6 +15,7 @@
             url: '/dashboard/getData',
             type: 'GET',
             data: {
+                shipper,
                 trip,
                 driver,
             },
@@ -54,6 +57,29 @@
             }
         });
     }
+    shipperSel.select2({
+        ajax: {
+            url: '/shipper/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    })
+        .on('select2:select', (e) => {
+            shipper = e.params.data.id;
+            loadSummary.length = 0;
+            getLoadsData();
+        })
+        .on('select2:unselect', (e) => {
+            shipper = null;
+            getLoadsData();
+        });
     tripSel.select2({
         ajax: {
             url: '/trip/selection',
@@ -62,6 +88,7 @@
                     search: params.term,
                     page: params.page || 1,
                     take: 15,
+                    shipper: shipperSel.val(),
                 };
             },
         },
