@@ -302,13 +302,15 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.status",
             "loads.inspected",
+            "loads.trip_id",
         ];
         $query = Load::with('driver:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
-            });
+            })
+            ->with('trip:id,name');
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }

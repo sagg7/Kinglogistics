@@ -208,6 +208,7 @@ class ShipperInvoiceController extends Controller
             "shipper_invoices.status",
         ])
             ->with('shipper:id,name')
+            ->with('loads.trip:id,name')
             ->where(function ($q) use ($type) {
                 switch ($type) {
                     case ShipperInvoiceEnum::PENDING:
@@ -247,7 +248,7 @@ class ShipperInvoiceController extends Controller
         $shipperInvoice = ShipperInvoice::with([
             'shipper:id,name',
             'loads.loadStatus',
-        ])
+         ])
             ->findOrFail($id);
 
         $photos = [];

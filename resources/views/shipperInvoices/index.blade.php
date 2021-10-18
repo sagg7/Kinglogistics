@@ -30,9 +30,16 @@
                     else
                         return '';
                 };
+                const loadFormatter = (params) => {
+                    if (params.value && params.value[0])
+                        return params.value[0].trip.name;
+                    else
+                        return '';
+                };
                 const invoicesColumns = [
                     {headerName: 'Date', field: 'date'},
                     {headerName: 'Invoice#', field: 'id'},
+                    {headerName: 'Job', field: 'loads', valueFormatter: loadFormatter},
                     {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                 ];

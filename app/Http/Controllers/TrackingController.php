@@ -58,7 +58,7 @@ class TrackingController extends Controller
                 });
             })
             ->withTrashed()
-            ->get();
+            ->get()->take(1000);
     }
 
     public function getPinLoadData(Request $request)

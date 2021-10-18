@@ -53,6 +53,12 @@
                     else
                         return 'ㅤ';
                 };
+                const JobFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return 'ㅤ';
+                };
                 const capitalizeStatus = (params) => {
                     let string = params.value ? params.value : '';
                     if (string === "to_location")
@@ -166,6 +172,7 @@
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'Customer Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
+                        {headerName: 'Job', field: 'trip', editable: true, valueFormatter: JobFormatter},
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
                     menu: [
