@@ -274,6 +274,11 @@ class LoadController extends Controller
                     'relation' => $item,
                     'column' => 'name',
                 ];
+            case 'trip':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
                 break;
             default:
                 $array = null;
@@ -311,9 +316,9 @@ class LoadController extends Controller
                     $q->where('shipper_id', $request->shipper);
             })
             ->with('trip:id,name');
-        if (!$request->sortModel) {
-            $query->orderByDesc('date');
-        }
+        //if (!$request->sortModel) {
+        //    $query->orderByDesc('date');
+        //}
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
@@ -321,6 +326,7 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
+
             if (empty($request->sortModel))
                 $query->orderBy('finished_timestamp', 'desc');
         } else {
