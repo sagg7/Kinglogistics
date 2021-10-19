@@ -114,8 +114,8 @@ trait PaymentsAndCollection
                     $q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
                 })*/
                 ->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
-                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
+                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
+                    //$q->whereDate('finished_timestamp', '<=', $carbon_now);
                 })
                 ->whereNotNull('inspected')
                 //->whereDate('date', '<=', $this->customDate)
