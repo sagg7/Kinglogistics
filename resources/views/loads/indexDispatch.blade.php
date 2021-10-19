@@ -49,7 +49,7 @@
                 };
                 const emptyFormatter = (params) => {
                     if (params.value)
-                        return params.value.name;
+                        return params.value;
                     else
                         return 'ㅤ';
                 };
@@ -107,50 +107,65 @@
                 let control = {};
                 let bol = {};
                 const checkDuplicates = (type = null) => {
-                    if (!type || type === 'control_number')
-                        control = {};
-                    if (!type || type === 'customer_reference')
-                        reference = {};
-                    if (!type || type === 'bol')
-                        bol = {};
                     tbLoad.dataSource.data.rows.forEach(item => {
                         if (!type || type === 'control_number') {
-                            if (item.control_number)
-                                if (!control[item.control_number])
-                                    control[item.control_number] = 1;
-                                else
-                                    control[item.control_number]++;
+                            if (item.control_number) {
+                                if (!control[item.control_number]) {
+                                    control[item.control_number] = {
+                                        count: 1,
+                                        ids: [],
+                                    };
+                                } else if (control[item.control_number]['ids'].find(obj => obj === item.id)) {
+                                    return;
+                                } else
+                                    control[item.control_number]['count']++;
+                                control[item.control_number]['ids'].push(item.id);
+                            }
                         }
                         if (!type || type === 'customer_reference') {
-                            if (item.customer_reference)
-                                if (!reference[item.customer_reference])
-                                    reference[item.customer_reference] = 1;
-                                else
-                                    reference[item.customer_reference]++;
+                            if (item.customer_reference) {
+                                if (!reference[item.customer_reference]) {
+                                    reference[item.customer_reference] = {
+                                        count: 1,
+                                        ids: [],
+                                    };
+                                } else if (reference[item.customer_reference]['ids'].find(obj => obj === item.id)) {
+                                    return;
+                                } else
+                                    reference[item.customer_reference]['count']++;
+                                reference[item.customer_reference]['ids'].push(item.id);
+                            }
                         }
                         if (!type || type === 'bol') {
-                            if (item.bol)
-                                if (!bol[item.bol])
-                                    bol[item.bol] = 1;
-                                else
-                                    bol[item.bol]++;
+                            if (item.bol) {
+                                if (!bol[item.bol]) {
+                                    bol[item.bol] = {
+                                        count: 1,
+                                        ids: [],
+                                    };
+                                } else if (bol[item.bol]['ids'].find(obj => obj === item.id)) {
+                                    return;
+                                } else
+                                    bol[item.bol]['count']++;
+                                bol[item.bol]['ids'].push(item.id);
+                            }
                         }
                     });
                     if (!type || type === 'control_number') {
-                        tbLoad.columnDefs[4].cellClass = params => {
-                            if (params.value && control[params.value] > 1)
+                        tbLoad.columnDefs[5].cellClass = params => {
+                            if (params.value && control[params.value] && control[params.value]['count'] > 1)
                                 return 'bg-danger text-white';
                         }
                     }
                     if (!type || type === 'customer_reference') {
-                        tbLoad.columnDefs[5].cellClass = params => {
-                            if (params.value && reference[params.value] > 1)
+                        tbLoad.columnDefs[6].cellClass = params => {
+                            if (params.value && reference[params.value] && reference[params.value]['count'] > 1)
                                 return 'bg-danger text-white';
                         }
                     }
                     if (!type || type === 'bol') {
-                        tbLoad.columnDefs[6].cellClass = params => {
-                            if (params.value && bol[params.value] > 1)
+                        tbLoad.columnDefs[7].cellClass = params => {
+                            if (params.value && bol[params.value] && bol[params.value]['count'] > 1)
                                 return 'bg-danger text-white';
                         }
                     }
