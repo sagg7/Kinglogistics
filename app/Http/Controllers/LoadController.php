@@ -316,9 +316,9 @@ class LoadController extends Controller
                     $q->where('shipper_id', $request->shipper);
             })
             ->with('trip:id,name');
-        //if (!$request->sortModel) {
-        //    $query->orderByDesc('date');
-        //}
+        if (!$request->sortModel) {
+            $query->orderByDesc('date');
+        }
         if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
@@ -529,6 +529,7 @@ class LoadController extends Controller
                 'status' => $load->status,
             ];
         }
+
         return view('exports.loads.loadPictures', compact('loads'));
     }
 }
