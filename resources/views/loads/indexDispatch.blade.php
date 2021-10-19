@@ -53,6 +53,12 @@
                     else
                         return 'ㅤ';
                 };
+                const JobFormatter = (params) => {
+                    if (params.value)
+                        return params.value.name;
+                    else
+                        return 'ㅤ';
+                };
                 const capitalizeStatus = (params) => {
                     let string = params.value ? params.value : '';
                     if (string === "to_location")
@@ -181,6 +187,7 @@
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'Customer Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
+                        {headerName: 'Job', field: 'trip', editable: true, valueFormatter: JobFormatter},
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
                     menu: [
@@ -469,7 +476,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
-                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
+                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()" _blank><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>
                         </div>
                     </fieldset>

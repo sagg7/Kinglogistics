@@ -274,6 +274,11 @@ class LoadController extends Controller
                     'relation' => $item,
                     'column' => 'name',
                 ];
+            case 'trip':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
                 break;
             default:
                 $array = null;
@@ -302,13 +307,15 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.status",
             "loads.inspected",
+            "loads.trip_id",
         ];
         $query = Load::with('driver:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
-            });
+            })
+            ->with('trip:id,name');
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
@@ -319,6 +326,7 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
+
             if (empty($request->sortModel))
                 $query->orderBy('finished_timestamp', 'desc');
         } else {
@@ -475,8 +483,10 @@ class LoadController extends Controller
     }
 
     public function pictureReport(Request $request){
-        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
-        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        $dates = explode(" - ", $request->dateRange);
+
+        $start = str_replace("/","-",$dates[0]) ? Carbon::parse(str_replace("/","-",$dates[0])) : Carbon::now()->startOfMonth();
+        $end = str_replace("/","-",$dates[1]) ? Carbon::parse(str_replace("/","-",$dates[1]))->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         $select = [
             "loads.id",
@@ -491,6 +501,7 @@ class LoadController extends Controller
             ->with('trip:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
+            ->whereNull('inspected')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
@@ -518,6 +529,7 @@ class LoadController extends Controller
                 'status' => $load->status,
             ];
         }
+
         return view('exports.loads.loadPictures', compact('loads'));
     }
 }

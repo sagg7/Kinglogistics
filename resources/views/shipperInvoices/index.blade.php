@@ -30,9 +30,16 @@
                     else
                         return '';
                 };
+                const loadFormatter = (params) => {
+                    if (params.value && params.value[0])
+                        return params.value[0].trip.name;
+                    else
+                        return '';
+                };
                 const invoicesColumns = [
                     {headerName: 'Date', field: 'date'},
                     {headerName: 'Invoice#', field: 'id'},
+                    {headerName: 'Job', field: 'loads', valueFormatter: loadFormatter},
                     {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                 ];
@@ -88,6 +95,7 @@
                                                 },
                                             }
                                         },
+                                        {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
                                     ],
                                     container: 'completedInvoicesGrid',
                                     url: '/shipper/invoice/search/completed',
@@ -101,6 +109,7 @@
                                     menu: [
                                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
                                         {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
+                                        {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
                                     ],
                                     container: 'paidInvoicesGrid',
                                     url: '/shipper/invoice/search/paid',
