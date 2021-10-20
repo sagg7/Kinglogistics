@@ -14,6 +14,8 @@ Route::prefix('trip')->group(function () {
         ->name('trip.search');
     Route::get('selection', [TripController::class, 'selection'])
         ->name('trip.selection');
+    Route::get('dashboardData', [TripController::class, 'dashboardData'])
+        ->name('trip.dashboardData');
     Route::get('getTrip', [TripController::class, 'getTrip'])
         ->name('trip.getTrip');
     Route::get('edit/{id}', [TripController::class, 'edit'])

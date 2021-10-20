@@ -270,10 +270,6 @@ class LoadController extends Controller
     {
         switch ($item) {
             case 'driver':
-                $array = [
-                    'relation' => $item,
-                    'column' => 'name',
-                ];
             case 'trip':
                 $array = [
                     'relation' => $item,

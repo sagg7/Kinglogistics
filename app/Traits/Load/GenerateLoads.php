@@ -112,7 +112,7 @@ trait GenerateLoads
             if (!$id){
                 $loadStatus = new LoadStatus();
                 $loadStatus->load_id = $load->id;
-                $loadStatus->unallocated_timestamp = Carbon::now()->format('Y-m-d H:i:s');
+                $loadStatus->unallocated_timestamp = Carbon::now();
                 $loadStatus->save();
             }
 

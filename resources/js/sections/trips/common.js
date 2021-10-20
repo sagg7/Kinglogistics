@@ -1,7 +1,8 @@
 (() => {
     const shipper = $('#shipper_id'),
         zone = $('#zone_id'),
-        rate = $('#rate_id');
+        rate = $('#rate_id'),
+        status = $('#status');
     zone.select2({
         placeholder: 'Select',
         ajax: {
@@ -55,6 +56,9 @@
         },
         placeholder: 'Select',
         allowClear: true,
+    });
+    status.select2({
+        placeholder: 'Select',
     });
     checkValidRate();
 })();
