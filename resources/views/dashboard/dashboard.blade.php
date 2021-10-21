@@ -14,11 +14,18 @@
         <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.6') }}"></script>
         <script defer>
             let tbOnCall = null;
+            let tbJobs = null;
             (() => {
                 const getRole = (params) => {
                     if (params.data)
                         return params.data.roles[0].name;
                 };
+                const percentageFormatter = (params) => {
+                    if (params.value)
+                        return `${params.value}%`;
+                    else
+                        return '';
+                }
                 function PhoneCallRenderer() {}
                 PhoneCallRenderer.prototype.init = (params) => {
                     this.eGui = document.createElement('div');
@@ -64,6 +71,47 @@
                         tbOnCall.rowData = res;
                         tbOnCall.gridOptions.api.setRowData(res);
                         tbOnCall.gridOptions.api.sizeColumnsToFit();
+                    },
+                    error: () => {
+                        throwErrorMsg();
+                    }
+                });
+                const tripsStatusFormatter = (params) => {
+                    if (params.value)
+                        return params.value.charAt(0).toUpperCase()  + params.value.slice(1)
+                            + `${params.data.status_current} of ${params.data.status_total}`;
+                    else
+                        return '';
+                };
+                const minutesAVGFormatter = (params) => {
+                    if (params.value)
+                        return `${params.value} min`;
+                    else
+                        return '';
+                }
+                tbJobs = new simpleTableAG({
+                    id: 'jobsTable',
+                    columns: [
+                        {headerName: 'Name', field: 'name'},
+                        {headerName: 'Status', field: 'status', valueFormatter: tripsStatusFormatter},
+                        {headerName: 'Percentage', field: 'percentage', valueFormatter: percentageFormatter},
+                        {headerName: 'Miles', field: 'mileage'},
+                        {headerName: 'AVG', field: 'avg', valueFormatter: minutesAVGFormatter},
+                    ],
+                    rowData: [],
+                    gridOptions: {
+                        components: {
+                            tableRef: 'tbJobs',
+                        },
+                    },
+                });
+                $.ajax({
+                    type: 'GET',
+                    url: '/trip/dashboardData',
+                    success: (res) => {
+                        tbJobs.rowData = res;
+                        tbJobs.gridOptions.api.setRowData(res);
+                        tbJobs.gridOptions.api.sizeColumnsToFit();
                     },
                     error: () => {
                         throwErrorMsg();
@@ -214,6 +262,18 @@
                 <div class="card-body">
                     <div class="card-content">
                         <div id="trailersChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header align-self-center">
+                    <h3>Jobs summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-content" style="height: 312px;">
+                        <div class="aggrid ag-auto-height total-row ag-theme-material w-100" id="jobsTable" style="height: 100%;"></div>
                     </div>
                 </div>
             </div>

@@ -26,7 +26,7 @@
                 @endif
             })();
         </script>
-        <script src="{{ asset('js/sections/trips/common.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/trips/common.min.js?1.0.1') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
     @endsection
 

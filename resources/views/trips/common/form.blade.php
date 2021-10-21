@@ -48,6 +48,33 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('status', ucfirst(__('status')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('status', $statuses, $trip->status ?? null, ['class' => 'form-control' . ($errors->first('status') ? ' is-invalid' : '')]) !!}
+                    @error('status')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('status_current', ucfirst(__('status current')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('status_current', $trip->status_current ?? null, ['class' => 'form-control' . ($errors->first('status_current') ? ' is-invalid' : '')]) !!}
+                    @error('status_current')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('status_total', ucfirst(__('status total')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('status_total', $trip->status_total ?? null, ['class' => 'form-control' . ($errors->first('status_total') ? ' is-invalid' : '')]) !!}
+                    @error('status_total')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
                 @endif
             </div>
             <hr>

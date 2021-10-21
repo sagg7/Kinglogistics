@@ -5,17 +5,20 @@ namespace App\Http\Controllers;
 use App\Enums\CarrierPaymentEnum;
 use App\Enums\ShipperInvoiceEnum;
 use App\Models\Trip;
+use App\Models\Turn;
 use App\Models\Zone;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\RecalculateTotals;
+use App\Traits\Turn\DriverTurn;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TripController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, RecalculateTotals;
+    use GetSelectionData, GetSimpleSearchData, RecalculateTotals, DriverTurn;
 
     /**
      * @return array
@@ -24,6 +27,7 @@ class TripController extends Controller
     {
         return [
             'zones' => [null => ''] + Zone::pluck('name', 'id')->toArray(),
+            'statuses' => [null => '', 'stage' => 'Stage', 'loads' => 'Loads'],
         ];
     }
 
@@ -40,6 +44,9 @@ class TripController extends Controller
             'destination' => ['required', 'string', 'max:255'],
             'destination_coords' => ['required', 'string', 'max:255'],
             'mileage' => ['required', 'numeric'],
+            'status' => ['required'],
+            'status_current' => ['numeric'],
+            'status_total' => ['numeric'],
         ], [
             'origin_coords.required' => 'The origin map location is required',
             'destination_coords.required' => 'The destination map location is required',
@@ -114,6 +121,9 @@ class TripController extends Controller
             $trip->destination = $request->destination;
             $trip->destination_coords = $request->destination_coords;
             $trip->mileage = $request->mileage;
+            $trip->status = $request->status;
+            $trip->status_current = $request->status_current;
+            $trip->status_total = $request->status_total;
             $trip->save();
 
             return $trip;
@@ -278,5 +288,39 @@ class TripController extends Controller
         }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    public function dashboardData()
+    {
+        $turn = Turn::select('*');
+        $this->filterByActiveTurn($turn);
+        $turn = $turn->first();
+        $trips = Trip::with(['loads' => function ($q) use ($turn) {
+            $q->select(['trip_id', 'unallocated_timestamp'])
+                ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id');
+            if ($turn->start->isBefore($turn->end)) {
+                $q->whereDate('unallocated_timestamp', '>=', $turn->start)
+                    ->whereDate('unallocated_timestamp', '<=', $turn->end);
+            } else {
+                $q->whereDate('unallocated_timestamp', '<=', $turn->start)
+                    ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
+            }
+        }])
+            ->get();
+
+        foreach ($trips as $trip) {
+            $trip->percentage = $trip->status_current ? ($trip->status_current * 100) / $trip->status_total : 0;
+            $minutesSum = 0;
+            $minutesCount = 0;
+            foreach ($trip->loads as $idx => $load) {
+                if (isset($trip->loads[$idx - 1])) {
+                    $minutesSum += Carbon::parse($load->unallocated_timestamp)->diffInMinutes($trip->loads[$idx - 1]->unallocated_timestamp);
+                    $minutesCount++;
+                }
+            }
+            $trip->avg = $minutesCount > 0 ? (double)number_format($minutesSum / $minutesCount, 2) : 0;
+        }
+
+        return $trips->toArray();
     }
 }
