@@ -186,6 +186,12 @@ class ShipperInvoiceController extends Controller
                     'column' => 'name',
                 ];
                 break;
+            case 'loads':
+                $array = [
+                    'relation' => 'loads.trip',
+                    'column' => 'name',
+                ];
+                break;
             default:
                 $array = null;
                 break;
@@ -203,6 +209,7 @@ class ShipperInvoiceController extends Controller
         $query = ShipperInvoice::select([
             "shipper_invoices.id",
             "shipper_invoices.shipper_id",
+            "shipper_invoices.custom_id",
             "shipper_invoices.date",
             "shipper_invoices.total",
             "shipper_invoices.status",
