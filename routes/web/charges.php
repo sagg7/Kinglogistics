@@ -24,7 +24,7 @@ Route::prefix('charge')->group(function () {
     Route::post('delete/{id}', [ChargeController::class, 'destroy'])
         ->name('charge.delete');
     Route::post('uploadDieselExcel', [ChargeController::class, 'uploadDieselExcel'])
-        ->name('uploadDieselExcel');
+        ->name('charge.uploadDieselExcel');
 
     Route::prefix('type')->group(function () {
         Route::post('store', [ChargeTypeController::class, 'store'])
