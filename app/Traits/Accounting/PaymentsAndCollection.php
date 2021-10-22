@@ -25,7 +25,7 @@ use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
-    protected $customDate = "2021-10-17";
+    protected $customDate = "2021-10-21";
 
     use CarrierPaymentsPDF;
     /**
@@ -158,8 +158,8 @@ trait PaymentsAndCollection
                     foreach ($trip['load_groups'] as $group) {
                         if (count($group['loads']) > 0) {
                             $shipper_invoice = new ShipperInvoice();
-                            //$shipper_invoice->date = $this->customDate;
-                            $shipper_invoice->date = $carbon_now;
+                            $shipper_invoice->date = $this->customDate;
+                            //$shipper_invoice->date = $carbon_now;
                             $shipper_invoice->shipper_id = $shipper_id;
                             $shipper_invoice->save();
                             $invoice_total = 0;
