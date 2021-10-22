@@ -38,7 +38,7 @@
                 };
                 const invoicesColumns = [
                     {headerName: 'Date', field: 'date'},
-                    {headerName: 'Invoice#', field: 'id'},
+                    {headerName: 'Invoice#', field: 'custom_id'},
                     {headerName: 'Job', field: 'loads', valueFormatter: loadFormatter},
                     {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
