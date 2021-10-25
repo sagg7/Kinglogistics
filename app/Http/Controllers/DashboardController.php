@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\Load;
+use App\Traits\Accounting\PaymentsAndCollection;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    use PaymentsAndCollection;
+
     public function index()
     {
         return view('dashboard.dashboard');
@@ -87,6 +90,7 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-        ProcessPaymentsAndCollection::dispatch()->afterCommit();
+        //$this->carrierPayments();
+        //ProcessPaymentsAndCollection::dispatch()->afterCommit();
     }
 }

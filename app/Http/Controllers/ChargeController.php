@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PeriodEnum;
-use App\Exports\DieselImport;
+use App\Exports\DieselErrorsExport;
+use App\Imports\DieselImport;
+use App\Jobs\ProcessDeleteFileDelayed;
 use App\Models\Carrier;
 use App\Models\Charge;
 use App\Models\ChargeType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ChargeController extends Controller
 {
@@ -98,21 +102,7 @@ class ChargeController extends Controller
     public function diesel()
     {
         $carriers = Carrier::pluck('name', 'id')->toArray();
-        $content = '<form id="uploadDiesel" action="'. url("charge/uploadDieselExcel") .'" method="POST" >
-                        <div class="file-group" style="margin-bottom: 20px">
-                            <label for="fileExcel"
-                                   class="btn form-control btn-block"  style="height: 200px; width: 200px; border-radius: 50%; margin: auto; background-color: #1c7430">
-                                    <i class="fas fa-file-upload fa-5x" style="color: white; margin-top: 50px"></i>
-                                    <input type="file" name="fileExcel" id="fileExcel" hidden>
-                            </label>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-block mr-1 mb-1 waves-effect waves-light" >Upload</button>
-                        </form>
-                        ';
-        $params = compact('carriers', 'content');
+        $params = compact('carriers');
         return view('charges.diesel', $params);
     }
 
@@ -268,15 +258,23 @@ class ChargeController extends Controller
         return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
     }
 
-    public function uploadDieselExcel(Request $request){
+    public function uploadDieselExcel(Request $request)
+    {
+        $import = new DieselImport;
+        Excel::import($import, $request->fileExcel);
+        $data = $import->data;
 
-        $array = (new DieselImport())->toArray($request->fileExcel);
-        foreach ($array as $items ){
-            foreach ($items as $item){
+        $result = ['success' => true];
 
-            }
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Diesel Excel Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new DieselErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset($path);
         }
 
-        Return "Finished";
+        return $result;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -30,6 +31,8 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $this->chargeRentals();
             $this->shipperInvoices();
+            Storage::deleteDirectory('temp');
+            Storage::deleteDirectory('public/temp');
         })->daily()->at('00:00');
 
         // EACH MONDAY AT 3AM GENERATE PAYMENTS AND CHARGES FOR CARRIERS

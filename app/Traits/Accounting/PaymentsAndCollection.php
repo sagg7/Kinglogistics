@@ -10,6 +10,7 @@ use App\Models\Carrier;
 use App\Models\CarrierExpense;
 use App\Models\CarrierPayment;
 use App\Models\Charge;
+use App\Models\Diesel;
 use App\Models\Expense;
 use App\Models\Incident;
 use App\Models\Load;
@@ -238,6 +239,29 @@ trait PaymentsAndCollection
                 ->get();
             $all_carriers = [];
             $carbon_now = Carbon::now();
+            $diesels = Diesel::with('truck')
+                ->whereNull("was_charged")
+                ->get();
+            $dieselCharges = [];
+            foreach ($diesels as $diesel) {
+                if (isset($dieselCharges[$diesel->truck->carrier_id])) {
+                    $dieselCharges[$diesel->truck->carrier_id] += ($diesel->discount + $diesel->amount);
+                } else
+                    $dieselCharges[$diesel->truck->carrier_id] = ($diesel->discount + $diesel->amount);
+            }
+            foreach ($dieselCharges as $carrier_id => $charge) {
+                $new_expenses[] = [
+                    "amount" => $charge,
+                    "description" => "Diesel Charges",
+                    "date" => $carbon_now,
+                    "gallons" => null,
+                    "non_editable" => true,
+                    "carrier_id" => $carrier_id,
+                    "created_at" => $carbon_now,
+                    "updated_at" => $carbon_now,
+                ];
+            }
+            Diesel::whereNull('was_charged')->update(['was_charged' => 1]);
             // Set charges to create expenses
             foreach ($charges as $charge) {
                 // If there are no related carriers it means it's a charge for all carriers
@@ -303,6 +327,8 @@ trait PaymentsAndCollection
                 $new_expenses[] = [
                     "amount" => $paid_amount,
                     "description" => "Payment #$loan->paid_installments - $loan->description",
+                    "date" => $carbon_now,
+                    "gallons" => null,
                     "non_editable" => true,
                     "carrier_id" => $loan->carrier->id,
                     "created_at" => $carbon_now,
@@ -321,6 +347,8 @@ trait PaymentsAndCollection
                 $new_expenses = [
                     "amount" => $incident->incident_type->fine,
                     "description" => "Safety Incident Fine: " . $incident->incident_type->name . " - " . $incident->driver->name,
+                    "date" => $carbon_now,
+                    "gallons" => null,
                     "non_editable" => true,
                     "carrier_id" => $incident->carrier_id,
                     "created_at" => $carbon_now,
