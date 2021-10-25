@@ -91,6 +91,6 @@ class DashboardController extends Controller
     public function testKernel()
     {
         //$this->carrierPayments();
-        ProcessPaymentsAndCollection::dispatch()->afterCommit();
+        //ProcessPaymentsAndCollection::dispatch()->afterCommit();
     }
 }
