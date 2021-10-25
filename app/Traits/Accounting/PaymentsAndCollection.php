@@ -26,7 +26,7 @@ use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
-    protected $customDate = "2021-10-21";
+    protected $customDate = "2021-10-25";
 
     use CarrierPaymentsPDF;
     /**
