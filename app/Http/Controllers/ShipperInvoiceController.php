@@ -227,7 +227,7 @@ class ShipperInvoiceController extends Controller
                         abort(404);
                 }
             })
-            ->orderBy('custom_id', 'desc');
+            ->orderBy('custom_id', 'asc');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
