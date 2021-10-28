@@ -110,16 +110,15 @@ trait PaymentsAndCollection
             $loads = Load::join('drivers', 'drivers.id', '=', 'driver_id')
                 ->whereNull('shipper_invoice_id')
                 ->whereHas('driver')
-                /*->whereHas('shipper', function($q) {
+                ->whereHas('shipper', function($q) {
                     // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
                     $q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
-                })*/
+                })
                 ->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
-                    //$q->whereDate('finished_timestamp', '<=', $carbon_now);
+                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
+                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
                 })
                 ->whereNotNull('inspected')
-                //->whereDate('date', '<=', $this->customDate)
                 ->where('status', 'finished')
                 ->with([
                     'shipper',
@@ -159,8 +158,8 @@ trait PaymentsAndCollection
                     foreach ($trip['load_groups'] as $group) {
                         if (count($group['loads']) > 0) {
                             $shipper_invoice = new ShipperInvoice();
-                            $shipper_invoice->date = $this->customDate;
-                            //$shipper_invoice->date = $carbon_now;
+                            //$shipper_invoice->date = $this->customDate;
+                            $shipper_invoice->date = $carbon_now;
                             $shipper_invoice->shipper_id = $shipper_id;
                             $shipper_invoice->save();
                             $invoice_total = 0;
@@ -366,7 +365,6 @@ trait PaymentsAndCollection
                     $q->whereDate('finished_timestamp', '<=', $carbon_now);
                 })
                 ->whereNotNull('inspected')
-                //->whereDate('date', '<=', $this->customDate)
                 ->with([
                     'shipper',
                     'driver.carrier',
