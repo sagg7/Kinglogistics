@@ -63,6 +63,21 @@
                     @endisset
                 </div>
             </div>
+            <div class="row">
+                <div class="form-group col-md-12 text-center">
+                    <label class="col-form-label" for="signature">
+                        @if($company->signature)
+                            <a src="{{ $company->signature }}" href="#viewSignature" data-target="#viewSignature" data-toggle="modal">Signature</a>
+                        @else
+                            Signature
+                        @endif
+                    </label>
+                    <div>
+                        <canvas class="d-block mx-auto" id="signature"></canvas>
+                        <button type="button" class="btn btn-outline-danger mt-1">Clear</button>
+                    </div>
+                </div>
+            </div>
             <hr>
             <div class="row">
                 <div class="form-group col-md-12">

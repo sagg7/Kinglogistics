@@ -82,6 +82,8 @@ class DriverController extends Controller
             $driver->zone_id = $request->zone_id;
             $driver->name = $request->name;
             $driver->email = $request->email;
+            $driver->phone = $request->phone;
+            $driver->address = $request->address;
             $driver->inactive = $request->inactive ?? null;
             if ($request->password)
                 $driver->password = Hash::make($request->password);

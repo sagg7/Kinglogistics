@@ -12,6 +12,10 @@
         <script>
             const equipment = @json($equipment->message_json ?? null);
             const services = @json($service->message_json ?? null);
+            const canvases = [
+                {canvas: document.getElementById('signature')},
+            ];
+            const signature = "{{ $company->signature }}";
             (() => {
                 const coords = $('[name=coords]');
                 const mapProperties = {
@@ -160,12 +164,31 @@
                 });
             })();
         </script>
+        <script src="{{ asset('js/common/initSignature.min.js?1.0.1') }}"></script>
     @endsection
-
-
+    @section('modals')
+        <div class="modal fade" id="viewSignature" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content" style="max-height: calc(100vh - 3.5rem);">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Signature</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="{{ $company->signature }}" alt="signature">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endsection
     @component('components.nav-pills-form', ['pills' => [['name' => 'Information', 'pane' => 'pane-info'],['name' => 'Equipment', 'pane' => 'pane-equipment'],['name' => 'Services', 'pane' => 'pane-service']]])
         <div role="tabpanel" class="tab-pane active" id="pane-info" aria-expanded="true">
-            {!! Form::open(['route' => ['company.update', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data', 'id' => 'profileForm']) !!}
+            {!! Form::open(['route' => ['company.update', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical with-sig-pad', 'enctype' => 'multipart/form-data', 'id' => 'profileForm']) !!}
             @include('brokers.common.form')
             {!! Form::close() !!}
         </div>

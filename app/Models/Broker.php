@@ -21,6 +21,16 @@ class Broker extends Model
 
     /**
      * @param $value
+     * @return string
+     */
+    public function getSignatureAttribute($value)
+    {
+        if ($value)
+            return $this->getTemporaryFile($value);
+    }
+
+    /**
+     * @param $value
      * @return string|void
      */
     public function getInsuranceUrlAttribute($value)

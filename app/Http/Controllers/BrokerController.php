@@ -59,6 +59,12 @@ class BrokerController extends Controller
             $company->insurance_url = $this->uploadFile($request->insurance, "brokers/$company->id/insurance");
         $company->address = $request->address;
         $company->location = $request->coords;
+        dd($request->signature);
+        if ($request->signature) {
+            $company->signature = $this->uploadImage($request->signature, "brokers/$company->id/signature");
+            if ($company->signature)
+                $this->deleteDirectory($company->signature);
+        }
         $company->save();
 
         return redirect()->route('company.profile');

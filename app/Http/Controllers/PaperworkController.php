@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Broker;
+use App\Models\Driver;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
 use App\Models\PaperworkTemplate;
@@ -18,6 +20,13 @@ use Mpdf\Mpdf;
 class PaperworkController extends Controller
 {
     use GetSelectionData, GetSimpleSearchData, FileUpload, S3Functions;
+
+    protected $broker_id;
+
+    public function __construct()
+    {
+        $this->broker_id = 1;
+    }
 
     /**
      * @param array $data
@@ -201,31 +210,77 @@ class PaperworkController extends Controller
     public function showTemplate(Request $request, int $id, int $related_id)
     {
         $paperwork = Paperwork::find($id);
-        $data = $this->templateToHtml($paperwork->template);
+        $data = $this->templateToHtml($paperwork->template, $related_id);
 
         $params = compact('paperwork', 'id', 'related_id', 'data');
         return view("paperwork.templates.show", $params);
     }
 
-    public function templateToHtml(string $template)
+    private function renderHtmlVars(string $template, $related_id = null, $simpleVars = false)
     {
         preg_match_all("/{{[^}]*}}/", $template, $result);
 
+        $matches = ["/{{\"signature\"}}/", "/{{/", "/}}/", "/,\s/", "/\"validate\"/"];
+        $replacements = ["{{\"signature\":true}}", "{", "}", ",", "\"validate\":true"];
+
+        if (!$simpleVars) {
+            $carrier = null;
+            $company = Broker::find($this->broker_id);
+            if (auth()->guard('carrier')->check()) {
+                $carrier = auth()->user();
+            } else if (auth()->guard('driver')->check()) {
+                $carrier = auth()->user()->load('carrier')->carrier;
+            }
+            $driver = null;
+            if (auth()->guard('carrier')->check()) {
+                $driver = Driver::where('carrier_id', auth()->user()->id)->find($related_id);
+            } else if (auth()->guard('driver')->check()) {
+                $driver = auth()->user();
+            }
+        } else {
+            return compact('result', 'matches', 'replacements');
+        }
+
+        return compact( 'result','matches', 'replacements', 'carrier', 'driver', 'company');
+    }
+
+    private function getFormattedJsonType($json)
+    {
+        if (isset($json->text))
+            $type = "text";
+        if (isset($json->answers))
+            $type = "radio";
+        if (isset($json->signature))
+            $type = "signature";
+        if (isset($json->carrier))
+            $type = "carrier";
+        if (isset($json->driver))
+            $type = "driver";
+        if (isset($json->company))
+            $type = "company";
+        return $type;
+    }
+
+    public function templateToHtml(string $template, $related_id = null)
+    {
         $replaced = [];
-        $matches = ["/{{/", "/}}/", "/,\s/", "/\"validate\"/", "/\"signature\"/"];
-        $replacements = ["{", "}", ",", "\"validate\":true", "\"signature\":true"];
         $canvases = [];
         $validation = [];
+
+        $vars = $this->renderHtmlVars($template, $related_id);
+        $matches = $vars["matches"];
+        $replacements = $vars["replacements"];
+        $carrier = $vars["carrier"];
+        $driver = $vars["driver"];
+        $company = $vars["company"];
+        $result = $vars["result"];
+
+        $signatureCount = 0;
         foreach ($result[0] as $idx => $element) {
             $formatted = preg_replace($matches, $replacements, $element);
             $json = json_decode($formatted);
-            if (isset($json->answers))
-                $type = "radio";
-            else if (isset($json->signature))
-                $type = "signature";
-            else
-                $type = "text";
-            $inputName = 'name="input-' . $idx .'"';
+            $type = $this->getFormattedJsonType($json);
+            $inputName = 'name="input-' . $idx . '"';
             switch ($type) {
                 case "text":
                     $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . $json->text . '" required></div>';
@@ -243,21 +298,85 @@ class PaperworkController extends Controller
                         $validation[] = "input-$idx";
                     break;
                 case 'signature':
-                    $canvasId = 'signature-' . $idx;
-                    $replaced[] = '<div class="form-group text-center">' .
-                        '<label class="col-form-label" for="' . $canvasId . '">Signature</label>' .
-                        '<div>' .
-                        '<canvas class="d-block mx-auto" id="' . $canvasId . '"></canvas>' .
-                        '<button type="button" class="btn btn-outline-danger mt-1">Clear</button>' .
-                        '</div>' .
-                        '</div>';
-                    $canvases[] = $canvasId;
+                    if ($signatureCount === 0) {
+                        $canvasId = 'signature-' . $idx;
+                        $replaced[] = '<div class="form-group text-center">' .
+                            '<label class="col-form-label" for="' . $canvasId . '">Signature</label>' .
+                            '<div>' .
+                            '<canvas class="d-block mx-auto" id="' . $canvasId . '"></canvas>' .
+                            '<button type="button" class="btn btn-outline-danger mt-1">Clear</button>' .
+                            '</div>' .
+                            '</div>';
+                        $canvases[] = $canvasId;
+                    } else {
+                        $replaced[] = '<div class="form-group text-center">'.
+                            '<fieldset>'.
+                            '<label class="col-form-label d-block" for="' . $inputName . '">Signature</label>' .
+                            '<div class="vs-checkbox-con vs-checkbox-primary justify-content-center">'.
+                            '<input type="checkbox" value="signed" id="' . $inputName .'" required>'.
+                            '<span class="vs-checkbox">'.
+                            '<span class="vs-checkbox--check">'.
+                            '<i class="vs-icon feather icon-check"></i>'.
+                            '</span>'.
+                            '</span>'.
+                            '<span class="">Sign with previous signature</span>'.
+                            '</div>'.
+                            '</fieldset>'.
+                            '</div>';
+                    }
+                    $signatureCount++;
+                    break;
+                case 'carrier':
+                    switch ($json->carrier) {
+                        case 'name':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier name' . '" required value="' . ($carrier->name ?? null) . '"></div>';
+                            break;
+                        case 'address':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier address' . '" required value="' . ($carrier->address ?? null) . '"></div>';
+                            break;
+                        case 'phone':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier phone' . '" required value="' . ($carrier->phone ?? null) . '"></div>';
+                            break;
+                    }
+                    break;
+                case 'driver':
+                    switch ($json->driver) {
+                        case 'name':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver name' . '" required value="' . ($driver->name ?? null) . '"></div>';
+                            break;
+                        case 'address':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver address' . '" required value="' . ($driver->address ?? null) . '"></div>';
+                            break;
+                        case 'phone':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver phone' . '" required value="' . ($driver->phone ?? null) . '"></div>';
+                            break;
+                    }
+                    break;
+                case 'company':
+                    switch ($json->company) {
+                        case 'name':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company name' . '" required value="' . ($company->name ?? null) . '"></div>';
+                            break;
+                        case 'address':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company address' . '" required value="' . ($company->address ?? null) . '"></div>';
+                            break;
+                        case 'phone':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company phone' . '" required value="' . ($company->contact_phone ?? null) . '"></div>';
+                            break;
+                        case 'signature':
+                            if ($company->signature)
+                                $replaced[] = "<div style='text-align: center;'><img src='" . $company->signature . "' alt='signature'></div>";
+                            else
+                                $replaced[] = "<div style='text-align: center;'>No company signature available</div>";
+                            break;
+                    }
                     break;
                 default:
                     $replaced[] = "{{Error}}";
                     break;
             }
         }
+
         // Replace special characters for regular expressions
         foreach ($result[0] as $i => $item) {
             $result[0][$i] = "/" . preg_quote ($item) . "/";
@@ -270,6 +389,44 @@ class PaperworkController extends Controller
         ];
     }
 
+    private function getGeneralType($type, $json)
+    {
+        switch ($type) {
+            case 'carrier':
+                switch ($json->carrier) {
+                    case 'name':
+                    case 'address':
+                    case 'phone':
+                        $type = 'text';
+                        break;
+                }
+                break;
+            case 'driver':
+                switch ($json->driver) {
+                    case 'name':
+                    case 'address':
+                    case 'phone':
+                        $type = 'text';
+                        break;
+                }
+                break;
+            case 'company':
+                switch ($json->company) {
+                    case 'name':
+                    case 'address':
+                    case 'phone':
+                        $type = 'text';
+                        break;
+                    /*case 'signature':
+                        $type = 'signature';
+                        break;*/
+                    // Instead of saving file, it will be queried on the pdf
+                }
+                break;
+        }
+        return $type;
+    }
+
     public function storeTemplate(Request $request, int $id, int $related_id)
     {
         return DB::transaction(function () use ($request, $id, $related_id) {
@@ -279,24 +436,24 @@ class PaperworkController extends Controller
                 ->first()
                 ?: new PaperworkTemplate();
 
-            preg_match_all("/{{[^}]*}}/", $paperwork->template, $result);
-            $matches = ["/{{/", "/}}/", "/,\s/", "/\"validate\"/", "/\"signature\"/"];
-            $replacements = ["{", "}", ",", "\"validate\":true", "\"signature\":true"];
+            $vars = $this->renderHtmlVars($paperwork->template, $related_id);
+            $matches = $vars["matches"];
+            $replacements = $vars["replacements"];
+            $result = $vars["result"];
+
             $correctAnswers = 0;
             $totalAnswers = 0;
             $template_filled = [];
+            $signature = null;
             foreach ($result[0] as $idx => $element) {
                 $formatted = preg_replace($matches, $replacements, $element);
                 $json = json_decode($formatted);
-                if (isset($json->answers))
-                    $type = "radio";
-                else if (isset($json->signature))
-                    $type = "signature";
-                else
-                    $type = "text";
+                $type = $this->getFormattedJsonType($json);
+                $type = $this->getGeneralType($type, $json);
                 $reqAnswer = null;
                 switch ($type) {
                     case 'text':
+                    case 'carrier':
                         $reqAnswer = $request["input-$idx"];
                         break;
                     case 'radio':
@@ -309,7 +466,10 @@ class PaperworkController extends Controller
                         break;
                     case 'signature':
                         $reqAnswer = $request["signature-$idx"];
-                        $reqAnswer = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
+                        if (!$signature) {
+                            $signature = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
+                        }
+                        $reqAnswer = $signature;
                         break;
                 }
                 $template_filled[] = $reqAnswer;
@@ -341,30 +501,25 @@ class PaperworkController extends Controller
             ->where('related_id', $related_id)
             ->first();
 
-        preg_match_all("/{{[^}]*}}/", $paperwork->template, $result);
+        $replaced = [];
 
-        // Replace special characters for regular expressions
-        foreach ($result[0] as $i => $item) {
-            $result[0][$i] = "/" . preg_quote ($item) . "/";
-        }
+        $vars = $this->renderHtmlVars($paperwork->template, $related_id);
+        $matches = $vars["matches"];
+        $replacements = $vars["replacements"];
+        $carrier = $vars["carrier"];
+        $driver = $vars["driver"];
+        $company = $vars["company"];
+        $result = $vars["result"];
 
         $filled = $template->filled_template;
         if (!is_array($filled))
             $filled = json_decode($filled);
-
-        preg_match_all("/{{[^}]*}}/", $paperwork->template, $result);
-        $matches = ["/{{/", "/}}/", "/,\s/", "/\"validate\"/", "/\"signature\"/"];
-        $replacements = ["{", "}", ",", "\"validate\":true", "\"signature\":true"];
-        $replaced = [];
         foreach ($result[0] as $idx => $element) {
             $formatted = preg_replace($matches, $replacements, $element);
             $json = json_decode($formatted);
-            if (isset($json->answers))
-                $type = "radio";
-            else if (isset($json->signature))
-                $type = "signature";
-            else
-                $type = "text";
+            $type = $this->getFormattedJsonType($json);
+            $type = $this->getGeneralType($type, $json);
+
             switch ($type) {
                 case "text":
                     $replaced[] = "<strong>$filled[$idx]</strong>";
@@ -374,6 +529,10 @@ class PaperworkController extends Controller
                     break;
                 case 'signature':
                     $replaced[] = "\r\n<div style='text-align: center;'><img src='" . $this->getTemporaryFile($filled[$idx]) . "' alt='signature'></div>";
+                    break;
+                case 'company':
+                    if ($json->company === 'signature')
+                        $replaced[] = "\r\n<div style='text-align: center;'><img src='" . $company->signature . "' alt='company signature'></div>";
                     break;
             }
         }
