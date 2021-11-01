@@ -10,6 +10,11 @@
         <div style="height: 220mm">
             <div>
                 <p style="text-align:center; border-style: solid; border-radius: 50px">
+                @if($load['inspected'])
+                    <span>&#128994;</span>
+                @else
+                    <span>&#128308;</span>
+                @endif
                     Driver Name - <strong>{{$load['driverName']}}</strong>, Job - <strong>{{$load['job']}}</strong>, Control Number - <strong>{{$load['control_number']}}</strong>,         Customer Reference - <strong>{{$load['customer_reference']}}</strong>,     BOL - <strong>{{$load['bol']}}</strong>,     Finished Timestamp - <strong>{{$load['finished_timestamp']}}</strong>,     Status - <strong>{{$load['status']}}</strong>
                     </p>
             </div>

@@ -120,7 +120,7 @@ class LoadController extends Controller
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)){ //temporary
                     $data['driver_id'] = $request->driver_id;
-                    $data['status'] = 'finished';
+                    //$data['status'] = 'finished';
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
@@ -381,7 +381,7 @@ class LoadController extends Controller
 
         $load_status = LoadStatus::where('load_id', $id)->first();
 
-        $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",50);
+        $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",30);
         if ($type == "to_location") {
             $load_status->to_location_voucher = $new_voucher;
         } else {
@@ -492,6 +492,7 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.trip_id",
             "loads.status",
+            "loads.inspected",
         ];
         $query = Load::with('driver:id,name')
             ->with('trip:id,name')
@@ -522,6 +523,7 @@ class LoadController extends Controller
                 'finished' => (isset($load->loadStatus->finished_voucher)) ? $this->getTemporaryFile($load->loadStatus->finished_voucher) : "NO IMAGE",
                 'ticket' => (isset($load->loadStatus->to_location_voucher)) ? $this->getTemporaryFile($load->loadStatus->to_location_voucher) : "NO IMAGE",
                 'finished_timestamp' => $load->loadStatus->finished_timestamp,
+                'inspected' => $load->inspected,
                 'status' => $load->status,
             ];
         }
