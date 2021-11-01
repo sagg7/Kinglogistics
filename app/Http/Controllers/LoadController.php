@@ -120,7 +120,7 @@ class LoadController extends Controller
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)){ //temporary
                     $data['driver_id'] = $request->driver_id;
-                    //$data['status'] = 'finished';
+                    $data['status'] = 'requested';
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
