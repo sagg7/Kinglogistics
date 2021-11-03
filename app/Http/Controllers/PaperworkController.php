@@ -390,7 +390,7 @@ class PaperworkController extends Controller
 
         // Replace special characters for regular expressions
         foreach ($result[0] as $i => $item) {
-            $result[0][$i] = "/" . preg_quote ($item) . "/";
+            $result[0][$i] = "/" . preg_quote ($item, '/') . "/";
         }
 
         return [
