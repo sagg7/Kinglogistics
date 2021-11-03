@@ -19,7 +19,7 @@ class ProfileResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'inactive' => $this->phone,
+            'inactive' => $this->inactive,
             'carrier' => new CarrierResource($this->carrier),
             'zone' => new ZoneResource($this->zone),
             'is_shift_active' => $this->isShiftActive(),
