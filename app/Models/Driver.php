@@ -26,7 +26,6 @@ class Driver extends Authenticatable implements CanResetPassword
     ];
 
     protected $casts = [
-        'inactive' => 'boolean'
     ];
 
     /**
