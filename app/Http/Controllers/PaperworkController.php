@@ -11,6 +11,7 @@ use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -220,8 +221,8 @@ class PaperworkController extends Controller
     {
         preg_match_all("/{{[^}]*}}/", $template, $result);
 
-        $matches = ["/{{\"signature\"}}/", "/{{/", "/}}/", "/,\s/", "/\"validate\"/"];
-        $replacements = ["{{\"signature\":true}}", "{", "}", ",", "\"validate\":true"];
+        $matches = ["/{{\"signature\"}}/","/{{\"date\"}}/", "/{{/", "/}}/", "/,\s/", "/\"validate\"/"];
+        $replacements = ["{{\"signature\":true}}","{{\"date\":true}}", "{", "}", ",", "\"validate\":true"];
 
         if (!$simpleVars) {
             $carrier = null;
@@ -237,11 +238,12 @@ class PaperworkController extends Controller
             } else if (auth()->guard('driver')->check()) {
                 $driver = auth()->user();
             }
+            $date = Carbon::now()->format('m-d-Y');
         } else {
             return compact('result', 'matches', 'replacements');
         }
 
-        return compact( 'result','matches', 'replacements', 'carrier', 'driver', 'company');
+        return compact( 'result','matches', 'replacements', 'carrier', 'driver', 'company','date');
     }
 
     private function getFormattedJsonType($json)
@@ -258,6 +260,8 @@ class PaperworkController extends Controller
             $type = "driver";
         if (isset($json->company))
             $type = "company";
+        if (isset($json->date))
+            $type = "date";
         return $type;
     }
 
@@ -274,6 +278,7 @@ class PaperworkController extends Controller
         $driver = $vars["driver"];
         $company = $vars["company"];
         $result = $vars["result"];
+        $date = $vars["date"];
 
         $signatureCount = 0;
         foreach ($result[0] as $idx => $element) {
@@ -326,10 +331,16 @@ class PaperworkController extends Controller
                     }
                     $signatureCount++;
                     break;
+                case 'date':
+                    $replaced[] = '<div class="form-group d-inline-block m-0">' . $date .'</div>';
+                    break;
                 case 'carrier':
                     switch ($json->carrier) {
                         case 'name':
                             $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier name' . '" required value="' . ($carrier->name ?? null) . '"></div>';
+                            break;
+                        case 'owner':
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Owner name' . '" required value="' . ($carrier->owner ?? null) . '"></div>';
                             break;
                         case 'address':
                             $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier address' . '" required value="' . ($carrier->address ?? null) . '"></div>';
@@ -470,6 +481,9 @@ class PaperworkController extends Controller
                             $signature = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
                         }
                         $reqAnswer = $signature;
+                        break;
+                    case 'date':
+                        $reqAnswer = $request["date-$idx"];
                         break;
                 }
                 $template_filled[] = $reqAnswer;
