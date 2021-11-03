@@ -1,5 +1,5 @@
 (() => {
-    const resizeCanvas = (canvas, sigPad) => {
+    /*const resizeCanvas = (canvas, sigPad) => {
         // When zoomed out to less than 100%, for some very strange reason,
         // some browsers report devicePixelRatio as less than 1
         // and only part of the canvas is cleared then.
@@ -16,7 +16,7 @@
         // that the state of this library is consistent with visual state of the canvas, you
         // have to clear it manually.
         sigPad.clear();
-    };
+    };*/
     let sigPadArr = [];
     canvases.forEach((item) => {
         const required = item.required ? item.required : false,
@@ -37,9 +37,9 @@
         canvas.parentNode.insertBefore(input, canvas.nextSibling);
 
         sigPadArr.push({signaturePad: sigPad, input, required, label});
-        window.onresize = () => {
+        /*window.onresize = () => {
             resizeCanvas(canvas, sigPad);
-        };
+        };*/
     });
 
     $('form.with-sig-pad').submit((e) => {

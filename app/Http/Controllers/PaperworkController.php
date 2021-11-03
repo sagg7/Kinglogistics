@@ -497,6 +497,8 @@ class PaperworkController extends Controller
             $template->paperwork_id = $paperwork->id;
             $template->related_id = $related_id;
             $template->filled_template = json_encode($template_filled);
+            $template->ip = $request->ip();
+            $template->device = $request->header('user-agent');
             $template->save();
 
             if (auth()->guard('web')->check())
