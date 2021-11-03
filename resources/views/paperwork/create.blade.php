@@ -6,6 +6,9 @@
         <script src="{{ asset('js/sections/paperwork/common.min.js') }}"></script>
     @endsection
 
+    @section('modals')
+        @include('paperwork.common.modals.infoModal')
+    @endsection
     <div class="tab-content">
         <div class="tab-pane active" id="simple" aria-labelledby="simple-tab" role="tabpanel">
             {!! Form::open(['route' => ['paperwork.store'], 'method' => 'post', 'class' => 'form form-vertical']) !!}

@@ -33,7 +33,7 @@
                     </fieldset>
                 </div>
                 <div class="form-group col d-none">
-                    {!! Form::label('template', ucfirst(__('template')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('template', ucfirst(__('template')), ['class' => 'col-form-label']) !!} <i class="fas fa-info-circle cursor-pointer" data-toggle="modal" data-target="#infoModal"></i>
                     {!! Form::textarea('template', $paperwork->template ?? null, ['class' => 'form-control' . ($errors->first('template') ? ' is-invalid' : ''), 'disabled']) !!}
                     @error('template')
                     <span class="invalid-feedback" role="alert">

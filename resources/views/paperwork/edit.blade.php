@@ -6,6 +6,9 @@
         <script src="{{ asset('js/sections/paperwork/common.min.js') }}"></script>
     @endsection
 
+    @section('modals')
+        @include('paperwork.common.modals.infoModal')
+    @endsection
     {!! Form::open(['route' => ['paperwork.update', $paperwork->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}
     @include('paperwork.common.form')
     {!! Form::close() !!}
