@@ -3,12 +3,12 @@
         <div class="card-content">
             <div class="row">
                 <div class="form-group col-md-6">
-                    {!! Form::label('mode', 'Paperwork Type') !!}
-                    {!! Form::select('mode', $mode, $paperwork->mode ?? null, ['class' => 'form-control' . ($errors->first('period') ? ' is-invalid' : '')]) !!}
+                    {!! Form::label('mode', 'Paperwork Type', ['class' => 'col-form-label']) !!}
+                    {!! Form::select('mode', $mode, $paperwork->mode ?? null, ['class' => 'form-control' . ($errors->first('mode') ? ' is-invalid' : '')]) !!}
                 </div>
                 <div class="form-group col-md-6">
-                    {!! Form::label('type', 'Section Type') !!}
-                    {!! Form::select('type', $types, $paperwork->type ?? null, ['class' => 'form-control' . ($errors->first('period') ? ' is-invalid' : '')]) !!}
+                    {!! Form::label('type', 'Section Type', ['class' => 'col-form-label']) !!}
+                    {!! Form::select('type', $types, $paperwork->type ?? null, ['class' => 'form-control' . ($errors->first('type') ? ' is-invalid' : '')]) !!}
                 </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
@@ -32,7 +32,19 @@
                         </div>
                     </fieldset>
                 </div>
-                <div class="form-group col d-none">
+                <div class="form-group col-md-6">
+                    {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('shipper_id', isset($paperwork->shipper_id) ? [$paperwork->shipper_id => $paperwork->shipper->name] : [], $paperwork->shipper_id ?? null, ['class' => 'form-control', 'disabled' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+                </div>
+                <div class="form-group col-6" id="simpleTemplate">
+                    {!! Form::label('file', ucfirst(__('template file')), ['class' => 'col-form-label d-block']) !!}
+                    <label for="file" class="btn btn-success btn-block">Upload file</label>
+                    {!! Form::file('file', ['class' => 'd-none', ($errors->first('file') ? ' is-invalid' : '')]) !!}
+                    @isset($paperwork->file)
+                        <a href="{{ route('s3storage.temporaryUrl', ['url' => $paperwork->file]) }}" target="_blank">{{ $paperwork->file_name }}</a>
+                    @endisset
+                </div>
+                <div class="form-group col-12 d-none" id="advancedTemplate">
                     {!! Form::label('template', ucfirst(__('template')), ['class' => 'col-form-label']) !!} <i class="fas fa-info-circle cursor-pointer" data-toggle="modal" data-target="#infoModal"></i>
                     {!! Form::textarea('template', $paperwork->template ?? null, ['class' => 'form-control' . ($errors->first('template') ? ' is-invalid' : ''), 'disabled']) !!}
                     @error('template')

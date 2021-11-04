@@ -11,7 +11,7 @@
     @endsection
     <div class="tab-content">
         <div class="tab-pane active" id="simple" aria-labelledby="simple-tab" role="tabpanel">
-            {!! Form::open(['route' => ['paperwork.store'], 'method' => 'post', 'class' => 'form form-vertical']) !!}
+            {!! Form::open(['route' => ['paperwork.store'], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data']) !!}
             @include('paperwork.common.form')
             {!! Form::close() !!}
         </div>

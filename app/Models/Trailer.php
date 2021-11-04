@@ -14,6 +14,8 @@ class Trailer extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $appends = ['shippers_ids'];
+
     /**
      * @return HasMany
      */
@@ -57,5 +59,10 @@ class Trailer extends Model
     public function chassisType(): BelongsTo
     {
         return $this->belongsTo(ChassisType::class);
+    }
+
+    public function getShippersIdsAttribute()
+    {
+        return $this->shippers->pluck('id');
     }
 }

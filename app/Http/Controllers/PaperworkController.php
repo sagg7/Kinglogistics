@@ -101,8 +101,12 @@ class PaperworkController extends Controller
 
         $paperwork->name = $request->name;
         $paperwork->type = $request->type;
+        $paperwork->shipper_id = $request->shipper_id;
         $paperwork->required = $request->required ?? null;
         $paperwork->template = $request->template ?? null;
+        if (($paperwork->file || $request->template) && $request->file)
+            $this->deleteFile($paperwork->file);
+        $paperwork->file = $request->file ? $this->uploadFile($request->file, "paperworkTemplate/" . md5(Carbon::now())) : null;
         $paperwork->save();
 
         return $paperwork;
