@@ -164,7 +164,7 @@
                 });
             })();
         </script>
-        <script src="{{ asset('js/common/initsignature.min.js?1.0.2') }}"></script>
+        <script src="{{ asset('js/common/initSignature.min.js?1.0.2') }}"></script>
     @endsection
     @section('modals')
         <div class="modal fade" id="viewSignature" tabindex="-1" role="dialog" aria-hidden="true">
