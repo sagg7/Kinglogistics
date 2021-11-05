@@ -13,6 +13,26 @@
                 });
 
                 const uploadModal = $('#uploadExcel');
+                const xlsInput = $('#fileExcel');
+                xlsInput.change((e) => {
+                    const target = e.currentTarget,
+                        inp = $(target),
+                        icon = inp.closest('label'),
+                        form = inp.closest('form'),
+                        btn = form.find('button[type=submit]'),
+                        file = target.files[0];
+                    if (file) {
+                        icon.removeClass('bg-warning').addClass('bg-success');
+                        btn.removeClass('btn-warning').addClass('btn-success')
+                        .text(`Upload: ${file.name}`)
+                        .prop('disabled', false);
+                    } else {
+                        icon.removeClass('bg-success').addClass('bg-warning');
+                        btn.removeClass('btn-success').addClass('btn-warning')
+                        .text('Upload')
+                        .prop('disabled', true);
+                    }
+                });
                 $('#uploadDiesel').submit((e) => {
                     e.preventDefault();
                     const form = $(e.currentTarget),
@@ -58,15 +78,15 @@
                     <div class="modal-body">
                         {!! Form::open(['route' => ['charge.uploadDieselExcel'], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data', 'id' => 'uploadDiesel']) !!}
                         <div class="file-group" style="margin-bottom: 20px">
-                            <label for="fileExcel" class="btn form-control btn-block"  style="height: 200px; width: 200px; border-radius: 50%; margin: auto; background-color: #1c7430">
+                            <label for="fileExcel" class="btn form-control btn-block bg-warning"  style="height: 200px; width: 200px; border-radius: 50%; margin: auto;">
                                 <i class="fas fa-file-upload fa-5x" style="color: white; margin-top: 50px"></i>
-                                <input type="file" name="fileExcel" id="fileExcel" hidden>
+                                <input type="file" name="fileExcel" id="fileExcel" hidden accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                             </label>
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-block mr-1 mb-1 waves-effect waves-light submit-ajax" >Upload</button>
+                        <button type="submit" class="btn btn-warning btn-block mr-1 mb-1 waves-effect waves-light submit-ajax text-white" disabled>Upload</button>
                         {!! Form::close() !!}
                     </div>
                     <div class="modal-footer">

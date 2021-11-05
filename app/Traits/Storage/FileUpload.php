@@ -12,17 +12,15 @@ trait FileUpload
      * @param $file
      * @param string $path
      * @param int $quality
+     * @param string $extension
      * @param string|null $options
      * @param bool $local
-     * @param bool $delete
      * @return string
      */
-    private function uploadImage($file, string $path, int $quality = 100, string $options = null, bool $local = false, bool $delete = true, string $extension = 'png'): string
+    private function uploadImage($file, string $path, int $quality = 100, string $extension = 'png', string $options = null, bool $local = false): string
     {
         $originalPath = $path;
         $path = ($local ? "public" : "temp") . "/$path";
-        if ($delete)
-            Storage::deleteDirectory($path);
         Storage::makeDirectory($path);
         $storage_path = storage_path("app/$path/");
         $img = Image::make($file)->encode($extension, $quality);
