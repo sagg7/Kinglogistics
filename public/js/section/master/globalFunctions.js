@@ -32,10 +32,10 @@ const select2Lang = {
     },
     confirmMsg = (obj = {}) => {
         let optns = {
-            title: '¿Confirmar?',
+            title: 'Confirm',
             showCancelButton: true,
-            confirmButtonText: 'Confirmar',
-            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
             confirmButtonColor: '#7367F0',
             cancelButtonColor: '#EA5455',
             allowOutsideClick: () => !Swal.isLoading()

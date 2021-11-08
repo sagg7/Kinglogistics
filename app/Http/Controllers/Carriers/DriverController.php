@@ -36,9 +36,9 @@ class DriverController extends Controller
     /**
      * @return array
      */
-    private function createEditParams(): array
+    private function createEditParams($id = null): array
     {
-        return $this->getTurnsArray() + $this->getPaperworkByType('driver');
+        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id);
     }
 
     /**
@@ -130,7 +130,7 @@ class DriverController extends Controller
         $driver = Driver::where('carrier_id', auth()->user()->id)
             ->with(['zone:id,name'])
             ->findOrFail($id);
-        $createEdit = $this->createEditParams();
+        $createEdit = $this->createEditParams($id);
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
         $params = compact('driver', 'paperworkUploads', 'paperworkTemplates') + $createEdit;

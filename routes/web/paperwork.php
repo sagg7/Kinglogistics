@@ -18,11 +18,10 @@ Route::prefix('paperwork')->group(function () {
         ->name('paperwork.update');
     Route::post('delete/{id}', [PaperworkController::class, 'destroy'])
         ->name('paperwork.delete');
-
-
+    Route::post('deleteImage', [PaperworkController::class, 'deleteImage'])
+        ->name('paperwork.deleteImage');
     Route::post('storeFiles', [PaperworkController::class, 'storeFiles'])
         ->name('paperwork.storeFiles');
-
     Route::get('showTemplate/{id}/{related_id}', [PaperworkController::class, 'showTemplate'])
         ->name('paperwork.showTemplate');
     Route::get('pdf/{id}/{related_id}', [PaperworkController::class, 'pdf'])

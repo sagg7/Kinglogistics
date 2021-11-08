@@ -2,6 +2,7 @@
 
 namespace App\Traits\Paperwork;
 
+use App\Models\Driver;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
 use App\Models\PaperworkTemplate;
@@ -12,11 +13,38 @@ trait PaperworkFilesFunctions
      * @param string $type
      * @return array
      */
-    private function getPaperworkByType(string $type): array
+    private function getPaperworkByType(string $type, $id = null): array
     {
         return [
             'filesUploads' => Paperwork::whereNull('template')
                 ->where('type', $type)
+                ->where(function ($q) use ($type, $id) {
+                    $q->whereHas('shipper', function ($q) use ($type, $id) {
+                        switch ($type) {
+                            case 'driver':
+                                $driver = Driver::with([
+                                    'truck' => function ($q) {
+                                        $q->with([
+                                            'trailer' => function ($q) {
+                                                $q->with(['shippers' => function ($q) {
+                                                    $q->select('id');
+                                                }])
+                                                    ->select(['id']);
+                                            }
+                                        ])
+                                            ->select(['id','driver_id','trailer_id']);
+                                    },
+                                ])
+                                    ->find($id);
+                                $shippers = $driver->truck->trailer->shippers_ids ?? [];
+                                $q->whereIn('id', $shippers);
+                                break;
+                            default:
+                                break;
+                        }
+                    })
+                        ->orWhereDoesntHave('shipper');
+                })
                 ->orderBy('required', 'DESC')
                 ->get(),
             'filesTemplates' => Paperwork::whereNotNull('template')

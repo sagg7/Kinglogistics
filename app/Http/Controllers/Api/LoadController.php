@@ -310,10 +310,8 @@ class LoadController extends Controller
             $receipt,
             'loads/' . $loadStatus->id,
             50,
-            null,
-            false,
-            true,
-            'jpg');
+            'jpg',
+        );
 
         $loadStatus->to_location_voucher = $voucher;
         $loadStatus->update();
@@ -359,10 +357,8 @@ class LoadController extends Controller
             $receipt,
             'loads/' . $loadStatus->id,
             50,
-            null,
-            false,
-            true,
-            'jpg');
+            'jpg',
+        );
         $loadStatus->finished_voucher = $voucher;
         $loadStatus->update();
 

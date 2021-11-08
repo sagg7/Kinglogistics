@@ -23,7 +23,12 @@
             @foreach($filesUploads as $i => $file)
                 <tr data-file="{{ $file->id }}">
                     <td><i class="feather @isset($paperworkUploads[$file->id]){{ 'icon-check-circle text-success' }}@elseif($file->required){{ 'icon-x-circle text-danger' }}@else{{ 'icon-alert-circle text-warning' }}@endisset"></i></td>
-                    <td>{{ $file->name }}</td>
+                    <td>
+                        <div>{{ $file->name }}</div>
+                        @if($file->file)
+                            <a href="{{ route('s3storage.temporaryUrl', ['url' => $file->file]) }}" target="_blank">{{ $file->file_name }}</a>
+                        @endif
+                    </td>
                     <td>
                         <div class="file-group">
                             <label for="file-{{ $file->id }}"
