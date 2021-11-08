@@ -44,14 +44,31 @@
                         <a href="{{ route('s3storage.temporaryUrl', ['url' => $paperwork->file]) }}" target="_blank">{{ $paperwork->file_name }}</a>
                     @endisset
                 </div>
-                <div class="form-group col-12 d-none" id="advancedTemplate">
-                    {!! Form::label('template', ucfirst(__('template')), ['class' => 'col-form-label']) !!} <i class="fas fa-info-circle cursor-pointer" data-toggle="modal" data-target="#infoModal"></i>
-                    {!! Form::textarea('template', $paperwork->template ?? null, ['class' => 'form-control' . ($errors->first('template') ? ' is-invalid' : ''), 'disabled']) !!}
-                    @error('template')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ ucfirst($message) }}</strong>
-                    </span>
-                    @enderror
+                <div class="col-12 d-none" id="advancedTemplate">
+                    <div class="form-group">
+                        {!! Form::label('images', ucfirst(__('Upload images')), ['class' => 'col-form-label d-block']) !!}
+                        {!! Form::file('images[]', [($errors->first('images') ? ' is-invalid' : ''), 'multiple', 'accept' => 'image/jpeg, image/png', 'disabled', 'id' => 'imagesInput']) !!}
+                        <ul id="imagesList" style="font-size: 1.3rem;">
+                            @isset($paperwork)
+                                @foreach($paperwork->images as $image)
+                                    <li>
+                                        <code id="img_{{ $image->number }}">{{ '{{"image":"' . $image->number . '"}' . '}' }}</code>
+                                        <button type="button" class="btn btn-danger deleteImage" data-imageid="{{ $image->id }}" style="padding: 3px 5px;"><i class="fas fa-times"></i></button>
+                                    </li>
+                                @endforeach
+                            @endisset
+                        </ul>
+                    </div>
+
+                    <div class="form-group">
+                        {!! Form::label('template', ucfirst(__('template')), ['class' => 'col-form-label']) !!} <i class="fas fa-info-circle cursor-pointer" data-toggle="modal" data-target="#infoModal"></i>
+                        {!! Form::textarea('template', $paperwork->template ?? null, ['class' => 'form-control' . ($errors->first('template') ? ' is-invalid' : ''), 'disabled']) !!}
+                        @error('template')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>

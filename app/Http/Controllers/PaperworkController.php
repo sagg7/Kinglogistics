@@ -6,6 +6,7 @@ use App\Models\Broker;
 use App\Models\Driver;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
+use App\Models\PaperworkImage;
 use App\Models\PaperworkTemplate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -94,22 +95,38 @@ class PaperworkController extends Controller
      */
     private function storeUpdate(Request $request, $id = null)
     {
-        if ($id)
-            $paperwork = Paperwork::findOrFail($id);
-        else
-            $paperwork = new Paperwork();
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $paperwork = Paperwork::findOrFail($id);
+            else
+                $paperwork = new Paperwork();
 
-        $paperwork->name = $request->name;
-        $paperwork->type = $request->type;
-        $paperwork->shipper_id = $request->shipper_id;
-        $paperwork->required = $request->required ?? null;
-        $paperwork->template = $request->template ?? null;
-        if (($paperwork->file || $request->template) && $request->file)
-            $this->deleteFile($paperwork->file);
-        $paperwork->file = $request->file ? $this->uploadFile($request->file, "paperworkTemplate/" . md5(Carbon::now())) : null;
-        $paperwork->save();
+            $paperwork->name = $request->name;
+            $paperwork->type = $request->type;
+            $paperwork->shipper_id = $request->shipper_id;
+            $paperwork->required = $request->required ?? null;
+            $paperwork->template = $request->template ?? null;
+            if (($paperwork->file || $request->template) && $request->file)
+                $this->deleteFile($paperwork->file);
+            $paperwork->file = $request->file ? $this->uploadFile($request->file, "paperworkTemplate" . md5(Carbon::now())) : null;
+            $paperwork->save();
 
-        return $paperwork;
+            if ($request->images) {
+                $images = [];
+                $number = $paperwork->images()->latest()->value('number') ?: 0;
+                foreach ($request->images as $image) {
+                    $number++;
+                    $url = $this->uploadImage($image, "paperworkImages/$paperwork->id", 85);
+                    $images[] = new PaperworkImage([
+                        'url' => $url,
+                        'number' => $number,
+                    ]);
+                }
+                $paperwork->images()->saveMany($images);
+            }
+
+            return $paperwork;
+        });
     }
 
     /**
@@ -131,7 +148,7 @@ class PaperworkController extends Controller
      */
     public function edit(int $id)
     {
-        $paperwork = Paperwork::findOrFail($id);
+        $paperwork = Paperwork::with('images')->findOrFail($id);
         $paperwork->mode = $paperwork->template ? 1 : 0;
         $params = compact('paperwork') + $this->createdEditParams();
         return view('paperwork.edit', $params);
@@ -157,14 +174,27 @@ class PaperworkController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function destroy($id)
+    public function destroy($id): array
     {
         $paperwork = Paperwork::findOrFail($id);
+        if ($paperwork->file)
+            $this->deleteFile($paperwork->file);
+        return ['success' => $paperwork->delete()];
+    }
 
-        if ($paperwork)
-            return ['success' => $paperwork->delete()];
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function deleteImage(Request $request): array
+    {
+        return DB::transaction(function () use ($request) {
+            $image = PaperworkImage::findOrFail($request->id);
+            $this->deleteFile($image->url);
+            return ['success' => $image->delete()];
+        });
     }
 
     /**
@@ -214,8 +244,8 @@ class PaperworkController extends Controller
 
     public function showTemplate(Request $request, int $id, int $related_id)
     {
-        $paperwork = Paperwork::find($id);
-        $data = $this->templateToHtml($paperwork->template, $related_id);
+        $paperwork = Paperwork::with('images')->findOrFail($id);
+        $data = $this->templateToHtml($paperwork, $related_id);
 
         $params = compact('paperwork', 'id', 'related_id', 'data');
         return view("paperwork.templates.show", $params);
@@ -266,16 +296,18 @@ class PaperworkController extends Controller
             $type = "company";
         if (isset($json->date))
             $type = "date";
+        if (isset($json->image))
+            $type = "image";
         return $type;
     }
 
-    public function templateToHtml(string $template, $related_id = null)
+    public function templateToHtml(Paperwork $paperwork, $related_id = null)
     {
         $replaced = [];
         $canvases = [];
         $validation = [];
 
-        $vars = $this->renderHtmlVars($template, $related_id);
+        $vars = $this->renderHtmlVars($paperwork->template, $related_id);
         $matches = $vars["matches"];
         $replacements = $vars["replacements"];
         $carrier = $vars["carrier"];
@@ -283,6 +315,8 @@ class PaperworkController extends Controller
         $company = $vars["company"];
         $result = $vars["result"];
         $date = $vars["date"];
+
+        $images = $paperwork->images->toArray();
 
         $signatureCount = 0;
         foreach ($result[0] as $idx => $element) {
@@ -386,6 +420,11 @@ class PaperworkController extends Controller
                             break;
                     }
                     break;
+                case 'image':
+                    $foundIdx = array_search($json->image, array_column($images, 'id'), false);
+                    if ($foundIdx !== false)
+                        $replaced[] = "<div style='text-align: center;'><img class='img-fluid' src='" . $this->getTemporaryFile($images[$foundIdx]['url']) . "' alt='image'></div>";
+                    break;
                 default:
                     $replaced[] = "{{Error}}";
                     break;
@@ -398,7 +437,7 @@ class PaperworkController extends Controller
         }
 
         return [
-            "html" => preg_replace($result[0], $replaced, $template, 1),
+            "html" => preg_replace($result[0], $replaced, $paperwork->template, 1),
             "canvases" => $canvases,
             "validation" => $validation,
         ];
@@ -526,11 +565,12 @@ class PaperworkController extends Controller
         $vars = $this->renderHtmlVars($paperwork->template, $related_id);
         $matches = $vars["matches"];
         $replacements = $vars["replacements"];
-        $carrier = $vars["carrier"];
-        $driver = $vars["driver"];
+        //$carrier = $vars["carrier"];
+        //$driver = $vars["driver"];
         $company = $vars["company"];
         $result = $vars["result"];
 
+        $images = $paperwork->images->toArray();
         $filled = $template->filled_template;
         if (!is_array($filled))
             $filled = json_decode($filled);
@@ -553,6 +593,11 @@ class PaperworkController extends Controller
                 case 'company':
                     if ($json->company === 'signature')
                         $replaced[] = "\r\n<div style='text-align: center;'><img src='" . $company->signature . "' alt='company signature'></div>";
+                    break;
+                case 'image':
+                    $foundIdx = array_search($json->image, array_column($images, 'id'), false);
+                    if (isset($images[$foundIdx]))
+                        $replaced[] = "<div style='text-align: center;'><img class='img-fluid' src='" . $this->getTemporaryFile($images[$foundIdx]['url']) . "' alt='image'></div>";
                     break;
             }
         }

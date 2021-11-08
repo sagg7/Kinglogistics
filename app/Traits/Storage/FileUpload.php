@@ -13,17 +13,25 @@ trait FileUpload
      * @param string $path
      * @param int $quality
      * @param string $extension
+     * @param int|null $width
+     * @param int|null $height
      * @param string|null $options
      * @param bool $local
      * @return string
      */
-    private function uploadImage($file, string $path, int $quality = 100, string $extension = 'png', string $options = null, bool $local = false): string
+    private function uploadImage($file, string $path, int $quality = 100, string $extension = 'png', int $width = null, int $height = null, string $options = null, bool $local = false): string
     {
         $originalPath = $path;
         $path = ($local ? "public" : "temp") . "/$path";
         Storage::makeDirectory($path);
         $storage_path = storage_path("app/$path/");
         $img = Image::make($file)->encode($extension, $quality);
+        if ($width && $height) {
+            $img->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $img->resizeCanvas($width, $height, 'center', false, [255, 255, 255, 0]);
+        }
         $md5 = md5($img->__toString());
         $img->save($storage_path . "$md5.$extension");
         // Store file on local storage

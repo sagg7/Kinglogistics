@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
 use Illuminate\Http\Request;
 
 class S3StorageController extends Controller
 {
-    use S3Functions;
+    use S3Functions, FileUpload;
 
     /**
      * @param Request $request
@@ -20,5 +21,10 @@ class S3StorageController extends Controller
     public function getTemporaryUrl(Request $request)
     {
         return $this->getTemporaryFile($request->url);
+    }
+
+    public function deleteFileFromUrl(Request $request)
+    {
+        return $this->deleteFile($request->url);
     }
 }
