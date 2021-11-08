@@ -64,11 +64,18 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
             ->mergeCells('A4:H4')
             ->mergeCells('A5:H5');
 
+        $sheet->getPageMargins()
+            ->setLeft(.5)
+            ->setRight(.5)
+            ->setTop(.5)
+            ->setBottom(.5)
+            ->setHeader(.5);
+
         for ($i = 1; $i < 48; $i++) {
             if ($i === 6)
                 $sheet->getRowDimension($i)->setRowHeight(24.082);
             else
-                $sheet->getRowDimension($i)->setRowHeight(12.041);
+                $sheet->getRowDimension($i)->setRowHeight(15.041);
         }
 
         return [
@@ -140,8 +147,8 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
     {
         return [
             'A' => 11,
-            'B' => 20,
-            'C' => 18,
+            'B' => 22,
+            'C' => 23,
             'D' => 11,
             'E' => 11,
             'F' => 9,
