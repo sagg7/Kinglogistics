@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Show shipper</label>
+                        <label>Show customer</label>
                         <div class="vs-checkbox-con vs-checkbox-primary">
                             {{ Form::checkbox('show_shipper', 1) }}
                             <span class="vs-checkbox">

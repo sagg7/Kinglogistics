@@ -55,7 +55,7 @@
                 </ul>
             </li>
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-shipping-fast"></i><span class="menu-title" data-i18n="User">Shippers</span></a>
+                <a href="#"><i class="fas fa-shipping-fast"></i><span class="menu-title" data-i18n="User">Customers</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/shipper/create">

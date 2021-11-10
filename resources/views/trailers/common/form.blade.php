@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('shippers[]', ucfirst(__('customers')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shippers[]', [], $trailer->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
                     @error('shippers')
                     <span class="invalid-feedback" role="alert">

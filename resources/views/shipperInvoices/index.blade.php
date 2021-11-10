@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Shipper</x-slot>
+    <x-slot name="crumb_section">Customer</x-slot>
     <x-slot name="crumb_subsection">Invoices</x-slot>
 
     @section('modals')
@@ -40,7 +40,7 @@
                     {headerName: 'Date', field: 'date'},
                     {headerName: 'Invoice#', field: 'custom_id'},
                     {headerName: 'Job', field: 'loads', valueFormatter: loadFormatter},
-                    {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
+                    {headerName: 'Customer', field: 'shipper', valueFormatter: nameFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
                 ];
                 penInvoicesTable = new tableAG({
@@ -51,7 +51,7 @@
                         {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
                         {text: 'Send Email & Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-paper-plane',
                             menuData: {
-                                title: 'Confirm sending email to shipper?',
+                                title: 'Confirm sending email to customer?',
                                 afterConfirmFunction: () => {
                                     if (comInvoicesTable)
                                         comInvoicesTable.updateSearchQuery();

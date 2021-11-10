@@ -33,7 +33,7 @@
                     </fieldset>
                 </div>
                 <div class="form-group col-md-6">
-                    {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper_id', isset($paperwork->shipper_id) ? [$paperwork->shipper_id => $paperwork->shipper->name] : [], $paperwork->shipper_id ?? null, ['class' => 'form-control', 'disabled' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
                 </div>
                 <div class="form-group col-6" id="simpleTemplate">

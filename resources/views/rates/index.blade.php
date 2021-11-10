@@ -25,11 +25,11 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Group', field: 'rate_group', valueFormatter: nameFormatter},
-                        {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
+                        {headerName: 'Customer', field: 'shipper', valueFormatter: nameFormatter},
                         {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                         {headerName: 'Start Mileage', field: 'start_mileage'},
                         {headerName: 'End Mileage', field: 'end_mileage'},
-                        {headerName: 'Shipper Rate', field: 'shipper_rate', valueFormatter: moneyFormatter},
+                        {headerName: 'Customer Rate', field: 'shipper_rate', valueFormatter: moneyFormatter},
                         {headerName: 'Carrier Rate', field: 'carrier_rate', valueFormatter: moneyFormatter},
                     ],
                     menu: [

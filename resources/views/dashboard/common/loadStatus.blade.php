@@ -13,7 +13,7 @@
                 <div class="row text-left">
                     <div class="col col-sm-4">
                         <fieldset class="form-group">
-                            <label for="shipper">Shipper</label>
+                            <label for="shipper">Customer</label>
                             {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>

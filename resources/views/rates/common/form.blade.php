@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 <div class="form-group col-md-3">
-                    {!! Form::label('shipper', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('shipper', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper', [], $rate->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper') ? ' is-invalid' : '')]) !!}
                     @error('shipper')
                     <span class="invalid-feedback" role="alert">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('shipper_rate', ucfirst(__('shipper rate')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('shipper_rate', ucfirst(__('customer rate')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-dollar-sign"></i></span>

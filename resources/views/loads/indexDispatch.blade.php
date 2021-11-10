@@ -465,7 +465,7 @@
                     </fieldset>
 
                     <fieldset class="form-group col-6">
-                        {!! Form::label('shipper', 'Shipper', ['class' => 'col-form-label']) !!}
+                        {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
                         {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
                     </fieldset>
 

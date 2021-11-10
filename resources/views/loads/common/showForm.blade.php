@@ -13,7 +13,7 @@
                 </div>
                 @if(auth()->guard('web')->check())
                     <div class="form-group col-md-3">
-                        {!! Form::label('shipper_id', ucfirst(__('shipper')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
                         {!! Form::text('shipper_id', $load->shipper->name ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : ''), 'readonly']) !!}
                         @error('shipper_id')
                         <span class="invalid-feedback" role="alert">

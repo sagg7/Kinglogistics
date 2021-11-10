@@ -11,7 +11,7 @@
     <p id="online"></p>
 
 
-    <button type="button" id="joinChannelAsShippers">Join as Shipper</button>
+    <button type="button" id="joinChannelAsShippers">Join as Customer</button>
     <br><br>
     <button type="button" id="joinChannelAsCarrier">Join as Carrier</button>
     <br><br>

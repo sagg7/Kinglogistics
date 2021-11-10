@@ -26,7 +26,7 @@
                                 {headerName: 'Name', field: 'name'},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                     @if(auth()->guard('web')->check())
-                                {headerName: 'Shipper', field: 'shipper', valueFormatter: nameFormatter},
+                                {headerName: 'Customer', field: 'shipper', valueFormatter: nameFormatter},
                                 @endif
                             ],
                             menu: [
