@@ -3,19 +3,160 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use App\Traits\Turn\DriverTurn;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use function Clue\StreamFilter\fun;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class DriverController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, DriverTurn;
+    use GetSelectionData, GetSimpleSearchData, DriverTurn, DriverParams, PaperworkFilesFunctions;
+
+    /**
+     * @param null $id
+     * @return array
+     */
+    private function createEditParams($id = null): array
+    {
+        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id);
+    }
+
+    /**
+     * @param array $data
+     * @param int|null $id
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    private function validator(array $data, int $id = null): \Illuminate\Contracts\Validation\Validator
+    {
+        return Validator::make($data, [
+            'turn_id' => ['sometimes', 'numeric'],
+            'zone_id' => ['sometimes', 'exists:zones,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
+            'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return Driver
+     */
+    private function storeUpdate(Request $request, $id = null): Driver
+    {
+        return DB::transaction(function ($q) use ($request, $id) {
+            $carrier_id = auth()->guard('carrier')->check() ? auth()->user()->id : $request->carrier_id;
+            if ($id) {
+                $driver = Driver::where(function ($q) {
+                    if (auth()->guard('carrier')->check())
+                        $q->where('carrier_id', auth()->user()->id);
+                })
+                    ->findOrFail($id);
+                if (auth()->guard('web')->check())
+                    $driver->carrier_id = $carrier_id;
+            } else {
+                $driver = new Driver();
+                $driver->carrier_id = $carrier_id;
+            }
+
+            $driver->name = $request->name;
+            $driver->email = $request->email;
+            if ($request->password)
+                $driver->password = Hash::make($request->password);
+            if (auth()->guard('carrier')->check()) {
+                $driver->turn_id = $request->turn_id;
+                $driver->zone_id = $request->zone_id;
+                $driver->phone = $request->phone;
+                $driver->address = $request->address;
+                $driver->inactive = $request->inactive ?? null;
+            }
+            $driver->save();
+
+            return $driver;
+        });
+    }
 
     public function index()
     {
         return view('drivers.index');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function create()
+    {
+        $params = $this->createEditParams();
+
+        return view('drivers.create', $params);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws ValidationException
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $this->validator($request->all())->validate();
+
+        $this->storeUpdate($request);
+
+        return redirect()->route('driver.index');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param int $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function edit(int $id)
+    {
+        $driver = Driver::where(function ($q) {
+            if (auth()->guard('carrier')->check())
+                $q->where('carrier_id', auth()->user()->id);
+        })
+            ->with('carrier')
+            ->with(['zone:id,name'])
+            ->findOrFail($id);
+        $createEdit = $this->createEditParams($id);
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
+        $params = compact('driver', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
+        return view('drivers.edit', $params);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param int $id
+     * @param bool $profile
+     * @return RedirectResponse
+     * @throws ValidationException
+     */
+    public function update(Request $request, int $id, bool $profile = false): RedirectResponse
+    {
+        $this->validator($request->all(), $id)->validate();
+
+        $this->storeUpdate($request, $id);
+
+        if ($profile)
+            return redirect()->route('driver.profile');
+        else
+            return redirect()->route('driver.index');
     }
 
     /**
@@ -49,6 +190,26 @@ class DriverController extends Controller
             ->with('truck.trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return array
+     */
+    public function destroy(int $id): array
+    {
+        $driver = Driver::where(function ($q) {
+            if (auth()->guard('carrier')->check())
+                $q->where('carrier_id', auth()->user()->id);
+        })
+            ->findOrFail($id);
+
+        if ($driver)
+            return ['success' => $driver->delete()];
+        else
+            return ['success' => false];
     }
 
     /**
@@ -87,6 +248,11 @@ class DriverController extends Controller
         return $array;
     }
 
+    /**
+     * @param $query
+     * @param $type
+     * @return mixed
+     */
     private function filterByType($query, $type)
     {
         switch ($type)
@@ -117,9 +283,10 @@ class DriverController extends Controller
 
     /**
      * @param Request $request
+     * @param string|null $type
      * @return array
      */
-    public function search(Request $request, $type = null)
+    public function search(Request $request, string $type = null): array
     {
         $query = Driver::select([
             "drivers.id",
@@ -153,18 +320,18 @@ class DriverController extends Controller
             $active = $this->filterByType($query, 'active')->count();
 
             return compact('onShift', 'outOfShift', 'active');
-        } else {
-            $query->with([
-                'truck:driver_id,number',
-                'zone:id,name',
-                'carrier:id,name',
-                'latestLoad' => function ($q) {
-                    $q->where('status', '!=', 'finished')
-                        ->select('status', 'driver_id');
-                },
-                'shift:id,driver_id',
-            ]);
         }
+
+        $query->with([
+            'truck:driver_id,number',
+            'zone:id,name',
+            'carrier:id,name',
+            'latestLoad' => function ($q) {
+                $q->where('status', '!=', 'finished')
+                    ->select('status', 'driver_id');
+            },
+            'shift:id,driver_id',
+        ]);
 
         $query = $this->filterByType($query, $type);
 

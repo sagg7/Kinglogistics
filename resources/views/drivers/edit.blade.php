@@ -3,8 +3,8 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section("scripts")
-        <script src="{{ asset('js/sections/subdomains/carriers/drivers/common.min.js') }}"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/drivers/common.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script>
             (() => {
                 $("#zone_id")
@@ -19,7 +19,7 @@
         <div role="tabpanel" class="tab-pane active" id="pane-general" aria-labelledby="pane-general"
              aria-expanded="true">
             {!! Form::open(['route' => ['driver.update', $driver->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}
-            @include('subdomains.carriers.drivers.common.form')
+            @include('drivers.common.form')
             {!! Form::close() !!}
         </div>
         <div role="tabpanel" class="tab-pane" id="pane-paperwork" aria-labelledby="pane-paperwork"

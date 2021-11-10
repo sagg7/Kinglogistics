@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Broker;
+use App\Models\Carrier;
 use App\Models\Driver;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
@@ -271,12 +272,16 @@ class PaperworkController extends Controller
                 $carrier = auth()->user();
             } else if (auth()->guard('driver')->check()) {
                 $carrier = auth()->user()->load('carrier')->carrier;
+            } else if (auth()->guard('web')->check()) {
+                $carrier = Carrier::find($related_id);
             }
             $driver = null;
             if (auth()->guard('carrier')->check()) {
                 $driver = Driver::where('carrier_id', auth()->user()->id)->find($related_id);
             } else if (auth()->guard('driver')->check()) {
                 $driver = auth()->user();
+            } else if (auth()->guard('web')->check()) {
+                $driver = Driver::find($related_id);
             }
             $date = Carbon::now()->format('m-d-Y');
         } else {

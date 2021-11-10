@@ -8,7 +8,7 @@
     @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
-        <script src="{{ asset('js/common/filesUploads.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script defer>
             var tbEquipment = null;
             (() => {

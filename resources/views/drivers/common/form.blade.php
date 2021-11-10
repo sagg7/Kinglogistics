@@ -2,6 +2,17 @@
     <div class="card-body">
         <div class="card-content">
             <div class="row">
+                @if(auth()->guard('web')->check())
+                    <div class="form-group col-md-12">
+                        {!! Form::label('carrier_id', ucfirst(__('carrier')), ['class' => 'col-form-label']) !!}
+                        {!! Form::select('carrier_id', [$driver->carrier_id => $driver->carrier->name], $driver->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
+                        @error('carrier_id')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                @endif
                 @if(auth()->guard('carrier')->check())
                     <div class="form-group col-md-6">
                         {!! Form::label('turn_id', ucfirst(__('turn')), ['class' => 'col-form-label']) !!}

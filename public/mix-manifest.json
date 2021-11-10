@@ -1,3 +1,4 @@
 {
-    "/js/sections/paperwork/common.min.js": "/js/sections/paperwork/common.min.js"
+    "/js/common/filesUploads.min.js?1.0.1.js": "/js/common/filesUploads.min.js?1.0.1.js",
+    "/js/sections/drivers/common.min.js": "/js/sections/drivers/common.min.js"
 }

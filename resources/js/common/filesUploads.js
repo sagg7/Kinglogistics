@@ -44,9 +44,11 @@
                 if (res.success) {
                     res.data.forEach((item) => {
                         const tr = tbody.find(`tr[data-file="${item.paperwork_id}"]`),
-                            fLink = tr.find('.file-link');
+                            fLink = tr.find('.file-link'),
+                            fIcon = tr.find('.file-icon');
                         tr.find('input[type=file]').val('').trigger('change');
-                        fLink.html(`<a href="${item.url}" target="_blank">${item.file_name}</a>`);
+                        fLink.html(`<a href="/s3storage/temporaryUrl?url=${item.url}" target="_blank">${item.file_name}</a>`);
+                        fIcon.html(`<i class="feather icon-check-circle text-success"></i>`);
                     });
                 } else
                     throwErrorMsg();

@@ -42,6 +42,10 @@
                                     }
                                 },
                             ],
+                            menu: [
+                                {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
+                                {route: '/driver/delete', type: 'delete'}
+                            ],
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,
