@@ -251,7 +251,13 @@ class PaperworkController extends Controller
         return view("paperwork.templates.show", $params);
     }
 
-    private function renderHtmlVars(string $template, $related_id = null, $simpleVars = false)
+    /**
+     * @param string $template
+     * @param null $related_id
+     * @param false $simpleVars
+     * @return array
+     */
+    private function renderHtmlVars(string $template, $related_id = null, bool $simpleVars = false): array
     {
         preg_match_all("/{{[^}]*}}/", $template, $result);
 
@@ -318,7 +324,16 @@ class PaperworkController extends Controller
 
         $images = $paperwork->images->toArray();
 
-        $signatureCount = 0;
+        $signature = null;
+        switch ($paperwork->type) {
+            case 'driver':
+                $signature = $driver->signature;
+                break;
+            case 'carrier':
+                $signature = $carrier->signature;
+                break;
+        }
+        $signatureCount = $signature ? 1 : 0;
         foreach ($result[0] as $idx => $element) {
             $formatted = preg_replace($matches, $replacements, $element);
             $json = json_decode($formatted);
@@ -493,12 +508,22 @@ class PaperworkController extends Controller
             $vars = $this->renderHtmlVars($paperwork->template, $related_id);
             $matches = $vars["matches"];
             $replacements = $vars["replacements"];
+            $carrier = $vars["carrier"];
+            $driver = $vars["driver"];
             $result = $vars["result"];
 
             $correctAnswers = 0;
             $totalAnswers = 0;
             $template_filled = [];
             $signature = null;
+            switch ($paperwork->type) {
+                case 'driver':
+                    $signature = $driver->signature;
+                    break;
+                case 'carrier':
+                    $signature = $carrier->signature;
+                    break;
+            }
             foreach ($result[0] as $idx => $element) {
                 $formatted = preg_replace($matches, $replacements, $element);
                 $json = json_decode($formatted);
@@ -522,6 +547,16 @@ class PaperworkController extends Controller
                         $reqAnswer = $request["signature-$idx"];
                         if (!$signature) {
                             $signature = $this->uploadImage($reqAnswer, "paperworkTemplates/$paperwork->type/$related_id");
+                            switch ($paperwork->type) {
+                                case 'driver':
+                                    $driver->signature = $signature;
+                                    $driver->save();
+                                    break;
+                                case 'carrier':
+                                    $carrier->signature = $signature;
+                                    $carrier->save();
+                                    break;
+                            }
                         }
                         $reqAnswer = $signature;
                         break;
@@ -544,12 +579,39 @@ class PaperworkController extends Controller
             $template->device = $request->header('user-agent');
             $template->save();
 
+            $guard = null;
             if (auth()->guard('web')->check())
-                return redirect()->route('driver.profile');
+                $guard = 'web';
             else if (auth()->guard('carrier')->check())
-                return redirect()->route('carrier.profile');
-            else
-                return redirect()->route("$paperwork->type.index");
+                $guard = 'carrier';
+            else if (auth()->guard('driver')->check())
+                $guard = 'driver';
+
+            switch ($paperwork->type) {
+                case 'carrier':
+                    switch ($guard) {
+                        case 'carrier':
+                            return redirect()->route('carrier.profile');
+                        case 'web':
+                            return redirect()->route('carrier.edit', $related_id);
+                    }
+                    break;
+                case 'driver':
+                    switch ($guard) {
+                        case 'driver':
+                            return redirect()->route('driver.profile');
+                        case 'carrier':
+                        case 'web':
+                            return redirect()->route('driver.edit', $related_id);
+                    }
+                    break;
+                case 'trailer':
+                    return redirect()->route('trailer.edit', $related_id);
+                case 'truck':
+                    return redirect()->route('truck.edit', $related_id);
+                default:
+                    return redirect()->route("$paperwork->type.index");
+            }
         });
     }
 
