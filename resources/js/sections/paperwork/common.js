@@ -85,7 +85,7 @@
     imgsInp.change((e) => {
         let number = 0;
         const savedImgs = imgsList.find('code:not(.new_img)').parent();
-        if (savedImgs) {
+        if (savedImgs.length > 0) {
             const lastEntry = savedImgs[savedImgs.length - 1].firstElementChild.getAttribute('id');
             number = lastEntry.split('_')[1];
         }

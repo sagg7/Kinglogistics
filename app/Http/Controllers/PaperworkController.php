@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendPaperworkCompletionNotification;
 use App\Models\Broker;
 use App\Models\Carrier;
 use App\Models\Driver;
@@ -11,18 +12,19 @@ use App\Models\PaperworkImage;
 use App\Models\PaperworkTemplate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Mpdf\Mpdf;
 
 class PaperworkController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, FileUpload, S3Functions;
+    use GetSelectionData, GetSimpleSearchData, FileUpload, S3Functions, PaperworkFilesFunctions;
 
     protected $broker_id;
 
@@ -215,11 +217,93 @@ class PaperworkController extends Controller
         return $this->multiTabSearchData($query, $request);
     }
 
+    /**
+     * @param $type
+     * @param $related_id
+     */
+    private function checkPaperworkCompletion($type, $related_id): void
+    {
+        DB::transaction(function () use ($type, $related_id) {
+            // Get the mail from driver or carrier to notify seller if the paperwork has been completed
+            switch ($type) {
+                case 'driver':
+                    $driver = Driver::with('carrier.seller')->find($related_id);
+                    // If the driver has previously completed the paperwork, return
+                    if ($driver->completed_paperwork)
+                        return;
+                    $driver->completed_paperwork = 1;
+                    $driver->save();
+                    $email = $driver->carrier->seller->email;
+                    $title = "The driver \"$driver->name\" has completed its paperwork.";
+                    break;
+                case 'carrier':
+                    $carrier = Carrier::with('seller')->find($related_id);
+                    // If the carrier has previously completed the paperwork, return
+                    if ($carrier->completed_paperwork)
+                        return;
+                    $carrier->completed_paperwork = 1;
+                    $carrier->save();
+                    $email = $carrier->seller->email;
+                    $title = "The carrier \"$carrier->name\" has completed its paperwork";
+                    break;
+                default:
+                    return;
+            }
+            // If no email was found then return and don't check completion
+            if (!$email)
+                return;
+            // Get the current related paperwork type model
+            $model = "App\Models\\" . ucfirst($type);
+            // Get the user
+            $modelUser = $model::find($related_id);
+
+            // Get the templates and files that should be filled to this type
+            $paperwork = $this->getPaperworkByType($type, $modelUser->id);
+            $paperworkFiles = $paperwork['filesUploads'];
+            $paperworkTemplates = $paperwork['filesTemplates'];
+
+            // Get the filled paperwork
+            $files = $this->getFilesPaperwork($paperworkFiles, $modelUser->id);
+            $templates = $this->getTemplatesPaperwork($paperworkTemplates, $modelUser->id);
+
+            // Check through the paperwork files
+            foreach ($paperworkFiles as $paperworkFile) {
+                // If the file is required, check if it has been completed
+                if ($paperworkFile->required) {
+                    $index = array_search($paperworkFile->id, array_column($files, 'paperwork_id'), false);
+                    // If not, return
+                    if ($index === false) {
+                        return;
+                    }
+                }
+            }
+            // Check through the paperwork templates
+            foreach ($paperworkTemplates as $paperworkTemplate) {
+                // If the file is required, check if it has been completed
+                if ($paperworkTemplate->required) {
+                    $index = array_search($paperworkTemplate->id, array_column($templates, 'paperwork_id'), false);
+                    // If not, return
+                    if ($index === false) {
+                        return;
+                    }
+                }
+            }
+
+            // If it gets to this point, the paperwork is completed and must send and email to the seller
+            $content = "Check out the progress through this link";
+            $route = route("$type.edit", $related_id);
+            $params = compact('title', 'content', 'route');
+            //return view('mails.notification', $params);
+            Mail::to($email)->send(new SendPaperworkCompletionNotification($params));
+        });
+    }
+
     public function storeFiles(Request $request)
     {
         return DB::transaction(function () use ($request) {
             $result = [];
             if ($request->file) {
+                $fileCount = 1;
                 foreach ($request->file as $i => $file) {
                     $paperwork = PaperworkFile::where('paperwork_id', $i)
                         ->where('related_id', $request->related_id)
@@ -236,6 +320,12 @@ class PaperworkController extends Controller
                     $paperwork->file_name = $paperwork->getFileNameAttribute();
 
                     $result[] = $paperwork;
+
+                    if (count($request->file) === $fileCount) {
+                        $paperwork->load('parentPaperwork');
+                        $this->checkPaperworkCompletion($paperwork->parentPaperwork->type, $request->related_id);
+                    }
+                    $fileCount++;
                 }
             }
 
@@ -591,6 +681,8 @@ class PaperworkController extends Controller
                 $guard = 'carrier';
             else if (auth()->guard('driver')->check())
                 $guard = 'driver';
+
+            $this->checkPaperworkCompletion($paperwork->type, $related_id);
 
             switch ($paperwork->type) {
                 case 'carrier':

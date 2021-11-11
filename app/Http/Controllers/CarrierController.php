@@ -9,9 +9,11 @@ use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CarrierController extends Controller
 {
@@ -49,7 +51,7 @@ class CarrierController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function index()
     {
@@ -59,7 +61,7 @@ class CarrierController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function create()
     {
@@ -76,8 +78,11 @@ class CarrierController extends Controller
     {
         if ($id)
             $carrier = Carrier::findOrFail($id);
-        else
+        else {
             $carrier = new Carrier();
+            if (auth()->user()->hasRole('seller'))
+                $carrier->seller_id = auth()->user()->id;
+        }
 
         $carrier->name = $request->name;
         $carrier->email = $request->email;
@@ -99,8 +104,9 @@ class CarrierController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return RedirectResponse|\Illuminate\Http\Response
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
@@ -114,10 +120,10 @@ class CarrierController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         //
     }
@@ -125,10 +131,10 @@ class CarrierController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $carrier = Carrier::findOrFail($id);
         $createEdit = $this->createEditParams();
@@ -141,13 +147,13 @@ class CarrierController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param int $id
      * @param bool $profile
-     * @return \Illuminate\Http\Response
-     * @throws \Illuminate\Validation\ValidationException
+     * @return RedirectResponse
+     * @throws ValidationException
      */
-    public function update(Request $request, int $id, bool $profile = false)
+    public function update(Request $request, int $id, bool $profile = false): RedirectResponse
     {
         $this->validator($request->all(), $id)->validate();
 
@@ -162,10 +168,10 @@ class CarrierController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return array
      */
-    public function destroy($id)
+    public function destroy(int $id): array
     {
         $carrier = Carrier::findOrFail($id);
 
@@ -185,7 +191,7 @@ class CarrierController extends Controller
      * @param Request $request
      * @return array
      */
-    public function selection(Request $request)
+    public function selection(Request $request): array
     {
         $query = Carrier::select([
             'id',
@@ -199,9 +205,9 @@ class CarrierController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
-    public function search(Request $request)
+    public function search(Request $request): array
     {
         $query = Carrier::select([
             "carriers.id",
@@ -213,7 +219,11 @@ class CarrierController extends Controller
         return $this->multiTabSearchData($query, $request);
     }
 
-    public function searchEquipment(Request $request)
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function searchEquipment(Request $request): array
     {
         $query = CarrierEquipment::select([
             "carrier_equipment.id",

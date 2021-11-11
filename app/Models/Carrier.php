@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,14 @@ class Carrier extends Authenticatable
     public function locationGroup(): HasOne
     {
         return $this->hasOne(LocationGroup::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
 }
