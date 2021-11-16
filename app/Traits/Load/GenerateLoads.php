@@ -72,7 +72,7 @@ trait GenerateLoads
             $trip = Trip::find($data['trip_id']);
 
             $load->shipper_id = $trip->shipper_id;
-            $load->load_type_id = $data["load_type_id"];
+            $load->load_type_id = $data["load_type_id"] ?? null;
             if (isset($data['driver_id'])) {
                 $load->driver_id = $data["driver_id"] ?? null;
                 $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
