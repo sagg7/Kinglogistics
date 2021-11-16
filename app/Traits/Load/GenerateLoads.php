@@ -29,7 +29,7 @@ trait GenerateLoads
             'load_number' => ['sometimes', 'numeric', 'min:1', 'max:999'],
             'shipper_id' => ['sometimes', 'exists:shippers,id'],
             'trip_id' => ['required', 'exists:trips,id'],
-            'load_type_id' => ['sometimes', 'exists:load_types,id'],
+            'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['nullable', 'exists:drivers,id'],
             'date' => ['required', 'date'],
             'control_number' => ['required', 'numeric'],
@@ -72,7 +72,7 @@ trait GenerateLoads
             $trip = Trip::find($data['trip_id']);
 
             $load->shipper_id = $trip->shipper_id;
-            $load->load_type_id = $data["load_type_id"] ?? null;
+            $load->load_type_id = $data["load_type_id"];
             if (isset($data['driver_id'])) {
                 $load->driver_id = $data["driver_id"] ?? null;
                 $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
