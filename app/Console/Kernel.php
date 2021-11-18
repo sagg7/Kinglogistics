@@ -74,7 +74,9 @@ class Kernel extends ConsoleKernel
                     1,
                 );
 
-                $botAnswers = new BotAnswers();
+                $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
+                if (!$botAnswer)
+                    $botAnswers = new BotAnswers();
 
                 $botAnswers->bot_question_id = 1;
                 $botAnswers->driver_id = $driver_id;

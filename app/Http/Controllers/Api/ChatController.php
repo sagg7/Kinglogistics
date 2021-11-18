@@ -6,6 +6,7 @@ use App\Events\NewChatMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationResource;
 use App\Models\BotAnswers;
+use App\Models\BotQuestions;
 use App\Models\Driver;
 use App\Models\Message;
 use App\Traits\Chat\MessagesTrait;
@@ -89,7 +90,7 @@ class ChatController extends Controller
 
         $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
         $affirmative = 2;
-        if ($botAnswer != null && $botAnswer->incorrect > 10){
+        if ($botAnswer != null && $botAnswer->incorrect < 6){
             if (strtolower($content)  == 'si' || strtolower($content)  == 'yes' || strtolower($content)  == 'y' || strtolower($content)  == 's')
                 $affirmative = 1;
             if (strtolower($content)  == 'no' || strtolower($content)  == 'n')
@@ -111,6 +112,18 @@ class ChatController extends Controller
                         $driver->save();
                         break;
                 }
+            } else {
+                $message = $this->sendMessage(
+                    $driver->id,
+                    BotQuestions::find(4)->question,
+                    null,
+                    null,
+                    null,
+                    null,
+                    $image,
+                    1
+                );
+                $botAnswer->incorrect = integerValue($botAnswer->incorrect)+1;
             }
         }
 
