@@ -76,7 +76,7 @@ class Kernel extends ConsoleKernel
 
                 $botAnswers = new BotAnswers();
 
-                $botAnswers->content = 1;
+                $botAnswers->bot_question_id = 1;
                 $botAnswers->driver_id = $driver_id;
 
                 $botAnswers->save();
@@ -94,7 +94,7 @@ class Kernel extends ConsoleKernel
                 );
                 $messages[] = $message;
             }
-        })->daily()->at('15:17');
+        })->daily()->at('16:35');
     }
 
     /**
