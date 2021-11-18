@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Enums\DriverAppRoutes;
-use App\Models\BotAnwers;
+use App\Models\BotAnswers;
 use App\Models\BotQuestions;
 use App\Models\Driver;
 use App\Traits\Accounting\PaymentsAndCollection;
@@ -53,7 +53,6 @@ class Kernel extends ConsoleKernel
         //})->weekly()->mondays()->at('08:00');
 
         $schedule->call(function () {
-
             $drivers =  [2];
             $user_id = null;
             $image = null;
@@ -75,14 +74,14 @@ class Kernel extends ConsoleKernel
                     1,
                 );
 
-                $botAnswers = new BotAnwers();
+                $botAnswers = new BotAnswers();
 
                 $botAnswers->content = 1;
                 $botAnswers->driver_id = $driver_id;
 
                 $botAnswers->save();
                 $driver->status = 'pending';
-                $driver = 1;
+                $driver->save();
                 $driverDevices = $this->getUserDevices($driver);
 
                 $this->sendNotification(
@@ -95,7 +94,7 @@ class Kernel extends ConsoleKernel
                 );
                 $messages[] = $message;
             }
-        })->daily()->at('14:05');
+        })->daily()->at('15:17');
     }
 
     /**

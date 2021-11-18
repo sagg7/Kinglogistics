@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\NewChatMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationResource;
-use App\Models\BotAnwers;
+use App\Models\BotAnswers;
 use App\Models\Driver;
 use App\Models\Message;
 use App\Traits\Chat\MessagesTrait;
@@ -87,7 +87,7 @@ class ChatController extends Controller
             $image = $this->uploadImage($image, 'chat');
         }
 
-        $botAnswer = BotAnwers::where('driver_id', $driver->id)->first();
+        $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
         $affirmative = 2;
         if ($botAnswer != null && $botAnswer->incorrect > 10){
             if (strtolower($content)  == 'si' || strtolower($content)  == 'yes' || strtolower($content)  == 'y' || strtolower($content)  == 's')
