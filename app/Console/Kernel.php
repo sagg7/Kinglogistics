@@ -95,7 +95,7 @@ class Kernel extends ConsoleKernel
                 );
                 $messages[] = $message;
             }
-        })->weekly()->mondays()->at('13:59');
+        })->daily()->at('14:05');
     }
 
     /**
