@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Models\Zone;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -25,7 +26,7 @@ class DriverController extends Controller
      */
     private function createEditParams($id = null): array
     {
-        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id);
+        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id) + ['zones' => [null => 'Select'] + Zone::pluck('name', 'id')->toArray()];
     }
 
     /**
@@ -70,13 +71,12 @@ class DriverController extends Controller
             $driver->email = $request->email;
             if ($request->password)
                 $driver->password = Hash::make($request->password);
-            if (auth()->guard('carrier')->check()) {
-                $driver->turn_id = $request->turn_id;
-                $driver->zone_id = $request->zone_id;
-                $driver->phone = $request->phone;
-                $driver->address = $request->address;
-                $driver->inactive = $request->inactive ?? null;
-            }
+
+            $driver->turn_id = $request->turn_id;
+            $driver->zone_id = $request->zone_id;
+            $driver->phone = $request->phone;
+            $driver->address = $request->address;
+            $driver->inactive = $request->inactive ?? null;
             $driver->save();
 
             return $driver;
