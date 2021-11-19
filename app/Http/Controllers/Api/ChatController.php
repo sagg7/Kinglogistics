@@ -136,7 +136,7 @@ class ChatController extends Controller
                     $image,
                     1
                 );
-                $botAnswer->incorrect = $botAnswer->incorrect ?? 0 + 1;
+                $botAnswer->incorrect++;
                 $botAnswer->save();
 
                 $driverDevices = $this->getUserDevices($driver);

@@ -79,6 +79,7 @@ class Kernel extends ConsoleKernel
                     $botAnswers = new BotAnswers();
 
                 $botAnswers->bot_question_id = 1;
+                $botAnswers->incorrect = 0;
                 $botAnswers->driver_id = $driver_id;
 
                 $botAnswers->save();

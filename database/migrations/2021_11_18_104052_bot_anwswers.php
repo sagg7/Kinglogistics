@@ -24,7 +24,7 @@ class BotAnwswers extends Migration
             $table->bigInteger('bot_question_id')->unsigned();
             $table->bigInteger('driver_id')->unsigned();
             $table->string('answer')->nullable();
-            $table->integer('incorrect')->nullable();
+            $table->integer('incorrect')->default(0);
             $table->timestamps();
             $table->softDeletes();
 
