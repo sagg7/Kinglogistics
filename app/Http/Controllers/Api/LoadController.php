@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Drivers\LoadResource;
 use App\Http\Resources\Drivers\LoadStatusResource;
 use App\Http\Resources\Helpers\KeyValueResource;
+use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
@@ -363,6 +364,9 @@ class LoadController extends Controller
         $loadStatus->update();
 
         $this->endShift($driver);
+
+        BotLoadReminder::dispatch([$driver->id], true)->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
+
 
         // Check if driver can accept more loads and attach to response
         return response([

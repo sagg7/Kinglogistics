@@ -2,7 +2,11 @@
 
 namespace App\Console;
 
+use App\Enums\AppConfigEnum;
 use App\Enums\DriverAppRoutes;
+use App\Jobs\BotLoadReminder;
+use App\Jobs\ProcessDeleteFileDelayed;
+use App\Models\AppConfig;
 use App\Models\BotAnswers;
 use App\Models\BotQuestions;
 use App\Models\Driver;
@@ -58,10 +62,63 @@ class Kernel extends ConsoleKernel
             $image = null;
 
             $messages = [];
+
+            $drivers = Driver::where('turn_id', 1);
+
+            foreach ($drivers as $driver) {
+
+                $content = str_replace( "{{driver:name}}", $driver->name, BotQuestions::find(1)->question);//Hola {{driver:name}}, ¿Estas listo para trabajar? contesta: Si No
+
+                $message = $this->sendMessage(
+                    $driver->id,
+                    $content,
+                    $user_id,
+                    null,
+                    null,
+                    true,
+                    $image,
+                    1,
+                );
+
+                $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
+                if (!$botAnswer)
+                    $botAnswer = new BotAnswers();
+
+                $botAnswer->bot_question_id = 1;
+                $botAnswer->incorrect = 0;
+                $botAnswer->driver_id = $driver->id;
+                $botAnswer->save();
+
+                $driver->status = 'pending';
+                $driver->save();
+
+                $driverDevices = $this->getUserDevices($driver);
+
+                $this->sendNotification(
+                    'Message from King',
+                    $content,
+                    $driverDevices,
+                    DriverAppRoutes::CHAT,
+                    $message,
+                    DriverAppRoutes::CHAT_ID,
+                );
+                $messages[] = $message;
+            }
+
+            BotLoadReminder::dispatch($drivers->pluck()->pluck('name', 'id')->toArray(), true)->delay(now()->addMinutes(30+AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
+        })->daily()->at('05:30');
+
+
+        $schedule->call(function () {
+            $drivers =  [2];
+            $user_id = null;
+            $image = null;
+
+            $messages = [];
             foreach ($drivers as $driver_id) {
                 $driver = Driver::find($driver_id);
 
-                $content = "Hola $driver->name, ¿Estas listo para trabajar? \n contesta: \n Si \n No";
+                $content = str_replace( "{{driver:name}}", $driver->name, BotQuestions::find(3)->question);//Hola {{driver:name}}, Esperamos que haya sido un buen día, puedes terminar ahora tu turno, ¡Nos vemos mañana!
 
                 $message = $this->sendMessage(
                     $driver_id,
@@ -75,16 +132,9 @@ class Kernel extends ConsoleKernel
                 );
 
                 $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
-                if (!$botAnswer)
-                    $botAnswers = new BotAnswers();
+                if ($botAnswer)
+                    $botAnswer->delete();
 
-                $botAnswers->bot_question_id = 1;
-                $botAnswers->incorrect = 0;
-                $botAnswers->driver_id = $driver_id;
-
-                $botAnswers->save();
-                $driver->status = 'pending';
-                $driver->save();
                 $driverDevices = $this->getUserDevices($driver);
 
                 $this->sendNotification(
@@ -97,7 +147,7 @@ class Kernel extends ConsoleKernel
                 );
                 $messages[] = $message;
             }
-        })->daily()->at('16:35');
+        })->daily()->at('18:15');
     }
 
     /**

@@ -41,6 +41,7 @@ class ChatController extends Controller
         $content = $request->get('content');
         $userId = $request->get('user_id');
         $image = $request->get('image');
+        $botSended = $request->get('is_bot_sender', null);
 
         if (empty($driverIds)) {
             return response('Drivers collection is not setted', 400);
@@ -60,7 +61,8 @@ class ChatController extends Controller
                 null,
                 null,
                 null,
-                $image
+                $image,
+                $botSended
             );
 
             $driverDevices = $this->getUserDevices($driver);
@@ -111,30 +113,43 @@ class ChatController extends Controller
                 $affirmative = 0;
             if ($affirmative != 2){
                 switch ($botAnswer->bot_question_id){
-                    case '1':
+                    case '1': //Hola {{driver:name}}, ¿Estas listo para trabajar?
                         if( $affirmative ){
                             $driver->status = 'ready';
+                            $responseContent = BotQuestions::find(5)->question; //Excelente!, nos vemos a las 6!
+                        } else {
+                            $driver->status = 'inactive';
+                            $responseContent = BotQuestions::find(6)->question; //Lamento escuchar eso, ¿Cual es el motivo?
                         }
-                        else
-                            $driver->status = 'inactive';
                         $driver->save();
                         $botAnswer->answer = $content;
-                        $driver->save();
-                        $responseContent = BotQuestions::find(5)->question; //Excelente!, nos vemos a las 6!
+                        $botAnswer->save();
                         break;
-                    case '2':
-                        if( $affirmative )
+                    case '2': //Hola {{driver:name}}, ¿Sigues Activo? Por favor contesta:
+                        if( $affirmative ) {
                             $driver->status = 'active';
-                        else
+                            $responseContent = BotQuestions::find(5)->question; //Excelente!, nos vemos a las 6!
+                        } else {
                             $driver->status = 'inactive';
+                            $responseContent = BotQuestions::find(6)->question; //Lamento escuchar eso, ¿Cual es el motivo?
+                        }
                         $driver->save();
                         $botAnswer->answer = $content;
-                        $driver->save();
-                        $responseContent = BotQuestions::find(6)->question; //Lamento escuchar eso, ¿Cual es el motivo?
-                        $botAnswer->delete();
+                        $botAnswer->save();
                         break;
+                    case '7'://Hola, ¿ya recibiste carga? por favor contesta: si no
+                        if( $affirmative ) {
+                            $responseContent = BotQuestions::find(8)->question; //Por favor, agrégala en la aplicación.
+                        } else {
+                            $responseContent = BotQuestions::find(10)->question; //¿Sigues activo?
+                        }
+                        $botAnswer->bot_question_id = 2;
+                        $botAnswer->answer = null;
+                        $botAnswer->save();
                     default:
                         $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
+                        $botAnswer->incorrect++;
+                        $botAnswer->save();
                         break;
                 }
             }
@@ -148,8 +163,6 @@ class ChatController extends Controller
                 $image,
                 1
             );
-            $botAnswer->incorrect++;
-            $botAnswer->save();
 
             $driverDevices = $this->getUserDevices($driver);
 
