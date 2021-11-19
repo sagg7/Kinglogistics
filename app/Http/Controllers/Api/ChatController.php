@@ -102,8 +102,9 @@ class ChatController extends Controller
         event(new NewChatMessage($message));
 
         $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
+
         $affirmative = 2;
-        if ($botAnswer != null && $botAnswer->incorrect < 6){
+        if ($botAnswer != null && $botAnswer->answer != null && $botAnswer->incorrect < 6){
             if (strtolower($content)  == 'si' || strtolower($content)  == 'yes' || strtolower($content)  == 'y' || strtolower($content)  == 's')
                 $affirmative = 1;
             if (strtolower($content)  == 'no' || strtolower($content)  == 'n')
@@ -111,11 +112,15 @@ class ChatController extends Controller
             if ($affirmative != 2){
                 switch ($botAnswer->bot_question_id){
                     case '1':
-                        if( $affirmative )
+                        if( $affirmative ){
                             $driver->status = 'ready';
+                        }
                         else
                             $driver->status = 'inactive';
                         $driver->save();
+                        $botAnswer->answer = $content;
+                        $driver->save();
+                        $responseContent = BotQuestions::find(5)->question; //Excelente!, nos vemos a las 6!
                         break;
                     case '2':
                         if( $affirmative )
@@ -123,33 +128,39 @@ class ChatController extends Controller
                         else
                             $driver->status = 'inactive';
                         $driver->save();
+                        $botAnswer->answer = $content;
+                        $driver->save();
+                        $responseContent = BotQuestions::find(6)->question; //Lamento escuchar eso, ¿Cual es el motivo?
+                        $botAnswer->delete();
+                        break;
+                    default:
+                        $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
                         break;
                 }
-            } else {
-                $message = $this->sendMessage(
-                    $driver->id,
-                    BotQuestions::find(4)->question,
-                    null,
-                    null,
-                    null,
-                    null,
-                    $image,
-                    1
-                );
-                $botAnswer->incorrect++;
-                $botAnswer->save();
-
-                $driverDevices = $this->getUserDevices($driver);
-
-                $this->sendNotification(
-                    'Message from King',
-                    BotQuestions::find(4)->question,
-                    $driverDevices,
-                    DriverAppRoutes::CHAT,
-                    $message,
-                    DriverAppRoutes::CHAT_ID,
-                );
             }
+            $message = $this->sendMessage(
+                $driver->id,
+                $responseContent,
+                null,
+                null,
+                null,
+                null,
+                $image,
+                1
+            );
+            $botAnswer->incorrect++;
+            $botAnswer->save();
+
+            $driverDevices = $this->getUserDevices($driver);
+
+            $this->sendNotification(
+                'Message from King',
+                BotQuestions::find(4)->question,
+                $driverDevices,
+                DriverAppRoutes::CHAT,
+                $message,
+                DriverAppRoutes::CHAT_ID,
+            );
         }
 
         return response(['status' => 'ok'], 200);
