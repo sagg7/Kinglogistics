@@ -123,7 +123,7 @@ class ChatController extends Controller
                     $image,
                     1
                 );
-                $botAnswer->incorrect = integerValue($botAnswer->incorrect)+1;
+                $botAnswer->incorrect = $botAnswer->incorrect ?? 0 + 1;
             }
         }
 
