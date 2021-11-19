@@ -104,7 +104,7 @@ class ChatController extends Controller
         $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
 
         $affirmative = 2;
-        if ($botAnswer != null && $botAnswer->answer != null && $botAnswer->incorrect < 6){
+        if ($botAnswer != null && $botAnswer->answer == null && $botAnswer->incorrect < 6){
             if (strtolower($content)  == 'si' || strtolower($content)  == 'yes' || strtolower($content)  == 'y' || strtolower($content)  == 's')
                 $affirmative = 1;
             if (strtolower($content)  == 'no' || strtolower($content)  == 'n')
