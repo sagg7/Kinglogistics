@@ -88,6 +88,19 @@ class ChatController extends Controller
             $image = $this->uploadImage($image, 'chat');
         }
 
+
+        $message = $this->sendMessage(
+            $driver->id,
+            $content,
+            null,
+            true,
+            null,
+            null,
+            $image
+        );
+
+        event(new NewChatMessage($message));
+
         $botAnswer = BotAnswers::where('driver_id', $driver->id)->first();
         $affirmative = 2;
         if ($botAnswer != null && $botAnswer->incorrect < 6){
@@ -124,20 +137,20 @@ class ChatController extends Controller
                     1
                 );
                 $botAnswer->incorrect = $botAnswer->incorrect ?? 0 + 1;
+                $botAnswer->save();
+
+                $driverDevices = $this->getUserDevices($driver);
+
+                $this->sendNotification(
+                    'Message from King',
+                    $content,
+                    $driverDevices,
+                    DriverAppRoutes::CHAT,
+                    $message,
+                    DriverAppRoutes::CHAT_ID,
+                );
             }
         }
-
-        $message = $this->sendMessage(
-            $driver->id,
-            $content,
-            null,
-            true,
-            null,
-            null,
-            $image
-        );
-
-        event(new NewChatMessage($message));
 
         return response(['status' => 'ok'], 200);
     }
