@@ -168,7 +168,7 @@ class ChatController extends Controller
 
             $this->sendNotification(
                 'Message from King',
-                BotQuestions::find(4)->question,
+                $responseContent,
                 $driverDevices,
                 DriverAppRoutes::CHAT,
                 $message,
