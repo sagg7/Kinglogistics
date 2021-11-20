@@ -365,7 +365,7 @@ class LoadController extends Controller
 
         $this->endShift($driver);
 
-        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
+        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()/60));
 
 
         // Check if driver can accept more loads and attach to response

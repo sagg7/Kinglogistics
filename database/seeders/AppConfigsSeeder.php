@@ -32,5 +32,11 @@ class AppConfigsSeeder extends Seeder
             'key' => AppConfigEnum::MAX_LOAD_REJECTIONS,
             'value' => 3
         ]);
+
+        // Rejection times
+        AppConfig::create([
+            'key' => AppConfigEnum::TIME_AFTER_LOAD_REMINDER,
+            'value' => 3
+        ]);
     }
 }

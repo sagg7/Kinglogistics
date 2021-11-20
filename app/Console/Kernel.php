@@ -105,7 +105,7 @@ class Kernel extends ConsoleKernel
                 $messages[] = $message;
             }
 
-            //BotLoadReminder::dispatch($drivers->pluck()->pluck('name', 'id')->toArray())->delay(now()->addMinutes(30+AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
+            //BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()/60));
         })->daily()->at('05:30');
 
 
