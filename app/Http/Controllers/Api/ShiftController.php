@@ -107,7 +107,7 @@ class ShiftController extends Controller
 //        $load = $this->autoAssignUnallocatedLoad($driver);
         $driver->status = 'active';
         $driver->save();
-        BotLoadReminder::dispatch($driver->id, true)->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
+        BotLoadReminder::dispatch([$driver->id], true)->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
         // Starts shift for this driver
         $this->startShift($driver, $payload, $load);
 

@@ -41,7 +41,8 @@ trait ShiftTrait
         if (!empty($driver->shift)) {
             Shift::destroy($driver->shift->id);
         }
-
+        $driver->status = 'inactive';
+        $driver->save();
         return response(['status' => 'ok'], 200);
     }
 
