@@ -46,7 +46,7 @@ class DriverLocationUpdateForCarrier implements ShouldBroadcastNow
                 'truck' => [
                     'number' => $this->driver->truck->number,
                 ],
-                'shift' => $this->driver->shift->id,
+                'shift' => ($this->driver->shift) ? $this->driver->shift->id : null,
             ],
             'carrier' => [
                 'id' => $this->carrier->id,
