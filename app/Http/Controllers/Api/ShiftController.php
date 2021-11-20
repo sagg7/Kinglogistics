@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AppConfigEnum;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
+use App\Jobs\BotLoadReminder;
+use App\Models\AppConfig;
 use App\Models\Load;
 use App\Models\Shift;
 use App\Notifications\LoadAssignment;
@@ -104,6 +107,7 @@ class ShiftController extends Controller
 //        $load = $this->autoAssignUnallocatedLoad($driver);
         $driver->status = 'active';
         $driver->save();
+        BotLoadReminder::dispatch($driver->id, true)->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER/60)->first()));
         // Starts shift for this driver
         $this->startShift($driver, $payload, $load);
 
