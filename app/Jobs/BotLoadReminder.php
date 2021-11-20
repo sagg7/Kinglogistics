@@ -46,7 +46,7 @@ class BotLoadReminder implements ShouldQueue
         $content = BotQuestions::find(7)->question;// ¿Aún no recibes carga?
 
         foreach ($driverWithNoLoads as $driver_id){
-            $shift = Shift::where('driver', $driver_id)->first();
+            $shift = Shift::where('driver_id', $driver_id)->first();
             if ($shift) {
                 $botAnswer = BotAnswers::where('driver_id', $driver_id)->first();
                 if (!$botAnswer)
