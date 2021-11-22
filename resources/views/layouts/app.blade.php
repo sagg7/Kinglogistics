@@ -67,6 +67,7 @@
     @if(auth()->guard('web')->check())@include('layouts.menu')@endif
     @if(auth()->guard('shipper')->check())@include('layouts.subdomains.shippers.menu')@endif
     @if(auth()->guard('driver')->check())@include('layouts.subdomains.drivers.menu')@endif
+    @include('chat.modals.imagePreview')
     @yield('modals')
     <div class="app-content content">
         <div class="content-wrapper">
@@ -96,6 +97,9 @@
             </main>
         </div>
     </div>
+    @if($bottomChat ?? true)
+        @include("layouts.chat.chatTemplate")
+    @endif
     <footer class="footer footer-static footer-light"></footer>
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
@@ -121,6 +125,10 @@
     <script src="{{ asset('js/common/master.min.js?1.0.1') }}"></script>
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
+    <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
+    @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
+        <script src="{{ asset("js/sections/chat/bottomChat.min.js") }}"></script>
+    @endif
 
     <!-- BEGIN: Scripts JS-->
     <script src="{{ asset("app-assets/js/scripts/components.js") }}" type="application/javascript"></script>

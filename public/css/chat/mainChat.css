@@ -1,0 +1,62 @@
+.content.app-content .content-area-wrapper {
+    margin: 0 !important;
+}
+.chat-application .chats .chat-body,
+.chat-application .chats .chat-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+.chat-application .chats .chat-body .chat-content {
+    text-align: left;
+    max-width: 85%;
+}
+.chat-application .chats .chat-body .chat-image {
+    max-width: 250px;
+}
+.preview-image {
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: #eee;
+    transition: all 300ms ease;
+    bottom: 79px;
+}
+.preview-image.open {
+    height: calc(100% - 123px);
+}
+.preview-header {
+    top: 0;
+    left: 0;
+}
+.preview-image .main {
+    display: none;
+    height: 100%;
+}
+.preview-image.open .main {
+    display: block;
+}
+.preview-image .preview-header .close-btn {
+    color: gray;
+    font-size: 6em;
+    line-height: 1;
+    margin: -10px 0 -15px 0;
+    padding: 0 0 0 10px;
+}
+.preview-image.open .preview-header .close-btn {
+    display: block;
+}
+.preview-image .d-flex {
+    height: calc(100% - 80px);
+}
+.preview-body,
+.preview-body .content-body {
+    height: 100%;
+}
+.preview-body .content-body {
+    padding: 15px 0;
+}
+.preview-image img {
+    max-height: 100%;
+}

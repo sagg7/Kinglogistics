@@ -15,38 +15,39 @@ class ChatController extends Controller
 {
     use GetSelectionData, PushNotificationsTrait, MessagesTrait;
 
-    public function index()
+    /**
+     * @return mixed
+     */
+    public function getContacts()
     {
-        $contacts = Driver::where(function ($q) {
+        return Driver::where(function ($q) {
             $q->whereHas('latestMessage', function ($r) {
                 //$r->where('user_id', auth()->user()->id);
             })
                 ->orWhereHas('shift');
         })
+            ->leftJoin('messages', function ($q) {
+                $q->on('messages.driver_id', '=', 'drivers.id')
+                    ->on('messages.id', '=', DB::raw('(select max(id) from messages where messages.driver_id = drivers.id)'));
+            })
             ->whereNull("inactive")
             ->with([
                 'latestMessage' => function ($q) {
                     $q->select(['id',DB::raw('SUBSTRING(content, 1, 100) as content'),'created_at','driver_id', 'is_driver_sender']);
                 },
-                /*'shifts'/* => function ($q) {
-                    $q->skip(0)->take(15);
-                },*/
-                /*'carrier:id,name',
-                'truck' => function ($q) {
-                    $q->with('trailer:id,number')
-                        ->select(['id', 'number', 'driver_id', 'trailer_id']);
-                },*/
             ])
             ->withCount([
                 'messages as unread_count' => function ($q) {
                     $q->where('user_unread', 1);
                 }
             ])
-            ->get([
-                'id',
-                'carrier_id',
-                'name',
-            ]);
+            ->orderBy('messages.created_at', 'DESC')
+            ->get();
+    }
+
+    public function index()
+    {
+        $contacts = $this->getContacts();
         $params = compact('contacts');
         return view('chat.index', $params);
     }

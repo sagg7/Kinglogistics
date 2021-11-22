@@ -1,88 +1,10 @@
-<x-app-layout>
+@component("layouts.app", ['bottomChat' => false])
     @section("head")
         <link rel="stylesheet" href="{{ asset('app-assets/css/pages/app-chat.min.css') }}">
-        <style>
-            .content.app-content .content-area-wrapper {
-                margin: 0 !important;
-            }
-            .chat-application .chats .chat-body,
-            .chat-application .chats .chat-content {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-            .chat-application .chats .chat-body .chat-content {
-                text-align: left;
-                max-width: 85%;
-            }
-            .chat-application .chats .chat-body .chat-image {
-                max-width: 250px;
-            }
-            .preview-image {
-                display: block;
-                position: absolute;
-                left: 0;
-                width: 100%;
-                height: 0;
-                background: #eee;
-                transition: all 300ms ease;
-                bottom: 79px;
-            }
-            .preview-image.open {
-                height: calc(100% - 123px);
-            }
-            .preview-header {
-                top: 0;
-                left: 0;
-            }
-            .preview-image .main {
-                display: none;
-                height: 100%;
-            }
-            .preview-image.open .main {
-                display: block;
-            }
-            .preview-image .preview-header .close-btn {
-                color: gray;
-                font-size: 6em;
-                line-height: 1;
-                margin: -10px 0 -15px 0;
-                padding: 0 0 0 10px;
-            }
-            .preview-image.open .preview-header .close-btn {
-                display: block;
-            }
-            .preview-image .d-flex {
-                height: calc(100% - 80px);
-            }
-            .preview-body,
-            .preview-body .content-body {
-                height: 100%;
-            }
-            .preview-body .content-body {
-                padding: 15px 0;
-            }
-            .preview-image img {
-                max-height: 100%;
-            }
-        </style>
+        <link href="{{ asset("css/chat/mainChat.css") }}" rel="stylesheet">
     @endsection
 
     @section("modals")
-        <div class="modal fade" id="imagePreview" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
-                <div class="modal-content bg-transparent border-0 box-shadow-0" style="max-height: calc(100vh - 3.5rem);">
-                    <div class="modal-header bg-transparent">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center p-5 modal-spinner">
-                            <span class="spinner-border white" role="status" aria-hidden="true"></span>
-                        </div>
-                        <div class="content-body text-center d-none"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="modal fade" id="multiMessage" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
                 <div class="modal-content border-0 box-shadow-0" style="max-height: calc(100vh - 3.5rem);">
@@ -111,7 +33,6 @@
             const contacts = @json($contacts);
             const userId = {{ auth()->user()->id }};
         </script>
-        <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
         <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.1') }}"></script>
     @endsection
 
@@ -322,4 +243,4 @@
         </div>
     </div>
 
-</x-app-layout>
+@endcomponent
