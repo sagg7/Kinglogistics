@@ -53,6 +53,7 @@ class BotLoadReminder implements ShouldQueue
                     $botAnswer = new BotAnswers();
 
                 $botAnswer->bot_question_id = 7;
+                $botAnswer->answer = null;
                 $botAnswer->incorrect = 0;
                 $botAnswer->driver_id = $driver_id;
                 $botAnswer->save();
