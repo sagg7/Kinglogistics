@@ -9,9 +9,22 @@
     multiContacts.select2({
         placeholder: 'Select',
     })
+    const getMessageTime = (date) => {
+        const today = moment().startOf('day');
+        const yesterday = moment().subtract(1, 'days');
+        let text = '';
+        // if is today
+        if (date.isSame(today, 'd'))
+            text = "Today";
+        else if (date.isSame(yesterday, 'd'))
+            text = "Yesterday";
+        else
+            text = date.format('M/D/YYYY');
+        return text;
+    }
     if (contacts) {
         contacts.forEach(item => {
-            const time = item.latest_message ? moment(item.latest_message.created_at).format('h:mm A') : '';
+            const time = item.latest_message ? getMessageTime(moment(item.latest_message.created_at)) : '';
             const element = `<li>` +
                 `<div class="pr-1">` +
                 //`<span class="avatar m-0 avatar-md"><img class="media-object rounded-circle" src="../../../app-assets/images/portrait/small/avatar-s-2.jpg" height="42" width="42" alt="Generic placeholder image">` +
@@ -141,17 +154,8 @@
     let currentDate = null;
     let previousDate = null;
     const appendMessages = (messages, prepend = false) => {
-        const today = moment().startOf('day');
-        const yesterday = moment().subtract(1, 'days');
         const generateDivider = (date) => {
-            let text = '';
-            // if is today
-            if (date.isSame(today, 'd'))
-                text = "Today";
-            else if (date.isSame(yesterday, 'd'))
-                text = "Yesterday";
-            else
-                text = date.format('M/D/YYYY');
+            const text = getMessageTime(date);
             return `<div class="divider" data-date="${date.format('YYYY/MM/DD')}"><div class="divider-text">${text}</div></div>`;
         }
         const firstDivider = $(".chats .divider:first-child");

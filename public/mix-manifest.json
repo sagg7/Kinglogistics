@@ -1,3 +1,4 @@
 {
-    "/js/sections/paperwork/common.min.js": "/js/sections/paperwork/common.min.js"
+    "/app-assets/js/scripts/pages/app-chat.min.js": "/app-assets/js/scripts/pages/app-chat.min.js",
+    "/js/sections/chat/bottomChat.min.js": "/js/sections/chat/bottomChat.min.js"
 }

@@ -96,7 +96,7 @@ class ChatController extends Controller
             $content,
             null,
             true,
-            null,
+            true,
             null,
             $image
         );

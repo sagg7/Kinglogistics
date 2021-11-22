@@ -3,7 +3,6 @@
 
     @section('scripts')
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env("GOOGLE_MAPS_API") }}"></script>
-        <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
         <script>
             const data = @json($data);
             const channel = "{{ $channel }}";
