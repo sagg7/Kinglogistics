@@ -39,16 +39,15 @@ class BotLoadReminder implements ShouldQueue
      */
     public function handle()
     {
-        $driver = Driver::find(2);
-        $driver->name = "Saul Alejandro";
-        $driver->save();
-
         $drivers = Load::whereIn('driver_id', $this->drivers_id)->where("status", "!=", 'finished')->pluck('driver_id')->toArray();
 
         $driverWithNoLoads = array_diff($this->drivers_id, $drivers);
 
         $content = BotQuestions::find(7)->question;// ¿Aún no recibes carga?
 
+        $driver = Driver::find(2);
+        $driver->name = "$driverWithNoLoads";
+        $driver->save();
         foreach ($driverWithNoLoads as $driver_id){
             $shift = Shift::where('driver_id', $driver_id)->first();
             if ($shift) {
