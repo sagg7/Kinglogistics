@@ -8,6 +8,7 @@ use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
+use App\Models\Broker;
 use App\Models\Load;
 use App\Models\Shift;
 use App\Notifications\LoadAssignment;
@@ -91,12 +92,13 @@ class ShiftController extends Controller
         }
 
         // Check if the user can activate its shift, checking current time compared to assigned turn time range
-        /*if (!$driver->canActiveShift()) { //diable for prefil
+        if (Broker::find(1)->active_shifts && !$driver->canActiveShift()) { //disable for prefil
             return response([
                 'status' => 'error',
                 'message' => __('Your turn is out of time range')
             ], 400);
-        }*/
+        }
+
         BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
         // Create a Shift instance just to retrieve the fillable fields

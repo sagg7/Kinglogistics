@@ -12,6 +12,7 @@ use App\Http\Resources\Helpers\KeyValueResource;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
 use App\Models\AvailableDriver;
+use App\Models\Broker;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
@@ -367,7 +368,11 @@ class LoadController extends Controller
 
         BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
-
+        if (Broker::find(1)->active_shifts){
+            $canActivate = $driver->canActiveShift();
+        } else {
+            $canActivate = 1;
+        }
         // Check if driver can accept more loads and attach to response
         return response([
             'status' => 'ok',
