@@ -23,7 +23,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         {!! Form::label('zone_id', ucfirst(__('zone')), ['class' => 'col-form-label']) !!}
-                        {!! Form::select('zone_id', [], $driver->zone_id ?? null, ['class' => 'form-control' . ($errors->first('zone_id') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('zone_id', $zones, $driver->zone_id ?? null, ['class' => 'form-control' . ($errors->first('zone_id') ? ' is-invalid' : '')]) !!}
                         @error('zone_id')
                         <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

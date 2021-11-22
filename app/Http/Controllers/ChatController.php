@@ -69,8 +69,12 @@ class ChatController extends Controller
     {
         $drivers = $request->drivers;
         $content = $request->message;
-        $user_id = auth()->user()->id;
         $image = $request->image;
+        $is_bot_sender = $request->is_bot_sender;
+        if ($is_bot_sender)
+            $user_id = null;
+        else
+            $user_id = auth()->user()->id;
 
         $messages = [];
         foreach ($drivers as $driver_id) {
@@ -85,6 +89,7 @@ class ChatController extends Controller
                 null,
                 true,
                 $image,
+                $is_bot_sender
             );
 
             $driver = Driver::find($driver_id);

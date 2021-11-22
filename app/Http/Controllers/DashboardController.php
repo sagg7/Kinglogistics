@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Illuminate\Http\Request;

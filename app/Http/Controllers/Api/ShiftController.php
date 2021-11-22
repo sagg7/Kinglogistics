@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AppConfigEnum;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
+use App\Jobs\BotLoadReminder;
+use App\Models\AppConfig;
 use App\Models\Load;
 use App\Models\Shift;
 use App\Notifications\LoadAssignment;
@@ -94,6 +97,7 @@ class ShiftController extends Controller
                 'message' => __('Your turn is out of time range')
             ], 400);
         }*/
+        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
         // Create a Shift instance just to retrieve the fillable fields
         $shift = new Shift();
@@ -102,7 +106,8 @@ class ShiftController extends Controller
         // Check if exists unallocated loads and auto assign to driver
         $load = null;
 //        $load = $this->autoAssignUnallocatedLoad($driver);
-
+        $driver->status = 'active';
+        $driver->save();
         // Starts shift for this driver
         $this->startShift($driver, $payload, $load);
 
