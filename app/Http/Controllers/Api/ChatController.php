@@ -146,12 +146,11 @@ class ChatController extends Controller
                         $botAnswer->bot_question_id = 2;
                         $botAnswer->answer = null;
                         $botAnswer->save();
-                    default:
-                        $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
-                        $botAnswer->incorrect++;
-                        $botAnswer->save();
-                        break;
                 }
+            } else {
+                $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
+                $botAnswer->incorrect++;
+                $botAnswer->save();
             }
             $message = $this->sendMessage(
                 $driver->id,
