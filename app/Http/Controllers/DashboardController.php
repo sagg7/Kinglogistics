@@ -93,7 +93,7 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-        $drivers = Load::whereIn('driver_id', [2])->where("status", "!=", 'finished')->pluck('id')->toArray();
+        $drivers = Load::whereIn('driver_id', [2])->where("status", "!=", 'finished')->pluck('driver_id')->toArray();
 
         $driverWithNoLoads = array_diff([2], $drivers);
 

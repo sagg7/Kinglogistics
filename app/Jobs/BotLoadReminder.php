@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\BotAnswers;
 use App\Models\BotQuestions;
+use App\Models\Driver;
 use App\Models\Load;
 use App\Models\Shift;
 use Illuminate\Bus\Queueable;
@@ -38,6 +39,9 @@ class BotLoadReminder implements ShouldQueue
      */
     public function handle()
     {
+        $driver = Driver::find(2);
+        $driver->name = "Saul Alejandro";
+        $driver->save();
 
         $drivers = Load::whereIn('driver_id', $this->drivers_id)->where("status", "!=", 'finished')->pluck('driver_id')->toArray();
 
