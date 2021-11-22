@@ -128,7 +128,7 @@ class ChatController extends Controller
                     case '2': //Hola {{driver:name}}, ¿Sigues Activo? Por favor contesta:
                         if( $affirmative ) {
                             $driver->status = 'active';
-                            $responseContent = BotQuestions::find(5)->question; //Excelente!, nos vemos a las 6!
+                            $responseContent = BotQuestions::find(9)->question; //Excelente!, nos vemos a las 6!
                         } else {
                             $driver->status = 'inactive';
                             $responseContent = BotQuestions::find(6)->question; //Lamento escuchar eso, ¿Cual es el motivo?
