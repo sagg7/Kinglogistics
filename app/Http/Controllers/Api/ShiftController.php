@@ -97,6 +97,7 @@ class ShiftController extends Controller
                 'message' => __('Your turn is out of time range')
             ], 400);
         }*/
+        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()/60));
 
         // Create a Shift instance just to retrieve the fillable fields
         $shift = new Shift();
@@ -107,7 +108,6 @@ class ShiftController extends Controller
 //        $load = $this->autoAssignUnallocatedLoad($driver);
         $driver->status = 'active';
         $driver->save();
-        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(1));
         // Starts shift for this driver
         $this->startShift($driver, $payload, $load);
 

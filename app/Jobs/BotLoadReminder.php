@@ -45,9 +45,6 @@ class BotLoadReminder implements ShouldQueue
 
         $content = BotQuestions::find(7)->question;// ¿Aún no recibes carga?
 
-        $driver = Driver::find(2);
-        $driver->name = serialize($driverWithNoLoads);
-        $driver->save();
         foreach ($driverWithNoLoads as $driver_id){
             $shift = Shift::where('driver_id', $driver_id)->first();
             if ($shift) {
@@ -64,7 +61,6 @@ class BotLoadReminder implements ShouldQueue
                 $driverWithNoLoads = array_splice($driverWithNoLoads, $driver_id);
             }
         }
-
         $request = new Request(['drivers'=>$driverWithNoLoads,'message'=> $content,'user_id'=>null,'image' => null, 'is_bot_sender'=> 1 ]);
 
         app(\App\Http\Controllers\ChatController::class)->sendMessageAsUser($request);
