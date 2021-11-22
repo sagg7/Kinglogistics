@@ -39,7 +39,7 @@ class BotLoadReminder implements ShouldQueue
     public function handle()
     {
 
-        $drivers = Load::whereIn('driver_id', $this->drivers_id)->where("status", "!=", 'finished')->pluck('id')->toArray();
+        $drivers = Load::whereIn('driver_id', $this->drivers_id)->where("status", "!=", 'finished')->pluck('driver_id')->toArray();
 
         $driverWithNoLoads = array_diff($this->drivers_id, $drivers);
 
