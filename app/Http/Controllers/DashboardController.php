@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessPaymentsAndCollection;
+use App\Models\BotAnswers;
+use App\Models\BotQuestions;
 use App\Models\Load;
+use App\Models\Shift;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Illuminate\Http\Request;
 
@@ -90,6 +93,31 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
+        $drivers = Load::whereIn('driver_id', [2])->where("status", "!=", 'finished')->pluck('id')->toArray();
+
+        $driverWithNoLoads = array_diff([2], $drivers);
+
+        $content = BotQuestions::find(7)->question;// ¿Aún no recibes carga?
+
+        foreach ($driverWithNoLoads as $driver_id){
+            $shift = Shift::where('driver_id', $driver_id)->first();
+            if ($shift) {
+                $botAnswer = BotAnswers::where('driver_id', $driver_id)->first();
+                if (!$botAnswer)
+                    $botAnswer = new BotAnswers();
+
+                $botAnswer->bot_question_id = 7;
+                $botAnswer->incorrect = 0;
+                $botAnswer->driver_id = $driver_id;
+                $botAnswer->save();
+            } else {
+                $driverWithNoLoads = array_splice($driverWithNoLoads, $driver_id);
+            }
+        }
+
+        $request = new Request(['drivers'=>$driverWithNoLoads,'message'=> $content,'user_id'=>null,'image' => null, 'is_bot_sender'=> 1 ]);
+
+        app(\App\Http\Controllers\ChatController::class)->sendMessageAsUser($request);
         //$this->carrierPayments();
         //ProcessPaymentsAndCollection::dispatch()->afterCommit();
     }
