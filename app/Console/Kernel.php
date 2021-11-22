@@ -106,7 +106,7 @@ class Kernel extends ConsoleKernel
             }
 
             //BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()/60));
-        })->daily()->at('09:20');
+        })->daily()->at('9:31');
 
 
         $schedule->call(function () {
