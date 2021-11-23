@@ -59,6 +59,6 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/subdomains/carriers/profile/equipment/common.js'], 'public/js/sections/subdomains/carriers/profile/equipment/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
-    .scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
+    //.scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
     .scripts(['resources/js/sections/chat/bottomChat.js'], 'public/js/sections/chat/bottomChat.min.js')
     ;

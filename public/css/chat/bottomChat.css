@@ -15,6 +15,14 @@
     -webkit-font-smoothing: antialiased;
     box-shadow: 1px 1px 7px 3px rgba(0, 0, 0, .1);
     transition: all 100ms ease-out;
+    position: relative;
+}
+
+#__chat_button_counter {
+    position: fixed;
+    bottom: 50px;
+    padding: 8px;
+    border-radius: 50%;
 }
 
 #__chat_box {
@@ -488,6 +496,7 @@
 
 .__message_time {
     width: 55px;
+    font-size: 13px;
 }
 
 .__message_preview {
