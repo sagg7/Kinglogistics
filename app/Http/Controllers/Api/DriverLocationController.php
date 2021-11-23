@@ -53,7 +53,7 @@ class DriverLocationController extends Controller
         event(new DriverLocationUpdateForShipper(
                 $driver,
                 $shipper,
-                LocationGroup::where('shipper_id', $shipper->shipper_id)->first(),
+                LocationGroup::where('shipper_id', $shipper->id)->first(),
                 $coords,
                 $speed,
                 $request->get('status'))
