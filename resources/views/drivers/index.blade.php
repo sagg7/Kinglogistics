@@ -33,14 +33,15 @@
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
-                                {
+                                {headerName: 'Status', field: 'status', valueFormatter: nameFormatter},
+                                /*{
                                     headerName: 'Shift', field: 'shift',
                                     filter: false,
                                     sortable: false,
                                     valueFormatter: (params) => {
                                         return params.value ? 'Active' : 'Inactive';
                                     }
-                                },
+                                },*/
                             ],
                             menu: [
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},

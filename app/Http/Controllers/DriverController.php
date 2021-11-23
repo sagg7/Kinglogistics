@@ -294,6 +294,7 @@ class DriverController extends Controller
             "drivers.zone_id",
             "drivers.carrier_id",
             "drivers.turn_id",
+            "drivers.status",
         ])
             ->whereNull('inactive')
             ->where(function ($q) {
