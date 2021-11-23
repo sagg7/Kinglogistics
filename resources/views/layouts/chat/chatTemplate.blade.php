@@ -3,6 +3,7 @@
 <div id="__bottom_chat">
     <button class="btn btn-round" id="__chat_button">
         <i class="fas fa-comment-dots"></i>
+        <span id="__chat_button_counter" class="bg-danger d-none"></span>
     </button>
     <div id="__chat_box">
         <div id="__contacts_list">
@@ -30,33 +31,7 @@
                 <!--<span>miro@badev@gmail.com</span>-->
             </div>
             <div id="__chat_messages">
-                <div id="__chats">
-                    <label>Thursday 02</label>
-
-                    <div class="message left">
-                        <!--<img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" />-->
-                        <div class="bubble">
-                            Really cool stuff!
-                            <span>3 min</span>
-                        </div>
-                    </div>
-
-                    <div class="message right">
-                        <!--<img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/2_copy.jpg" />-->
-                        <div class="bubble">
-                            Can you share a link for the tutorial?
-                            <span>1 min</span>
-                        </div>
-                    </div>
-
-                    <div class="message left">
-                        <!--<img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" />-->
-                        <div class="bubble">
-                            Yeah, hold on
-                            <span>Now</span>
-                        </div>
-                    </div>
-                </div>
+                <div id="__chats"></div>
             </div>
 
             <form action="javascript:void(0);" id="__chat_send_message">

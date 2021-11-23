@@ -11,6 +11,8 @@ Route::group(['middleware' => ['role:admin|operations|dispatch|safety']], functi
             ->name('chat.getContacts');
         Route::get('getChatHistory', [ChatController::class, 'getChatHistory'])
             ->name('chat.getChatHistory');
+        Route::get('getUnreadCount', [ChatController::class, 'getUnreadCount'])
+            ->name('chat.getUnreadCount');
         Route::post('sendMessage', [ChatController::class, 'sendMessageAsUser'])
             ->name('chat.sendMessage');
     });

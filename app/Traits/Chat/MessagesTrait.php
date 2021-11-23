@@ -18,7 +18,7 @@ trait MessagesTrait
         bool $userUnread = null,
         bool $driverUnread = null,
         string $imageUrl = null,
-        string $botSended = null
+        string $botSent = null
     ): Message
     {
         return Message::create([
@@ -29,7 +29,7 @@ trait MessagesTrait
             'user_unread' => $userUnread,
             'driver_unread' => $driverUnread,
             'image' => $imageUrl,
-            'is_bot_sender' => $botSended,
+            'is_bot_sender' => $botSent,
         ]);
     }
 

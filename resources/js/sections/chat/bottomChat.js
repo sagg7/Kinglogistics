@@ -2,6 +2,7 @@
     const preloadbg = document.createElement("img");
     preloadbg.src = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/timeline1.png";
 
+    let openChat = false;
     const chatBtn = $('#__chat_button');
     const chatBox = $('#__chat_box');
     const min = $('#minimizeChat');
@@ -10,6 +11,7 @@
     const chatMessages = $('#__chat_messages');
     const chats = $('#__chats');
     const message = $("#__chat_message");
+    const messageCounter = $('#__chat_button_counter');
     const scrollBars = {
         chat: {
             container: chatMessages[0],
@@ -213,26 +215,28 @@
             const time = item.latest_message ? getMessageTime(moment(item.latest_message.created_at)) : '';
             const element =
                 `<div class="__contact" data-userid="${item.id}">` +
-                    //`<!--<img src="" />-->` +
-                    `<div class="__message_content">` +
-                        `<p>` +
-                            `<strong class="__contact_name">${item.name}</strong>` +
-                            `<span class="__message_preview truncate">${item.latest_message ? item.latest_message.content ? item.latest_message.content : '<i class="fas fa-camera"></i> Photo' : ''}</span>` +
-                        `</p>` +
-                        `<span class="__message_meta">` +
-                        `<span class="__message_time d-block">${time}</span>` +
-                        (item.unread_count ? `<span class="__message_count badge badge-primary badge-pill">${item.unread_count}</span>` : '') +
-                        `</span>` +
-                    `</div>` +
-                    //`<!--<div class="status inactive"></div>-->` +
+                //`<!--<img src="" />-->` +
+                `<div class="__message_content">` +
+                `<p>` +
+                `<strong class="__contact_name">${item.name}</strong>` +
+                `<span class="__message_preview truncate">${item.latest_message ? item.latest_message.content ? item.latest_message.content : '<i class="fas fa-camera"></i> Photo' : ''}</span>` +
+                `</p>` +
+                `<span class="__message_meta">` +
+                `<span class="__message_time d-block">${time}</span>` +
+                (item.unread_count ? `<span class="__message_count badge badge-primary badge-pill">${item.unread_count}</span>` : '') +
+                `</span>` +
+                `</div>` +
+                //`<!--<div class="status inactive"></div>-->` +
                 `</div>`;
             contactList.append(element);
         });
         contactHandler();
     }
     chatBtn.click(() => {
+        openChat = true;
         chatBtn.addClass('hidden');
         chatBox.addClass('active');
+        messageCounter.addClass('d-none');
         if (contacts.length === 0)
             $.ajax({
                 url: '/chat/getContacts',
@@ -241,9 +245,10 @@
                     contacts = data;
                     fillContacts();
                 }
-            })
+            });
     });
     min.click(() => {
+        openChat = false;
         chatBtn.removeClass('hidden');
         chatBox.removeClass('active');
     });
@@ -433,8 +438,12 @@
     };
     window.Echo.private('chat')
         .listen('NewChatMessage', e => {
-            const message = e.message;
-            message.newly_received = true;
-            organizeMessages(Number(message.driver_id), message, 'received');
+            if (!openChat)
+                messageCounter.removeClass('d-none');
+            if (contacts.length > 0) {
+                const message = e.message;
+                message.newly_received = true;
+                organizeMessages(Number(message.driver_id), message, 'received');
+            }
         });
 })();

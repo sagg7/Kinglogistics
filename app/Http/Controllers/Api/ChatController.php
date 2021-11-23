@@ -41,7 +41,7 @@ class ChatController extends Controller
         $content = $request->get('content');
         $userId = $request->get('user_id');
         $image = $request->get('image');
-        $botSended = $request->get('is_bot_sender', null);
+        $botSent = $request->get('is_bot_sender', null);
 
         if (empty($driverIds)) {
             return response('Drivers collection is not setted', 400);
@@ -62,7 +62,7 @@ class ChatController extends Controller
                 null,
                 null,
                 $image,
-                $botSended
+                $botSent
             );
 
             $driverDevices = $this->getUserDevices($driver);
