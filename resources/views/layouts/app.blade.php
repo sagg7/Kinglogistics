@@ -97,7 +97,7 @@
             </main>
         </div>
     </div>
-    @if($bottomChat ?? true)
+    @if(auth()->guard('web')->check() && $bottomChat ?? true)
         @include("layouts.chat.chatTemplate")
     @endif
     <footer class="footer footer-static footer-light"></footer>
@@ -126,7 +126,7 @@
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
-    @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
+    @if(auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
         <script src="{{ asset("js/sections/chat/bottomChat.min.js") }}"></script>
     @endif
 
