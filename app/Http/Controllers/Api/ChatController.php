@@ -147,6 +147,10 @@ class ChatController extends Controller
                             $botAnswer->answer = null;
                         }
                         $botAnswer->save();
+                        break;
+                    default:
+                        $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
+                        break;
                 }
             } else {
                 $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
