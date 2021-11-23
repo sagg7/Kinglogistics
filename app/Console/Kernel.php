@@ -63,7 +63,7 @@ class Kernel extends ConsoleKernel
 
             $messages = [];
 
-            $drivers = Driver::where('turn_id', 1)->where('inactive', null)->where('status', 'inactive')->get();
+            $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'inactive')->get();
 
             foreach ($drivers as $driver) {
 
@@ -106,13 +106,15 @@ class Kernel extends ConsoleKernel
             }
 
             //BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()/60));
-        })->daily()->at('11:53');
+        })->daily()->at('5:30');
 
 
         $schedule->call(function () {
             $drivers =  [2];
             $user_id = null;
             $image = null;
+
+            $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'active')->get();
 
             $messages = [];
             foreach ($drivers as $driver_id) {
