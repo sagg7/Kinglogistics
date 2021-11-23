@@ -40,7 +40,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcastNow
                 'id' => $this->driver->id,
                 'name' => $this->driver->name,
                 'truck' => [
-                    'number' => $this->driver->truck->number,
+                    'number' => ($this->driver->truck) ? $this->driver->truck->number : null,
                 ],
                 'shift' => ($this->driver->shift) ? $this->driver->shift->id : null,
             ],
