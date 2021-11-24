@@ -35,6 +35,20 @@
                 <div class="form-group col-md-6">
                     {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper_id', isset($paperwork->shipper_id) ? [$paperwork->shipper_id => $paperwork->shipper->name] : [], $paperwork->shipper_id ?? null, ['class' => 'form-control', 'disabled' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+                    @error('shipper_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-6">
+                    {!! Form::label('category', ucfirst(__('Paperwork category')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('category', $categories, $paperwork->category ?? null, ['class' => 'form-control select2' . ($errors->first('category') ? ' is-invalid' : '')]) !!}
+                    @error('category')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
                 </div>
                 <div class="form-group col-6" id="simpleTemplate">
                     {!! Form::label('file', ucfirst(__('template file')), ['class' => 'col-form-label d-block']) !!}

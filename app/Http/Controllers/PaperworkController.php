@@ -52,6 +52,7 @@ class PaperworkController extends Controller
         return [
             "mode" => ['Simple', 'Advanced'],
             "types" => [null => '', 'carrier' => 'Carriers', 'driver' => 'Drivers', 'trailer' => 'Trailers', 'truck' => 'Trucks'],
+            "categories" => [null => 'Initial', 'orientation' => 'Orientation'],
         ];
     }
 
@@ -107,6 +108,7 @@ class PaperworkController extends Controller
             $paperwork->name = $request->name;
             $paperwork->type = $request->type;
             $paperwork->shipper_id = $request->shipper_id;
+            $paperwork->category = $request->category;
             $paperwork->required = $request->required ?? null;
             $paperwork->template = $request->template ?? null;
             if (($paperwork->file || $request->template) && $request->file)
@@ -227,24 +229,20 @@ class PaperworkController extends Controller
             // Get the mail from driver or carrier to notify seller if the paperwork has been completed
             switch ($type) {
                 case 'driver':
-                    $driver = Driver::with('carrier.seller')->find($related_id);
+                    $user = Driver::with('carrier.seller')->find($related_id);
                     // If the driver has previously completed the paperwork, return
-                    if ($driver->completed_paperwork)
+                    if ($user->completed_paperwork)
                         return;
-                    $driver->completed_paperwork = 1;
-                    $driver->save();
-                    $email = $driver->carrier->seller->email;
-                    $title = "The driver \"$driver->name\" has completed its paperwork.";
+                    $email = $user->carrier->seller->email;
+                    $title = "The driver \"$user->name\" has completed its paperwork.";
                     break;
                 case 'carrier':
-                    $carrier = Carrier::with('seller')->find($related_id);
+                    $user = Carrier::with('seller')->find($related_id);
                     // If the carrier has previously completed the paperwork, return
-                    if ($carrier->completed_paperwork)
+                    if ($user->completed_paperwork)
                         return;
-                    $carrier->completed_paperwork = 1;
-                    $carrier->save();
-                    $email = $carrier->seller->email;
-                    $title = "The carrier \"$carrier->name\" has completed its paperwork";
+                    $email = $user->seller->email;
+                    $title = "The carrier \"$user->name\" has completed its paperwork";
                     break;
                 default:
                     return;
@@ -288,6 +286,9 @@ class PaperworkController extends Controller
                     }
                 }
             }
+
+            $user->completed_paperwork = 1;
+            $user->save();
 
             // If it gets to this point, the paperwork is completed and must send and email to the seller
             $content = "Check out the progress through this link";
@@ -684,6 +685,9 @@ class PaperworkController extends Controller
 
             $this->checkPaperworkCompletion($paperwork->type, $related_id);
 
+            if (session('fillDocumentation')) {
+                return redirect("/documentation");
+            }
             switch ($paperwork->type) {
                 case 'carrier':
                     switch ($guard) {

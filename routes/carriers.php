@@ -22,7 +22,7 @@ Route::middleware('guest:carrier')->group(function () {
         ->name('login');
 });
 
-Route::middleware('auth:carrier')->group(function () {
+Route::middleware(['auth:carrier','documentation'])->group(function () {
     require __DIR__.'/carriers/drivers.php';
     require __DIR__.'/carriers/turns.php';
     require __DIR__.'/carriers/trailers.php';
@@ -40,6 +40,7 @@ Route::middleware('auth:carrier')->group(function () {
     require __DIR__.'/carriers/jobOpportunities.php';
     require __DIR__.'/carriers/equipment.php';
     require __DIR__.'/web/s3storage.php';
+    require __DIR__.'/common/documentation.php';
 
     Route::get('carrier/payment/downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
         ->name('carrier.downloadPaymentPDF');

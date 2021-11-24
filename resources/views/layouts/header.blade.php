@@ -1,11 +1,12 @@
 <!-- BEGIN: Header-->
 <div class="content-overlay"></div>
 <div class="header-navbar-shadow"></div>
-<nav class="header-navbar navbar-expand-lg navbar navbar-with-menu floating-nav navbar-light navbar-shadow">
+<nav class="@if(session('fillDocumentation')){{ "header-navbar navbar-expand-lg navbar navbar-with-menu navbar-fixed navbar-shadow navbar-brand-center" }}@else{{ "header-navbar navbar-expand-lg navbar navbar-with-menu floating-nav navbar-light navbar-shadow" }}@endif">
     <div class="navbar-wrapper">
         <div class="navbar-container content">
             <div class="navbar-collapse" id="navbar-mobile">
                 <div class="mr-auto float-left bookmark-wrapper d-flex align-items-center">
+                    @if(!session('fillDocumentation'))
                     <ul class="nav navbar-nav">
                         <li class="nav-item mobile-menu d-xl-none mr-auto">
                             <a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#">
@@ -13,6 +14,7 @@
                             </a>
                         </li>
                     </ul>
+                    @endif
                     <ul class="nav navbar-nav">
                         <li class="nav-item d-none d-lg-block">
                             <img src="{{ asset("images/app/logos/logo-dark-simple.png") }}" alt="King Logistic Oil" style="max-height: 40px;">

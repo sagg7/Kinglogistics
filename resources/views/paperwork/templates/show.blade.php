@@ -45,7 +45,7 @@
                 {!! Form::open(['route' => ['paperwork.storeTemplate', 'id' => $id, 'related_id' => $related_id], 'class' => 'with-sig-pad']) !!}
                 <h1 class="text-center mb-3">{{ $paperwork->name }}</h1>
                 {!! $data["html"] !!}
-                {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
+                {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block mt-2', 'type' => 'submit']) !!}
                 {!! Form::close() !!}
             </div>
         </div>

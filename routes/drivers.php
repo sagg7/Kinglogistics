@@ -20,10 +20,11 @@ Route::middleware('guest:driver')->group(function () {
         ->name('login');
 });
 
-Route::middleware('auth:driver')->group(function () {
+Route::middleware(['auth:driver','documentation'])->group(function () {
     require __DIR__.'/drivers/paperwork.php';
     require __DIR__.'/drivers/incidents.php';
     require __DIR__.'/web/s3storage.php';
+    require __DIR__.'/common/documentation.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.drivers.dashboard');

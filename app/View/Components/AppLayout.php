@@ -13,6 +13,9 @@ class AppLayout extends Component
      */
     public function render()
     {
+        if (session('fillDocumentation')) {
+            return view('layouts.appSimple');
+        }
         return view('layouts.app');
     }
 }
