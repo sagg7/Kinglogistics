@@ -225,6 +225,26 @@ class TrailerController extends Controller
             "trailers.status",
             "trailers.trailer_type_id",
         ])
+            ->where(function ($q) use ($request) {
+                if ($request->driver)
+                    $q->whereHas('truck', function ($q) use ($request) {
+                        $q->whereHas('driver', function ($q) use ($request) {
+                            $q->where('id', $request->driver);
+                        });
+                    });
+                if ($request->shipper)
+                    $q->whereHas('shippers', function ($q) use ($request) {
+                        $q->where('id', $request->shipper);
+                    });
+                if ($request->trip)
+                    $q->whereHas('truck', function ($q) use ($request) {
+                        $q->whereHas('driver', function ($q) use ($request) {
+                            $q->whereHas('active_load', function ($q) use ($request) {
+                                $q->where('trip_id', $request->trip_id);
+                            });
+                        });
+                    });
+            })
             ->with(['trailer_type:id,name']);
 
         if ($request->graph) {

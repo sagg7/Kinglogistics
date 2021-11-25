@@ -2,6 +2,7 @@
 
     @section("scripts")
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env("GOOGLE_MAPS_API") }}"></script>
+        <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script>
             const data = @json($tracking["data"]);
             const channel = "{{ $tracking["channel"] }}";
@@ -10,7 +11,7 @@
             const guard = 'carrier';
         </script>
         <script src="{{ asset('js/sections/tracking/common.min.js?1.0.7') }}"></script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.6') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.7') }}"></script>
     @endsection
 
     @section('modals')

@@ -4656,8 +4656,11 @@ input:focus ~ .bg-info {
 }
 
 .bg-rgba-info {
-  /*background : rgba(0, 207, 232, 0.15) !important;*/
-  background : rgba(16, 22, 58, 1) !important;
+  background : rgba(0, 207, 232, 0.15) !important;
+}
+
+.bg-rgba-info.alt-color {
+    background : rgba(16, 22, 58, 1) !important;
 }
 
 .border-info {

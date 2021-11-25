@@ -2,7 +2,7 @@
     <div class="card bg-analytics">
         <div class="card-content">
             <div class="card-body text-center">
-                <div class="avatar avatar-lg bg-rgba-info p-50 m-0 mb-1">
+                <div class="avatar avatar-lg bg-rgba-info alt-color p-50 m-0 mb-1">
                     <div class="avatar-content text-white">
                         <i class="fas fa-truck-loading font-large-1"></i>
                     </div>
@@ -11,24 +11,28 @@
                     <h2 class="mb-2">Loads Status</h2>
                 </div>
                 <div class="row text-left">
-                    <div class="col col-sm-4">
-                        <fieldset class="form-group">
-                            <label for="shipper">Customer</label>
-                            {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
-                        </fieldset>
-                    </div>
+                    @if(!auth()->guard('shipper')->check())
+                        <div class="col col-sm-4">
+                            <fieldset class="form-group">
+                                <label for="shipper">Customer</label>
+                                {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                            </fieldset>
+                        </div>
+                    @endif
                     <div class="col col-sm-4">
                         <fieldset class="form-group">
                             <label for="trips">Job</label>
                             {!! Form::select('trips', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>
-                    <div class="col col-sm-4">
-                        <fieldset class="form-group">
-                            <label for="driver">Driver</label>
-                            {!! Form::select('driver', [], null, ['class' => 'form-control']) !!}
-                        </fieldset>
-                    </div>
+                    @if(!auth()->guard('shipper')->check())
+                        <div class="col col-sm-4">
+                            <fieldset class="form-group">
+                                <label for="driver">Driver</label>
+                                {!! Form::select('driver', [], null, ['class' => 'form-control']) !!}
+                            </fieldset>
+                        </div>
+                    @endif
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">

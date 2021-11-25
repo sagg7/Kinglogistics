@@ -177,6 +177,14 @@ class DriverController extends Controller
                     $q->where("zone_id", $request->zone);
                 if ($request->turn)
                     $q->where("turn_id", $request->turn);
+                if ($request->shipper)
+                    $q->whereHas('truck', function ($q) use ($request) {
+                        $q->whereHas('trailer', function ($q) use ($request) {
+                            $q->whereHas('shippers', function ($q) use ($request) {
+                                $q->where('id', $request->shipper);
+                            });
+                        });
+                    });
             })
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");
@@ -299,7 +307,7 @@ class DriverController extends Controller
             "drivers.status",
         ])
             ->whereNull('inactive')
-            ->where(function ($q) {
+            ->where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
                     $q->whereHas('truck', function ($q) {
                         $q->whereHas('trailer', function ($q) {
@@ -308,21 +316,47 @@ class DriverController extends Controller
                             });
                         });
                     });
+                if ($request->driver)
+                    $q->where('id', $request->driver);
+                if ($request->shipper)
+                    $q->whereHas('truck', function ($q) use ($request) {
+                        $q->whereHas('trailer', function ($q) use ($request) {
+                            $q->whereHas('shippers', function ($q) use ($request) {
+                                $q->where('id', $request->shipper);
+                            });
+                        });
+                    });
+                if ($request->trip)
+                    $q->whereHas('active_load', function ($q) use ($request) {
+                        $q->where('trip_id', $request->trip_id);
+                });
             });
 
         if ($request->graph) {
+            $query->where(function ($q) use ($request) {
+            });
             $all = $query->get();
-            $onShift = 0;
-            $outOfShift = 0;
+            $morning = [
+                'active' => 0,
+                'inactive' => 0,
+                'pending' => 0,
+                'error' => 0,
+            ];
+            $night = [
+                'active' => 0,
+                'inactive' => 0,
+                'pending' => 0,
+                'error' => 0,
+            ];
             foreach ($all as $item) {
-                if ($item->shift)
-                    $onShift++;
-                else
-                    $outOfShift++;
+                if ($item->turn_id == 1) {
+                    $morning[$item->status]++;
+                } else {
+                    $night[$item->status]++;
+                }
             }
-            $active = $this->filterByType($query, 'active')->count();
 
-            return compact('onShift', 'outOfShift', 'active');
+            return compact('morning', 'night');
         }
 
         $query->with([

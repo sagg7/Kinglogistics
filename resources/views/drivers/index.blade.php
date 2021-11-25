@@ -111,12 +111,12 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-danger" id="count-inactive">
+            <div class="card border-info" id="count-inactive">
                 <div class="card-body">
                     <div class="card-content">
-                        <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+                        <div class="avatar bg-rgba-info p-50 m-0 mb-1">
                             <div class="avatar-content">
-                                <i class="fas fa-times text-danger font-medium-5"></i>
+                                <i class="fas fa-times text-info font-medium-5"></i>
                             </div>
                         </div>
                         <h2 class="text-bold-700">Inactive</h2>
