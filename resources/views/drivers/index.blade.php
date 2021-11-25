@@ -15,12 +15,16 @@
                     options = pills.find('.nav-item'),
                     countActive = $('#count-active').find('span'),
                     countInactive = $('#count-inactive').find('span'),
+                    countReady = $('#count-ready').find('span'),
                     countPending = $('#count-pending').find('span'),
+                    countError = $('#count-error').find('span'),
                     countByTab = {},
                     setCount = (count) => {
                         countActive.text(count.active);
                         countInactive.text(count.inactive);
+                        countReady.text(count.ready);
                         countPending.text(count.pending);
+                        countError.text(count.error);
                     },
                     tableProperties = (type) => {
                         const nameFormatter = (params) => {
@@ -126,15 +130,45 @@
             </div>
         </div>
         <div class="col">
+            <div class="card border-success" id="count-ready">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-check-double text-success font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Ready</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
             <div class="card border-warning" id="count-pending">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
                             <div class="avatar-content">
-                                <i class="fas fa-exclamation text-warning font-medium-5"></i>
+                                <i class="far fa-clock text-warning font-medium-5"></i>
                             </div>
                         </div>
                         <h2 class="text-bold-700">Pending</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-danger" id="count-error">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-exclamation-triangle text-danger font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Error</h2>
                         <span class="font-large-1">0</span>
                     </div>
                 </div>

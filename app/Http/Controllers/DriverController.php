@@ -380,7 +380,9 @@ class DriverController extends Controller
             $result["count"] = [
                 "active" => (clone $query)->where('status', 'active')->count(),
                 "inactive" => (clone $query)->where('status', 'inactive')->count(),
+                "ready" => (clone $query)->where('status', 'ready')->count(),
                 "pending" => (clone $query)->where('status', 'pending')->count(),
+                "error" => (clone $query)->where('status', 'error')->count(),
             ];
             unset($result['query']);
         }
