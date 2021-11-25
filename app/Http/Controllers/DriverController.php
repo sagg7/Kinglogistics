@@ -257,20 +257,22 @@ class DriverController extends Controller
     {
         switch ($type)
         {
-            case 'active':
+            case 'morning':
                 $query->where(function ($q) {
-                    $q->whereHas('shift')
+                    /*$q->whereHas('shift')
                         ->orWhereHas('turn', function ($q) {
                             $this->filterByActiveTurn($q);
-                        });
+                        });*/
+                    $q->where('turn_id', 1);
                 });
                 break;
-            case 'inactive':
+            case 'night':
                 $query->where(function ($q) {
-                    $q->whereDoesntHave('shift')
+                    /*$q->whereDoesntHave('shift')
                         ->orWhereHas('turn', function ($q) {
                             $this->filterByInactiveTurn($q);
-                        });
+                        });*/
+                    $q->where('turn_id', 2);
                 });
                 break;
             case 'awaiting':
@@ -336,6 +338,16 @@ class DriverController extends Controller
 
         $query = $this->filterByType($query, $type);
 
-        return $this->multiTabSearchData($query, $request, 'getRelationArray');
+        $result = $this->multiTabSearchData($query, $request, 'getRelationArray', 'where');
+        if ($request->startRow == 0) {
+            $result = $this->multiTabSearchData($query, $request, 'getRelationArray', 'where', true);
+            $result["count"] = [
+                "active" => (clone $query)->where('status', 'active')->count(),
+                "inactive" => (clone $query)->where('status', 'inactive')->count(),
+                "pending" => (clone $query)->where('status', 'pending')->count(),
+            ];
+            unset($result['query']);
+        }
+        return $result;
     }
 }
