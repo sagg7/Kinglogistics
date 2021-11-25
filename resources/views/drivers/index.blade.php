@@ -96,12 +96,12 @@
 
     <div class="row text-center">
         <div class="col">
-            <div class="card border-success" id="count-active">
+            <div class="card border-primary" id="count-active">
                 <div class="card-body">
                     <div class="card-content">
-                        <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+                        <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
                             <div class="avatar-content">
-                                <i class="fas fa-check text-success font-medium-5"></i>
+                                <i class="fas fa-check text-primary font-medium-5"></i>
                             </div>
                         </div>
                         <h2 class="text-bold-700">Active</h2>

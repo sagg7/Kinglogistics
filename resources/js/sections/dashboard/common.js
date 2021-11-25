@@ -298,6 +298,9 @@
                     name: 'Inactive',
                     data: [res.morning.inactive, res.night.inactive]
                 }, {
+                    name: 'Ready',
+                    data: [res.morning.ready, res.night.ready]
+                }, {
                     name: 'Pending',
                     data: [res.morning.pending, res.night.pending]
                 }, {
@@ -306,7 +309,7 @@
                 }]
                 if (!driversChart) {
                     const config = {
-                        colors: [chartColorsObj.success, chartColorsObj.info, chartColorsObj.warning, chartColorsObj.danger],
+                        colors: [chartColorsObj.primary, chartColorsObj.info, chartColorsObj.success, chartColorsObj.warning, chartColorsObj.danger],
                     }
                     driversChart = stackedBarChart('driversChart', series, config);
                 } else {

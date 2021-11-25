@@ -339,12 +339,14 @@ class DriverController extends Controller
             $morning = [
                 'active' => 0,
                 'inactive' => 0,
+                'ready' => 0,
                 'pending' => 0,
                 'error' => 0,
             ];
             $night = [
                 'active' => 0,
                 'inactive' => 0,
+                'ready' => 0,
                 'pending' => 0,
                 'error' => 0,
             ];
