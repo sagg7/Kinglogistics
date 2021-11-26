@@ -141,6 +141,8 @@ class ChatController extends Controller
                         if( $affirmative ) {
                             $responseContent = BotQuestions::find(8)->question; //Por favor, agrégala en la aplicación.
                             $botAnswer->answer = $content;
+                            $driver->status = 'active';
+                            $driver->save();
                         } else {
                             $responseContent = BotQuestions::find(10)->question; //¿Sigues activo?
                             $botAnswer->bot_question_id = 2;

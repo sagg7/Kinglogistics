@@ -57,6 +57,10 @@ class BotLoadReminder implements ShouldQueue
                 $botAnswer->incorrect = 0;
                 $botAnswer->driver_id = $driver_id;
                 $botAnswer->save();
+
+                $driver = Driver::find($driver_id);
+                $driver->status = 'pending';
+                $driver->save();
             } else {
                 $driverWithNoLoads = array_splice($driverWithNoLoads, $driver_id);
             }
