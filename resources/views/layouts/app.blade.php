@@ -26,7 +26,7 @@
         <!-- BEGIN: Theme CSS-->
         <link rel="stylesheet" href="{{ asset("app-assets/css/bootstrap.min.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/bootstrap-extended.css") }}">
-        <link rel="stylesheet" href="{{ asset("app-assets/css/colors.css?1.0.0") }}">
+        <link rel="stylesheet" href="{{ asset("app-assets/css/colors.css?1.0.1") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/components.min.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/themes/dark-layout.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css") }}">
@@ -97,7 +97,7 @@
             </main>
         </div>
     </div>
-    @if($bottomChat ?? true)
+    @if(auth()->guard('web')->check() && ($bottomChat ?? true))
         @include("layouts.chat.chatTemplate")
     @endif
     <footer class="footer footer-static footer-light"></footer>

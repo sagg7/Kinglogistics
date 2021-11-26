@@ -8,7 +8,7 @@
     const loadSummary = [];
     const summaryArea = $('#loads-summary');
     const summaryTable = summaryArea.find('table');
-    const activeDrivers = [];
+    //const activeDrivers = [];
     const getLoadsData = () => {
         summaryTable.find('h2').text(0);
         $.ajax({
@@ -31,7 +31,7 @@
                             count: value.count,
                             data: value.data,
                         });
-                        if (driverSel.is(':empty')) {
+                        /*if (driverSel.is(':empty')) {
                             value.data.forEach((item) => {
                                 const driver = item.driver ? activeDrivers.find(obj => Number(obj.id) === Number(item.driver.id)) : null;
                                 if (!driver && driver !== null)
@@ -40,23 +40,328 @@
                                         name: item.driver.name,
                                     });
                             });
-                        }
+                        }*/
                     });
-                    if (driverSel.is(':empty')) {
+                    /*if (driverSel.is(':empty')) {
                         activeDrivers.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
                         let html = '<option></option>';
                         activeDrivers.forEach(item => {
                             html += `<option value="${item.id}">${item.name}</option>`;
                         });
                         driverSel.html(html);
-                    }
+                    }*/
                 }
             },
             error: () => {
                 throwErrorMsg();
             }
         });
+    };
+    /*
+     * TABLES
+     */
+    const getRole = (params) => {
+        if (params.data)
+            return params.data.roles[0].name;
+    };
+    const percentageFormatter = (params) => {
+        if (params.value)
+            return `${params.value}%`;
+        else
+            return '';
     }
+    function PhoneCallRenderer() {}
+    PhoneCallRenderer.prototype.init = (params) => {
+        this.eGui = document.createElement('div');
+        if (params.value) {
+            this.eGui.innerHTML = `<a href="tel:${params.value}">${params.value}</a>`;
+        }
+    }
+    PhoneCallRenderer.prototype.getGui = () => {
+        return this.eGui;
+    }
+    function MailToRenderer() {}
+    MailToRenderer.prototype.init = (params) => {
+        this.eGui = document.createElement('div');
+        if (params.value) {
+            this.eGui.innerHTML = `<a href="mailto:${params.value}">${params.value}</a>`;
+        }
+    }
+    MailToRenderer.prototype.getGui = () => {
+        return this.eGui;
+    }
+    const tripsStatusFormatter = (params) => {
+        if (params.value)
+            return params.value.charAt(0).toUpperCase()  + params.value.slice(1)
+                + `${params.data.status_current} of ${params.data.status_total}`;
+        else
+            return '';
+    };
+    const minutesAVGFormatter = (params) => {
+        if (params.value)
+            return `${params.value} min`;
+        else
+            return '';
+    }
+    const fillOnCallTable = () => {
+        $.ajax({
+            type: 'GET',
+            url: '/user/searchActive',
+            data: {
+                all: true,
+            },
+            success: (res) => {
+                tbOnCall.rowData = res;
+                tbOnCall.gridOptions.api.setRowData(res);
+                tbOnCall.gridOptions.api.sizeColumnsToFit();
+            },
+            error: () => {
+                throwErrorMsg();
+            }
+        });
+    }
+    const fillJobsTable = () => {
+        $.ajax({
+            type: 'GET',
+            url: '/trip/dashboardData',
+            success: (res) => {
+                tbJobs.rowData = res;
+                tbJobs.gridOptions.api.setRowData(res);
+                tbJobs.gridOptions.api.sizeColumnsToFit();
+            },
+            error: () => {
+                throwErrorMsg();
+            }
+        });
+    }
+    if (typeof tbOnCall !== "undefined") {
+        tbOnCall = new simpleTableAG({
+            id: 'onCallTable',
+            columns: [
+                {headerName: 'Name', field: 'name'},
+                {headerName: 'Role', field: 'role', valueFormatter: getRole},
+                {headerName: 'Email', field: 'email', cellRenderer: MailToRenderer},
+                {headerName: 'Phone', field: 'phone', cellRenderer: PhoneCallRenderer},
+            ],
+            rowData: [],
+            gridOptions: {
+                components: {
+                    tableRef: 'tbOnCall',
+                },
+            },
+        });
+        fillOnCallTable();
+    }
+    if (typeof tbJobs !== "undefined") {
+        tbJobs = new simpleTableAG({
+            id: 'jobsTable',
+            columns: [
+                {headerName: 'Name', field: 'name'},
+                {headerName: 'Status', field: 'status', valueFormatter: tripsStatusFormatter},
+                {headerName: 'Percentage', field: 'percentage', valueFormatter: percentageFormatter},
+                {headerName: 'Miles', field: 'mileage'},
+                {headerName: 'AVG', field: 'avg', valueFormatter: minutesAVGFormatter},
+            ],
+            rowData: [],
+            gridOptions: {
+                components: {
+                    tableRef: 'tbJobs',
+                },
+            },
+        });
+        fillJobsTable();
+    }
+    /*
+     * CHARTS
+     */
+
+    const barChart = (chartId, series, config) => {
+        // Column Chart
+        // ----------------------------------
+        const options = {
+            chart: {
+                height: 350,
+                type: 'bar',
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    endingShape: 'flat',
+                    columnWidth: '55%',
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            series,
+            legend: {
+                offsetY: -10
+            },
+            xaxis: {
+                categories: [''],
+            },
+            fill: {
+                opacity: 1
+
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return Number(val);
+                    }
+                }
+            }
+        }
+        _.merge(options, config);
+        const barChart = new ApexCharts(
+            document.querySelector(`#${chartId}`),
+            options
+        );
+        barChart.render();
+
+        return barChart;
+    };
+    const stackedBarChart = (chartId, series, config) => {
+        const options = {
+            series,
+            chart: {
+                type: 'bar',
+                height: 350,
+                stacked: true,
+                toolbar: {
+                    show: true
+                },
+                zoom: {
+                    enabled: true
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    legend: {
+                        position: 'bottom',
+                        offsetX: -10,
+                        offsetY: 0
+                    }
+                }
+            }],
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    borderRadius: 10
+                },
+            },
+            xaxis: {
+                categories: [
+                    'Morning',
+                    'Night',
+                ],
+            },
+            legend: {
+                position: 'right',
+                offsetY: 40
+            },
+            fill: {
+                opacity: 1
+            }
+        };
+        _.merge(options, config);
+        const barChart = new ApexCharts(
+            document.querySelector(`#${chartId}`),
+            options
+        );
+        barChart.render();
+
+        return barChart;
+    }
+    let driversChart = null;
+    const showDriversChart = () => {
+        $.ajax({
+            url: '/driver/search',
+            type: 'GET',
+            data: {
+                graph: true,
+                shipper,
+                trip,
+                driver,
+            },
+            success: (res) => {
+                const series = [{
+                    name: 'Active',
+                    data: [res.morning.active, res.night.active]
+                }, {
+                    name: 'Inactive',
+                    data: [res.morning.inactive, res.night.inactive]
+                }, {
+                    name: 'Ready',
+                    data: [res.morning.ready, res.night.ready]
+                }, {
+                    name: 'Pending',
+                    data: [res.morning.pending, res.night.pending]
+                }, {
+                    name: 'Error',
+                    data: [res.morning.error, res.night.error]
+                }]
+                if (!driversChart) {
+                    const config = {
+                        colors: [chartColorsObj.primary, chartColorsObj.info, chartColorsObj.success, chartColorsObj.warning, chartColorsObj.danger],
+                    }
+                    driversChart = stackedBarChart('driversChart', series, config);
+                } else {
+                    driversChart.updateSeries(series);
+                }
+            }
+        });
+    }
+    let trailersChart = null;
+    const showTrailersChart = () => {
+        $.ajax({
+            url: '/trailer/search',
+            type: 'GET',
+            data: {
+                graph: true,
+                shipper,
+                trip,
+                driver,
+            },
+            success: (res) => {
+                const series = [{
+                    name: 'Total',
+                    data: [res.all],
+                }, {
+                    name: 'In Use',
+                    data: [res.available],
+                }, {
+                    name: 'Available',
+                    data: [res.rented],
+                }];
+                const config = {
+                    yaxis: {
+                        title: {
+                            text: 'Number of trailers'
+                        },
+                    },
+                }
+                if (!trailersChart) {
+                    trailersChart = barChart('trailersChart', series, config);
+                } else {
+                    trailersChart.updateSeries(series);
+                }
+            }
+        });
+    }
+    if (guard === 'web') {
+        showDriversChart();
+        showTrailersChart();
+    }
+    /*
+     * SELECT2 FILTERS
+     */
     shipperSel.select2({
         ajax: {
             url: '/shipper/selection',
@@ -75,10 +380,14 @@
             shipper = e.params.data.id;
             loadSummary.length = 0;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         })
         .on('select2:unselect', (e) => {
             shipper = null;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         });
     tripSel.select2({
         ajax: {
@@ -99,12 +408,30 @@
             trip = e.params.data.id;
             loadSummary.length = 0;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         })
         .on('select2:unselect', (e) => {
             trip = null;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         });
     driverSel.select2({
+        ajax: {
+            url: '/driver/selection',
+            type: 'GET',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                    shipper,
+                    trip,
+                    driver,
+                };
+            },
+        },
         placeholder: 'Select',
         allowClear: true,
     })
@@ -112,10 +439,14 @@
             driver = e.params.data.id;
             loadSummary.length = 0;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         })
         .on('select2:unselect', (e) => {
             driver = null;
             getLoadsData();
+            showDriversChart();
+            showTrailersChart();
         });
     getLoadsData();
     const capitalizeString = (string) => {

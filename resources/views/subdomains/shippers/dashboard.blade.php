@@ -60,7 +60,7 @@
                 chart.render();
             })();
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.6') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.7') }}"></script>
     @endsection
 
     @section('modals')

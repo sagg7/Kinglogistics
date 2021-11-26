@@ -13,6 +13,19 @@
             (() => {
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
+                    countActive = $('#count-active').find('span'),
+                    countInactive = $('#count-inactive').find('span'),
+                    countReady = $('#count-ready').find('span'),
+                    countPending = $('#count-pending').find('span'),
+                    countError = $('#count-error').find('span'),
+                    countByTab = {},
+                    setCount = (count) => {
+                        countActive.text(count.active);
+                        countInactive.text(count.inactive);
+                        countReady.text(count.ready);
+                        countPending.text(count.pending);
+                        countError.text(count.error);
+                    },
                     tableProperties = (type) => {
                         const nameFormatter = (params) => {
                                 if (params.value)
@@ -26,6 +39,12 @@
                                     string = "in transit";
                                 return string.charAt(0).toUpperCase()  + string.slice(1)
                             };
+                        const capitalizeFormatter = (params) => {
+                            if (params.value)
+                                return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
+                            else
+                                return '';
+                        };
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         return {
                             columns: [
@@ -33,7 +52,7 @@
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
-                                {headerName: 'Status', field: 'status', valueFormatter: nameFormatter},
+                                {headerName: 'Status', field: 'status', valueFormatter: capitalizeFormatter},
                                 /*{
                                     headerName: 'Shift', field: 'shift',
                                     filter: false,
@@ -50,6 +69,12 @@
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,
+                            successCallback: (params) => {
+                                if (params.count) {
+                                    setCount(params.count);
+                                    countByTab[type] = params.count;
+                                }
+                            }
                         };
                     },
                     initTables = (type) => {
@@ -59,6 +84,8 @@
                     },
                     activePane = (id) => {
                         const type = id.split('-')[1];
+                        if (countByTab[type])
+                            setCount(countByTab[type]);
                         initTables(type);
                     };
                 options.click((e) => {
@@ -71,6 +98,83 @@
         </script>
     @endsection
 
+    <div class="row text-center">
+        <div class="col">
+            <div class="card border-primary" id="count-active">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-check text-primary font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Active</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-info" id="count-inactive">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-info p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-times text-info font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Inactive</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-success" id="count-ready">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-success p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-check-double text-success font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Ready</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-warning" id="count-pending">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="far fa-clock text-warning font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Pending</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-danger" id="count-error">
+                <div class="card-body">
+                    <div class="card-content">
+                        <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
+                            <div class="avatar-content">
+                                <i class="fas fa-exclamation-triangle text-danger font-medium-5"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-bold-700">Error</h2>
+                        <span class="font-large-1">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card pills-layout">
         <div class="card-content">
 
@@ -80,13 +184,13 @@
                     <div class="col-lg col-md col-xs-12 col-sm-12 pl-0 pr-0 pills-menu-col">
                         <ul class="nav nav-pills flex-column mt-md-0 mt-1">
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75 active" data-toggle="pill" href="#pane-active" aria-expanded="true">
-                                    On shift
+                                <a class="nav-link d-flex py-75 active" data-toggle="pill" href="#pane-morning" aria-expanded="true">
+                                    Morning shift
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-inactive" aria-expanded="false">
-                                    Out of shift
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-night" aria-expanded="false">
+                                    Night shift
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -99,11 +203,11 @@
 
                     <div class="col-lg col-md col-xs-12 col-sm-12">
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="pane-active" aria-labelledby="pane-active" aria-expanded="true">
-                                <div id="gridActive"></div>
+                            <div role="tabpanel" class="tab-pane active" id="pane-morning" aria-labelledby="pane-morning" aria-expanded="true">
+                                <div id="gridMorning"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="pane-inactive" aria-labelledby="pane-inactive" aria-expanded="true">
-                                <div id="gridInactive"></div>
+                            <div role="tabpanel" class="tab-pane" id="pane-night" aria-labelledby="pane-night" aria-expanded="true">
+                                <div id="gridNight"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-awaiting" aria-labelledby="pane-awaiting" aria-expanded="true">
                                 <div id="gridAwaiting"></div>
