@@ -42,6 +42,7 @@ class DriverController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'inactive_observations' => ['required', 'string', 'max:512'],
         ]);
     }
 
@@ -77,6 +78,7 @@ class DriverController extends Controller
             $driver->phone = $request->phone;
             $driver->address = $request->address;
             $driver->inactive = $request->inactive ?? null;
+            $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
 
             return $driver;
@@ -286,6 +288,9 @@ class DriverController extends Controller
             case 'awaiting':
                 $query->whereHas('availableDriver');
                 break;
+            case 'inactive':
+                $query->where('inactive', 1);
+                break;
         }
 
         return $query;
@@ -305,9 +310,10 @@ class DriverController extends Controller
             "drivers.carrier_id",
             "drivers.turn_id",
             "drivers.status",
+            "drivers.inactive",
+            "drivers.inactive_observations",
         ])
-            ->whereNull('inactive')
-            ->where(function ($q) use ($request) {
+            ->where(function ($q) use ($request, $type) {
                 if (auth()->guard('shipper')->check())
                     $q->whereHas('truck', function ($q) {
                         $q->whereHas('trailer', function ($q) {
@@ -330,6 +336,8 @@ class DriverController extends Controller
                     $q->whereHas('active_load', function ($q) use ($request) {
                         $q->where('trip_id', $request->trip_id);
                 });
+                if ($type !== 'inactive')
+                    $q->whereNull('inactive');
             });
 
         if ($request->graph) {

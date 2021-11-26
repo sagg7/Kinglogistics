@@ -102,6 +102,15 @@
                         </div>
                     </fieldset>
                 </div>
+                <div class="form-group col-12">
+                    {!! Form::label('inactive_observations', ucfirst(__('inactive observations')), ['class' => 'col-form-label']) !!}
+                    {!! Form::textarea('inactive_observations', $driver->inactive_observations, ['class' => 'form-control', 'rows' => 5, 'maxlength' => 512]) !!}
+                    @error('inactive_observations')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

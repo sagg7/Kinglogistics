@@ -8,7 +8,9 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbActive = null,
+            var tbMorning = null,
+                tbNight = null,
+                tbAwaiting = null,
                 tbInactive = null;
             (() => {
                 const pills = $('.nav-pills'),
@@ -45,22 +47,26 @@
                             else
                                 return '';
                         };
+                        function TooltipRenderer() {}
+                        TooltipRenderer.prototype.init = (params) => {
+                            this.eGui = document.createElement('div');
+                            this.eGui.id = `inactive_tooltip_${params.data.id}`;
+                            this.eGui.innerHTML = params.value;
+                            if (Number(params.data.inactive) === 1 && params.data.inactive_observations) {
+                                new bootstrap.Tooltip(this.eGui, {title: params.data.inactive_observations});
+                            }
+                        }
+                        TooltipRenderer.prototype.getGui = () => {
+                            return this.eGui;
+                        }
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         return {
                             columns: [
-                                {headerName: 'Name', field: 'name'},
+                                {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
                                 {headerName: 'Status', field: 'status', valueFormatter: capitalizeFormatter},
-                                /*{
-                                    headerName: 'Shift', field: 'shift',
-                                    filter: false,
-                                    sortable: false,
-                                    valueFormatter: (params) => {
-                                        return params.value ? 'Active' : 'Inactive';
-                                    }
-                                },*/
                             ],
                             menu: [
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
@@ -198,6 +204,11 @@
                                     Awaiting
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-inactive" aria-expanded="false">
+                                    Inactive
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -211,6 +222,9 @@
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-awaiting" aria-labelledby="pane-awaiting" aria-expanded="true">
                                 <div id="gridAwaiting"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-inactive" aria-labelledby="pane-inactive" aria-expanded="true">
+                                <div id="gridInactive"></div>
                             </div>
                         </div>
                     </div>
