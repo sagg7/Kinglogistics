@@ -11,7 +11,7 @@ Route::prefix('carrier')->group(function () {
         ->name('carrier.create');
     Route::post('store', [CarrierController::class, 'store'])
         ->name('carrier.store');
-    Route::get('search', [CarrierController::class, 'search'])
+    Route::get('search/{type?}', [CarrierController::class, 'search'])
         ->name('carrier.search');
     Route::get('selection', [CarrierController::class, 'selection'])
         ->name('carrier.selection');
@@ -20,10 +20,11 @@ Route::prefix('carrier')->group(function () {
     Route::post('update/{id}', [CarrierController::class, 'update'])
         ->name('carrier.update');
     Route::post('setStatus/{id}', [CarrierController::class, 'setStatus'])
-        ->name('carrier.setStatus')
-        ->where('profile', '[0-1]');
+        ->name('carrier.setStatus');
     Route::post('delete/{id}', [CarrierController::class, 'destroy'])
         ->name('carrier.delete');
+    Route::post('restore/{id}', [CarrierController::class, 'restore'])
+        ->name('carrier.restore');
 
     Route::prefix('payment')->group(function () {
         Route::get('/', [CarrierPaymentController::class, 'index'])

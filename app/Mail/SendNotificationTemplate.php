@@ -7,18 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SendCarrierActive extends Mailable
+class SendNotificationTemplate extends Mailable
 {
     use Queueable, SerializesModels;
+
+    protected $params;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($params)
     {
-        //
+        $this->params = $params;
     }
 
     /**
@@ -28,6 +30,7 @@ class SendCarrierActive extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->subject($this->params['subject'] ?? "You have a new notification")
+            ->view('mails.notification', $this->params);
     }
 }

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierEnum;
+use App\Enums\RoleSlugs;
+use App\Mail\SendNotificationTemplate;
 use App\Models\Carrier;
 use App\Models\CarrierEquipment;
+use App\Models\User;
 use App\Rules\EmailArray;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
@@ -13,6 +16,7 @@ use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -176,18 +180,77 @@ class CarrierController extends Controller
         switch ($request->status) {
             case "prospect":
                 $status = CarrierEnum::PROSPECT;
+                $host = explode(".", $request->getHost());
+                $host = $host[1] . "." . $host[2];
+                $subject = "Please complete your paperwork";
+                $title = "Complete your paperwork to continue the process";
+                $content = "Login to the paperwork completion process by this link";
+                foreach ($carrier->drivers as $driver) {
+                    $params = [
+                        "subject" => $subject,
+                        "title" => $title,
+                        "content" => $content,
+                        "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
+                    ];
+                    Mail::to($carrier->email)->send(new SendNotificationTemplate($params));
+                }
+                $params = [
+                    "subject" => $subject,
+                    "title" => $title,
+                    "content" => $content,
+                    "route" => "https://" . env('ROUTE_CARRIERS') . ".$host/tokenLogin?token=" . crc32($carrier->id.$carrier->password),
+                ];
+                Mail::to($carrier->email)->send(new SendNotificationTemplate($params));
                 break;
             case "ready":
                 $status = CarrierEnum::READY_TO_WORK;
+                $users = User::whereHas('roles', function ($q) {
+                    $q->where('slug', RoleSlugs::HUMAN_RESOURCES)
+                        ->orWhere('slug', RoleSlugs::OPERATIONS);
+                })
+                    ->get();
+                foreach ($users as $user) {
+                    $params = [
+                        "subject" => "There's a new carrier ready to work",
+                        "title" => 'The carrier "' . $carrier->name . '" has been set as ready to work',
+                        "content" => "Continue to the site to see its progress",
+                        "route" => route('dashboard'),
+                    ];
+                    Mail::to($user->email)->send(new SendNotificationTemplate($params));
+                }
                 break;
             case "active":
                 $status = CarrierEnum::ACTIVE;
+                $users = User::where(function ($q) use ($carrier) {
+                    $q->where(function ($q) use ($carrier) {
+                        $q->where('users.id', $carrier->seller_id)
+                            ->whereHas('roles', function ($q) {
+                                $q->where('slug', RoleSlugs::SELLER);
+                            });
+                    })
+                        ->orWhereHas('roles', function ($q) {
+                            $q->where('slug', RoleSlugs::OPERATIONS)
+                                ->orWhere('slug', RoleSlugs::ACCOUNTANT);
+                        });
+                })
+                    ->get();
+                foreach ($users as $user) {
+                    $params = [
+                        "subject" => "A carrier carrier is now active",
+                        "title" => 'The carrier "' . $carrier->name . '" has been set as active',
+                        "content" => "Continue to the site to see more information",
+                        "route" => route('dashboard'),
+                    ];
+                    Mail::to($user->email)->send(new SendNotificationTemplate($params));
+                }
                 break;
             case "not_working":
                 $status = CarrierEnum::NOT_WORKING;
                 break;
             case "not_rehirable":
                 $status = CarrierEnum::NOT_REHIRABLE;
+                $carrier->drivers()->delete();
+                $carrier->delete();
                 break;
             default:
                 return abort(404);
@@ -209,14 +272,38 @@ class CarrierController extends Controller
 
         if ($carrier) {
             $message = '';
-            if ($carrier->rentals()->first())
+            if ($carrier->rentals()->first()) {
                 $message .= "•" . $this->generateCrudMessage(4, 'Carrier', ['constraint' => 'rentals']) . "<br>";
-            if ($message)
+            }
+            if ($message) {
                 return ['success' => false, 'msg' => $message];
-            else
-                return ['success' => $carrier->delete()];
-        } else
-            return ['success' => false];
+            }
+            $carrier->drivers()->delete();
+            return ['success' => $carrier->delete()];
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * @param int $id
+     * @return array|false[]
+     */
+    public function restore(int $id): array
+    {
+        $carrier = Carrier::withTrashed()
+            ->where('id', $id);
+
+        if ($carrier) {
+            $carrierFound = (clone $carrier->first());
+            $carrierFound->drivers()->withTrashed()->restore();
+            if ($carrierFound->status === CarrierEnum::NOT_REHIRABLE) {
+                $carrierFound->status = CarrierEnum::ACTIVE;
+                $carrierFound->save();
+            }
+            return ['success' => $carrier->restore()];
+        }
+
+        return ['success' => false];
     }
 
     /**
@@ -236,10 +323,35 @@ class CarrierController extends Controller
     }
 
     /**
+     * @param $query
+     * @param $type
+     * @return mixed
+     */
+    private function filterByType($query, $type)
+    {
+        switch ($type) {
+            default:
+            case 'all':
+                $query->where('status', '!=', CarrierEnum::NOT_REHIRABLE);
+                break;
+            case 'deleted':
+                $query->onlyTrashed()
+                    ->where('status', '!=', CarrierEnum::NOT_REHIRABLE);
+                break;
+            case 'notRehirable':
+                $query->onlyTrashed()
+                    ->where('status', CarrierEnum::NOT_REHIRABLE);
+                break;
+        }
+
+        return $query;
+    }
+
+    /**
      * @param Request $request
      * @return array
      */
-    public function search(Request $request): array
+    public function search(Request $request, string $type = null): array
     {
         $query = Carrier::select([
             "carriers.id",
@@ -248,6 +360,8 @@ class CarrierController extends Controller
             "carriers.phone",
             "carriers.status",
         ]);
+
+        $query = $this->filterByType($query, $type);
 
         return $this->multiTabSearchData($query, $request);
     }
