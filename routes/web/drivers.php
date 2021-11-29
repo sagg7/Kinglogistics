@@ -19,5 +19,9 @@ Route::prefix('driver')->group(function () {
     Route::middleware('auth:web')->group(function () {
         Route::get('selection', [DriverController::class, 'selection'])
             ->name('driver.selection');
+        Route::post('delete/{id}', [DriverController::class, 'destroy'])
+            ->name('driver.delete');
+        Route::post('restore/{id}', [DriverController::class, 'restore'])
+            ->name('driver.restore');
     });
 });

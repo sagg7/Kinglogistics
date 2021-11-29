@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CarrierEnum;
 use App\Models\Carrier;
 use App\Models\CarrierEquipment;
 use App\Rules\EmailArray;
@@ -166,6 +167,37 @@ class CarrierController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return array|\never
+     */
+    public function setStatus(Request $request)
+    {
+        $carrier = Carrier::findOrFail($request->id);
+        switch ($request->status) {
+            case "prospect":
+                $status = CarrierEnum::PROSPECT;
+                break;
+            case "ready":
+                $status = CarrierEnum::READY_TO_WORK;
+                break;
+            case "active":
+                $status = CarrierEnum::ACTIVE;
+                break;
+            case "not_working":
+                $status = CarrierEnum::NOT_WORKING;
+                break;
+            case "not_rehirable":
+                $status = CarrierEnum::NOT_REHIRABLE;
+                break;
+            default:
+                return abort(404);
+        }
+        $carrier->status = $status;
+
+        return ['success' => $carrier->save()];
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param int $id
@@ -214,6 +246,7 @@ class CarrierController extends Controller
             "carriers.name",
             "carriers.email",
             "carriers.phone",
+            "carriers.status",
         ]);
 
         return $this->multiTabSearchData($query, $request);

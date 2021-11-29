@@ -18,7 +18,9 @@ Route::prefix('carrier')->group(function () {
     Route::get('edit/{id}', [CarrierController::class, 'edit'])
         ->name('carrier.edit');
     Route::post('update/{id}', [CarrierController::class, 'update'])
-        ->name('carrier.update')
+        ->name('carrier.update');
+    Route::post('setStatus/{id}', [CarrierController::class, 'setStatus'])
+        ->name('carrier.setStatus')
         ->where('profile', '[0-1]');
     Route::post('delete/{id}', [CarrierController::class, 'destroy'])
         ->name('carrier.delete');

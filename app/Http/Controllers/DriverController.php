@@ -223,6 +223,25 @@ class DriverController extends Controller
     }
 
     /**
+     * @param int $id
+     * @return array|false[]
+     */
+    public function restore(int $id): array
+    {
+        $driver = Driver::where(function ($q) {
+            if (auth()->guard('carrier')->check())
+                $q->where('carrier_id', auth()->user()->id);
+        })
+            ->withTrashed()
+            ->where('id', $id);
+
+        if ($driver)
+            return ['success' => $driver->restore()];
+        else
+            return ['success' => false];
+    }
+
+    /**
      * @param $item
      * @return array|string[]|null
      */
@@ -290,6 +309,9 @@ class DriverController extends Controller
                 break;
             case 'inactive':
                 $query->where('inactive', 1);
+                break;
+            case 'deleted':
+                $query->onlyTrashed();
                 break;
         }
 

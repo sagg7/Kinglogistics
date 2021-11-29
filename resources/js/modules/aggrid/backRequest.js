@@ -52,6 +52,13 @@ OptionsRenderer.prototype.init = (params) => {
     params.data.menuId = [];
     params.colDef.menuData.forEach((item, i) => {
         const itemId = OptionsRenderer.prototype.guidGenerator();
+        let href = `${item.route}/${params.data.id}`;
+        if (item.route_params) {
+            href += '?';
+            Object.entries(item.route_params).forEach(([key, value]) => {
+                href += `${key}=${value}&`;
+            });
+        }
         params.data.menuId.push({id: itemId, type: item.type});
         if (item.type) {
             let classId = '',
@@ -80,11 +87,11 @@ OptionsRenderer.prototype.init = (params) => {
                     break;
             }
             menuData = item.menuData;
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${icon}"></i> ${text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 ${classId}" href="${href}" id="${itemId}"><i class="${icon}"></i> ${text}</a></li>`;
         } else if (item.modal)
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1 open-modal" href="${href}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
         else
-            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1" href="${item.route}/${params.data.id}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
+            content += `<li class="list-group-item p-0"><a class="btn-link d-block p-1" href="${href}" id="${itemId}"><i class="${item.icon}"></i> ${item.text}</a></li>`;
     });
 
     content += `</ul>`;

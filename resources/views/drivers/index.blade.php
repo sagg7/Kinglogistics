@@ -60,6 +60,17 @@
                             return this.eGui;
                         }
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
+                        let menu;
+                        if (type === "deleted") {
+                            menu = [
+                                {text: 'Restore', route: '/driver/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm', menuData: {title: 'Restore driver?'}}
+                            ];
+                        } else {
+                            menu = [
+                                {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
+                                {route: '/driver/delete', type: 'delete'},
+                            ];
+                        }
                         return {
                             columns: [
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
@@ -68,10 +79,7 @@
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
                                 {headerName: 'Status', field: 'status', valueFormatter: capitalizeFormatter},
                             ],
-                            menu: [
-                                {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
-                                {route: '/driver/delete', type: 'delete'}
-                            ],
+                            menu,
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,
@@ -209,6 +217,11 @@
                                     Inactive
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-deleted" aria-expanded="false">
+                                    Deleted
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -225,6 +238,9 @@
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-inactive" aria-labelledby="pane-inactive" aria-expanded="true">
                                 <div id="gridInactive"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-deleted" aria-labelledby="pane-deleted" aria-expanded="true">
+                                <div id="gridDeleted"></div>
                             </div>
                         </div>
                     </div>
