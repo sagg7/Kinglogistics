@@ -93,13 +93,16 @@ class LoadController extends Controller
                 // Then check the relations with the shipper
                 $q->where(function ($r) use ($shipper) {
                     // WHERE THE ASSIGNED TRAILER TO THE TRUCK THAT BELONGS TO THE DRIVER IS OWNED BY THE SHIPPER
-                    $r->whereHas('truck', function ($s) use ($shipper) {
-                        $s->whereHas('trailer', function ($t) use ($shipper) {
-                            $t->whereHas('shippers', function ($u) use ($shipper) {
-                                $u->where('shipper_id', $shipper);
+                    $r->whereHas('shippers', function ($q) use ($shipper) {
+                        $q->where('id', $shipper);
+                    })
+                        ->orWhereHas('truck', function ($s) use ($shipper) {
+                            $s->whereHas('trailer', function ($t) use ($shipper) {
+                                $t->whereHas('shippers', function ($u) use ($shipper) {
+                                    $u->where('shipper_id', $shipper);
+                                });
                             });
                         });
-                    });
                 });
                 // The carrier must be active
                 $q->whereHas("carrier", function ($q) {

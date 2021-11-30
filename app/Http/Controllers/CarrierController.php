@@ -122,6 +122,15 @@ class CarrierController extends Controller
         return redirect()->route('carrier.index');
     }
 
+    public function getCarrierData(int $id)
+    {
+        $carrier = Carrier::findOrFail($id);
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $carrier->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $carrier->id);
+        return compact('carrier', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
+    }
+
     /**
      * Display the specified resource.
      *
@@ -141,11 +150,7 @@ class CarrierController extends Controller
      */
     public function edit(int $id)
     {
-        $carrier = Carrier::findOrFail($id);
-        $createEdit = $this->createEditParams();
-        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $carrier->id);
-        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $carrier->id);
-        $params = compact('carrier', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
+        $params = $this->getCarrierData($id);
         return view('carriers.edit', $params);
     }
 

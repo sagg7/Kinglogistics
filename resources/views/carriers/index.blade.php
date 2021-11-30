@@ -17,9 +17,12 @@
                     tableProperties = (type) => {
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         let menu;
+                        let gridOptions = {};
+                        let previousModalId = null;
                         switch (type) {
                             default:
                                 menu = [
+                                    {text: 'Paperwork', route: '#view-paperwork', icon: 'far fa-eye', type: 'modal'},
                                     {text: 'Edit', route: '/carrier/edit', icon: 'feather icon-edit'},
                                     {
                                         text: 'Prospect',
@@ -68,6 +71,122 @@
                                     },
                                     {route: '/carrier/delete', type: 'delete'},
                                 ];
+                                gridOptions = {
+                                    components: {
+                                        OptionModalFunc: (modalId, carrierId) => {
+                                            const modal = $(`${modalId}`),
+                                                content = modal.find('.content-body');
+                                            modal.modal('show');
+                                            if (carrierId === previousModalId)
+                                                return;
+                                            previousModalId = carrierId;
+                                            content.html('<h3>Paperwork</h3>' +
+                                                '<table class="table" id="paperworkTable"><thead><tr>' +
+                                                '<div class="progress progress-bar-primary progress-xl mt-1 mb-1">' +
+                                                '<div class="progress-bar" role="progressbar" id="paperworkProgress"></div>' +
+                                                '</div>' +
+                                                '<th>Status</th><th>Name</th><th>PDF</th>' +
+                                                '</tr></thead>' +
+                                                '<tbody></tbody></table><hr>' +
+                                                '<h3>File uploads</h3>' +
+                                                '<div class="progress progress-bar-primary progress-xl mt-1 mb-1">' +
+                                                '<div class="progress-bar" role="progressbar" id="uploadsProgress"></div>' +
+                                                '</div>' +
+                                                '<table class="table" id="uploadsTable"><thead><tr>' +
+                                                '<th>Status</th><th>Name</th><th>PDF</th><th>Expiration date</th>' +
+                                                '</tr></thead>' +
+                                                '<tbody></tbody></table><hr>'
+                                            );
+                                            const paperworkTable = content.find('#paperworkTable'),
+                                                paperworkTbody = paperworkTable.find('tbody'),
+                                                paperworkProgress = $('#paperworkProgress');
+                                            const uploadsTable = content.find('#uploadsTable'),
+                                                uploadsTbody = uploadsTable.find('tbody'),
+                                                uploadsProgress = $('#uploadsProgress');
+                                            $.ajax({
+                                                url: `/carrier/getCarrierData/${carrierId}`,
+                                                type: 'GET',
+                                                success: (res) => {
+                                                    let totalProgress = 0,
+                                                        completedProgress = 0;
+                                                    res.filesTemplates.forEach((file, i) => {
+                                                        if (file.required) {
+                                                            totalProgress++;
+                                                            if (res.paperworkTemplates[file.id])
+                                                                completedProgress++;
+                                                        }
+                                                        let iconClass;
+                                                        if (res.paperworkTemplates[file.id]) {
+                                                            iconClass = 'icon-check-circle text-success';
+                                                        } else if (file.required) {
+                                                            iconClass = 'icon-x-circle text-danger';
+                                                        } else {
+                                                            iconClass = 'icon-alert-circle text-warning';
+                                                        }
+                                                        let pdfLink = '';
+                                                        if (res.paperworkTemplates[file.id]) {
+                                                            pdfLink = `<a href="/paperwork/pdf/${file.id}/${res.carrier.id}" target="_blank">Show PDF</a>`;
+                                                        }
+                                                        paperworkTbody.append(`<tr data-file="${file.id}">` +
+                                                        `<td><i class="feather ${iconClass}"></i></td>` +
+                                                        `<td>${file.name}</td>` +
+                                                        `<td>${pdfLink}</td>` +
+                                                        `</tr>`);
+                                                    });
+                                                    let calculatedProgress = ((completedProgress * 100) / totalProgress).toFixed(2);
+                                                    paperworkProgress.text(`${calculatedProgress}%`)
+                                                        .css('width', `${calculatedProgress}%`);
+                                                    totalProgress = 0;
+                                                    completedProgress = 0;
+                                                    res.filesUploads.forEach((file, i) => {
+                                                        if (file.required) {
+                                                            totalProgress++;
+                                                            if (res.paperworkUploads[file.id])
+                                                                completedProgress++;
+                                                        }
+                                                        let iconClass;
+                                                        if (res.paperworkUploads[file.id]) {
+                                                            iconClass = 'icon-check-circle text-success';
+                                                        } else if (file.required) {
+                                                            iconClass = 'icon-x-circle text-danger';
+                                                        } else {
+                                                            iconClass = 'icon-alert-circle text-warning';
+                                                        }
+                                                        let pdfLink = '';
+                                                        let expiration = '';
+                                                        if (res.paperworkUploads[file.id]) {
+                                                            pdfLink = `<a href="/s3storage/temporaryUrl?url=>${res.paperworkUploads[file.id].url}" target="_blank">${res.paperworkUploads[file.id].file_name}</a>`;
+                                                            expiration = res.paperworkUploads[file.id].expiration_date ? res.paperworkUploads[file.id].expiration_date : '';
+                                                        }
+                                                        let template = '';
+                                                        if (file.file) {
+                                                            template = `<a href="/s3storage/temporaryUrl?url=${file.file}" target="_blank">${file.file_name}</a>`;
+                                                        }
+                                                        uploadsTbody.append(
+                                                            `<tr>` +
+                                                                `<td class="file-icon"><i class="feather ${iconClass}"></i></td>` +
+                                                                `<td>` +
+                                                                    `<div>${file.name}</div>` +
+                                                                    template +
+                                                                `</td>` +
+                                                                `<td>${pdfLink}</td>` +
+                                                                `<td>` +
+                                                                    expiration +
+                                                                `</td>` +
+                                                            `</tr>`
+                                                        );
+                                                    });
+                                                    calculatedProgress = ((completedProgress * 100) / totalProgress).toFixed(2);
+                                                    uploadsProgress.text(`${calculatedProgress}%`)
+                                                        .css('width', `${calculatedProgress}%`);
+
+                                                    content.removeClass('d-none');
+                                                    $('.modal-spinner').addClass('d-none');
+                                                }
+                                            });
+                                        }
+                                    },
+                                };
                                 break;
                             case "deleted":
                                 menu = [
@@ -89,6 +208,7 @@
                                 {headerName: 'Phone', field: 'phone'},
                             ],
                             menu,
+                            gridOptions,
                             container: `grid${tableName}`,
                             url: `/carrier/search/${type}`,
                             tableRef: `tb${tableName}`,
@@ -114,6 +234,9 @@
     @endsection
 
     <!-- TODO: ADD DOCUMENT PROGRESS MODAL -->
+    @section('modals')
+        @include("common.modals.genericAjaxLoading", ["id" => "view-paperwork", "title" => "Paperwork progress"])
+    @endsection
 
     <div class="card pills-layout">
         <div class="card-content">

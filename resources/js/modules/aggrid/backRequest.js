@@ -106,11 +106,14 @@ OptionsRenderer.prototype.init = (params) => {
             params.colDef.menuData.forEach((item, i) => {
                 const menuId = params.data.menuId[i];
                 const option = $(`#${menuId.id}`);
+                console.log(item.type);
                 switch (item.type) {
                     default:
                         break;
                     case 'modal':
+                        console.log('here');
                         option.click((e) => {
+                            console.log('open modal');
                             let btn = $(e.currentTarget),
                                 href = btn.attr('href').split("/"),
                                 modal = href[0],

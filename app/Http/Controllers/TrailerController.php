@@ -30,6 +30,7 @@ class TrailerController extends Controller
             'number' => ['required', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
+            'shippers' => ['nullable', 'array', 'exists:shippers,id'],
             //'status' => ['required'],
         ],
         [],

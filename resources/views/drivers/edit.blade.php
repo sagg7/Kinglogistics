@@ -3,10 +3,21 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section("scripts")
-        <script src="{{ asset('js/sections/drivers/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/drivers/common.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script>
             (() => {
+                const shippers = @json($driver->shippers);
+                let shippersHtml = '',
+                    shippersIds = [];
+                shippers.forEach((item) => {
+                    shippersHtml += `<option value="${item.id}">${item.name}</option>`;
+                    shippersIds.push(item.id);
+                });
+                $('[name="shippers[]"]')
+                    .html(shippersHtml)
+                    .val(shippersIds)
+                    .trigger('change');
                 $("#zone_id")
                     .html(`<option value="{{ $driver->zone_id }}">{{ $driver->zone->name }}</option>`)
                     .val({{ $driver->zone_id }})
