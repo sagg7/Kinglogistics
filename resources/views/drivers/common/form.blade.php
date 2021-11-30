@@ -3,10 +3,19 @@
         <div class="card-content">
             <div class="row">
                 @if(auth()->guard('web')->check())
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         {!! Form::label('carrier_id', ucfirst(__('carrier')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('carrier_id', isset($driver) ? [$driver->carrier_id => $driver->carrier->name] : [], $driver->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
                         @error('carrier_id')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ ucfirst($message) }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
+                        {!! Form::select('shippers[]', [], $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
+                        @error('shippers')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ ucfirst($message) }}</strong>
                         </span>

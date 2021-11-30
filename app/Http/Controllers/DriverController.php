@@ -42,7 +42,8 @@ class DriverController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['string', 'email', 'max:255', "unique:drivers,email,$id,id"],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
-            'inactive_observations' => ['required', 'string', 'max:512'],
+            'inactive_observations' => ['nullable', 'string', 'max:512'],
+            'shippers' => ['nullable', 'array', 'exists:shippers,id'],
         ]);
     }
 
@@ -80,6 +81,8 @@ class DriverController extends Controller
             $driver->inactive = $request->inactive ?? null;
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
+
+            $driver->shippers()->sync($request->shippers);
 
             return $driver;
         });
@@ -130,7 +133,7 @@ class DriverController extends Controller
             if (auth()->guard('carrier')->check())
                 $q->where('carrier_id', auth()->user()->id);
         })
-            ->with('carrier')
+            ->with(['carrier', 'shippers'])
             ->with(['zone:id,name'])
             ->findOrFail($id);
         $createEdit = $this->createEditParams($id);
@@ -151,7 +154,7 @@ class DriverController extends Controller
      */
     public function update(Request $request, int $id, bool $profile = false): RedirectResponse
     {
-        $this->validator($request->all(), $id)->validate();
+        $this->validator($request->all(), $id)->errors();
 
         $this->storeUpdate($request, $id);
 
@@ -180,13 +183,16 @@ class DriverController extends Controller
                 if ($request->turn)
                     $q->where("turn_id", $request->turn);
                 if ($request->shipper)
-                    $q->whereHas('truck', function ($q) use ($request) {
-                        $q->whereHas('trailer', function ($q) use ($request) {
-                            $q->whereHas('shippers', function ($q) use ($request) {
-                                $q->where('id', $request->shipper);
+                    $q->whereHas('shippers', function ($q) use ($request) {
+                        $q->where('id', $request->shipper);
+                    })
+                        ->orWhereHas('truck', function ($q) use ($request) {
+                            $q->whereHas('trailer', function ($q) use ($request) {
+                                $q->whereHas('shippers', function ($q) use ($request) {
+                                    $q->where('id', $request->shipper);
+                                });
                             });
                         });
-                    });
             })
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");
@@ -337,23 +343,29 @@ class DriverController extends Controller
         ])
             ->where(function ($q) use ($request, $type) {
                 if (auth()->guard('shipper')->check())
-                    $q->whereHas('truck', function ($q) {
-                        $q->whereHas('trailer', function ($q) {
-                            $q->whereHas('shippers', function ($q) {
-                                $q->where('id', auth()->user()->id);
+                    $q->whereHas('shippers', function ($q) use ($request) {
+                        $q->where('id', auth()->user()->id);
+                    })
+                        ->orWhereHas('truck', function ($q) {
+                            $q->whereHas('trailer', function ($q) {
+                                $q->whereHas('shippers', function ($q) {
+                                    $q->where('id', auth()->user()->id);
+                                });
                             });
                         });
-                    });
                 if ($request->driver)
                     $q->where('id', $request->driver);
                 if ($request->shipper)
-                    $q->whereHas('truck', function ($q) use ($request) {
-                        $q->whereHas('trailer', function ($q) use ($request) {
-                            $q->whereHas('shippers', function ($q) use ($request) {
-                                $q->where('id', $request->shipper);
+                    $q->whereHas('shippers', function ($q) use ($request) {
+                        $q->where('id', $request->shipper);
+                    })
+                        ->orWhereHas('truck', function ($q) use ($request) {
+                            $q->whereHas('trailer', function ($q) use ($request) {
+                                $q->whereHas('shippers', function ($q) use ($request) {
+                                    $q->where('id', $request->shipper);
+                                });
                             });
                         });
-                    });
                 if ($request->trip)
                     $q->whereHas('active_load', function ($q) use ($request) {
                         $q->where('trip_id', $request->trip_id);

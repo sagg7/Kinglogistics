@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/drivers/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/drivers/common.min.js?1.0.0') }}"></script>
     @endsection
 
     {!! Form::open(['route' => 'driver.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
