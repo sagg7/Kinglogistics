@@ -15,6 +15,8 @@ Route::prefix('carrier')->group(function () {
         ->name('carrier.search');
     Route::get('selection', [CarrierController::class, 'selection'])
         ->name('carrier.selection');
+    Route::get('getCarrierData/{id}', [CarrierController::class, 'getCarrierData'])
+        ->name('carrier.getCarrierData');
     Route::get('edit/{id}', [CarrierController::class, 'edit'])
         ->name('carrier.edit');
     Route::post('update/{id}', [CarrierController::class, 'update'])

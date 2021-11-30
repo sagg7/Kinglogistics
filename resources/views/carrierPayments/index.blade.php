@@ -104,7 +104,7 @@
                                         {headerName: 'Amount', field: 'amount', filter:false, sortable: false, valueFormatter: expensesFormatter},
                                     ],
                                     menu: [
-                                        {text: 'List', route: '#view-expenses', icon: 'far fa-eye', modal: true},
+                                        {text: 'List', route: '#view-expenses', icon: 'far fa-eye', type: 'modal'},
                                         {text: 'Complete', route: '/carrier/payment/payCharges', type: 'confirm', icon: 'fas fa-check-circle', menuData: {title: 'Pay off the charges?'}},
                                     ],
                                     gridOptions: {
