@@ -26,7 +26,9 @@ class DriverController extends Controller
      */
     private function createEditParams($id = null): array
     {
-        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id) + ['zones' => [null => 'Select'] + Zone::pluck('name', 'id')->toArray()];
+        return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id) +
+            ['zones' => [null => 'Select'] + Zone::pluck('name', 'id')->toArray()] +
+            ['language' => ['spanish' => 'Spanish', 'english' => 'English']];
     }
 
     /**
@@ -78,6 +80,7 @@ class DriverController extends Controller
             $driver->zone_id = $request->zone_id;
             $driver->phone = $request->phone;
             $driver->address = $request->address;
+            $driver->language = $request->language;
             $driver->inactive = $request->inactive ?? null;
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
