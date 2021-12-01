@@ -68,6 +68,9 @@
                         } else {
                             menu = [
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
+                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations'))
+                                {text: 'End Shift', route: "/driver/endShift", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || status === "active" || status === "ready"', menuData: {title: "End driver's shift?"}},
+                                @endif
                                 {route: '/driver/delete', type: 'delete'},
                             ];
                         }
@@ -214,7 +217,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-inactive" aria-expanded="false">
-                                    Inactive
+                                    Inactive Down
                                 </a>
                             </li>
                             <li class="nav-item">

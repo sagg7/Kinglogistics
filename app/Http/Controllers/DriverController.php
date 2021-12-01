@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LoadStatusEnum;
+use App\Exceptions\DriverHasUnfinishedLoadsException;
+use App\Models\AvailableDriver;
 use App\Models\Driver;
+use App\Models\Shift;
 use App\Models\Zone;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
@@ -432,5 +436,33 @@ class DriverController extends Controller
             unset($result['query']);
         }
         return $result;
+    }
+
+    public function endShift($id){
+
+        $driver = Driver::find($id);
+
+        $unfinishedLoads = $driver->loads->filter(function ($load) {
+            return !in_array($load->status, [LoadStatusEnum::FINISHED, LoadStatusEnum::UNALLOCATED]);
+        });
+
+        if (count($unfinishedLoads) > 0) {
+            throw new DriverHasUnfinishedLoadsException;
+        }
+
+        if (!empty($driver->availableDriver)) {
+            AvailableDriver::destroy($driver->availableDriver->id);
+            return response(['status' => 'ok'], 200);
+
+        }
+
+        if (!empty($driver->shift)) {
+            Shift::destroy($driver->shift->id);
+        }
+        $driver->status = 'inactive';
+        $driver->save();
+
+        return ['success' => $driver->restore()];
+
     }
 }

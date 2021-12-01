@@ -14,6 +14,8 @@ Route::prefix('driver')->group(function () {
         ->name('driver.edit');
     Route::post('update/{id}', [DriverController::class, 'update'])
         ->name('driver.update');
+    Route::post('endShift/{id}', [DriverController::class, 'endShift'])
+        ->name('driver.endShift');
     Route::get('search/{type?}', [DriverController::class, 'search'])
         ->name('driver.search');
     Route::middleware('auth:web')->group(function () {
