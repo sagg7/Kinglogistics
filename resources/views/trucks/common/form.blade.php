@@ -32,6 +32,7 @@
                         </span>
                         @enderror
                     </div>
+                    @endif
                     <div class="form-group col-md-6">
                         {!! Form::label('driver_id', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('driver_id', [], $truck->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}
@@ -41,7 +42,7 @@
                         </span>
                         @enderror
                     </div>
-                @endif
+
                 <div class="form-group col-md-6">
                     {!! Form::label('number', ucfirst(__('number')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('number', $truck->number ?? null, ['class' => 'form-control' . ($errors->first('number') ? ' is-invalid' : '')]) !!}
