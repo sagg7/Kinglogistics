@@ -105,7 +105,10 @@ class TruckController extends Controller
                 $trailer->truck->trailer_id = null;
                 $trailer->truck->save();
             }
-            $truck->carrier_id = auth()->user()->id ?? $request->carrier_id;
+            if (auth()->guard('carrier')->check())
+                $truck->carrier_id = auth()->user()->id;
+            else
+                $truck->carrier_id = $request->carrier_id;
             $truck->trailer_id = $request->trailer_id;
             $truck->driver_id = $request->driver_id;
             $truck->number = $request->number;
