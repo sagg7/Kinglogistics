@@ -149,7 +149,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $drivers = Driver::where('turn_id', 2)->whereNull('inactive')->where('status', 'inactive')->get();
 
-            $this->dischargeDrivers($drivers);
+            $this->welcomeDrivers($drivers);
         })->daily()->at('17:30');
         // Discharge drivers with morning turn
         $schedule->call(function () {
