@@ -189,6 +189,8 @@ class DriverController extends Controller
                     $q->where("zone_id", $request->zone);
                 if ($request->turn)
                     $q->where("turn_id", $request->turn);
+                if ($request->noTruck)
+                    $q->whereDoesntHave('truck');
                 if ($request->shipper)
                     $q->whereHas('shippers', function ($q) use ($request) {
                         $q->where('id', $request->shipper);
