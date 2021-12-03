@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Edit</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/trucks/common.min.js') }}"></script>
+        <script src="{{ asset('js/sections/trucks/common.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script>
             (() => {
