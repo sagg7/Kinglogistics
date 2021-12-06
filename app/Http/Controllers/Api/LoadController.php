@@ -91,6 +91,9 @@ class LoadController extends Controller
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
 
+        $driver->status = 'active';
+        $driver->save();
+
         return response([
             'status' => 'ok',
             'message' => 'The load has been successfully created!',
