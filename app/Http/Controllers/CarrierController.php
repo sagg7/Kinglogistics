@@ -15,6 +15,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -117,7 +118,12 @@ class CarrierController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        $this->storeUpdate($request);
+        DB::transaction(function () use ($request) {
+            $carrier = $this->storeUpdate($request);
+            $request->merge(['id' => $carrier->id]);
+            $request->merge(['status' => 'prospect']);
+            $this->setStatus($request);
+        });
 
         return redirect()->route('carrier.index');
     }
@@ -336,8 +342,13 @@ class CarrierController extends Controller
     {
         switch ($type) {
             default:
-            case 'all':
-                $query->where('status', '!=', CarrierEnum::NOT_REHIRABLE);
+            case 'active':
+                $query->where('status', '=', CarrierEnum::INTERESTED)
+                    ->orWhere('status', '=', CarrierEnum::ACTIVE)
+                    ->orWhere('status', '=', CarrierEnum::READY_TO_WORK);
+                break;
+            case 'prospect':
+                $query->where('status', '=', CarrierEnum::PROSPECT);
                 break;
             case 'deleted':
                 $query->onlyTrashed()
