@@ -247,8 +247,13 @@
                     <div class="col-lg col-md col-xs-12 col-sm-12 pl-0 pr-0 pills-menu-col">
                         <ul class="nav nav-pills flex-column mt-md-0 mt-1">
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75 active" data-toggle="pill" href="#pane-all" aria-expanded="true">
-                                    All carriers
+                                <a class="nav-link d-flex py-75 active" data-toggle="pill" href="#pane-active" aria-expanded="true">
+                                    Active
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-prospect" aria-expanded="false">
+                                    Prospects
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -266,8 +271,11 @@
 
                     <div class="col-lg col-md col-xs-12 col-sm-12">
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="pane-all" aria-labelledby="pane-all" aria-expanded="true">
-                                <div id="gridAll"></div>
+                            <div role="tabpanel" class="tab-pane active" id="pane-active" aria-labelledby="pane-active" aria-expanded="true">
+                                <div id="gridActive"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane active" id="pane-prospect" aria-labelledby="pane-prospect" aria-expanded="true">
+                                <div id="gridProspect"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-deleted" aria-labelledby="pane-deleted" aria-expanded="true">
                                 <div id="gridDeleted"></div>
