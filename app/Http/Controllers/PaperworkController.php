@@ -241,7 +241,7 @@ class PaperworkController extends Controller
                     // If the carrier has previously completed the paperwork, return
                     if ($user->completed_paperwork)
                         return;
-                    $email = $user->seller->email;
+                    $email = ($user->seller) ? $user->seller->email : null;
                     $title = "The carrier \"$user->name\" has completed its paperwork";
                     break;
                 default:
