@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    use PaymentsAndCollection;
+   // use PaymentsAndCollection;
     protected $customDate = "2021-12-05";
 
     public function index()
