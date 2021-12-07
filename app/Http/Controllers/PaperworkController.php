@@ -353,8 +353,8 @@ class PaperworkController extends Controller
     {
         preg_match_all("/{{[^}]*}}/", $template, $result);
 
-        $matches = ["/{{\"signature\"}}/","/{{\"date\"}}/", "/{{/", "/}}/", "/,\s/", "/\"validate\"/"];
-        $replacements = ["{{\"signature\":true}}","{{\"date\":true}}", "{", "}", ",", "\"validate\":true"];
+        $matches = ["/{{\"date\"}}/", "/{{/", "/}}/", "/,\s/", "/\"validate\"/","/\"optional\"/","/\"signature\"/"];
+        $replacements = ["{{\"date\":true}}", "{", "}", ",", "\"validate\":true","\"optional\":true","\"signature\":true"];
 
         if (!$simpleVars) {
             $carrier = null;
@@ -384,6 +384,7 @@ class PaperworkController extends Controller
 
     private function getFormattedJsonType($json)
     {
+        $type = null;
         if (isset($json->text))
             $type = "text";
         if (isset($json->answers))
@@ -435,9 +436,14 @@ class PaperworkController extends Controller
             $json = json_decode($formatted);
             $type = $this->getFormattedJsonType($json);
             $inputName = 'name="input-' . $idx . '"';
+            if (isset($json->optional) && !isset($json->validate)) {
+                $required = "";
+            } else {
+                $required = "required";
+            }
             switch ($type) {
                 case "text":
-                    $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . $json->text . '" required></div>';
+                    $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . $json->text . '" ' . $required . '></div>';
                     break;
                 case 'radio':
                     $html = "<h4 class='m-0'>$json->text</h4>\r\n";
@@ -445,7 +451,7 @@ class PaperworkController extends Controller
                         shuffle($json->answers);
                     foreach ($json->answers as $i => $answer) {
                         $radioId = 'input-' . $idx . "-" . $i;
-                        $html .= '<input type="' . $type . '" ' . $inputName . ' id="' . $radioId . '" value="' . $answer . '" required><label class="col-form-label" for="' . $radioId . '">' . $answer . "</label>\r\n";
+                        $html .= '<input type="' . $type . '" ' . $inputName . ' id="' . $radioId . '" value="' . $answer . '" ' . $required . '><label class="col-form-label" for="' . $radioId . '">' . $answer . "</label>\r\n";
                     }
                     $replaced[] = $html;
                     if (isset($json->validate))
@@ -467,7 +473,7 @@ class PaperworkController extends Controller
                             '<fieldset>'.
                             '<label class="col-form-label d-block" for="' . $inputName . '">Signature</label>' .
                             '<div class="vs-checkbox-con vs-checkbox-primary justify-content-center">'.
-                            '<input type="checkbox" value="signed" id="' . $inputName .'" required>'.
+                            '<input type="checkbox" value="signed" id="' . $inputName .'" ' . $required . '>'.
                             '<span class="vs-checkbox">'.
                             '<span class="vs-checkbox--check">'.
                             '<i class="vs-icon feather icon-check"></i>'.
@@ -486,42 +492,42 @@ class PaperworkController extends Controller
                 case 'carrier':
                     switch ($json->carrier) {
                         case 'name':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier name' . '" required value="' . ($carrier->name ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier name' . '" ' . $required . ' value="' . ($carrier->name ?? null) . '"></div>';
                             break;
                         case 'owner':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Owner name' . '" required value="' . ($carrier->owner ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Owner name' . '" ' . $required . ' value="' . ($carrier->owner ?? null) . '"></div>';
                             break;
                         case 'address':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier address' . '" required value="' . ($carrier->address ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier address' . '" ' . $required . ' value="' . ($carrier->address ?? null) . '"></div>';
                             break;
                         case 'phone':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier phone' . '" required value="' . ($carrier->phone ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Carrier phone' . '" ' . $required . ' value="' . ($carrier->phone ?? null) . '"></div>';
                             break;
                     }
                     break;
                 case 'driver':
                     switch ($json->driver) {
                         case 'name':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver name' . '" required value="' . ($driver->name ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver name' . '" ' . $required . ' value="' . ($driver->name ?? null) . '"></div>';
                             break;
                         case 'address':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver address' . '" required value="' . ($driver->address ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver address' . '" ' . $required . ' value="' . ($driver->address ?? null) . '"></div>';
                             break;
                         case 'phone':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver phone' . '" required value="' . ($driver->phone ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Driver phone' . '" ' . $required . ' value="' . ($driver->phone ?? null) . '"></div>';
                             break;
                     }
                     break;
                 case 'company':
                     switch ($json->company) {
                         case 'name':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company name' . '" required value="' . ($company->name ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company name' . '" ' . $required . ' value="' . ($company->name ?? null) . '"></div>';
                             break;
                         case 'address':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company address' . '" required value="' . ($company->address ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company address' . '" ' . $required . ' value="' . ($company->address ?? null) . '"></div>';
                             break;
                         case 'phone':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company phone' . '" required value="' . ($company->contact_phone ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Company phone' . '" ' . $required . ' value="' . ($company->contact_phone ?? null) . '"></div>';
                             break;
                         case 'signature':
                             if ($company->signature)
