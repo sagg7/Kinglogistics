@@ -23,8 +23,12 @@ class DashboardController extends Controller
         /*$start = Carbon::now()->subMonths(3)->startOfMonth();
         $end = Carbon::now()->endOfMonth()->endOfDay();*/
         //whereBetween('loads.date', [$start, $end])
+        $today = new Carbon();
+        if($today->dayOfWeek == Carbon::THURSDAY)
+            $monday = $today;
+        else
+            $monday = new Carbon('last monday');
 
-        $monday = new Carbon('last monday');
         $monday = $monday->format('Y/m/d')." 00:00:00";
         $loads = Load::where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
