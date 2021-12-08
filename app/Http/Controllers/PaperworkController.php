@@ -233,7 +233,7 @@ class PaperworkController extends Controller
                     // If the driver has previously completed the paperwork, return
                     if ($user->completed_paperwork)
                         return;
-                    $email = $user->carrier->seller->email;
+                    $email = ($user->carrier->seller) ? $user->seller->email : null;
                     $title = "The driver \"$user->name\" has completed its paperwork.";
                     break;
                 case 'carrier':

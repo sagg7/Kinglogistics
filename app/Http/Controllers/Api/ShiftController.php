@@ -83,6 +83,14 @@ class ShiftController extends Controller
             ], 400);
         }
 
+        // Before create a shift, checks if the driver has already inactive status
+        if ($driver->inactive) {
+            return response([
+                'status' => 'error',
+                'message' => __('You have inactive status please contact dispatch')
+            ], 400);
+        }
+
         // Check if the user can activate its shift, checking if the last load rejection is between the latest 12 hours
         if (!$driver->rejectionCheck()) {
             return response([
