@@ -104,7 +104,8 @@ class JobOpportunityController extends Controller
                 if (auth()->guard('carrier')->check()) {
                     $q->whereHas('carriers', function ($q) {
                         $q->where('carrier_id', auth()->user()->id);
-                    });
+                    })
+                        ->orWhereDoesntHave('carriers');
                 }
             })
             ->findOrFail($id);
@@ -179,7 +180,8 @@ class JobOpportunityController extends Controller
                 if (auth()->guard('carrier')->check()) {
                     $q->whereHas('carriers', function ($q) {
                         $q->where('carrier_id', auth()->user()->id);
-                    });
+                    })
+                        ->orWhereDoesntHave('carriers');
                 }
             });
 

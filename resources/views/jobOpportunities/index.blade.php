@@ -15,16 +15,24 @@
                         {headerName: 'Title', field: 'title'},
                         //{headerName: 'Preview', field: 'preview'},
                     ],
+                    @if(auth()->guard('web')->check())
                     menu: [
                         {text: 'Show', route: '/jobOpportunity/show', icon: 'feather icon-eye'},
-                        @if(auth()->guard('web')->check())
                         {text: 'Edit', route: '/jobOpportunity/edit', icon: 'feather icon-edit'},
                         {route: '/jobOpportunity/delete', type: 'delete'}
-                        @endif
                     ],
+                    @endif
                     container: 'myGrid',
                     url: '/jobOpportunity/search',
                     tableRef: 'tbAG',
+                    @if(auth()->guard('carrier')->check())
+                    gridOptions: {
+                        onRowClicked: params => {
+                            window.location = `/jobOpportunity/show/${params.data.id}`;
+                        },
+                        rowClass: 'cursor-pointer',
+                    },
+                    @endif
                 });
             })();
         </script>

@@ -101,11 +101,6 @@
                 <a href="#"><i class="fas fa-hand-holding-usd"></i><span class="menu-title" data-i18n="User">Job Opportunities</span></a>
                 <ul class="menu-content">
                     <li>
-                        <a href="/jobOpportunity/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="/jobOpportunity/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
