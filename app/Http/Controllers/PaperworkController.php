@@ -613,6 +613,7 @@ class PaperworkController extends Controller
             $carrier = $vars["carrier"];
             $driver = $vars["driver"];
             $result = $vars["result"];
+            $date = $vars["date"];
 
             $correctAnswers = 0;
             $totalAnswers = 0;
@@ -641,7 +642,7 @@ class PaperworkController extends Controller
                         $reqAnswer = $request["input-$idx"];
                         if (isset($json->validate)) {
                             $totalAnswers++;
-                            if ($json->answers[0] === $reqAnswer)
+                            if (trim($json->answers[0]) === $reqAnswer)
                                 $correctAnswers++;
                         }
                         break;
@@ -663,7 +664,7 @@ class PaperworkController extends Controller
                         $reqAnswer = $signature;
                         break;
                     case 'date':
-                        $reqAnswer = $request["date-$idx"];
+                        $reqAnswer = $date;
                         break;
                 }
                 $template_filled[] = $reqAnswer;
@@ -673,6 +674,7 @@ class PaperworkController extends Controller
                 if ($validationTotal < 70)
                     return redirect()->back()->with('error', 'Your score wasn\'t enough to proceed, you may try to answer again');
             }
+            dd($template_filled);
 
             $template->paperwork_id = $paperwork->id;
             $template->related_id = $related_id;
@@ -751,10 +753,11 @@ class PaperworkController extends Controller
 
             switch ($type) {
                 case "text":
+                case "date":
                     $replaced[] = "<strong>$filled[$idx]</strong>";
                     break;
                 case 'radio':
-                    $replaced[] = "\r\n<div><h4 class='mt-2'>$json->text</h4>\r\n<p>$filled[$idx]</p></div>";
+                    $replaced[] = "\r\n<div><h4 class='mt-2'>$json->text</h4>\r\n<div>$filled[$idx]</div></div>";
                     break;
                 case 'signature':
                     $replaced[] = "\r\n<div style='text-align: center;'><img src='" . $this->getTemporaryFile($filled[$idx]) . "' alt='signature'></div>";
@@ -775,7 +778,7 @@ class PaperworkController extends Controller
             $result[0][$i] = "/" . preg_quote ($item) . "/";
         }
 
-        $html = "<h1 style='text-align: center;'>$paperwork->name</h1>" . preg_replace($result[0], $replaced, $paperwork->template, 1);
+        $html = str_replace("\r\n", "<br />", "<h1 style='text-align: center;'>$paperwork->name</h1>" . preg_replace($result[0], $replaced, $paperwork->template, 1));
         $title = $paperwork->name;
 
         $mpdf = new Mpdf();

@@ -36,7 +36,7 @@ trait PaperworkFilesFunctions
                                     },
                                 ])
                                     ->find($id);
-                                $shippers = $driver->truck->trailer->shippers_ids ?? [];
+                                $shippers = $driver->shippers_ids ?? [];
                                 $q->whereIn('id', $shippers);
                                 break;
                             default:

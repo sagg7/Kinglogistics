@@ -21,6 +21,8 @@ class Driver extends Authenticatable implements CanResetPassword
 {
     use HasFactory, HasApiTokens, SoftDeletes, Notifiable;
 
+    protected $appends = ['shippers_ids'];
+
     protected $hidden = [
         'password'
     ];
@@ -129,6 +131,11 @@ class Driver extends Authenticatable implements CanResetPassword
     public function shippers(): BelongsToMany
     {
         return $this->belongsToMany(Shipper::class);
+    }
+
+    public function getShippersIdsAttribute()
+    {
+        return $this->shippers->pluck('id');
     }
 
     /**

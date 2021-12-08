@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function profile()
     {
         $driver = auth()->user();
-        $createEdit = $this->getPaperworkByType('driver', $driver->id);
+        $createEdit = $this->getPaperworkByType('driver', $driver->id) + ['language' => ['spanish' => 'Spanish', 'english' => 'English']];
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
         $params = compact('driver', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
