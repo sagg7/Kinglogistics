@@ -80,6 +80,9 @@ class DriverController extends Controller
             if ($request->password)
                 $driver->password = Hash::make($request->password);
 
+            if ($id && $request->inactive)
+                $this->endShift($id);
+
             $driver->turn_id = $request->turn_id;
             $driver->zone_id = $request->zone_id;
             $driver->phone = $request->phone;
