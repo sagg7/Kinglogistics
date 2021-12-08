@@ -9,11 +9,13 @@
             </div>
             <div class="modal-body">
                 The following syntax elements are available to create the form template:<br><br>
-                <strong>1) {{"text":"Placeholder text"}} </strong><br><br>
-                Show a text input with a placeholder text of the data that is being requested to be filled <br><br>
+                <strong>1) {{"text":"Placeholder text","optional"}} </strong><br><br>
+                Show a text input with a placeholder text of the data that is being requested to be filled. If the
+                property "optional" is present, the input field becomes an optional data to be filled, this property
+                also works for any of the following cases.<br><br>
                 <strong>2) {{"text":"Placeholder text","answers":["First answer", "Second answer", "Third answer"], "validate"}} </strong><br><br>
                 Show a multiple choice question in which the placeholder would serve as a question. In the answers section,
-                in case the "validate" property would be present, the first answer would represent the correct option
+                in case the "validate" property is present, the first answer would represent the correct option
                 and all of them would show up randomized each time, at the end all the questions with this property
                 will be validated and if the average is above 70. In the other case when this property is not present
                 the question would represent a simple multiple choice scenario when the answers appear in the order they
