@@ -674,7 +674,7 @@ class PaperworkController extends Controller
                 if ($validationTotal < 70)
                     return redirect()->back()->with('error', 'Your score wasn\'t enough to proceed, you may try to answer again');
             }
-            dd($template_filled);
+            //dd($template_filled);
 
             $template->paperwork_id = $paperwork->id;
             $template->related_id = $related_id;
