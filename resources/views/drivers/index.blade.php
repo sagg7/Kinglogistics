@@ -74,6 +74,7 @@
                                     color = 'yellow'
                                 }
                                 this.eGui.innerHTML = `<div class="text-center" style="color: red;">${params.value}</div>`;
+                                new bootstrap.Tooltip(this.eGui, {title: Math.round((now - created)/60000)+" min"});
                             } else {
                                 this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
                             }
