@@ -59,6 +59,29 @@
                         TooltipRenderer.prototype.getGui = () => {
                             return this.eGui;
                         }
+                        function StatusRenderer() {}
+                        StatusRenderer.prototype.init = (params) => {
+                            this.eGui = document.createElement('div');
+
+
+                            if(params.value === 'pending'){
+                                let created = new Date(params.data.bot_answer.updated_at).getTime();
+                                let now = new Date().getTime();
+                                let color = 'green';
+                                if (now - created > 1000*60*10){
+                                    if (now - created > 1000*60*20)
+                                        color = 'red';
+                                    color = 'yellow'
+                                }
+                                this.eGui.innerHTML = `<div class="text-center" style="color: red;">${params.value}</div>`;
+                            } else {
+                                this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
+                            }
+
+                        }
+                        StatusRenderer.prototype.getGui = () => {
+                            return this.eGui;
+                        }
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         let menu;
                         if (type === "deleted") {
@@ -80,7 +103,7 @@
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
-                                {headerName: 'Status', field: 'status', valueFormatter: capitalizeFormatter},
+                                {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],
                             menu,
                             container: `grid${tableName}`,

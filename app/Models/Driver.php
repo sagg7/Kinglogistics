@@ -246,4 +246,9 @@ class Driver extends Authenticatable implements CanResetPassword
         return !$this->latestRejection || $now->isAfter($this->latestRejection->created_at->addHours(12));
     }
 
+    public function botAnswer(): HasOne
+    {
+        return $this->hasOne(BotAnswers::class)->latest();
+    }
+
 }

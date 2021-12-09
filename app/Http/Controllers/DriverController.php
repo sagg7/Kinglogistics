@@ -419,6 +419,7 @@ class DriverController extends Controller
             'truck:driver_id,number',
             'zone:id,name',
             'carrier:id,name',
+            'botAnswer',
             'latestLoad' => function ($q) {
                 $q->where('status', '!=', 'finished')
                     ->select('status', 'driver_id');
