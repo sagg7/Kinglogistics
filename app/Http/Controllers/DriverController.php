@@ -99,7 +99,7 @@ class DriverController extends Controller
             if (!$id) {
                 $host = explode(".", $request->getHost());
                 $host = $host[1] . "." . $host[2];
-                $subject = "Please complete your paperwork";
+                $subject = "Hello $driver->name Please complete your paperwork";
                 $title = "Complete your paperwork to continue the process";
                 $content = "Login to the paperwork completion process by this link";
                 $params = [
