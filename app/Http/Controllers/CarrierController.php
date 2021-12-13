@@ -203,7 +203,7 @@ class CarrierController extends Controller
                         "content" => $content,
                         "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
                     ];
-                    Mail::to($carrier->email)->send(new SendNotificationTemplate($params));
+                    Mail::to($driver->email)->send(new SendNotificationTemplate($params));
                 }
                 $params = [
                     "subject" => $subject,

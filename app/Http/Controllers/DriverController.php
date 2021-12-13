@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
+use App\Mail\SendNotificationTemplate;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Shift;
@@ -17,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -93,6 +95,21 @@ class DriverController extends Controller
             $driver->save();
 
             $driver->shippers()->sync($request->shippers);
+
+            if (!$id) {
+                $host = explode(".", $request->getHost());
+                $host = $host[1] . "." . $host[2];
+                $subject = "Please complete your paperwork";
+                $title = "Complete your paperwork to continue the process";
+                $content = "Login to the paperwork completion process by this link";
+                $params = [
+                    "subject" => $subject,
+                    "title" => $title,
+                    "content" => $content,
+                    "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
+                ];
+                Mail::to($driver->email)->send(new SendNotificationTemplate($params));
+            }
 
             return $driver;
         });
