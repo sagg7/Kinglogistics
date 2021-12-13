@@ -8,8 +8,11 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbAll = null,
+            var tbActive = null,
+                tbReady = null,
+                tbProspects = null,
                 tbDeleted = null,
+                tbNotWorking = null,
                 tbNotRehirable = null;
             (() => {
                 const pills = $('.nav-pills'),
@@ -31,7 +34,13 @@
                                         icon: 'fas fa-check-circle',
                                         type: 'confirm',
                                         conditional: 'status === "interested"',
-                                        menuData: {title: 'Set status as prospect?'}
+                                        menuData: {
+                                            title: 'Set status as prospect?',
+                                            afterConfirmFunction: () => {
+                                                if (tbProspects)
+                                                    tbProspects.updateSearchQuery();
+                                            }
+                                        },
                                     },
                                     {
                                         text: 'Ready to work',
@@ -40,7 +49,13 @@
                                         icon: 'fas fa-check-circle',
                                         type: 'confirm',
                                         conditional: 'status === "prospect"',
-                                        menuData: {title: 'Set status as ready to work?'}
+                                        menuData: {
+                                            title: 'Set status as ready to work?',
+                                            afterConfirmFunction: () => {
+                                                if (tbReady)
+                                                    tbReady.updateSearchQuery();
+                                            }
+                                        },
                                     },
                                     {
                                         text: 'Active',
@@ -49,7 +64,13 @@
                                         icon: 'fas fa-check-circle',
                                         type: 'confirm',
                                         conditional: 'status === "ready_to_work" || params.data.status === "not_working"',
-                                        menuData: {title: 'Set status as active?'}
+                                        menuData: {
+                                            title: 'Set status as active?',
+                                            afterConfirmFunction: () => {
+                                                if (tbActive)
+                                                    tbActive.updateSearchQuery();
+                                            }
+                                        },
                                     },
                                     {
                                         text: 'Not working',
@@ -58,7 +79,13 @@
                                         icon: 'far fa-times-circle',
                                         type: 'confirm',
                                         conditional: 'status === "active"',
-                                        menuData: {title: 'Set status as not working?'}
+                                        menuData: {
+                                            title: 'Set status as not working?',
+                                            afterConfirmFunction: () => {
+                                                if (tbNotWorking)
+                                                    tbNotWorking.updateSearchQuery();
+                                            }
+                                        },
                                     },
                                     {
                                         text: 'Not rehirable',
@@ -67,7 +94,13 @@
                                         icon: 'fas fa-ban font-weight-bold',
                                         type: 'confirm',
                                         conditional: 'status === "active"',
-                                        menuData: {title: 'Set status as not rehirable?'}
+                                        menuData: {
+                                            title: 'Set status as not rehirable?',
+                                            afterConfirmFunction: () => {
+                                                if (tbNotRehirable)
+                                                    tbNotRehirable.updateSearchQuery();
+                                            }
+                                        },
                                     },
                                     {route: '/carrier/delete', type: 'delete'},
                                 ];
@@ -233,7 +266,6 @@
         </script>
     @endsection
 
-    <!-- TODO: ADD DOCUMENT PROGRESS MODAL -->
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "view-paperwork", "title" => "Paperwork progress"])
     @endsection
@@ -252,6 +284,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-ready" aria-expanded="true">
+                                    Ready to work
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-prospect" aria-expanded="false">
                                     Prospects
                                 </a>
@@ -259,6 +296,11 @@
                             <li class="nav-item">
                                 <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-deleted" aria-expanded="false">
                                     Deleted
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-notWorking" aria-expanded="false">
+                                    Not working
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -274,11 +316,17 @@
                             <div role="tabpanel" class="tab-pane active" id="pane-active" aria-labelledby="pane-active" aria-expanded="true">
                                 <div id="gridActive"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane active" id="pane-prospect" aria-labelledby="pane-prospect" aria-expanded="true">
+                            <div role="tabpanel" class="tab-pane" id="pane-ready" aria-labelledby="pane-ready" aria-expanded="true">
+                                <div id="gridReady"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-prospect" aria-labelledby="pane-prospect" aria-expanded="true">
                                 <div id="gridProspect"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-deleted" aria-labelledby="pane-deleted" aria-expanded="true">
                                 <div id="gridDeleted"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-notWorking" aria-labelledby="pane-notWorking" aria-expanded="true">
+                                <div id="gridNotWorking"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-notRehirable" aria-labelledby="pane-notRehirable" aria-expanded="true">
                                 <div id="gridNotRehirable"></div>

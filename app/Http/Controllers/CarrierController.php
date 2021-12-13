@@ -343,9 +343,13 @@ class CarrierController extends Controller
         switch ($type) {
             default:
             case 'active':
-                $query->where('status', '=', CarrierEnum::INTERESTED)
-                    ->orWhere('status', '=', CarrierEnum::ACTIVE)
-                    ->orWhere('status', '=', CarrierEnum::READY_TO_WORK);
+                $query->where(function ($q) {
+                    $q->where('status', '=', CarrierEnum::INTERESTED)
+                        ->orWhere('status', '=', CarrierEnum::ACTIVE);
+                });
+                break;
+            case 'ready':
+                $query->where('status', '=', CarrierEnum::READY_TO_WORK);
                 break;
             case 'prospect':
                 $query->where('status', '=', CarrierEnum::PROSPECT);
@@ -353,6 +357,9 @@ class CarrierController extends Controller
             case 'deleted':
                 $query->onlyTrashed()
                     ->where('status', '!=', CarrierEnum::NOT_REHIRABLE);
+                break;
+            case 'notWorking':
+                $query->where('status', CarrierEnum::NOT_WORKING);
                 break;
             case 'notRehirable':
                 $query->onlyTrashed()
