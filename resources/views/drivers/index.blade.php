@@ -92,8 +92,9 @@
                         } else {
                             menu = [
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
-                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations'))
-                                {text: 'End Shift', route: "/driver/endShift", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || status === "active" || status === "ready"', menuData: {title: "End driver's shift?"}},
+                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))
+                                {text: 'End Shift', route: "/driver/endShift", icon: 'feather icon-x-circle', type: 'confirm', conditional: 'status === "pending" || status === "active" || status === "ready"', menuData: {title: "End driver's shift?"}},
+                                {text: 'Set as Active', route: "/driver/setActive", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || status === "ready"', menuData: {title: "Set driver as active?"}},
                                 @endif
                                 {route: '/driver/delete', type: 'delete'},
                             ];

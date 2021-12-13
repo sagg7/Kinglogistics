@@ -485,7 +485,18 @@ class DriverController extends Controller
         $driver->status = 'inactive';
         $driver->save();
 
-        return ['success' => $driver->restore()];
+        return ['success' => $driver];
+
+    }
+
+    public function setActive($id){
+
+        $driver = Driver::find($id);
+
+        $driver->status = 'active';
+        $driver->save();
+
+        return ['success' => $driver];
 
     }
 }
