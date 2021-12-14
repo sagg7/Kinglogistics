@@ -7,6 +7,7 @@ use App\Models\BotQuestions;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\Shift;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,6 +57,7 @@ class BotLoadReminder implements ShouldQueue
                 $botAnswer->answer = null;
                 $botAnswer->incorrect = 0;
                 $botAnswer->driver_id = $driver_id;
+                $botAnswer->updated_at = Carbon::now('America/Chicago');
                 $botAnswer->save();
 
                 $driver = Driver::find($driver_id);
