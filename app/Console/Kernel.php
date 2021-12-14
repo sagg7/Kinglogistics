@@ -134,29 +134,29 @@ class Kernel extends ConsoleKernel
         //})->weekly()->mondays()->at('08:00');
 
         // Welcome drivers with morning turn
-        $schedule->call(function () {
-            $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'inactive')->get();
-
-            $this->welcomeDrivers($drivers);
-        })->daily()->at('5:30');
-        // Discharge drivers with night turn
-        $schedule->call(function () {
-            $drivers = Driver::where('turn_id', 2)->whereNull('inactive')->where('status', 'inactive')->get();
-
-            $this->dischargeDrivers($drivers);
-        })->daily()->at('6:15');
-        // Welcome drivers with night turn
-        $schedule->call(function () {
-            $drivers = Driver::where('turn_id', 2)->whereNull('inactive')->where('status', 'inactive')->get();
-
-            $this->welcomeDrivers($drivers);
-        })->daily()->at('17:30');
-        // Discharge drivers with morning turn
-        $schedule->call(function () {
-            $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'inactive')->get();
-
-            $this->dischargeDrivers($drivers);
-        })->daily()->at('18:15');
+        //$schedule->call(function () {
+        //    $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'inactive')->get();
+//
+        //    $this->welcomeDrivers($drivers);
+        //})->daily()->at('5:30');
+        //// Discharge drivers with night turn
+        //$schedule->call(function () {
+        //    $drivers = Driver::where('turn_id', 2)->whereNull('inactive')->where('status', 'inactive')->get();
+//
+        //    $this->dischargeDrivers($drivers);
+        //})->daily()->at('6:15');
+        //// Welcome drivers with night turn
+        //$schedule->call(function () {
+        //    $drivers = Driver::where('turn_id', 2)->whereNull('inactive')->where('status', 'inactive')->get();
+//
+        //    $this->welcomeDrivers($drivers);
+        //})->daily()->at('17:30');
+        //// Discharge drivers with morning turn
+        //$schedule->call(function () {
+        //    $drivers = Driver::where('turn_id', 1)->whereNull('inactive')->where('status', 'inactive')->get();
+//
+        //    $this->dischargeDrivers($drivers);
+        //})->daily()->at('18:15');
     }
 
     /**
