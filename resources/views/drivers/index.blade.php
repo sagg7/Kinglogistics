@@ -12,6 +12,7 @@
                 tbNight = null,
                 tbAwaiting = null,
                 tbInactive = null;
+                now = null;
             (() => {
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
@@ -66,15 +67,16 @@
 
                             if(params.value === 'pending'){
                                 let created = new Date(params.data.bot_answer.updated_at).getTime();
-                                let now = new Date().getTime();
+                                let nowT = now.getTime();
                                 let color = 'green';
-                                if (now - created > 1000*60*10){
-                                    if (now - created > 1000*60*20)
+                                if ((nowT - created) > 1000*60*10){
+                                    if ((nowT - created) > 1000*60*20)
                                         color = 'red';
-                                    color = 'yellow'
+                                    else
+                                        color = 'orange'
                                 }
-                                this.eGui.innerHTML = `<div class="text-center" style="color: red;">${params.value}</div>`;
-                                new bootstrap.Tooltip(this.eGui, {title: Math.round((now - created)/60000)+" min"});
+                                this.eGui.innerHTML = `<div class="text-center" style="color: ${color};">${params.value}</div>`;
+                                new bootstrap.Tooltip(this.eGui, {title: Math.round((nowT - created)/60000)+" min"});
                             } else {
                                 this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
                             }
@@ -115,6 +117,9 @@
                                 if (params.count) {
                                     setCount(params.count);
                                     countByTab[type] = params.count;
+                                }
+                                if (params.now) {
+                                    now = new Date(params.now);
                                 }
                             }
                         };
