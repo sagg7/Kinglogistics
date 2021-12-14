@@ -124,7 +124,7 @@ class ChatController extends Controller
                         }
                         $driver->save();
                         $botAnswer->answer = $content;
-                        $botAnswer->updated_at = Carbon::now();
+                        $botAnswer->updated_at = Carbon::now('America/Chicago');
                         $botAnswer->save();
                         break;
                     case '2': //Hola {{driver:name}}, ¿Sigues Activo? Por favor contesta:
@@ -137,20 +137,20 @@ class ChatController extends Controller
                         }
                         $driver->save();
                         $botAnswer->answer = $content;
-                        $botAnswer->updated_at = Carbon::now();
+                        $botAnswer->updated_at = Carbon::now('America/Chicago');
                         $botAnswer->save();
                         break;
                     case '7'://Hola, ¿ya recibiste carga? por favor contesta: si no
                         if( $affirmative ) {
                             $responseContent = BotQuestions::find(8)->question; //Por favor, agrégala en la aplicación.
                             $botAnswer->answer = $content;
-                            $botAnswer->updated_at = Carbon::now();
+                            $botAnswer->updated_at = Carbon::now('America/Chicago');
                             $driver->status = 'active';
                             $driver->save();
                         } else {
                             $responseContent = BotQuestions::find(10)->question; //¿Sigues activo?
                             $botAnswer->bot_question_id = 2;
-                            $botAnswer->updated_at = Carbon::now();
+                            $botAnswer->updated_at = Carbon::now('America/Chicago');
                             $botAnswer->answer = null;
                         }
                         $botAnswer->save();
@@ -162,7 +162,7 @@ class ChatController extends Controller
             } else {
                 $responseContent = BotQuestions::find(4)->question; //Lo siento no te entendí, por favor contesta: SI NO
                 $botAnswer->incorrect++;
-                $botAnswer->updated_at = Carbon::now();
+                $botAnswer->updated_at = Carbon::now('America/Chicago');
                 $botAnswer->save();
             }
             $message = $this->sendMessage(

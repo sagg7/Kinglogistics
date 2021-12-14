@@ -2,6 +2,8 @@
 
 namespace App\Traits\EloquentQueryBuilder;
 
+use Carbon\Carbon;
+
 trait GetSimpleSearchData
 {
     private function simpleSearchData($query, $request, $mainStatement = 'where')
@@ -140,6 +142,7 @@ trait GetSimpleSearchData
         }
 
         return [
+            'now' => Carbon::now('America/Chicago'),
             'rows' => $result,
             'lastRow' => $total,
         ];
