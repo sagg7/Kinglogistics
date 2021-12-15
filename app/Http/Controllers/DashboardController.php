@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -23,14 +21,8 @@ class DashboardController extends Controller
         /*$start = Carbon::now()->subMonths(3)->startOfMonth();
         $end = Carbon::now()->endOfMonth()->endOfDay();*/
         //whereBetween('loads.date', [$start, $end])
-        $today = new Carbon();
-        if($today->dayOfWeek == Carbon::THURSDAY)
-            $monday = $today;
-        else
-            $monday = new Carbon('last monday');
-
-        $monday = $monday->format('Y/m/d')." 00:00:00";
-        $loads = Load::where(function ($q) use ($request) {
+        $loads = Load::whereDoesntHave('shipper_invoice')
+            ->where(function ($q) use ($request) {
                 if (auth()->guard('shipper')->check())
                     $q->where('shipper_id', auth()->user()->id);
                 else if (auth()->guard('carrier')->check())
@@ -47,8 +39,6 @@ class DashboardController extends Controller
                     $q->where('driver_id', $request->driver);
                 }
             })
-            ->join('load_statuses', 'loads.id', '=', 'load_id')
-            ->where(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), '>', $monday)
             ->with([
                 'driver' => function ($q) {
                     $q->with([
@@ -65,7 +55,7 @@ class DashboardController extends Controller
                 'load_type:id,name',
             ])
             ->get([
-                'loads.id',
+                'id',
                 'date',
                 'origin',
                 'destination',
