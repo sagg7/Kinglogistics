@@ -37,8 +37,11 @@
         </div>
         <div class="col-sm-6 col-12">
             <div class="card">
+                <div class="card-header align-self-center">
+                    <h3>Driver status</h3>
+                </div>
                 <div class="card-body">
-                    <div class="card-content">
+                    <div class="card-content"  style="height: 312px;">
                         <div id="driversChart"></div>
                     </div>
                 </div>
@@ -46,8 +49,11 @@
         </div>
         <div class="col-sm-6 col-12">
             <div class="card">
+                <div class="card-header align-self-center">
+                    <h3>Trailers use</h3>
+                </div>
                 <div class="card-body">
-                    <div class="card-content">
+                    <div class="card-content"  style="height: 312px;">
                         <div id="trailersChart"></div>
                     </div>
                 </div>

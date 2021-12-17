@@ -388,14 +388,14 @@ class DriverController extends Controller
                 if ($request->shipper)
                     $q->whereHas('shippers', function ($q) use ($request) {
                         $q->where('id', $request->shipper);
-                    })
-                        ->orWhereHas('truck', function ($q) use ($request) {
-                            $q->whereHas('trailer', function ($q) use ($request) {
-                                $q->whereHas('shippers', function ($q) use ($request) {
-                                    $q->where('id', $request->shipper);
-                                });
-                            });
-                        });
+                    });
+                        //->orWhereHas('truck', function ($q) use ($request) {
+                        //    $q->whereHas('trailer', function ($q) use ($request) {
+                        //        $q->whereHas('shippers', function ($q) use ($request) {
+                        //            $q->where('id', $request->shipper);
+                        //        });
+                        //    });
+                        //});
                 if ($request->trip)
                     $q->whereHas('active_load', function ($q) use ($request) {
                         $q->where('trip_id', $request->trip_id);
