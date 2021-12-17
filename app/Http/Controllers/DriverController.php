@@ -6,6 +6,7 @@ use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Mail\SendNotificationTemplate;
 use App\Models\AvailableDriver;
+use App\Models\BotAnswers;
 use App\Models\Driver;
 use App\Models\Shift;
 use App\Models\Zone;
@@ -482,8 +483,12 @@ class DriverController extends Controller
         if (!empty($driver->shift)) {
             Shift::destroy($driver->shift->id);
         }
+
+        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
+
         $driver->status = 'inactive';
         $driver->save();
+
 
         return ['success' => $driver];
 
@@ -492,9 +497,10 @@ class DriverController extends Controller
     public function setActive($id){
 
         $driver = Driver::find($id);
-
         $driver->status = 'active';
         $driver->save();
+
+        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
 
         return ['success' => $driver];
 

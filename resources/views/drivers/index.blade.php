@@ -76,7 +76,7 @@
                                         color = 'orange'
                                 }
                                 this.eGui.innerHTML = `<div class="text-center" style="color: ${color};">${params.value}</div>`;
-                                new bootstrap.Tooltip(this.eGui, {title: Math.round((nowT - created)/60000)+" min"});
+                                new bootstrap.Tooltip(this.eGui, {title: msToTime(nowT - created)});
                             } else {
                                 this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
                             }
@@ -142,6 +142,19 @@
                 });
                 activePane($('.tab-pane.active').attr('id'));
             })();
+
+            function msToTime(duration) {
+                var minutes = Math.floor((duration / (1000 * 60)) % 60),
+                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+                hours = (hours < 10) ? "0" + hours : hours;
+                minutes = (minutes < 10) ? "0" + minutes : minutes;
+                if (hours > 0)
+                    return hours + " hours " + minutes + " minutes";
+                else
+                    return minutes + " minutes";
+
+            }
         </script>
     @endsection
 

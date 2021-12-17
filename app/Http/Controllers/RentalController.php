@@ -241,9 +241,11 @@ class RentalController extends Controller
             'options',
             'position',
         ])
+            ->with('items')
             ->whereNull('deleted_at')
             ->orderBy('position')
             ->get();
+
         $pictures = DB::table('rental_delivery_photos')
             ->where('rental_id', '=', $rental_id)->get();
         $rental->drivers;
