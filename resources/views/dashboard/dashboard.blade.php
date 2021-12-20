@@ -29,7 +29,7 @@
                     <h3>On call personnel</h3>
                 </div>
                 <div class="card-body">
-                    <div class="card-content" style="height: 312px;">
+                    <div class="card-content" style="height: 360px;">
                         <div class="aggrid ag-auto-height total-row ag-theme-material w-100" id="onCallTable" style="height: 100%;"></div>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     <h3>Driver status</h3>
                 </div>
                 <div class="card-body">
-                    <div class="card-content"  style="height: 312px;">
+                    <div class="card-content"  style="height: 360px;">
                         <div id="driversChart"></div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     <h3>Trailers use</h3>
                 </div>
                 <div class="card-body">
-                    <div class="card-content"  style="height: 312px;">
+                    <div class="card-content"  style="height: 360px;">
                         <div id="trailersChart"></div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                     <h3>Jobs summary</h3>
                 </div>
                 <div class="card-body">
-                    <div class="card-content" style="height: 312px;">
+                    <div class="card-content" style="height: 360px;">
                         <div class="aggrid ag-auto-height total-row ag-theme-material w-100" id="jobsTable" style="height: 100%;"></div>
                     </div>
                 </div>

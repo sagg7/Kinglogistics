@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('load')->group(function () {
     Route::get('index', [LoadController::class, 'index'])
         ->name('load.index');
+    Route::get('indexDispatch', [LoadController::class, 'indexDispatch'])
+        ->name('load.indexDispatch');
     Route::get('show/{id}', [LoadController::class, 'show'])
         ->name('load.show');
     Route::get('location/{id}', [LoadController::class, 'location'])
