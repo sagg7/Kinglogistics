@@ -113,7 +113,7 @@ trait GenerateLoads
                 $loadStatus = new LoadStatus();
                 $loadStatus->load_id = $load->id;
                 $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
-                if ($load->notes = 'finished'){
+                if ($load->notes == 'finished'){
                     $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->requested_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->accepted_timestamp = Carbon::parse($data["date"]);
