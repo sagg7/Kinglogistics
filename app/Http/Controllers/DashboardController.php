@@ -21,32 +21,32 @@ class DashboardController extends Controller
     public function getData(Request $request)
     {
         /*$start = Carbon::now()->subMonths(3)->startOfMonth();
-        $end = Carbon::now()->endOfMonth()->endOfDay();*/
+       $end = Carbon::now()->endOfMonth()->endOfDay();*/
         //whereBetween('loads.date', [$start, $end])
         $today = new Carbon();
-        if($today->dayOfWeek == Carbon::THURSDAY)
+        if($today->dayOfWeek == Carbon::MONDAY)
             $monday = $today;
         else
             $monday = new Carbon('last monday');
 
         $monday = $monday->format('Y/m/d')." 00:00:00";
         $loads = Load::where(function ($q) use ($request) {
-                if (auth()->guard('shipper')->check())
-                    $q->where('shipper_id', auth()->user()->id);
-                else if (auth()->guard('carrier')->check())
-                    $q->whereHas('driver', function ($q) {
-                        $q->where('carrier_id', auth()->user()->id);
-                    });
-                if ($request->shipper) {
-                    $q->where('shipper_id', $request->shipper);
-                }
-                if ($request->trip) {
-                    $q->where('trip_id', $request->trip);
-                }
-                if ($request->driver) {
-                    $q->where('driver_id', $request->driver);
-                }
-            })
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
+            else if (auth()->guard('carrier')->check())
+                $q->whereHas('driver', function ($q) {
+                    $q->where('carrier_id', auth()->user()->id);
+                });
+            if ($request->shipper) {
+                $q->where('shipper_id', $request->shipper);
+            }
+            if ($request->trip) {
+                $q->where('trip_id', $request->trip);
+            }
+            if ($request->driver) {
+                $q->where('driver_id', $request->driver);
+            }
+        })
             ->join('load_statuses', 'loads.id', '=', 'load_id')
             ->where(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), '>', $monday)
             ->with([

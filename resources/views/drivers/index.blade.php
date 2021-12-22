@@ -12,6 +12,7 @@
                 tbNight = null,
                 tbAwaiting = null,
                 tbInactive = null;
+                now = null;
             (() => {
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
@@ -66,15 +67,16 @@
 
                             if(params.value === 'pending'){
                                 let created = new Date(params.data.bot_answer.updated_at).getTime();
-                                let now = new Date().getTime();
+                                let nowT = now.getTime();
                                 let color = 'green';
-                                if (now - created > 1000*60*10){
-                                    if (now - created > 1000*60*20)
+                                if ((nowT - created) > 1000*60*10){
+                                    if ((nowT - created) > 1000*60*20)
                                         color = 'red';
-                                    color = 'yellow'
+                                    else
+                                        color = 'orange'
                                 }
-                                this.eGui.innerHTML = `<div class="text-center" style="color: red;">${params.value}</div>`;
-                                new bootstrap.Tooltip(this.eGui, {title: Math.round((now - created)/60000)+" min"});
+                                this.eGui.innerHTML = `<div class="text-center" style="color: ${color};">${params.value}</div>`;
+                                new bootstrap.Tooltip(this.eGui, {title: msToTime(nowT - created)});
                             } else {
                                 this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
                             }
@@ -92,8 +94,9 @@
                         } else {
                             menu = [
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
-                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations'))
-                                {text: 'End Shift', route: "/driver/endShift", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || status === "active" || status === "ready"', menuData: {title: "End driver's shift?"}},
+                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))
+                                {text: 'End Shift', route: "/driver/endShift", icon: 'feather icon-x-circle', type: 'confirm', conditional: 'status === "pending" || status === "active" || status === "ready"', menuData: {title: "End driver's shift?"}},
+                                {text: 'Set as Active', route: "/driver/setActive", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || status === "ready"', menuData: {title: "Set driver as active?"}},
                                 @endif
                                 {route: '/driver/delete', type: 'delete'},
                             ];
@@ -114,6 +117,9 @@
                                 if (params.count) {
                                     setCount(params.count);
                                     countByTab[type] = params.count;
+                                }
+                                if (params.now) {
+                                    now = new Date(params.now);
                                 }
                             }
                         };
@@ -136,6 +142,19 @@
                 });
                 activePane($('.tab-pane.active').attr('id'));
             })();
+
+            function msToTime(duration) {
+                var minutes = Math.floor((duration / (1000 * 60)) % 60),
+                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+                hours = (hours < 10) ? "0" + hours : hours;
+                minutes = (minutes < 10) ? "0" + minutes : minutes;
+                if (hours > 0)
+                    return hours + " hours " + minutes + " minutes";
+                else
+                    return minutes + " minutes";
+
+            }
         </script>
     @endsection
 

@@ -2,6 +2,8 @@
 
 namespace App\Traits\EloquentQueryBuilder;
 
+use Carbon\Carbon;
+
 trait GetSimpleSearchData
 {
     private function simpleSearchData($query, $request, $mainStatement = 'where')
@@ -138,8 +140,8 @@ trait GetSimpleSearchData
             }
             array_multisort($sorting, $sortAfterQuery['direction'], $result);
         }
-
         return [
+            'now' => Carbon::now('America/Chicago')->format('Y-m-d H:i:s'),
             'rows' => $result,
             'lastRow' => $total,
         ];

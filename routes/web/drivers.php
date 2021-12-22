@@ -16,6 +16,8 @@ Route::prefix('driver')->group(function () {
         ->name('driver.update');
     Route::post('endShift/{id}', [DriverController::class, 'endShift'])
         ->name('driver.endShift');
+    Route::post('setActive/{id}', [DriverController::class, 'setActive'])
+        ->name('driver.setActive');
     Route::get('search/{type?}', [DriverController::class, 'search'])
         ->name('driver.search');
     Route::middleware('auth:web')->group(function () {

@@ -34,7 +34,7 @@ class RentalController extends Controller
     {
         return Validator::make($data, [
             'carrier_id' => ['required', 'exists:carriers,id'],
-            'driver_id' => ['required', 'exists:drivers,id'],
+            'driver_id' => ['exists:drivers,id'],
             'trailer_id' => ['required', 'exists:trailers,id'],
             'date_submit' => ['required', 'date'],
             'cost' => ['required', 'numeric'],
@@ -95,8 +95,10 @@ class RentalController extends Controller
 
             if ($rental->status !== 'finished') {
                 // Assign trailer to driver's truck
-                $rental->driver->truck->trailer_id = $request->trailer_id;
-                $rental->driver->truck->save();
+                if ($rental->driver && $rental->driver->truck) {
+                    $rental->driver->truck->trailer_id = $request->trailer_id;
+                    $rental->driver->truck->save();
+                }
                 // Assign trailer status to rented
                 $rental->trailer->status = 'rented';
                 $rental->trailer->save();
@@ -241,9 +243,11 @@ class RentalController extends Controller
             'options',
             'position',
         ])
+            ->with('items')
             ->whereNull('deleted_at')
             ->orderBy('position')
             ->get();
+
         $pictures = DB::table('rental_delivery_photos')
             ->where('rental_id', '=', $rental_id)->get();
         $rental->drivers;

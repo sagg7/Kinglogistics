@@ -44,10 +44,16 @@ class LoadController extends Controller
      */
     public function index()
     {
-        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch'))
-            return view('loads.indexDispatch');
-        else
-            return view('loads.index');
+        return view('loads.index');
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexDispatch()
+    {
+        return view('loads.indexDispatch');
     }
 
     /**
@@ -71,6 +77,7 @@ class LoadController extends Controller
     {
         $data = $request->all();
         $data['date'] = $request->date_submit;
+
 
         $shipper = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper_id;
         $data['shipper_id'] = $shipper;
@@ -123,7 +130,10 @@ class LoadController extends Controller
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)){ //temporary
                     $data['driver_id'] = $request->driver_id;
-                    $data['status'] = 'requested';
+                    if ($data['notes'])
+                        $data['status'] = 'finished';
+                    else
+                        $data['status'] = 'requested';
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
@@ -318,7 +328,7 @@ class LoadController extends Controller
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
-        if (auth()->guard('web')->check() && auth()->user()->hasRole('dispatch')) {
+        if (auth()->guard('web')->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
             $select[] = 'customer_reference';

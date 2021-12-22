@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
+use App\Mail\SendNotificationTemplate;
 use App\Models\AvailableDriver;
+use App\Models\BotAnswers;
 use App\Models\Driver;
 use App\Models\Shift;
 use App\Models\Zone;
@@ -17,6 +19,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -93,6 +96,21 @@ class DriverController extends Controller
             $driver->save();
 
             $driver->shippers()->sync($request->shippers);
+
+            if (!$id) {
+                $host = explode(".", $request->getHost());
+                $host = $host[1] . "." . $host[2];
+                $subject = "Hello $driver->name Please complete your paperwork";
+                $title = "Complete your paperwork to continue the process";
+                $content = "Login to the paperwork completion process by this link";
+                $params = [
+                    "subject" => $subject,
+                    "title" => $title,
+                    "content" => $content,
+                    "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
+                ];
+                Mail::to($driver->email)->send(new SendNotificationTemplate($params));
+            }
 
             return $driver;
         });
@@ -209,12 +227,12 @@ class DriverController extends Controller
             ->whereHas("carrier", function ($q) {
                 $q->whereNull("inactive");
             })
-            ->where(function ($q) use ($request) {
-                if ($request->rental)
-                    $q->whereHas("truck", function ($s) {
-                        $s->whereDoesntHave("trailer");
-                    });
-            })
+           //->where(function ($q) use ($request) {//temporal
+           //    if ($request->rental)
+           //        $q->whereHas("truck", function ($s) {
+           //            $s->whereDoesntHave("trailer");
+           //        });
+           //})
             ->with('truck.trailer:id,number');
 
         return $this->selectionData($query, $request->take, $request->page);
@@ -370,14 +388,14 @@ class DriverController extends Controller
                 if ($request->shipper)
                     $q->whereHas('shippers', function ($q) use ($request) {
                         $q->where('id', $request->shipper);
-                    })
-                        ->orWhereHas('truck', function ($q) use ($request) {
-                            $q->whereHas('trailer', function ($q) use ($request) {
-                                $q->whereHas('shippers', function ($q) use ($request) {
-                                    $q->where('id', $request->shipper);
-                                });
-                            });
-                        });
+                    });
+                        //->orWhereHas('truck', function ($q) use ($request) {
+                        //    $q->whereHas('trailer', function ($q) use ($request) {
+                        //        $q->whereHas('shippers', function ($q) use ($request) {
+                        //            $q->where('id', $request->shipper);
+                        //        });
+                        //    });
+                        //});
                 if ($request->trip)
                     $q->whereHas('active_load', function ($q) use ($request) {
                         $q->where('trip_id', $request->trip_id);
@@ -465,10 +483,26 @@ class DriverController extends Controller
         if (!empty($driver->shift)) {
             Shift::destroy($driver->shift->id);
         }
+
+        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
+
         $driver->status = 'inactive';
         $driver->save();
 
-        return ['success' => $driver->restore()];
+
+        return ['success' => $driver];
+
+    }
+
+    public function setActive($id){
+
+        $driver = Driver::find($id);
+        $driver->status = 'active';
+        $driver->save();
+
+        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
+
+        return ['success' => $driver];
 
     }
 }

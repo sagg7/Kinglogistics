@@ -232,6 +232,13 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
+                    <li>
+                        <a href="/load/indexDispatch">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View loads Dispatch</span>
+                        </a>
+                    </li>
+                    @endif
                     <li>
                         <a href="/trip/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Jobs</span>
@@ -274,7 +281,7 @@
                     </li>
                 </ul>
             </li>
-            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
+            @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety', 'sales']))
                 <li class="nav-item has-sub">
                     <a href="#"><i class="fas fa-map-marker-alt"></i><span class="menu-item" data-i18n="View">Tracking</span></a>
                     <ul class="menu-content">

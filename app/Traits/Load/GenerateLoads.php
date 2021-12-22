@@ -112,7 +112,17 @@ trait GenerateLoads
             if (!$id){
                 $loadStatus = new LoadStatus();
                 $loadStatus->load_id = $load->id;
-                $loadStatus->unallocated_timestamp = Carbon::now();
+                $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
+                if ($load->notes == 'finished'){
+                    $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->requested_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->accepted_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->loading_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->to_location_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->arrived_timestamp = Carbon::parse($data["date"]);
+                    $loadStatus->finished_timestamp = Carbon::parse($data["date"]);
+                }
+
                 $loadStatus->save();
             }
 
@@ -123,7 +133,7 @@ trait GenerateLoads
             $load = Load::find($load->id);
             $load->notified_at = Carbon::now()->format('Y-m-d H:i:s');
 
-            if (isset($data["driver_id"])) {
+            if (isset($data["driver_id"]) and $load->notes != 'finished') {
                 // Send push notification message to Driver
                 $this->notifyToDriver($data["driver_id"], $load);
 

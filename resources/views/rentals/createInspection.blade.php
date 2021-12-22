@@ -126,10 +126,8 @@
                                                     <div class="col-sm-4 col-md-6">
                                                         <div class="condition-background-select">
                                                             <select name="condition-background" id="conditionBackground" tabindex="-1" aria-hidden="true" @if(isset($is_deliver)){{ 'disabled' }}@endif>
-                                                                <option value="5" data-img="{{ asset('assets')}}/img/trailers/sandbox.jpg">Sandox</option>
-                                                                <option value="6" data-img="{{ asset('assets')}}/img/trailers/sandbox.jpg">Pick-Up</option>
-                                                                <option value="7" data-img="{{ asset('assets')}}/img/trailers/sandbox.jpg">Hatchback</option>
-                                                                <option value="8" data-img="{{ asset('assets')}}/img/trailers/sandbox.jpg">Camioneta</option>
+                                                                <option value="1" data-img="{{ asset('images/app/trailers/sandbox.png')}}">Sandox</option>
+                                                                <option value="2" data-img="{{ asset('images/app/trailers/sandbox.png')}}">HiCrush</option>
                                                             </select>
                                                         </div>
                                                     </div>
