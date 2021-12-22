@@ -57,7 +57,7 @@ class ReportController extends Controller
                             'trucks.number',
                         ]);
                 },
-                'chassisType:id,name',
+                'chassis_type:id,name',
             ])
             ->get();
     }

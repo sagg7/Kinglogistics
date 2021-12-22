@@ -48,5 +48,9 @@
         </script>
     @endsection
 
-    <x-aggrid-index></x-aggrid-index>
+    @component('components.aggrid-index', [
+    'menu' => [
+        ['url' => '/trailer/downloadXLS', 'text' => 'Download report', 'icon' => 'fas fa-file-excel']
+    ]
+    ])@endcomponent
 </x-app-layout>

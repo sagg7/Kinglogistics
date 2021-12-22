@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TemplateExport;
 use App\Models\ChassisType;
 use App\Models\Trailer;
 use App\Models\TrailerType;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -27,7 +29,7 @@ class TrailerController extends Controller
             'trailer_type_id' => ['required', 'exists:trailer_types,id'],
             'chassis_type_id' => ['required', 'exists:chassis_types,id'],
             'shipper_id' => ['nullable', 'exists:shippers,id'],
-            'number' => ['required', 'string', 'max:255'],
+            'number' => ['required', 'string', 'max:255', "unique:trailers,number,$id,id"],
             'plate' => ['nullable', 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:255'],
             'shippers' => ['nullable', 'array', 'exists:shippers,id'],
@@ -157,7 +159,7 @@ class TrailerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validator($request->all())->validate();
+        $this->validator($request->all(), $id)->validate();
 
         $this->storeUpdate($request, $id);
 
@@ -259,5 +261,28 @@ class TrailerController extends Controller
         }
 
         return $this->multiTabSearchData($query, $request);
+    }
+
+    public function downloadXLS()
+    {
+        $trailers = Trailer::with([
+            'trailer_type:id,name',
+            'chassis_type:id,name',
+        ])
+            ->get();
+        $data = [];
+        foreach ($trailers as $trailer) {
+            $data[] = [
+                'number' => $trailer->number,
+                'trailer_type' => $trailer->trailer_type->name,
+                'chassis_type' => $trailer->chassis_type->name,
+                'plate' => $trailer->plate,
+                'vin' => $trailer->vin,
+            ];
+        }
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Number", "Trailer Type", "Chassis Type", "Plate", "Vin"],
+        ]))->download("Trailers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
