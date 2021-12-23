@@ -20,4 +20,6 @@ Route::prefix('trailer')->group(function () {
         ->name('trailer.update');
     Route::post('delete/{id}', [TrailerController::class, 'destroy'])
         ->name('trailer.delete');
+    Route::get('downloadXLS', [TrailerController::class, 'downloadXLS'])
+        ->name('trailer.downloadXLS');
 });

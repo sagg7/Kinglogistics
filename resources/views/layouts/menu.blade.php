@@ -304,6 +304,16 @@
                     <a href="/chat"><i class="fas fa-comments"></i><span class="menu-title" data-i18n="User">Chat</span></a>
                 </li>
             @endif
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-chart-bar"></i><span class="menu-title" data-i18n="User">Reports</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/report/dailyLoads">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Daily Loads</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="navigation-header">
                 <span>Safety</span>
             </li>
