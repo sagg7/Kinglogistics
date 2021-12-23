@@ -53,6 +53,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/carrierPayments/editPayment.js'], 'public/js/sections/carrierPayments/editPayment.min.js')
     //.scripts(['resources/js/sections/drivers/common.js'], 'public/js/sections/drivers/common.min.js')
     //.scripts(['resources/js/sections/trucks/common.js'], 'public/js/sections/trucks/common.min.js')
+    .scripts(['resources/js/sections/reports/dailyLoads.js'], 'public/js/sections/reports/dailyLoads.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/expenses/common.js'], 'public/js/sections/subdomains/carriers/expenses/common.min.js')
     //.scripts(['resources/js/sections/subdomains/carriers/reports/historical.js'], 'public/js/sections/subdomains/carriers/reports/historical.min.js')

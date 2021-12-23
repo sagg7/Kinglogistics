@@ -31,12 +31,18 @@ class ReportController extends Controller
                         ->whereDate('finished_timestamp', '<=', $end)
                         ->orderBy('finished_timestamp')
                         ->select(['loads.id', 'trip_id', 'finished_timestamp']);
-                }
+                },
+                'shipper:id,name',
             ])
-            ->get(['id','name']);
+            ->withTrashed()
+            ->where(function ($q) use ($request) {
+                if ($request->shipper)
+                    $q->where('shipper_id', $request->shipper);
+            })
+            ->get(['id','name','shipper_id']);
 
-        $trips = [];
         $dates = [];
+        $series = [];
         // For each trip
         foreach ($query as $trip) {
             $count = [];
@@ -53,16 +59,42 @@ class ReportController extends Controller
                 else // else set is initial value as 1
                     $count[$formatted] = 1;
             }
-            // Store the name of the trip and the dates count data on the array
-            $trips[] = [
-                'name' => $trip->name,
-                'data' => $count,
-            ];
+
+            switch ($request->graph_type) {
+                default:
+                case "trips": // Format the data per trip
+                    // Store the name of the trip and the dates count data on the array
+                    $series[] = [
+                        'name' => $trip->name,
+                        'data' => $count,
+                    ];
+                    break;
+                case "shippers": // Format the data per shipper (customer)
+                    if (isset($series[$trip->shipper_id])) {
+                        foreach ($count as $date => $item) {
+                            // If the data for the date exists, sum the count to the previous value
+                            if (isset($series[$trip->shipper_id]["data"][$date]))
+                                $series[$trip->shipper_id]["data"][$date] += $item;
+                            else
+                                // else store the value
+                                $series[$trip->shipper_id]["data"][$date] = $item;
+                        }
+                    } else {
+                        // Store the name of the shipper and the dates count data on the array
+                        $series[$trip->shipper_id] = [
+                            'name' => $trip->shipper->name,
+                            'data' => $count,
+                        ];
+                    }
+                    break;
+            }
         }
+        if ($request->graph_type === "shippers")
+            $series = array_values($series);
         // Sort dates to correct order
         array_multisort($dates);
         // Loop trough each trip data
-        foreach ($trips as $key => $item) {
+        foreach ($series as $key => $item) {
             $data = [];
             // Using the saved dates array, saved the count of each date
             foreach ($dates as $date) {
@@ -74,14 +106,14 @@ class ReportController extends Controller
                 }
             }
             // Replaced the previous count to the new one, including dates as count 0
-            $trips[$key]['data'] = $data;
+            $series[$key]['data'] = $data;
         }
 
-        // Finally, format the dates array to a human readable format
+        // Finally, format the dates array to a human-readable format
         foreach ($dates as $key => $date) {
             $dates[$key] = Carbon::parse($date)->format('M d');
         }
 
-        return ['series' => $trips, 'categories' => $dates];
+        return ['series' => $series, 'categories' => $dates];
     }
 }

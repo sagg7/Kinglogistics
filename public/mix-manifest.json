@@ -1,3 +1,4 @@
 {
-    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js"
+    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
+    "/js/sections/reports/dailyLoads.min.js": "/js/sections/reports/dailyLoads.min.js"
 }
