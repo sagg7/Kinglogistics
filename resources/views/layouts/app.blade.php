@@ -138,5 +138,18 @@
             type="application/javascript"></script>
     <!-- END: Scripts JS-->
     @yield("scripts")
+    <script>
+        (() => {
+            @if($errors->any())
+            const errors = @json($errors->all());
+            let msg = `<ul class="text-left">`;
+            errors.forEach(error => {
+                msg += `<li>${error}</li>`;
+            });
+            msg += `</ul>`;
+            throwErrorMsg(msg);
+            @endif
+        })();
+    </script>
     </body>
 </html>

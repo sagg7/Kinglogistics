@@ -10,7 +10,7 @@ Route::prefix('rental')->group(function () {
         ->name('rental.create');
     Route::post('store', [RentalController::class, 'store'])
         ->name('rental.store');
-    Route::get('search', [RentalController::class, 'search'])
+    Route::get('search/{type?}', [RentalController::class, 'search'])
         ->name('rental.search');
     Route::get('edit/{id}', [RentalController::class, 'edit'])
         ->name('rental.edit');
@@ -22,6 +22,8 @@ Route::prefix('rental')->group(function () {
         ->name('rental.uploadPhoto');
     Route::post('getRented', [RentalController::class, 'getRented'])
         ->name('getRented');
+    Route::get('downloadXLS/{type}', [RentalController::class, 'downloadXLS'])
+        ->name('trailer.downloadXLS');
 
 });
 

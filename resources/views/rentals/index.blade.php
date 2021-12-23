@@ -8,7 +8,9 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbAG = null;
+            var tbUninspected = null,
+                tbDelivered = null,
+                tbFinished = null;
             (() => {
                 const nameFormatter = (params) => {
                     if (params.value)
@@ -34,30 +36,112 @@
                     else
                         return '';
                 };
-                tbAG = new tableAG({
-                    columns: [
-                        //{headerName: 'Fecha', field: 'date'},
-                        {headerName: 'Date', field: 'date'},
-                        {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
-                        {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
-                        {headerName: 'Trailer', field: 'trailer', valueFormatter: numberFormatter},
-                        {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
-                        {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
-                        {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
-                    ],
-                    menu: [
-                        {text: 'Check out', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
-                        {text: 'Check in', route: "/inspection/endInspection", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "delivered"'},
-                        {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
-                        {route: '/rental/delete', type: 'delete'}
-                    ],
-                    container: 'myGrid',
-                    url: '/rental/search',
-                    tableRef: 'tbAG',
+                const pills = $('.nav-pills'),
+                    options = pills.find('.nav-item'),
+                    tableProperties = (type) => {
+                        const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
+                        return {
+                            columns: [
+                                //{headerName: 'Fecha', field: 'date'},
+                                {headerName: 'Date', field: 'date'},
+                                {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                                {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
+                                {headerName: 'Trailer', field: 'trailer', valueFormatter: numberFormatter},
+                                {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
+                                {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
+                                {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
+                            ],
+                            menu: [
+                                {text: 'Check out', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
+                                {text: 'Check in', route: "/inspection/endInspection", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "delivered"'},
+                                {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
+                                {route: '/rental/delete', type: 'delete'}
+                            ],
+                            container: `grid${tableName}`,
+                            url: `/rental/search/${type}`,
+                            tableRef: `tb${tableName}`,
+                        };
+                    },
+                    initTables = (type) => {
+                        let table = `tb${type.replace(/^\w/, (c) => c.toUpperCase())}`;
+                        if (!window[table])
+                            window[table] = new tableAG(tableProperties(`${type}`));
+                    },
+                    activePane = (id) => {
+                        const type = id.split('-')[1];
+                        initTables(type);
+                    };
+                options.click((e) => {
+                    const link = $(e.currentTarget).find('a'),
+                        id = link.attr('href');
+                    activePane(id);
                 });
+                activePane($('.tab-pane.active').attr('id'));
+                $('#downloadXLS').click((e) => {
+                    e.preventDefault();
+                    const type = $('.tab-pane.active').attr('id').split('-')[1];
+                    window.location.href = `/rental/downloadXLS/${type}`;
+                })
             })();
         </script>
     @endsection
 
-    <x-aggrid-index></x-aggrid-index>
+    <div class="card pills-layout">
+        <div class="card-content">
+
+            <div class="card-header">
+                <div class="col-12">
+                    <div class="dropdown float-right">
+                        <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                            <a href="#" class="dropdown-item" id="downloadXLS"><i class="fas fa-file-excel"></i> Download Report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <div class="card-body">
+                <div class="row ml-0">
+
+                    <div class="col-lg col-md col-xs-12 col-sm-12 pl-0 pr-0 pills-menu-col">
+                        <ul class="nav nav-pills flex-column mt-md-0 mt-1">
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75 active" data-toggle="pill" href="#pane-uninspected" aria-expanded="true">
+                                    Uninspected
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-delivered" aria-expanded="false">
+                                    Delivered
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-finished" aria-expanded="false">
+                                    Finished
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg col-md col-xs-12 col-sm-12">
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="pane-uninspected" aria-labelledby="pane-uninspected" aria-expanded="true">
+                                <div id="gridUninspected"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-delivered" aria-labelledby="pane-delivered" aria-expanded="false">
+                                <div id="gridDelivered"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-finished" aria-labelledby="pane-finished" aria-expanded="false">
+                                <div id="gridFinished"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

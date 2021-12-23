@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PeriodEnum;
+use App\Exports\TemplateExport;
 use App\Models\InspectionCategory;
 use App\Models\InspectionRentalDelivery;
 use App\Models\InspectionRentalReturned;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 
 class RentalController extends Controller
@@ -184,7 +186,7 @@ class RentalController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function search(Request $request, $type)
     {
         $query = Rental::select([
             "rentals.id",
@@ -196,8 +198,12 @@ class RentalController extends Controller
             "rentals.cost",
             "rentals.status",
             "rentals.deposit",
+            "rentals.status",
         ])
             ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number']);
+
+        if ($type)
+            $query = $query->where('status', $type);
 
         $relationships = [];
         if ($request->searchable) {
@@ -519,5 +525,41 @@ class RentalController extends Controller
             'total' => $total
         ];
         return response()->json($data);
+    }
+
+    public function downloadXLS($type)
+    {
+        $rentals = Rental::with([
+            'carrier:id,name',
+            'carrier:id,name',
+            'trailer:id,number',
+        ])
+            ->where('status', $type)
+            ->get();
+
+        if (count($rentals) === 0)
+            return redirect()->back()->withErrors('There are no rentals to generate the document');
+
+        $data = [];
+        foreach ($rentals as $rental) {
+            $data[] = [
+                'date' => $rental->date->format('m/d/Y'),
+                'carrier' => $rental->carrier->name,
+                'driver' => $rental->driver->name,
+                'trailer' => $rental->trailer->number,
+                'period' => ucfirst($rental->period),
+                'cost' => $rental->cost,
+                'deposit' => $rental->deposit,
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Date", "Carrier", "Driver", "Trailer", "Period", "Cost", "Deposit"],
+            "formats" => [
+                'F' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+                'G' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Rentals " . ucfirst($type) . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
