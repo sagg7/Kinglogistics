@@ -271,7 +271,7 @@ class RentalController extends Controller
         $inspection_items = $this->createInspectionArray($request, $rental);
         $rental->inspectionItems()->sync($inspection_items);
         $rental->delivered_at = Carbon::now();
-        $rental->status = 'rented';
+        $rental->status = 'delivered';
         $rental->save();
         $jsonData = [
             'id' => $rental->id,

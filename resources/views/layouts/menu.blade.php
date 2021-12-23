@@ -227,11 +227,14 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
                         </a>
                     </li>
+                    @if(auth()->user()->hasRole(['admin', 'operations']))
+
                     <li>
                         <a href="/load/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    @endif
                     @if(auth()->user()->hasRole(['admin', 'operations', 'dispatch']))
                     <li>
                         <a href="/load/indexDispatch">
