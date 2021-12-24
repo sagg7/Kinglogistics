@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierPaymentEnum;
+use App\Exports\TemplateExport;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
 use App\Models\BonusType;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use function PHPUnit\Framework\isNan;
 
 class CarrierPaymentController extends Controller
@@ -229,7 +231,7 @@ class CarrierPaymentController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request, $type)
+    public function search(Request $request, $type, $download = false)
     {
         switch ($type) {
             default:
@@ -237,7 +239,7 @@ class CarrierPaymentController extends Controller
             case CarrierPaymentEnum::COMPLETED:
             case CarrierPaymentEnum::DAILY:
             case 'completedCharges':
-                return $this->searchCarrierPayments($request, $type);
+                return $this->searchCarrierPayments($request, $type, $download);
             case 'pendingCharges':
                 return $this->searchCarrierExpenses($request);
         }
@@ -267,7 +269,7 @@ class CarrierPaymentController extends Controller
     /**
      * @param Request $request
      * @param $type
-     * @return \Illuminate\Http\JsonResponse
+     * @return array|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     private function searchCarrierPayments(Request $request, $type)
     {
@@ -298,6 +300,32 @@ class CarrierPaymentController extends Controller
                         break;
                 }
             });
+
+        if ($request->download) {
+            $query = $query->get();
+            if (count($query) === 0)
+                return redirect()->back()->withErrors('There are no payments to generate the document');
+            $data = [];
+            foreach ($query as $item) {
+                $data[] = [
+                    $item->date->format('m/d/Y'),
+                    $item->carrier->name,
+                    $item->gross_amount,
+                    $item->reductions,
+                    $item->total,
+                    ucfirst($item->status),
+                ];
+            }
+            return (new TemplateExport([
+                "data" => $data,
+                "headers" => ["Date", "Carrier", "Subtotal", "Reductions", "Total", "Status"],
+                "formats" => [
+                    'C' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+                    'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+                    'E' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+                ],
+            ]))->download("Rentals " . ucfirst($type) . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+        }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

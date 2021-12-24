@@ -11,7 +11,6 @@
             var tbUninspected = null,
                 tbDelivered = null,
                 tbFinished = null;
-            const dateRange = $('#dateRange');
             (() => {
                 const nameFormatter = (params) => {
                     if (params.value)
@@ -92,11 +91,7 @@
                     activePane(id);
                 });
                 activePane($('.tab-pane.active').attr('id'));
-                $('#downloadXLS').click((e) => {
-                    e.preventDefault();
-                    const type = $('.tab-pane.active').attr('id').split('-')[1];
-                    window.location.href = `/rental/downloadXLS/${type}?start=${dateRange.data('daterangepicker').startDate.format('YYYY-MM-DD')}&end=${dateRange.data('daterangepicker').endDate.format('YYYY-MM-DD')}`;
-                });
+                const dateRange = $('#dateRange');
                 dateRange.daterangepicker({
                     format: 'YYYY/MM/DD',
                     startDate: moment().startOf('month'),
@@ -116,26 +111,6 @@
 
     <div class="card pills-layout">
         <div class="card-content">
-
-            <div class="card-header align-items-center">
-                <div class="col-4">
-                    <div class="d-none" id="dateFilter">
-                        <label for="dateRange">Select Dates</label>
-                        <input type="text" id="dateRange" class="form-control">
-                    </div>
-                </div>
-                <div class="col-4 offset-4">
-                    <div class="dropdown float-right">
-                        <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                            <a href="#" class="dropdown-item" id="downloadXLS"><i class="fas fa-file-excel"></i> Download Report</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr>
 
             <div class="card-body">
                 <div class="row ml-0">
@@ -163,12 +138,57 @@
                     <div class="col-lg col-md col-xs-12 col-sm-12">
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="pane-uninspected" aria-labelledby="pane-uninspected" aria-expanded="true">
+                                <div class="row align-items-center">
+                                    <div class="col-4 offset-8">
+                                        <div class="dropdown float-right">
+                                            <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-bars"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                                <a href="/rental/downloadXLS/uninspected" class="dropdown-item"><i class="fas fa-file-excel"></i> Download Report</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div id="gridUninspected"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-delivered" aria-labelledby="pane-delivered" aria-expanded="false">
+                                <div class="row align-items-center">
+                                    <div class="col-4 offset-8">
+                                        <div class="dropdown float-right">
+                                            <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-bars"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                                <a href="/rental/downloadXLS/delivered" class="dropdown-item"><i class="fas fa-file-excel"></i> Download Report</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div id="gridDelivered"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-finished" aria-labelledby="pane-finished" aria-expanded="false">
+                                <div class="row align-items-center">
+                                    <div class="col-4">
+                                        <div class="d-none" id="dateFilter">
+                                            <label for="dateRange">Select Dates</label>
+                                            <input type="text" id="dateRange" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-4 offset-4">
+                                        <div class="dropdown float-right">
+                                            <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-bars"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                                <a href="/rental/downloadXLS/finished" class="dropdown-item"><i class="fas fa-file-excel"></i> Download Report</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div id="gridFinished"></div>
                             </div>
                         </div>

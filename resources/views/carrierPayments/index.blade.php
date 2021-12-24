@@ -161,12 +161,38 @@
     @endsection
     @component('components.nav-pills-form', ['pills' => [['name' => 'Pending Payments', 'pane' => 'pending-payments'],['name' => 'Daily Pay', 'pane' => 'daily-payments'],['name' => 'Completed Payments', 'pane' => 'completed-payments'],['name' => 'Pending Charges', 'pane' => 'pending-charges'],['name' => 'Completed Charges', 'pane' => 'completed-charges']]])
         <div role="tabpanel" class="tab-pane active" id="pending-payments">
+            <div class="row align-items-center">
+                <div class="col-4 offset-8">
+                    <div class="dropdown float-right">
+                        <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                            <a href="/carrier/payment/downloadXLS/pending?download=1" class="dropdown-item" id="downloadXLS"><i class="fas fa-file-excel"></i> Download Report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div id="pendingPaymentsGrid"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="daily-payments">
             <div id="dailyPaymentsGrid"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="completed-payments">
+            <div class="row align-items-center">
+                <div class="col-4 offset-8">
+                    <div class="dropdown float-right">
+                        <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                            <a href="/carrier/payment/downloadXLS/completed?download=1" class="dropdown-item" id="downloadXLS"><i class="fas fa-file-excel"></i> Download Report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div id="completedPaymentsGrid"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="pending-charges">

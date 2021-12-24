@@ -37,6 +37,8 @@ Route::prefix('carrier')->group(function () {
             ->name('carrierPayment.update');
         Route::get('search/{type}', [CarrierPaymentController::class, 'search'])
             ->name('carrierPayment.search');
+        Route::get('downloadXLS/{type}', [CarrierPaymentController::class, 'search'])
+            ->name('carrierPayment.downloadXLS');
         Route::get('downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
             ->name('carrierPayment.downloadPaymentPDF');
 
