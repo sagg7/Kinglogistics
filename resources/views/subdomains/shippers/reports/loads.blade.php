@@ -153,7 +153,6 @@
                     };
                 dateRange.daterangepicker({
                     format: 'YYYY/MM/DD',
-                    locale: dateRangeLocale,
                     startDate: moment().startOf('week'),
                     endDate: moment().endOf('week'),
                 }, (start, end, label) => {

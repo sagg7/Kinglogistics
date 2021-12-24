@@ -200,10 +200,18 @@ class RentalController extends Controller
             "rentals.deposit",
             "rentals.status",
         ])
-            ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number']);
-
-        if ($type)
-            $query = $query->where('status', $type);
+            ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
+            ->where('status', $type)
+            ->where(function ($q) use ($type, $request) {
+                switch ($type) {
+                    case 'finished':
+                        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+                        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+                        $q->whereDate('finished_at', '>=', $start)
+                            ->whereDate('finished_at', '<=', $end);
+                        break;
+                }
+            });
 
         $relationships = [];
         if ($request->searchable) {
@@ -527,7 +535,7 @@ class RentalController extends Controller
         return response()->json($data);
     }
 
-    public function downloadXLS($type)
+    public function downloadXLS(Request $request, $type)
     {
         $rentals = Rental::with([
             'carrier:id,name',
@@ -535,6 +543,16 @@ class RentalController extends Controller
             'trailer:id,number',
         ])
             ->where('status', $type)
+            ->where(function ($q) use ($type, $request) {
+                switch ($type) {
+                    case 'finished':
+                        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+                        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+                        $q->whereDate('finished_at', '>=', $start)
+                            ->whereDate('finished_at', '<=', $end);
+                        break;
+                }
+            })
             ->get();
 
         if (count($rentals) === 0)

@@ -11,6 +11,7 @@
             var tbUninspected = null,
                 tbDelivered = null,
                 tbFinished = null;
+            const dateRange = $('#dateRange');
             (() => {
                 const nameFormatter = (params) => {
                     if (params.value)
@@ -50,6 +51,7 @@
                                 {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
                                 {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
                                 {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
+                                // TODO: ADD FINISH DATE AND DELIVERED DATE
                             ],
                             menu: [
                                 {text: 'Check out', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
@@ -71,17 +73,35 @@
                         const type = id.split('-')[1];
                         initTables(type);
                     };
+                const dateFilter = $('#dateFilter');
                 options.click((e) => {
                     const link = $(e.currentTarget).find('a'),
                         id = link.attr('href');
+                    if (id.split('-')[1] === "finished")
+                        dateFilter.removeClass('d-none');
+                    else
+                        dateFilter.addClass('d-none');
                     activePane(id);
                 });
                 activePane($('.tab-pane.active').attr('id'));
                 $('#downloadXLS').click((e) => {
                     e.preventDefault();
                     const type = $('.tab-pane.active').attr('id').split('-')[1];
-                    window.location.href = `/rental/downloadXLS/${type}`;
-                })
+                    window.location.href = `/rental/downloadXLS/${type}?start=${dateRange.data('daterangepicker').startDate.format('YYYY-MM-DD')}&end=${dateRange.data('daterangepicker').endDate.format('YYYY-MM-DD')}`;
+                });
+                dateRange.daterangepicker({
+                    format: 'YYYY/MM/DD',
+                    startDate: moment().startOf('month'),
+                    endDate: moment().endOf('month'),
+                }, (start, end, label) => {
+                    tbFinished.searchQueryParams = _.merge(
+                        tbFinished.searchQueryParams,
+                        {
+                            start: start.format('YYYY/MM/DD'),
+                            end: end.format('YYYY/MM/DD'),
+                        });
+                    tbFinished.updateSearchQuery();
+                });
             })();
         </script>
     @endsection
@@ -90,7 +110,13 @@
         <div class="card-content">
 
             <div class="card-header">
-                <div class="col-12">
+                <div class="col-4">
+                    <div class="d-none" id="dateFilter">
+                        <label for="dateRange">Select Dates</label>
+                        <input type="text" id="dateRange" class="form-control">
+                    </div>
+                </div>
+                <div class="col-4 offset-4">
                     <div class="dropdown float-right">
                         <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-bars"></i>

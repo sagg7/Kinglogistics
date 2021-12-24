@@ -99,7 +99,6 @@
     };
     dateRange.daterangepicker({
         format: 'YYYY/MM/DD',
-        locale: dateRangeLocale,
         startDate: moment().startOf('month'),
         endDate: moment().endOf('month'),
     }, (start, end, label) => {

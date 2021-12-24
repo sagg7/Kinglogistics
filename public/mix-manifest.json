@@ -1,4 +1,7 @@
 {
+    "/js/common/master.min.js": "/js/common/master.min.js",
     "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
-    "/js/sections/reports/dailyLoads.min.js": "/js/sections/reports/dailyLoads.min.js"
+    "/js/sections/tracking/history.min.js": "/js/sections/tracking/history.min.js",
+    "/js/sections/reports/dailyLoads.min.js": "/js/sections/reports/dailyLoads.min.js",
+    "/js/sections/subdomains/carriers/reports/historical.min.js": "/js/sections/subdomains/carriers/reports/historical.min.js"
 }
