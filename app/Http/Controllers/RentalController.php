@@ -199,6 +199,8 @@ class RentalController extends Controller
             "rentals.status",
             "rentals.deposit",
             "rentals.status",
+            "rentals.delivered_at",
+            "rentals.finished_at",
         ])
             ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
             ->where('status', $type)

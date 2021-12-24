@@ -25,7 +25,7 @@
                     else
                         return '';
                 };
-                const periodFormatter = (params) => {
+                const capitalizeFormatter = (params) => {
                     if (params.value)
                         return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
                     else
@@ -41,17 +41,16 @@
                     options = pills.find('.nav-item'),
                     tableProperties = (type) => {
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
-                        return {
+                        let properties = {
                             columns: [
                                 //{headerName: 'Fecha', field: 'date'},
                                 {headerName: 'Date', field: 'date'},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                                 {headerName: 'Trailer', field: 'trailer', valueFormatter: numberFormatter},
-                                {headerName: 'Period', field: 'period', valueFormatter: periodFormatter},
+                                {headerName: 'Period', field: 'period', valueFormatter: capitalizeFormatter},
                                 {headerName: 'Cost', field: 'cost', valueFormatter: moneyFormatter},
                                 {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
-                                // TODO: ADD FINISH DATE AND DELIVERED DATE
                             ],
                             menu: [
                                 {text: 'Check out', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
@@ -63,6 +62,15 @@
                             url: `/rental/search/${type}`,
                             tableRef: `tb${tableName}`,
                         };
+                        switch (type) {
+                            case 'delivered':
+                                properties.columns =  [{headerName: 'Delivery date', field: 'delivered_at'}, ...properties.columns];
+                                break;
+                            case 'finished':
+                                properties.columns =  [{headerName: 'Finish date', field: 'finished_at'}, ...properties.columns];
+                                break;
+                        }
+                        return properties;
                     },
                     initTables = (type) => {
                         let table = `tb${type.replace(/^\w/, (c) => c.toUpperCase())}`;
@@ -109,7 +117,7 @@
     <div class="card pills-layout">
         <div class="card-content">
 
-            <div class="card-header">
+            <div class="card-header align-items-center">
                 <div class="col-4">
                     <div class="d-none" id="dateFilter">
                         <label for="dateRange">Select Dates</label>

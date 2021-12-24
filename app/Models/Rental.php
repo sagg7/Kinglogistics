@@ -14,6 +14,8 @@ class Rental extends Model
     protected $casts = [
         'date' => 'date:m/d/Y',
         'charge_date' => 'date',
+        'delivered_at' => 'date:m/d/Y',
+        'finished_at' => 'date:m/d/Y',
     ];
 
     /**
