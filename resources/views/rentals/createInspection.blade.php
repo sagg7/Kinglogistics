@@ -66,12 +66,12 @@
                                                                     @else
                                                                         <div class="vs-checkbox-con vs-checkbox-primary">
                                                                             <input class="original" type="radio" name="option_{{ $item->id }}" value="{{ $index }}"
-                                                                            @if($index === json_decode($category->options)->default){{ 'checked' }}@endif @if(isset($is_deliver)){{ 'disabled' }}@endif>
+                                                                            @if(json_decode($category->options)->options[$index] === json_decode($category->options)->default){{ 'checked' }}@endif @if(isset($is_deliver)){{ 'disabled' }}@endif>
                                                                             <span class="vs-checkbox">
-                                                                                    <span class="vs-checkbox--check">
-                                                                                        <i class="vs-icon feather icon-check"></i>
-                                                                                    </span>
+                                                                                <span class="vs-checkbox--check">
+                                                                                    <i class="vs-icon feather icon-check"></i>
                                                                                 </span>
+                                                                            </span>
                                                                         </div>
                                                                     @endif
                                                                 </td>
