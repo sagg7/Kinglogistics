@@ -161,6 +161,7 @@
                 {headerName: 'Percentage', field: 'percentage', valueFormatter: percentageFormatter},
                 {headerName: 'Miles', field: 'mileage'},
                 {headerName: 'AVG', field: 'avg', valueFormatter: minutesAVGFormatter},
+                {headerName: 'Load time', field: 'load_time', valueFormatter: minutesAVGFormatter},
             ],
             rowData: [],
             gridOptions: {

@@ -12,7 +12,7 @@
             let tbOnCall = null;
             let tbJobs = null;
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.7') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.8') }}"></script>
     @endsection
 
     @section('modals')
