@@ -52,6 +52,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/user/dispatchSchedule">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Dispatch Schedule</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item has-sub">

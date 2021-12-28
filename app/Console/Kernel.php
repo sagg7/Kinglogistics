@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Enums\DriverAppRoutes;
 use App\Models\BotAnswers;
 use App\Models\BotQuestions;
+use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Chat\MessagesTrait;
@@ -12,6 +13,7 @@ use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\Notifications\PushNotificationsTrait;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
@@ -157,6 +159,22 @@ class Kernel extends ConsoleKernel
 //
         //    $this->dischargeDrivers($drivers);
         //})->daily()->at('18:15');
+
+        // On Mondays at 00:00 hours of the day, change the dispatch schedule to the programmed next week
+        $schedule->call(function () {
+            DB::transaction(function () {
+                // Check if there's at least one record for next week schedule
+                $next = DispatchSchedule::where('status', 'next')->first();
+                if ($next) { // If there are records for next week
+                    // Delete the current schedule
+                    DispatchSchedule::where('status', 'current')
+                        ->delete();
+                    // Activate setting status "current" for the rest of the schedule
+                    DispatchSchedule::where('status', 'next')
+                        ->update(['status' => 'current']);
+                }
+            });
+        })->weekly()->mondays()->at('00:00');
     }
 
     /**

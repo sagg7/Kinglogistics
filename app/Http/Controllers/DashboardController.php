@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessPaymentsAndCollection;
+use App\Models\DispatchSchedule;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
@@ -101,8 +102,8 @@ class DashboardController extends Controller
     public function testKernel()
     {
         //$this->carrierPayments();
-        ProcessPaymentsAndCollection::dispatch()->afterCommit();
+        //ProcessPaymentsAndCollection::dispatch()->afterCommit();
         //$this->shipperInvoices();
-        echo "Listoo";
+        //echo "Listoo";
     }
 }

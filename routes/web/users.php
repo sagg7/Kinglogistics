@@ -24,4 +24,8 @@ Route::prefix('user')->group(function () {
         ->name('user.update');
     Route::post('delete/{id}', [UserController::class, 'destroy'])
         ->name('user.delete');
+    Route::get('dispatchSchedule', [UserController::class, 'dispatchSchedule'])
+        ->name('user.dispatchSchedule');
+    Route::post('storeDispatchSchedule', [UserController::class, 'storeDispatchSchedule'])
+        ->name('user.storeDispatchSchedule');
 });

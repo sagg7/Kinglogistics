@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DispatchSchedule;
 use App\Models\Role;
 use App\Models\User;
 use App\Traits\EloquentQueryBuilder\agFilter;
@@ -269,5 +270,101 @@ class UserController extends Controller
             return $query->get();
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    /**
+     * @param bool $decode
+     * @return array
+     */
+    private function getHoursRange(bool $decode = false): array
+    {
+        $range = [];
+        $timeRange = range(0, 47*1800, 3600);
+        foreach ($timeRange as $time) {
+            $time += (3600 * 6);
+            if ($decode) {
+                $date = date('H:i:s', $time);
+            } else {
+                $date = date('h:i a', $time);
+            }
+            $range[] = $date;
+        }
+        return $range;
+    }
+
+    /**
+     * @param $day_string
+     * @return int
+     */
+    private function getDayNumber($day_string): int
+    {
+        switch ($day_string) {
+            default:
+            case 'mon':
+                return 0;
+            case 'tue':
+                return 1;
+            case 'wed':
+                return 2;
+            case 'thu':
+                return 3;
+            case 'fri':
+                return 4;
+            case 'sat':
+                return 5;
+            case 'sun':
+                return 6;
+        }
+    }
+
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function dispatchSchedule()
+    {
+        $range = $this->getHoursRange();
+        $schedule = DispatchSchedule::with('user:id,name')
+            ->get();
+        foreach ($schedule as $i => $item) {
+            $schedule[$i]->time_number = array_search(Carbon::parse($item->time)->format('h:i a'), $range);
+        }
+        $params = compact('range', 'schedule');
+        return view('users.dispatchSchedule', $params);
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function storeDispatchSchedule(Request $request)
+    {
+        return DB::transaction(function () use ($request) {
+            $range = $this->getHoursRange(true);
+
+            $formatScheduleArray = function ($schedule, $type = 'current') use ($range) {
+                $formatted = [];
+                $now = Carbon::now();
+                foreach ($schedule as $i => $item) {
+                    $formatted[] = [
+                        'day' => $this->getDayNumber($item['day']),
+                        'time' => $range[$item['hour']],
+                        'user_id' => $item['user'],
+                        'status' => $type,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+                return $formatted;
+            };
+
+            // Delete past schedule data
+            // TODO: CHANGE WHEN MORE THAN ONE DOMAIN TO FILTER BY DOMAIN DATA
+            DispatchSchedule::truncate();
+            $current = $formatScheduleArray($request->current);
+            $next = $formatScheduleArray($request->next, "next");
+            DispatchSchedule::insert(array_merge($current, $next));
+
+            return ['success' => true];
+        });
     }
 }
