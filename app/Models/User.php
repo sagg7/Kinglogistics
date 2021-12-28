@@ -50,4 +50,8 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function dispatch_schedule()
+    {
+        return $this->hasMany(DispatchSchedule::class);
+    }
 }
