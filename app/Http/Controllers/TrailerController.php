@@ -268,21 +268,28 @@ class TrailerController extends Controller
         $trailers = Trailer::with([
             'trailer_type:id,name',
             'chassis_type:id,name',
+            'rentals' => function ($q) {
+                $q->where('status', '!=', 'finished')
+                ->with(['carrier:id,name','driver:id,name']);
+            }
         ])
             ->get();
         $data = [];
         foreach ($trailers as $trailer) {
             $data[] = [
                 'number' => $trailer->number,
+                'carrier' => isset($trailer->rentals[0]) ? $trailer->rentals[0]->carrier->name : null,
+                'driver' => isset($trailer->rentals[0]) ? $trailer->rentals[0]->driver->name : null,
                 'trailer_type' => $trailer->trailer_type->name,
                 'chassis_type' => $trailer->chassis_type->name,
                 'plate' => $trailer->plate,
                 'vin' => $trailer->vin,
+                'status' => $trailer->status,
             ];
         }
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Number", "Trailer Type", "Chassis Type", "Plate", "Vin"],
+            "headers" => ["Number", "Carrier", "Driver", "Trailer Type", "Chassis Type", "Plate", "Vin", "Status"],
         ]))->download("Trailers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
