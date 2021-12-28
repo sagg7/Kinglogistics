@@ -328,6 +328,15 @@ class PaperworkController extends Controller
                     }
                     $fileCount++;
                 }
+            } else if ($request->expiration_date) {
+                foreach ($request->expiration_date as $i => $item) {
+                    $paperwork = PaperworkFile::where('paperwork_id', $i)
+                        ->where('related_id', $request->related_id)
+                        ->first();
+                    if (!Carbon::parse($paperwork->expiration_date)->isSameDay(Carbon::parse($request->expiration_date[$i])))
+                        $paperwork->expiration_date = $request->expiration_date[$i];
+                    $paperwork->save();
+                }
             }
 
             return ['success' => true, 'data' => $result];
