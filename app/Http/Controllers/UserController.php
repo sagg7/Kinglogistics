@@ -280,8 +280,9 @@ class UserController extends Controller
     {
         $range = [];
         $timeRange = range(0, 47*1800, 3600);
+        date_default_timezone_set('UTC');
         foreach ($timeRange as $time) {
-            $time += (3600 * 6);
+            //$time += (3600 * 6);
             if ($decode) {
                 $date = date('H:i:s', $time);
             } else {
