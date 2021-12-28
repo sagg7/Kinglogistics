@@ -284,6 +284,19 @@ class TruckController extends Controller
             ->where(function ($q) use ($request) {
                 if (auth()->guard('carrier')->check())
                     $q->where("carrier_id", auth()->user()->id);
+                if ($request->trip || $request->shipper || $request->driver)
+                    $q->whereHas('driver', function ($q) use ($request) {
+                        if ($request->driver)
+                            $q->where('id', $request->driver);
+                        if ($request->trip)
+                            $q->whereHas('active_load', function ($q) use ($request) {
+                                $q->where('trip_id', $request->trip);
+                            });
+                        if ($request->shipper)
+                            $q->whereHas('shippers', function ($q) use ($request) {
+                                $q->where('id', $request->shipper);
+                            });
+                    });
             })
             ->with([
                 'driver' => function ($q) {
@@ -292,6 +305,16 @@ class TruckController extends Controller
                 },
                 'trailer:id,number',
             ]);
+
+        if ($request->graph) {
+            $all = clone $query;
+            $all = $all->count();
+            $available = clone $query;
+            $available = $available->whereDoesntHave('driver')->count();
+            $in_use = clone $query;
+            $in_use = $in_use->whereHas('driver')->count();
+            return compact('all', 'available', 'in_use');
+        }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

@@ -355,9 +355,47 @@
             }
         });
     }
+    let trucksChart = null;
+    const showTrucksChart = () => {
+        $.ajax({
+            url: '/truck/search',
+            type: 'GET',
+            data: {
+                graph: true,
+                shipper,
+                /*trip,
+                driver,*/
+            },
+            success: (res) => {
+                const series = [{
+                    name: 'Total',
+                    data: [res.all],
+                }, {
+                    name: 'In Use',
+                    data: [res.in_use],
+                }, {
+                    name: 'Available',
+                    data: [res.available],
+                }];
+                const config = {
+                    yaxis: {
+                        title: {
+                            text: 'Number of trailers'
+                        },
+                    },
+                }
+                if (!trucksChart) {
+                    trucksChart = barChart('trucksChart', series, config);
+                } else {
+                    trucksChart.updateSeries(series);
+                }
+            }
+        });
+    }
     if (guard === 'web') {
         showDriversChart();
         showTrailersChart();
+        showTrucksChart();
     }
     /*
      * SELECT2 FILTERS
@@ -382,12 +420,14 @@
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            showTrucksChart();
         })
         .on('select2:unselect', (e) => {
             shipper = null;
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            showTrucksChart();
         });
     tripSel.select2({
         ajax: {
@@ -410,12 +450,14 @@
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            //showTrucksChart();
         })
         .on('select2:unselect', (e) => {
             trip = null;
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            //showTrucksChart();
         });
     driverSel.select2({
         ajax: {
@@ -441,12 +483,14 @@
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            //showTrucksChart();
         })
         .on('select2:unselect', (e) => {
             driver = null;
             getLoadsData();
             showDriversChart();
             showTrailersChart();
+            //showTrucksChart();
         });
     getLoadsData();
     const capitalizeString = (string) => {
