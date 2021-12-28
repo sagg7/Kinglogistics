@@ -465,9 +465,11 @@ class LoadController extends Controller
        // $request->endRow = 0;
        // $request->startRow = 1000;
         $dates = explode(" - ", $request->dateRange);
+        $startA = explode("/",$dates[0]);
+        $endA = explode("/",$dates[1]);
 
-        $request->merge(["start"=>str_replace("/","-",$dates[0])]);
-        $request->merge(["end"=>str_replace("/","-",$dates[1])]);
+        $request->merge(["start"=>$startA[2]."-".$startA[0]."-".$startA[1]]);
+        $request->merge(["end"=>$endA[2]."-".$endA[0]."-".$endA[1]]);
         $request->merge(["endRow"=>1000]);
         $request->merge(["startRow"=>0]);
         //$result = $this->search($request);
@@ -493,9 +495,12 @@ class LoadController extends Controller
 
     public function pictureReport(Request $request){
         $dates = explode(" - ", $request->dateRange);
+        $startA = explode("/",$dates[0]);
+        $endA = explode("/",$dates[1]);
 
-        $start = str_replace("/","-",$dates[0]) ? Carbon::parse(str_replace("/","-",$dates[0])) : Carbon::now()->startOfMonth();
-        $end = str_replace("/","-",$dates[1]) ? Carbon::parse(str_replace("/","-",$dates[1]))->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+
+        $start = $startA ? Carbon::parse($startA[2]."-".$startA[0]."-".$startA[1]) : Carbon::now()->startOfMonth();
+        $end = $endA ? Carbon::parse($endA[2]."-".$endA[0]."-".$endA[1])->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         $select = [
             "loads.id",
