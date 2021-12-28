@@ -345,15 +345,17 @@ class UserController extends Controller
             $formatScheduleArray = function ($schedule, $type = 'current') use ($range) {
                 $formatted = [];
                 $now = Carbon::now();
-                foreach ($schedule as $i => $item) {
-                    $formatted[] = [
-                        'day' => $this->getDayNumber($item['day']),
-                        'time' => $range[$item['hour']],
-                        'user_id' => $item['user'],
-                        'status' => $type,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
+                if ($schedule) {
+                    foreach ($schedule as $i => $item) {
+                        $formatted[] = [
+                            'day' => $this->getDayNumber($item['day']),
+                            'time' => $range[$item['hour']],
+                            'user_id' => $item['user'],
+                            'status' => $type,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
                 }
                 return $formatted;
             };
