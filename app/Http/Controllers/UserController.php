@@ -286,7 +286,7 @@ class UserController extends Controller
             if ($decode) {
                 $date = date('H:i:s', $time);
             } else {
-                $date = date('h:i a', $time);
+                $date = date('g a', $time) .  " - " . date('g a', ($time + 3600));
             }
             $range[] = $date;
         }
@@ -324,10 +324,11 @@ class UserController extends Controller
     public function dispatchSchedule()
     {
         $range = $this->getHoursRange();
+        $decodeRange = $this->getHoursRange(true);
         $schedule = DispatchSchedule::with('user:id,name')
             ->get();
         foreach ($schedule as $i => $item) {
-            $schedule[$i]->time_number = array_search(Carbon::parse($item->time)->format('h:i a'), $range);
+            $schedule[$i]->time_number = array_search($item->time, $decodeRange);
         }
         $params = compact('range', 'schedule');
         return view('users.dispatchSchedule', $params);
