@@ -315,7 +315,7 @@ class TruckController extends Controller
             ]);
 
         if ($request->graph) {
-            $query = $query->get();
+            $query = $query->whereNull("inactive")->get();
             $shippers = [["shipper" => "Unassigned", "count" => 0]];
             $sortShipper = function ($shipper) use (&$shippers) {
                 $key = array_search($shipper, array_column($shippers, 'shipper'));
