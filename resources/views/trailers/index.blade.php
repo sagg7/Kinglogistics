@@ -74,6 +74,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-returned" aria-expanded="false">
+                                    Returnedg
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-oos" aria-expanded="false">
                                     Out of service
                                 </a>
@@ -114,6 +119,22 @@
                                 </div>
                                 <hr>
                                 <div id="gridRented"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-returned" aria-labelledby="pane-returned" aria-expanded="false">
+                                <div class="row align-items-center">
+                                    <div class="col-4 offset-8">
+                                        <div class="dropdown float-right">
+                                            <button class="btn pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-bars"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                                <a href="/trailer/downloadXLS/returned" class="dropdown-item"><i class="fas fa-file-excel"></i> Download report</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div id="gridReturned"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-oos" aria-labelledby="pane-oos" aria-expanded="false">
                                 <div class="row align-items-center">
