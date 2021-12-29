@@ -299,21 +299,49 @@ class TruckController extends Controller
                     });
             })
             ->with([
-                'driver' => function ($q) {
-                    $q->with('active_rental:driver_id,deposit,deposit_is_paid')
+                'driver' => function ($q) use ($request) {
+                    $q->with([
+                        'active_rental:driver_id,deposit,deposit_is_paid',
+                        'shippers' => function ($q) use ($request) {
+                            if ($request->shipper) {
+                                $q->where('id', $request->shipper);
+                            }
+                            $q->select('id', 'name');
+                        },
+                    ])
                         ->select('id', 'name');
                 },
                 'trailer:id,number',
             ]);
 
         if ($request->graph) {
-            $all = clone $query;
-            $all = $all->count();
-            $available = clone $query;
-            $available = $available->whereDoesntHave('driver')->count();
-            $in_use = clone $query;
-            $in_use = $in_use->whereHas('driver')->count();
-            return compact('all', 'available', 'in_use');
+            $query = $query->get();
+            $shippers = [["shipper" => "Unassigned", "count" => 0]];
+            $sortShipper = function ($shipper) use (&$shippers) {
+                $key = array_search($shipper, array_column($shippers, 'shipper'));
+                if ($key !== false) {
+                    $shippers[$key]['count']++;
+                } else {
+                    $shippers[] = [
+                        'shipper' => $shipper,
+                        'count' => 1,
+                    ];
+                }
+            };
+            foreach ($query as $item) {
+                if (!$item->driver || count($item->driver->shippers) === 0) {
+                    $sortShipper('Unassigned');
+                } else {
+                    foreach ($item->driver->shippers as $shipper) {
+                        $sortShipper($shipper->name);
+                    }
+                }
+            }
+            if ($shippers[0]["count"] === 0)  {
+                unset($shippers[0]);
+                $shippers = array_values($shippers);
+            }
+            return $shippers;
         }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');

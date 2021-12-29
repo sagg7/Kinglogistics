@@ -282,6 +282,9 @@
     }
     let driversChart = null;
     const showDriversChart = () => {
+        if (guard !== 'web') {
+            return false;
+        }
         $.ajax({
             url: '/driver/search',
             type: 'GET',
@@ -321,6 +324,9 @@
     }
     let trailersChart = null;
     const showTrailersChart = () => {
+        if (guard !== 'web') {
+            return false;
+        }
         $.ajax({
             url: '/trailer/search',
             type: 'GET',
@@ -336,10 +342,10 @@
                     data: [res.all],
                 }, {
                     name: 'In Use',
-                    data: [res.available],
+                    data: [res.rented],
                 }, {
                     name: 'Available',
-                    data: [res.rented],
+                    data: [res.available],
                 }];
                 const config = {
                     yaxis: {
@@ -358,26 +364,26 @@
     }
     let trucksChart = null;
     const showTrucksChart = () => {
+        if (guard !== 'web') {
+            return false;
+        }
         $.ajax({
             url: '/truck/search',
             type: 'GET',
             data: {
                 graph: true,
                 shipper,
-                /*trip,
-                driver,*/
+                trip,
+                driver,
             },
             success: (res) => {
-                const series = [{
-                    name: 'Total',
-                    data: [res.all],
-                }, {
-                    name: 'In Use',
-                    data: [res.in_use],
-                }, {
-                    name: 'Available',
-                    data: [res.available],
-                }];
+                let series = [];
+                res.forEach(item => {
+                    series.push({
+                        name: item.shipper,
+                        data: [item.count],
+                    })
+                });
                 const config = {
                     yaxis: {
                         title: {
@@ -451,14 +457,14 @@
             getLoadsData();
             showDriversChart();
             showTrailersChart();
-            //showTrucksChart();
+            showTrucksChart();
         })
         .on('select2:unselect', (e) => {
             trip = null;
             getLoadsData();
             showDriversChart();
             showTrailersChart();
-            //showTrucksChart();
+            showTrucksChart();
         });
     driverSel.select2({
         ajax: {
@@ -484,14 +490,14 @@
             getLoadsData();
             showDriversChart();
             showTrailersChart();
-            //showTrucksChart();
+            showTrucksChart();
         })
         .on('select2:unselect', (e) => {
             driver = null;
             getLoadsData();
             showDriversChart();
             showTrailersChart();
-            //showTrucksChart();
+            showTrucksChart();
         });
     getLoadsData();
     const capitalizeString = (string) => {
