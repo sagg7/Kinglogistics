@@ -290,31 +290,33 @@ class TripController extends Controller
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
+    private function loadFilter($q, $turn)
+    {
+        $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->whereNotNull('unallocated_timestamp');
+        if ($turn->start->isBefore($turn->end)) {
+            $q->whereDate('unallocated_timestamp', '>=', $turn->start)
+                ->whereDate('unallocated_timestamp', '<=', $turn->end);
+        } else {
+            $q->whereDate('unallocated_timestamp', '<=', $turn->start)
+                ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
+        }
+    }
+
     public function dashboardData()
     {
         $turn = Turn::select('*');
         $this->filterByActiveTurn($turn);
         $turn = $turn->first();
-        $trips = Trip::with([
-            'loads' => function ($q) use ($turn) {
-                $q->whereHas('loadStatus', function ($q) use ($turn) {
-                    $q->whereNotNull('unallocated_timestamp');
-                    if ($turn->start->isBefore($turn->end)) {
-                        $q->whereDate('unallocated_timestamp', '>=', $turn->start)
-                            ->whereDate('unallocated_timestamp', '<=', $turn->end);
-                    } else {
-                        $q->whereDate('unallocated_timestamp', '<=', $turn->start)
-                            ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
-                    }
-                })
-                    ->with([
-                        'loadStatus' => function ($q) {
-                            $q->select(['load_id', 'accepted_timestamp', 'finished_timestamp', 'unallocated_timestamp']);
-                        },
-                    ])
-                    ->select(['loads.id', 'trip_id']);
-            },
-        ])
+        $trips = Trip::whereHas('loads', function ($q) use ($turn) {
+            $this->loadFilter($q, $turn);
+        })
+            ->with([
+                'loads' => function ($q) use ($turn) {
+                    $this->loadFilter($q, $turn);
+                    $q->select(['loads.id', 'trip_id', 'accepted_timestamp', 'finished_timestamp', 'unallocated_timestamp']);
+                },
+            ])
             ->get();
 
         foreach ($trips as $trip) {
