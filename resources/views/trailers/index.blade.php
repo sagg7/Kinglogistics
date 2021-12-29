@@ -75,7 +75,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-returned" aria-expanded="false">
-                                    Returnedg
+                                    Returned
                                 </a>
                             </li>
                             <li class="nav-item">
