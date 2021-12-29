@@ -4,6 +4,7 @@ namespace App\Traits\Accounting;
 
 use App\Enums\CarrierPaymentEnum;
 use App\Enums\PeriodEnum;
+use App\Enums\TrailerEnum;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
 use App\Models\Carrier;
@@ -191,7 +192,7 @@ trait PaymentsAndCollection
     {
         DB::transaction(function () {
             $rentals = Rental::with('trailer')
-                ->where('status', 'rented')
+                ->where('status', TrailerEnum::RENTED)
                 ->whereNull('finished_at')
                 ->get();
 

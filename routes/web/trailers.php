@@ -10,7 +10,7 @@ Route::prefix('trailer')->group(function () {
         ->name('trailer.create');
     Route::post('store', [TrailerController::class, 'store'])
         ->name('trailer.store');
-    Route::get('search', [TrailerController::class, 'search'])
+    Route::get('search/{type?}', [TrailerController::class, 'search'])
         ->name('trailer.search');
     Route::get('selection', [TrailerController::class, 'selection'])
         ->name('trailer.selection');
@@ -20,6 +20,6 @@ Route::prefix('trailer')->group(function () {
         ->name('trailer.update');
     Route::post('delete/{id}', [TrailerController::class, 'destroy'])
         ->name('trailer.delete');
-    Route::get('downloadXLS', [TrailerController::class, 'downloadXLS'])
+    Route::get('downloadXLS/{type}', [TrailerController::class, 'downloadXLS'])
         ->name('trailer.downloadXLS');
 });
