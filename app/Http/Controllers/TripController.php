@@ -295,20 +295,23 @@ class TripController extends Controller
         $turn = Turn::select('*');
         $this->filterByActiveTurn($turn);
         $turn = $turn->first();
-        $trips = Trip::whereHas('loads', function ($q) use ($turn) {
-            $q->whereHas('loadStatus', function ($q) use ($turn) {
-                if ($turn->start->isBefore($turn->end)) {
-                    $q->whereDate('unallocated_timestamp', '>=', $turn->start)
-                        ->whereDate('unallocated_timestamp', '<=', $turn->end);
-                } else {
-                    $q->whereDate('unallocated_timestamp', '<=', $turn->start)
-                        ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
-                }
-            });
-        })
-        ->with([
+        $trips = Trip::with([
             'loads' => function ($q) use ($turn) {
-                $q->with(['loadStatus:load_id,accepted_timestamp,finished_timestamp,unallocated_timestamp'])
+                $q->whereHas('loadStatus', function ($q) use ($turn) {
+                    $q->whereNotNull('unallocated_timestamp');
+                    if ($turn->start->isBefore($turn->end)) {
+                        $q->whereDate('unallocated_timestamp', '>=', $turn->start)
+                            ->whereDate('unallocated_timestamp', '<=', $turn->end);
+                    } else {
+                        $q->whereDate('unallocated_timestamp', '<=', $turn->start)
+                            ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
+                    }
+                })
+                    ->with([
+                        'loadStatus' => function ($q) {
+                            $q->select(['load_id', 'accepted_timestamp', 'finished_timestamp', 'unallocated_timestamp']);
+                        },
+                    ])
                     ->select(['loads.id', 'trip_id']);
             },
         ])

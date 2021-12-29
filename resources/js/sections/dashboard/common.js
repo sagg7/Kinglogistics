@@ -66,7 +66,7 @@
     };
     const percentageFormatter = (params) => {
         if (params.value)
-            return `${params.value}%`;
+            return `${params.value.toFixed(2)}%`;
         else
             return '';
     }
@@ -99,7 +99,7 @@
     };
     const minutesAVGFormatter = (params) => {
         if (params.value)
-            return `${params.value} min`;
+            return `${params.value.toFixed(2)} min`;
         else
             return '';
     }
