@@ -240,7 +240,7 @@ class TrailerController extends Controller
      * @param Request $request
      * @return array
      */
-    public function search(Request $request, $type)
+    public function search(Request $request, $type = null)
     {
         $query = Trailer::select([
             "trailers.id",
@@ -250,8 +250,7 @@ class TrailerController extends Controller
             "trailers.status",
             "trailers.trailer_type_id",
         ])
-            ->where('status', $type)
-            ->where(function ($q) use ($request) {
+            ->where(function ($q) use ($request, $type) {
                 if ($request->driver)
                     $q->whereHas('truck', function ($q) use ($request) {
                         $q->whereHas('driver', function ($q) use ($request) {
@@ -270,6 +269,8 @@ class TrailerController extends Controller
                             });
                         });
                     });
+                if ($type)
+                    $q->where('status', $type);
             })
             ->with(['trailer_type:id,name']);
 
