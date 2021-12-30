@@ -252,7 +252,7 @@ class TrailerController extends Controller
 
         if ($request->graph) {
             $all = clone $query;
-            $all = $all->count();
+            $all = $all->where('status', "!=", 'returned')->count();
             $available = clone $query;
             $available = $available->where('status', 'available')->count();
             $rented = clone $query;
