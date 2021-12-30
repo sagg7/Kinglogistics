@@ -12,6 +12,7 @@ use App\Http\Resources\Helpers\KeyValueResource;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
 use App\Models\AvailableDriver;
+use App\Models\BotAnswers;
 use App\Models\Broker;
 use App\Models\Driver;
 use App\Models\Load;
@@ -93,6 +94,8 @@ class LoadController extends Controller
 
         $driver->status = 'active';
         $driver->save();
+
+        $botAnswers = BotAnswers::where('driver_id', $driver->id)->delete();
 
         return response([
             'status' => 'ok',
