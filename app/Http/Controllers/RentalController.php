@@ -11,6 +11,7 @@ use App\Models\InspectionRentalReturned;
 use App\Models\Rental;
 use App\Models\RentalDeliveryPhotos;
 use App\Models\RentalReturnPhotos;
+use App\Models\Trailer;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use http\Exception;
@@ -105,6 +106,10 @@ class RentalController extends Controller
                 // Assign trailer status to rented
                 $rental->trailer->status = TrailerEnum::RENTED;
                 $rental->trailer->save();
+            } else {
+                // Assign trailer status to available
+                $rental->trailer->status = TrailerEnum::AVAILABLE;
+                $rental->trailer->save();
             }
 
             return $rental;
@@ -178,6 +183,9 @@ class RentalController extends Controller
         $rental = Rental::findOrFail($id);
 
         if ($rental) {
+            $trailer = Trailer::findOrFail($rental->trailer_id);
+            $trailer->status = TrailerEnum::AVAILABLE;
+            $trailer->save();
             return ['success' => $rental->delete()];
         } else
             return ['success' => false];
