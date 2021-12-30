@@ -284,14 +284,65 @@ class TruckController extends Controller
             ->where(function ($q) use ($request) {
                 if (auth()->guard('carrier')->check())
                     $q->where("carrier_id", auth()->user()->id);
+                if ($request->trip || $request->shipper || $request->driver)
+                    $q->whereHas('driver', function ($q) use ($request) {
+                        if ($request->driver)
+                            $q->where('id', $request->driver);
+                        if ($request->trip)
+                            $q->whereHas('active_load', function ($q) use ($request) {
+                                $q->where('trip_id', $request->trip);
+                            });
+                        if ($request->shipper)
+                            $q->whereHas('shippers', function ($q) use ($request) {
+                                $q->where('id', $request->shipper);
+                            });
+                    });
             })
             ->with([
-                'driver' => function ($q) {
-                    $q->with('active_rental:driver_id,deposit,deposit_is_paid')
+                'driver' => function ($q) use ($request) {
+                    $q->with([
+                        'active_rental:driver_id,deposit,deposit_is_paid',
+                        'shippers' => function ($q) use ($request) {
+                            if ($request->shipper) {
+                                $q->where('id', $request->shipper);
+                            }
+                            $q->select('id', 'name');
+                        },
+                    ])
                         ->select('id', 'name');
                 },
                 'trailer:id,number',
             ]);
+
+        if ($request->graph) {
+            $query = $query->whereNull("inactive")->get();
+            $shippers = [["shipper" => "Unassigned", "count" => 0]];
+            $sortShipper = function ($shipper) use (&$shippers) {
+                $key = array_search($shipper, array_column($shippers, 'shipper'));
+                if ($key !== false) {
+                    $shippers[$key]['count']++;
+                } else {
+                    $shippers[] = [
+                        'shipper' => $shipper,
+                        'count' => 1,
+                    ];
+                }
+            };
+            foreach ($query as $item) {
+                if (!$item->driver || count($item->driver->shippers) === 0) {
+                    $sortShipper('Unassigned');
+                } else {
+                    foreach ($item->driver->shippers as $shipper) {
+                        $sortShipper($shipper->name);
+                    }
+                }
+            }
+            if ($shippers[0]["count"] === 0)  {
+                unset($shippers[0]);
+                $shippers = array_values($shippers);
+            }
+            return $shippers;
+        }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PeriodEnum;
+use App\Enums\TrailerEnum;
 use App\Exports\TemplateExport;
 use App\Models\InspectionCategory;
 use App\Models\InspectionRentalDelivery;
@@ -102,7 +103,7 @@ class RentalController extends Controller
                     $rental->driver->truck->save();
                 }
                 // Assign trailer status to rented
-                $rental->trailer->status = 'rented';
+                $rental->trailer->status = TrailerEnum::RENTED;
                 $rental->trailer->save();
             }
 
@@ -183,6 +184,34 @@ class RentalController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'carrier':
+            case 'driver':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            case 'trailer':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'number',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -215,33 +244,7 @@ class RentalController extends Controller
                 }
             });
 
-        $relationships = [];
-        if ($request->searchable) {
-            $searchable = [];
-            foreach ($request->searchable as $item) {
-                switch ($item) {
-                    case 'carrier':
-                    case 'driver':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'name',
-                        ];
-                        break;
-                    case 'trailer':
-                        $relationships[] = [
-                            'relation' => $item,
-                            'column' => 'numer',
-                        ];
-                        break;
-                    default:
-                        $searchable[] = $item;
-                        break;
-                }
-            }
-            $request->searchable = $searchable;
-        }
-
-        return $this->multiTabSearchData($query, $request, []);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
     /**

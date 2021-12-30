@@ -150,6 +150,19 @@
             throwErrorMsg(msg);
             @endif
         })();
+        (() => {
+            $.each($('.file-datepick'), (index, item) => {
+                const inp = $(item);
+                inp.pickadate({
+                    selectYears: 250,
+                    selectMonths: true,
+                    formatSubmit: 'yyyy/mm/dd',
+                });
+                const picker = inp.pickadate('picker');
+                if (inp.val() !== '')
+                    picker.set('select', moment(inp.val()).format('YYYY-MM-DD'), { format: 'yyyy-mm-dd' });
+            });
+        })();
     </script>
     </body>
 </html>

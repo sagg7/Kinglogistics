@@ -12,7 +12,7 @@
             let tbOnCall = null;
             let tbJobs = null;
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.7') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.9') }}"></script>
     @endsection
 
     @section('modals')
@@ -60,6 +60,18 @@
             </div>
         </div>
         <div class="col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header align-self-center">
+                    <h3>Trucks use</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-content"  style="height: 360px;">
+                        <div id="trucksChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
             <div class="card">
                 <div class="card-header align-self-center">
                     <h3>Jobs summary</h3>

@@ -23,7 +23,11 @@ class ReportController extends Controller
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
-        $query = Trip::whereHas('loads')
+        $query = Trip::whereHas('loads', function ($q) use ($start, $end) {
+            $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+                ->whereDate('finished_timestamp', '>=', $start)
+                ->whereDate('finished_timestamp', '<=', $end);
+        })
             ->with([
                 'loads' => function ($q) use ($start, $end) {
                     $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')

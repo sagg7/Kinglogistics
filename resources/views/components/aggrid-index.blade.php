@@ -14,7 +14,7 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                @foreach($menu as $anchor)g
+                                @foreach($menu as $anchor)
                                     <a href="{{ $anchor['url'] }}" class="dropdown-item"><i class="{{ $anchor['icon'] ?? '' }}"></i> {{ $anchor['text'] }}</a>
                                 @endforeach
                             </div>

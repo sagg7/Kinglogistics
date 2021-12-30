@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TrailerEnum;
 use App\Exports\TemplateExport;
 use App\Models\ChassisType;
 use App\Models\Trailer;
@@ -50,7 +51,7 @@ class TrailerController extends Controller
         return [
                 'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
                 'chassis_types' => [null => ''] + ChassisType::pluck('name', 'id')->toArray(),
-                'statuses' => [null => ''] + ['available' => 'Available', 'rented' => 'Rented', 'oos' => 'Ouf of service'],
+                'statuses' => [null => ''] + [TrailerEnum::AVAILABLE => 'Available', TrailerEnum::RENTED => 'Rented', TrailerEnum::OUT_OF_SERVICE => 'Ouf of service'],
             ] + $this->getPaperworkByType("trailer");
     }
 
@@ -87,7 +88,7 @@ class TrailerController extends Controller
                 $trailer = Trailer::findOrFail($id);
             else {
                 $trailer = new Trailer();
-                $trailer->status = 'available';
+                $trailer->status = TrailerEnum::AVAILABLE;
                 // TODO: CASE FOR CARRIER OWNED TRAILER
                 /*if (false && auth()->guard('carrier')->check())
                     $trailer->carrier_id = auth()->user()->id;*/
@@ -207,7 +208,7 @@ class TrailerController extends Controller
             })*/
             ->where(function ($q) use ($request) {
                 if ($request->rental)
-                    $q->where('status', 'available');
+                    $q->where('status', TrailerEnum::AVAILABLE);
             })
             ->whereNull("inactive");
 
@@ -215,10 +216,31 @@ class TrailerController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            case 'trailer_type':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return array
      */
-    public function search(Request $request)
+    public function search(Request $request, $type = null)
     {
         $query = Trailer::select([
             "trailers.id",
@@ -228,7 +250,7 @@ class TrailerController extends Controller
             "trailers.status",
             "trailers.trailer_type_id",
         ])
-            ->where(function ($q) use ($request) {
+            ->where(function ($q) use ($request, $type) {
                 if ($request->driver)
                     $q->whereHas('truck', function ($q) use ($request) {
                         $q->whereHas('driver', function ($q) use ($request) {
@@ -247,6 +269,8 @@ class TrailerController extends Controller
                             });
                         });
                     });
+                if ($type)
+                    $q->where('status', $type);
             })
             ->with(['trailer_type:id,name']);
 
@@ -254,16 +278,16 @@ class TrailerController extends Controller
             $all = clone $query;
             $all = $all->where('status', "!=", 'returned')->count();
             $available = clone $query;
-            $available = $available->where('status', 'available')->count();
+            $available = $available->where('status', TrailerEnum::AVAILABLE)->count();
             $rented = clone $query;
-            $rented = $rented->where('status', 'rented')->count();
+            $rented = $rented->where('status', TrailerEnum::RENTED)->count();
             return compact('all', 'available', 'rented');
         }
 
-        return $this->multiTabSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
-    public function downloadXLS()
+    public function downloadXLS($type)
     {
         $trailers = Trailer::with([
             'trailer_type:id,name',
@@ -273,7 +297,12 @@ class TrailerController extends Controller
                 ->with(['carrier:id,name','driver:id,name']);
             }
         ])
+            ->where('status', $type)
             ->get();
+
+        if (count($trailers) === 0)
+            return redirect()->back()->withErrors('There are no rentals to generate the document');
+
         $data = [];
         foreach ($trailers as $trailer) {
             $data[] = [
@@ -284,12 +313,12 @@ class TrailerController extends Controller
                 'chassis_type' => $trailer->chassis_type->name,
                 'plate' => $trailer->plate,
                 'vin' => $trailer->vin,
-                'status' => $trailer->status,
+                //'status' => $trailer->status,
             ];
         }
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Number", "Carrier", "Driver", "Trailer Type", "Chassis Type", "Plate", "Vin", "Status"],
+            "headers" => ["Number", "Carrier", "Driver", "Trailer Type", "Chassis Type", "Plate", "Vin"/*, "Status"*/],
         ]))->download("Trailers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }

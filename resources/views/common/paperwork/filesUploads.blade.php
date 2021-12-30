@@ -1,7 +1,7 @@
 <div>
     <h3>File uploads</h3>
 
-    <div class="table-responsive">
+    <div class="">
         <table class="table" id="file-uploads">
             <colgroup>
                 <col style="width: 3%;">
@@ -47,7 +47,7 @@
                         @endif
                     </td>
                     <td class="position-relative">
-                        {!! Form::text("expiration_date[$file->id]", $paperworkUploads[$file->id]['expiration_date'] ?? null, ['class' => 'form-control pickadate-months-year']) !!}
+                        {!! Form::text("expiration_date[$file->id]", $paperworkUploads[$file->id]['expiration_date'] ?? null, ['class' => 'form-control file-datepick']) !!}
                     </td>
                 </tr>
             @endforeach

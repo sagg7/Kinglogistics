@@ -290,35 +290,55 @@ class TripController extends Controller
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
+    private function loadFilter($q, $turn)
+    {
+        $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->whereNotNull('unallocated_timestamp');
+        if ($turn->start->isBefore($turn->end)) {
+            $q->whereDate('unallocated_timestamp', '>=', $turn->start)
+                ->whereDate('unallocated_timestamp', '<=', $turn->end);
+        } else {
+            $q->whereDate('unallocated_timestamp', '<=', $turn->start)
+                ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
+        }
+    }
+
     public function dashboardData()
     {
         $turn = Turn::select('*');
         $this->filterByActiveTurn($turn);
         $turn = $turn->first();
-        $trips = Trip::with(['loads' => function ($q) use ($turn) {
-            $q->select(['trip_id', 'unallocated_timestamp'])
-                ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id');
-            if ($turn->start->isBefore($turn->end)) {
-                $q->whereDate('unallocated_timestamp', '>=', $turn->start)
-                    ->whereDate('unallocated_timestamp', '<=', $turn->end);
-            } else {
-                $q->whereDate('unallocated_timestamp', '<=', $turn->start)
-                    ->whereDate('unallocated_timestamp', '>=', $turn->end->subDay());
-            }
-        }])
+        $trips = Trip::whereHas('loads', function ($q) use ($turn) {
+            $this->loadFilter($q, $turn);
+        })
+            ->with([
+                'loads' => function ($q) use ($turn) {
+                    $this->loadFilter($q, $turn);
+                    $q->select(['loads.id', 'trip_id', 'accepted_timestamp', 'finished_timestamp', 'unallocated_timestamp']);
+                },
+            ])
             ->get();
 
         foreach ($trips as $trip) {
             $trip->percentage = $trip->status_current ? ($trip->status_current * 100) / $trip->status_total : 0;
-            $minutesSum = 0;
-            $minutesCount = 0;
+            $avgMinutesSum = 0;
+            $avgMinutesCount = 0;
+            $loadTimeSum = 0;
+            $loadTimeCount = 0;
             foreach ($trip->loads as $idx => $load) {
                 if (isset($trip->loads[$idx - 1])) {
-                    $minutesSum += Carbon::parse($load->unallocated_timestamp)->diffInMinutes($trip->loads[$idx - 1]->unallocated_timestamp);
-                    $minutesCount++;
+                    $avgMinutesSum += Carbon::parse($load->loadStatus->unallocated_timestamp)->diffInMinutes($trip->loads[$idx - 1]->loadStatus->unallocated_timestamp);
+                    $avgMinutesCount++;
+                }
+                if ($load->loadStatus->finished_timestamp) {
+                    $loadTimeSum += Carbon::parse($load->loadStatus->accepted_timestamp)->diffInMinutes($load->loadStatus->finished_timestamp);
+                    $loadTimeCount++;
                 }
             }
-            $trip->avg = $minutesCount > 0 ? (double)number_format($minutesSum / $minutesCount, 2) : 0;
+            // Calculates avg creation time in minutes between load and load on the same trip
+            $trip->avg = $avgMinutesCount > 0 ? (double)number_format($avgMinutesSum / $avgMinutesCount, 2) : 0;
+            // Calculates avg time in minutes between the time the load started and it when it was finished
+            $trip->load_time = $loadTimeCount > 0 ? (double)number_format($loadTimeSum / $loadTimeCount, 2) : 0;
         }
 
         return $trips->toArray();
