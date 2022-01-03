@@ -302,7 +302,7 @@ class LoadController extends Controller
      */
     public function search(Request $request)
     {
-        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth()->subMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         $select = [
