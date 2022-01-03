@@ -373,16 +373,16 @@ class LoadController extends Controller
         $this->endShift($driver);
 
         BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
-
-        if (Broker::find(1)->active_shifts){
-            $canActivate = $driver->canActiveShift();
-        } else {
-            $canActivate = 1;
-        }
+        $canActivate = 1; //Temporal not checking shift
+        //if (Broker::find(1)->active_shifts){
+        //    $canActivate = $driver->canActiveShift();
+        //} else {
+        //    $canActivate = 1;
+        //}
         // Check if driver can accept more loads and attach to response
         return response([
             'status' => 'ok',
-            'can_keep_shift' => $driver->canActiveShift(),
+            'can_keep_shift' => $canActivate,
             'load_status' => LoadStatusEnum::FINISHED,
             'load_status_details' => new LoadStatusResource($loadStatus)
         ]);
