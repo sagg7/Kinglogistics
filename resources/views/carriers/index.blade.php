@@ -188,7 +188,7 @@
                                                         let pdfLink = '';
                                                         let expiration = '';
                                                         if (res.paperworkUploads[file.id]) {
-                                                            pdfLink = `<a href="/s3storage/temporaryUrl?url=>${res.paperworkUploads[file.id].url}" target="_blank">${res.paperworkUploads[file.id].file_name}</a>`;
+                                                            pdfLink = `<a href="/s3storage/temporaryUrl?url=${res.paperworkUploads[file.id].url}" target="_blank">${res.paperworkUploads[file.id].file_name}</a>`;
                                                             expiration = res.paperworkUploads[file.id].expiration_date ? res.paperworkUploads[file.id].expiration_date : '';
                                                         }
                                                         let template = '';
