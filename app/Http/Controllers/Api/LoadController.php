@@ -46,7 +46,7 @@ class LoadController extends Controller
 
         $availableLoads = $driver->loads
             ->where('status', LoadStatusEnum::FINISHED)
-            ->sortByDesc('id')->take(40)->get();
+            ->sortByDesc('id')->take(40);
 
         $loads = LoadResource::collection($availableLoads);
 
