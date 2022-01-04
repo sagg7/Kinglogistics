@@ -382,7 +382,7 @@ class LoadController extends Controller
         // Check if driver can accept more loads and attach to response
         return response([
             'status' => 'ok',
-            'can_keep_shift' => $canActivate,
+            'can_keep_shift' => true,
             'load_status' => LoadStatusEnum::FINISHED,
             'load_status_details' => new LoadStatusResource($loadStatus)
         ]);
