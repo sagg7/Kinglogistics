@@ -49,7 +49,7 @@ class DashboardController extends Controller
             }
         })
             ->join('load_statuses', 'loads.id', '=', 'load_id')
-            ->where(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), '>', $monday)
+            ->where(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), '>=', $monday)
             ->with([
                 'driver' => function ($q) {
                     $q->with([
