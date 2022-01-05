@@ -308,7 +308,7 @@ class TrailerController extends Controller
             $data[] = [
                 'number' => $trailer->number,
                 'carrier' => isset($trailer->rentals[0]) ? $trailer->rentals[0]->carrier->name : null,
-                'driver' => isset($trailer->rentals[0]) ? $trailer->rentals[0]->driver->name : null,
+                'driver' => (isset($trailer->rentals[0]) && isset($trailer->rentals[0]->driver)) ? $trailer->rentals[0]->driver->name : null,
                 'trailer_type' => $trailer->trailer_type->name,
                 'chassis_type' => $trailer->chassis_type->name,
                 'plate' => $trailer->plate,

@@ -576,7 +576,7 @@ class RentalController extends Controller
             $data[] = [
                 'date' => $rental->date->format('m/d/Y'),
                 'carrier' => $rental->carrier->name,
-                'driver' => $rental->driver->name,
+                'driver' => (isset($rental->driver)) ? $rental->driver->name : null,
                 'trailer' => $rental->trailer->number,
                 'period' => ucfirst($rental->period),
                 'cost' => $rental->cost,
