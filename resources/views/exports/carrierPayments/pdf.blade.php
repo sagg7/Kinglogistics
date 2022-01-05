@@ -41,26 +41,26 @@
                 <td><br></td>
             </tr>
             <tr>
-                <td colspan="8"></td>
+                <td colspan="9"></td>
                 <td style="text-align: right; padding-right: 10px;">Subtotal</td>
                 <td style="text-align: left;">${{ number_format($carrierPayment->gross_amount, 2) }}</td>
             </tr>
             @foreach($bonuses as $bonus)
             <tr>
-                <td colspan="6"></td>
+                <td colspan="7"></td>
                 <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $bonus["name"] }}</td>
                 <td style="text-align: left;">${{ number_format($bonus["amount"], 2) }}</td>
             </tr>
             @endforeach
             @foreach($expenses as $expense)
             <tr>
-                <td colspan="6"></td>
+                <td colspan="7"></td>
                 <td colspan="3" style="text-align: right; padding-right: 10px;">{{ $expense["name"] }}</td>
                 <td style="text-align: left;">$({{ number_format($expense["amount"], 2) }})</td>
             </tr>
             @endforeach
             <tr>
-                <td colspan="6"></td>
+                <td colspan="7"></td>
                 <td colspan="3" style="text-align: right; padding-right: 10px;"><strong>Total</strong></td>
                 <td style="text-align: left;"><strong>${{ number_format($carrierPayment->total, 2) }}</strong></td>
             </tr>

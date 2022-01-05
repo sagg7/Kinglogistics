@@ -5,6 +5,7 @@ namespace App\Traits\Accounting;
 use App\Enums\CarrierPaymentEnum;
 use App\Enums\PeriodEnum;
 use App\Enums\TrailerEnum;
+use App\Exports\CarrierPaymentExport;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
 use App\Models\Carrier;
@@ -23,6 +24,7 @@ use App\Models\Trip;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
@@ -468,7 +470,7 @@ trait PaymentsAndCollection
             if ($item->carrier->invoice_email) {
                 $emails = explode(',', $item->carrier->invoice_email);
                 try {
-                    $pdf = $this->getPDFBinary($item->id);
+                    $pdf = Excel::raw(new CarrierPaymentExport($item->id), \Maatwebsite\Excel\Excel::MPDF);
                     foreach ($emails as $email) {
                         Mail::to($email)->send(new SendCarrierPayments($item->carrier, $pdf));
                     }

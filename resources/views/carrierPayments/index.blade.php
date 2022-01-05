@@ -60,6 +60,7 @@
                     menu: [
                         {text: 'Edit', route: '/carrier/payment/edit', icon: 'feather icon-edit'},
                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
+                        {text: 'XLSX', route: '/carrier/payment/downloadXLSX', icon: 'far fa-file-excel'},
                         {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || params.data.status === "daily"', menuData: {title: 'Set status as an approved payment?'}},
                         {text: 'Send Email & Complete', route: "/carrier/payment/complete", icon: 'fas fa-paper-plane', type: 'confirm', conditional: 'status === "approved"', menuData: {title: 'Confirm sending email to carrier?'}}
                     ],
@@ -90,6 +91,7 @@
                                     columns: paymentsColumns,
                                     menu: [
                                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
+                                        {text: 'XLSX', route: '/carrier/payment/downloadXLSX', icon: 'far fa-file-excel'},
                                     ],
                                     container: 'completedPaymentsGrid',
                                     url: '/carrier/payment/search/completed',
@@ -148,6 +150,7 @@
                                     ],
                                     menu: [
                                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
+                                        {text: 'XLSX', route: '/carrier/payment/downloadXLSX', icon: 'far fa-file-excel'},
                                     ],
                                     container: 'completedChargesGrid',
                                     url: '/carrier/payment/search/completedCharges',

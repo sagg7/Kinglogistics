@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Carriers;
 use App\Enums\CarrierPaymentEnum;
 use App\Enums\LoadStatusEnum;
 use App\Enums\RoleSlugs;
+use App\Exports\CarrierPaymentExport;
 use App\Http\Controllers\Controller;
 use App\Mail\SendCarrierPayments;
 use App\Models\CarrierPayment;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\MpdfException;
 
 class DailyPayController extends Controller
@@ -101,7 +103,7 @@ class DailyPayController extends Controller
                 })
                     ->get();
                 try {
-                    $pdf = $this->getPDFBinary($carrierPayment->id);
+                    $pdf = Excel::raw(new CarrierPaymentExport($carrierPayment->id), \Maatwebsite\Excel\Excel::MPDF);
                     foreach ($accountantDirectors as $item) {
                         Mail::to($item->email)->send(new SendCarrierPayments($carrierPayment->carrier, $pdf, "Daily Pay Request"));
                     }

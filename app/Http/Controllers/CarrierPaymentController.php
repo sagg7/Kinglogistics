@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierPaymentEnum;
+use App\Exports\CarrierPaymentExport;
 use App\Exports\TemplateExport;
 use App\Mail\SendCarrierPayments;
 use App\Models\Bonus;
@@ -17,10 +18,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Mpdf\Mpdf;
+use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\MpdfException;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use function PHPUnit\Framework\isNan;
 
 class CarrierPaymentController extends Controller
 {
@@ -185,7 +185,7 @@ class CarrierPaymentController extends Controller
 
         $emails = explode(',', $payment->carrier->invoice_email);
         try {
-            $pdf = $this->getPDFBinary($payment->id);
+            $pdf = Excel::raw(new CarrierPaymentExport($id), \Maatwebsite\Excel\Excel::MPDF);
             foreach ($emails as $email) {
                 Mail::to($email)->send(new SendCarrierPayments($payment->carrier, $pdf));
             }
@@ -355,11 +355,14 @@ class CarrierPaymentController extends Controller
     /**
      * @param $id
      * @return string
-     * @throws \Mpdf\MpdfException
      */
     public function downloadPDF($id)
     {
-        $mpdf = $this->generatePDF($id);
-        return $mpdf->Output();
+        return (new CarrierPaymentExport($id, \Maatwebsite\Excel\Excel::MPDF))->download();
+    }
+
+    public function downloadXLSX($id)
+    {
+        return (new CarrierPaymentExport($id))->download();
     }
 }
