@@ -185,7 +185,7 @@ class CarrierPaymentController extends Controller
 
         $emails = explode(',', $payment->carrier->invoice_email);
         try {
-            $pdf = Excel::raw(new CarrierPaymentExport($id), \Maatwebsite\Excel\Excel::MPDF);
+            $pdf = $this->getPDFBinary($payment->id);
             foreach ($emails as $email) {
                 Mail::to($email)->send(new SendCarrierPayments($payment->carrier, $pdf));
             }
@@ -358,7 +358,7 @@ class CarrierPaymentController extends Controller
      */
     public function downloadPDF($id)
     {
-        return (new CarrierPaymentExport($id, \Maatwebsite\Excel\Excel::MPDF))->download();
+        return $this->generatePDF($id)->Output();
     }
 
     public function downloadXLSX($id)

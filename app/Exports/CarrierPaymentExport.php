@@ -3,7 +3,7 @@
 namespace App\Exports;
 
 use App\Enums\CarrierPaymentEnum;
-use App\Models\CarrierPayment;
+use App\Traits\Carrier\Payment\PaymentExportData;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -22,7 +22,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, WithColumnWidths, WithTitle, WithEvents
 {
-    use Exportable;
+    use Exportable, PaymentExportData;
 
     private $fileTitle;
     private $carrierPayment;
@@ -37,43 +37,11 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
 
     public function __construct($id, $writerType = Excel::XLSX)
     {
-        $carrierPayment = CarrierPayment::with([
-            'carrier:id,name',
-            'loads.driver.truck',
-            'expenses.type',
-            'bonuses.bonus_type',
-        ])
-            ->findOrFail($id);
+        $data = $this->getPaymentExportData($id);
 
-        $expenses = [];
-        foreach ($carrierPayment->expenses as $item) {
-            if (!isset($expenses[$item->type_id])) {
-                $expenses[$item->type_id] = [
-                    'name' => $item->type->name ?? '',
-                    'amount' => (double)$item->amount,
-                ];
-            } else {
-                $expenses[$item->type_id]['amount'] += (double)$item->amount;
-            }
-        }
-        $expenses = array_values($expenses);
-
-        $bonuses = [];
-        foreach ($carrierPayment->bonuses as $item) {
-            if (!isset($bonuses[$item->bonus_type_id])) {
-                $bonuses[$item->bonus_type_id] = [
-                    'name' => $item->bonus_type->name ?? '',
-                    'amount' => (double)$item->amount,
-                ];
-            } else {
-                $bonuses[$item->bonus_type_id]['amount'] += (double)$item->amount;
-            }
-        }
-        $bonuses = array_values($bonuses);
-
-        $title = $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
-        if ($carrierPayment->status === CarrierPaymentEnum::CHARGES) {
-            $title = "PAID CHARGES WEEK " . $carrierPayment->date->startOfWeek()->day . "-" . $carrierPayment->date->endOfWeek()->day . " " . $carrierPayment->date->format('F') . " " . $carrierPayment->date->year;
+        $title = $data['carrierPayment']->date->startOfWeek()->day . "-" . $data['carrierPayment']->date->endOfWeek()->day . " " . $data['carrierPayment']->date->format('F') . " " . $data['carrierPayment']->date->year;
+        if ($data['carrierPayment']->status === CarrierPaymentEnum::CHARGES) {
+            $title = "PAID CHARGES WEEK " . $data['carrierPayment']->date->startOfWeek()->day . "-" . $data['carrierPayment']->date->endOfWeek()->day . " " . $data['carrierPayment']->date->format('F') . " " . $data['carrierPayment']->date->year;
             $this->pageOrientation = PageSetup::ORIENTATION_PORTRAIT;
             $this->paymentExportType = CarrierPaymentEnum::CHARGES;
         } else {
@@ -83,21 +51,21 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
         }
 
         $this->fileTitle = $title;
-        $this->carrierPayment = $carrierPayment;
-        $this->bonuses = $bonuses;
-        $this->expenses = $expenses;
+        $this->carrierPayment = $data['carrierPayment'];
+        $this->bonuses = $data['bonuses'];
+        $this->expenses = $data['expenses'];
 
         switch ($this->paymentExportType) {
             default:
             case "payment":
                 // The +5 represents The two rows for the document title, the header of the main table, the subtotal and the total row
-                $this->totalsRowsCount = count($bonuses) + count($expenses) + 2;
-                $this->allRowsCount = count($carrierPayment->loads) + $this->totalsRowsCount + 3;
+                $this->totalsRowsCount = count($this->bonuses) + count($this->expenses) + 2;
+                $this->allRowsCount = count($this->carrierPayment->loads) + $this->totalsRowsCount + 3;
                 break;
             case CarrierPaymentEnum::CHARGES:
                 // The +5 represents The two rows for the document title, the header of the main table and the total row
                 $this->totalsRowsCount = 1;
-                $this->allRowsCount = count($expenses) + $this->totalsRowsCount + 3;
+                $this->allRowsCount = count($this->expenses) + $this->totalsRowsCount + 3;
                 break;
         }
 
@@ -122,12 +90,15 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
 
     public function styles(Worksheet $sheet)
     {
+
+        $rowsTotalsStart = $this->allRowsCount - ($this->totalsRowsCount - 1);
+        $rowsTotalsEnd = $this->allRowsCount;
         switch ($this->paymentExportType) {
             default:
             case "payment":
                 $endColumn = "K";
                 $customStyles = [
-                    "J" . ($this->allRowsCount - ($this->totalsRowsCount - 1)) . ":J$this->allRowsCount" => [
+                    "A" . ($this->allRowsCount - ($this->totalsRowsCount - 1)) . ":J$this->allRowsCount" => [
                         'font' => [
                             'bold' => true,
                             'size' => 10,
@@ -137,6 +108,9 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
                         ],
                     ]
                 ];
+                for ($i = $rowsTotalsStart; $i <= $rowsTotalsEnd; $i++) {
+                    $sheet->mergeCells("A$i:J$i");
+                }
                 break;
             case CarrierPaymentEnum::CHARGES:
                 $endColumn = "B";
@@ -179,7 +153,6 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
 
         $sheet->mergeCells("A1:". $endColumn. "1")
             ->mergeCells("A2:". $endColumn. "2");
-
         $sheet->getPageMargins()
             ->setLeft(.5)
             ->setRight(.5)
@@ -326,21 +299,21 @@ class CarrierPaymentExport implements FromArray, ShouldAutoSize, WithStyles, Wit
             $total = [];
             // Row Subtotal
             $total[] = [
-                '','','','','','','','','',"Subtotal",$this->carrierPayment->gross_amount,
+                "Subtotal",'','','','','','','','','',$this->carrierPayment->gross_amount,
             ];
             foreach ($this->bonuses as $bonus) {
                 $total[] = [
-                    '','','','','','','','','',$bonus["name"],$bonus["amount"],
+                    $bonus["name"],'','','','','','','','','',$bonus["amount"],
                 ];
             }
             foreach ($this->expenses as $expense) {
                 $total[] = [
-                    '','','','','','','','','',$expense["name"],"$(" . number_format($expense["amount"], 2) . ")",
+                    $expense["name"],'','','','','','','','','',"$(" . number_format($expense["amount"], 2) . ")",
                 ];
             }
             // Row Total
             $total[] = [
-                '','','','','','','','','',"Total",$this->carrierPayment->total,
+                "Total",'','','','','','','','','',$this->carrierPayment->total,
             ];
                 break;
             case CarrierPaymentEnum::CHARGES:

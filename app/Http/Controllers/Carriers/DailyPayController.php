@@ -103,7 +103,7 @@ class DailyPayController extends Controller
                 })
                     ->get();
                 try {
-                    $pdf = Excel::raw(new CarrierPaymentExport($carrierPayment->id), \Maatwebsite\Excel\Excel::MPDF);
+                    $pdf = $this->getPDFBinary($carrierPayment->id);
                     foreach ($accountantDirectors as $item) {
                         Mail::to($item->email)->send(new SendCarrierPayments($carrierPayment->carrier, $pdf, "Daily Pay Request"));
                     }

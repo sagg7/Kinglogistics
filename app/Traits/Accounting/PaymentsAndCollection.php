@@ -470,7 +470,7 @@ trait PaymentsAndCollection
             if ($item->carrier->invoice_email) {
                 $emails = explode(',', $item->carrier->invoice_email);
                 try {
-                    $pdf = Excel::raw(new CarrierPaymentExport($item->id), \Maatwebsite\Excel\Excel::MPDF);
+                    $pdf = $this->getPDFBinary($item->id);
                     foreach ($emails as $email) {
                         Mail::to($email)->send(new SendCarrierPayments($item->carrier, $pdf));
                     }
