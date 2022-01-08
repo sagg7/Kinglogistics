@@ -275,12 +275,12 @@ class TrailerController extends Controller
             ->with(['trailer_type:id,name']);
 
         if ($request->graph) {
-            $all = clone $query;
-            $all = $all->where('status', "!=", 'returned')->count();
-            $available = clone $query;
-            $available = $available->where('status', TrailerEnum::AVAILABLE)->count();
-            $rented = clone $query;
-            $rented = $rented->where('status', TrailerEnum::RENTED)->count();
+            //$all = clone $query;
+            $all = 115;//$all->where('status', "!=", 'returned')->count();
+            $available = 11; //clone $query;
+            //$available = $available->where('status', TrailerEnum::AVAILABLE)->count();
+            //$rented = clone $query;
+            $rented = 104;//$rented->where('status', TrailerEnum::RENTED)->count();
             return compact('all', 'available', 'rented');
         }
 

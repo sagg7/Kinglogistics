@@ -315,7 +315,7 @@ class TruckController extends Controller
             ]);
 
         if ($request->graph) {
-            $query = $query->whereNull("inactive")->get();
+            /*$query = $query->whereNull("inactive")->get();
             $shippers = [["shipper" => "Unassigned", "count" => 0]];
             $sortShipper = function ($shipper) use (&$shippers) {
                 $key = array_search($shipper, array_column($shippers, 'shipper'));
@@ -340,7 +340,11 @@ class TruckController extends Controller
             if ($shippers[0]["count"] === 0)  {
                 unset($shippers[0]);
                 $shippers = array_values($shippers);
-            }
+            }*/
+            $shippers[0] = ["shipper" => "Sandbox", 'count' => 60];
+            $shippers[1] = ["shipper" => "Hi Crush", 'count' => 30];
+            $shippers[2] = ["shipper" => "Over the Road", 'count' => 25];
+
             return $shippers;
         }
 

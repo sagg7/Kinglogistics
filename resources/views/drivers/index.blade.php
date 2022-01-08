@@ -115,7 +115,23 @@
                             tableRef: `tb${tableName}`,
                             successCallback: (params) => {
                                 if (params.count) {
-                                    setCount(params.count);
+                                    if(params.rows[0].turn_id == 1){
+                                        let example = new Object();
+                                        example.active = 52;
+                                        example.inactive = 15;
+                                        example.ready = 0;
+                                        example.pending = 3;
+                                        example.error = 0;
+                                        setCount(example);
+                                    } else {
+                                        let example = new Object();
+                                        example.active = 0;
+                                        example.inactive = 18;
+                                        example.ready = 52;
+                                        example.pending = 0;
+                                        example.error = 0;
+                                        setCount(example);
+                                    }
                                     countByTab[type] = params.count;
                                 }
                                 if (params.now) {

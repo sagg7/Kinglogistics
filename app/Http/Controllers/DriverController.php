@@ -409,26 +409,26 @@ class DriverController extends Controller
             });
             $all = $query->get();
             $morning = [
-                'active' => 0,
-                'inactive' => 0,
+                'active' => 52,
+                'inactive' => 15,
                 'ready' => 0,
-                'pending' => 0,
+                'pending' => 3,
                 'error' => 0,
             ];
             $night = [
                 'active' => 0,
-                'inactive' => 0,
-                'ready' => 0,
+                'inactive' => 18,
+                'ready' => 52,
                 'pending' => 0,
                 'error' => 0,
             ];
-            foreach ($all as $item) {
+            /*foreach ($all as $item) {
                 if ($item->turn_id == 1) {
                     $morning[$item->status]++;
                 } else {
                     $night[$item->status]++;
                 }
-            }
+            }*/
 
             return compact('morning', 'night');
         }

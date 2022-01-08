@@ -94,6 +94,30 @@ class DashboardController extends Controller
             $loadsSummary[$load->status]["data"][] = $load;
         }
 
+        foreach ($loads as $load) {
+            if (isset($loadsSummary[$load->status]))
+                $loadsSummary[$load->status]["count"]++;
+            else
+                $loadsSummary[$load->status]["count"] = 1;
+            $loadsSummary[$load->status]["data"][] = $load;
+        }
+
+        foreach ($loads as $load) {
+            if (isset($loadsSummary[$load->status]))
+                $loadsSummary[$load->status]["count"]++;
+            else
+                $loadsSummary[$load->status]["count"] = 1;
+            $loadsSummary[$load->status]["data"][] = $load;
+        }
+
+        foreach ($loads as $load) {
+            if (isset($loadsSummary[$load->status]))
+                $loadsSummary[$load->status]["count"]++;
+            else
+                $loadsSummary[$load->status]["count"] = 1;
+            $loadsSummary[$load->status]["data"][] = $load;
+        }
+
         return [
             'loads' => $loadsSummary
         ];

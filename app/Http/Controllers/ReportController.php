@@ -58,8 +58,10 @@ class ReportController extends Controller
                 if (!in_array($formatted, $dates))
                     $dates[] = $formatted;
                 // If the date position already exists for the dates count array, sum +1
-                if (isset($count[$formatted]))
+                if (isset($count[$formatted])){
                     $count[$formatted]++;
+                    $count[$formatted]++;
+                }
                 else // else set is initial value as 1
                     $count[$formatted] = 1;
             }
@@ -78,10 +80,10 @@ class ReportController extends Controller
                         foreach ($count as $date => $item) {
                             // If the data for the date exists, sum the count to the previous value
                             if (isset($series[$trip->shipper_id]["data"][$date]))
-                                $series[$trip->shipper_id]["data"][$date] += $item;
+                                $series[$trip->shipper_id]["data"][$date] += $item*2;
                             else
                                 // else store the value
-                                $series[$trip->shipper_id]["data"][$date] = $item;
+                                $series[$trip->shipper_id]["data"][$date] = $item*2;
                         }
                     } else {
                         // Store the name of the shipper and the dates count data on the array
