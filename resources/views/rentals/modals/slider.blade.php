@@ -6,7 +6,6 @@
                     <button id="x" data-toggle="modal" data-target="#swiperModal" modal="dismiss">X</button>
                     <div class="owl-carousel owl-theme" id='picturesCarousel'>
                         @foreach ($pictures as $index => $picture)
-                            @dd($picture)
                             <div id="slider-{{$picture->id}}">
                                 <img class="owl-lazy" data-src="{{$picture->url}}"
                                      alt="" title="">
