@@ -23,8 +23,12 @@
                         {headerName: 'Phone', field: 'phone'},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-staff']))
                         {text: 'Edit', route: '/user/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-staff']))
                         {route: '/user/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/user/search',

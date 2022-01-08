@@ -21,13 +21,13 @@ Route::middleware('guest:shipper')->group(function () {
 });
 
 Route::middleware('auth:shipper')->group(function () {
-    require __DIR__.'/web/dashboard.php';
-    require __DIR__.'/web/trips.php';
+    require __DIR__.'/common/dashboard.php';
+    require __DIR__.'/shippers/trips.php';
     require __DIR__.'/shippers/loads.php';
-    require __DIR__.'/web/loadTypes.php';
+    require __DIR__.'/shippers/loadTypes.php';
     require __DIR__.'/shippers/zones.php';
     require __DIR__.'/shippers/tracking.php';
-    require __DIR__.'/web/drivers.php';
+    require __DIR__.'/shippers/drivers.php';
     require __DIR__.'/shippers/reports.php';
     require __DIR__.'/shippers/incidents.php';
     require __DIR__.'/shippers/brokers.php';

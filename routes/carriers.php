@@ -31,12 +31,12 @@ Route::middleware(['auth:carrier','documentation'])->group(function () {
     require __DIR__.'/carriers/expenses.php';
     require __DIR__.'/carriers/paperwork.php';
     require __DIR__.'/carriers/reports.php';
-    require __DIR__.'/web/trucks.php';
+    require __DIR__.'/carriers/trucks.php';
     require __DIR__.'/carriers/tracking.php';
-    require __DIR__.'/web/dashboard.php';
+    require __DIR__.'/common/dashboard.php';
     require __DIR__.'/carriers/trips.php';
     require __DIR__.'/carriers/accounting.php';
-    require __DIR__.'/web/incidents.php';
+    require __DIR__.'/common/incidents.php';
     require __DIR__.'/carriers/jobOpportunities.php';
     require __DIR__.'/carriers/equipment.php';
     require __DIR__.'/web/s3storage.php';

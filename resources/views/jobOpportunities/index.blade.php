@@ -18,8 +18,12 @@
                     @if(auth()->guard('web')->check())
                     menu: [
                         {text: 'Show', route: '/jobOpportunity/show', icon: 'feather icon-eye'},
+                        @if(auth()->user()->can(['update-job-opportunity']))
                         {text: 'Edit', route: '/jobOpportunity/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-job-opportunity']))
                         {route: '/jobOpportunity/delete', type: 'delete'}
+                        @endif
                     ],
                     @endif
                     container: 'myGrid',

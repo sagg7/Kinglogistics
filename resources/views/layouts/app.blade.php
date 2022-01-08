@@ -97,7 +97,7 @@
             </main>
         </div>
     </div>
-    @if(auth()->guard('web')->check() && ($bottomChat ?? true))
+    @if(auth()->guard('web')->check() && ($bottomChat ?? true) && auth()->user()->can(['read-chat']))
         @include("layouts.chat.chatTemplate")
     @endif
     <footer class="footer footer-static footer-light"></footer>

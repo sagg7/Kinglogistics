@@ -20,9 +20,12 @@
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
     @endsection
 
-    @include('dashboard.common.loadStatus')
+    @if(auth()->user()->can(['read-load']))
+        @include('dashboard.common.loadStatus')
+    @endif
 
     <div class="row">
+        @if(auth()->user()->can(['read-staff']))
         <div class="col-sm-6 col-12">
             <div class="card">
                 <div class="card-header align-self-center">
@@ -35,6 +38,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if(auth()->user()->can(['read-driver']))
         <div class="col-sm-6 col-12">
             <div class="card">
                 <div class="card-header align-self-center">
@@ -47,6 +52,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if(auth()->user()->can(['read-trailer']))
         <div class="col-sm-6 col-12">
             <div class="card">
                 <div class="card-header align-self-center">
@@ -59,6 +66,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if(auth()->user()->can(['read-truck']))
         <div class="col-sm-6 col-12">
             <div class="card">
                 <div class="card-header align-self-center">
@@ -71,6 +80,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if(auth()->user()->can(['read-jobs']))
         <div class="col-12">
             <div class="card">
                 <div class="card-header align-self-center">
@@ -83,6 +94,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 
 </x-app-layout>

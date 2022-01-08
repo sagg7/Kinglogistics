@@ -43,7 +43,9 @@
                         {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-carrier']))
                         {text: 'Edit', route: '/bonus/edit', icon: 'feather icon-edit'},
+                        @endif
                         {route: '/bonus/delete', type: 'delete'}
                     ],
                     container: 'myGrid',
@@ -54,5 +56,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/bonus/create', 'text' => 'Create Bonus']])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-carrier']) ? ['create_btn' => ['url' => '/bonus/create', 'text' => 'Create Bonus']] : [])@endcomponent
 </x-app-layout>

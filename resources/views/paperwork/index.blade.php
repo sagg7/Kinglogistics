@@ -30,8 +30,12 @@
                                 {headerName: 'Required', field: 'required', valueFormatter: checkFormatter},
                             ],
                             menu: [
+                                @if(auth()->user()->can(['create-paperwork']))
                                 {text: 'Edit', route: '/paperwork/edit', icon: 'feather icon-edit'},
+                                @endif
+                                @if(auth()->user()->can(['delete-paperwork']))
                                 {route: '/paperwork/delete', type: 'delete'}
+                                @endif
                             ],
                             container: `grid${tableName}`,
                             url: `/paperwork/search/${type.slice(0, -1)}`,

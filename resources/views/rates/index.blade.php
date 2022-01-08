@@ -33,8 +33,12 @@
                         {headerName: 'Carrier Rate', field: 'carrier_rate', valueFormatter: moneyFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['read-rate']))
                         {text: 'Edit', route: '/rate/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-rate']))
                         {route: '/rate/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/rate/search',
@@ -44,5 +48,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/rate/create', 'text' => 'Create rate']])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-rate']) ? ['create_btn' => ['url' => '/rate/create', 'text' => 'Create rate']] : [])@endcomponent
 </x-app-layout>

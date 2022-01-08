@@ -15,8 +15,12 @@
                         {headerName: 'Name', field: 'name'},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-trailer']))
                         {text: 'Edit', route: '/trailerType/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-trailer']))
                         {route: '/trailerType/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/trailerType/search',

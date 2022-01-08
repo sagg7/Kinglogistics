@@ -16,8 +16,12 @@
                         {headerName: 'Email', field: 'email'},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-customer']))
                         {text: 'Edit', route: '/shipper/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-customer']))
                         {route: '/shipper/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/shipper/search',

@@ -190,6 +190,7 @@
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-load-dispatch']))
                         {
                             text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
                             menuData: {
@@ -212,6 +213,7 @@
                                 }
                             }
                         },
+                        @endif
                     ],
                     gridOptions: {
                         PhotosRenderer: PhotosRenderer,

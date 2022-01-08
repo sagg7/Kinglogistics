@@ -49,6 +49,7 @@
                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
                         {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
                         {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
+                        @if(auth()->user()->can(['update-invoice']))
                         {text: 'Send Email & Complete', route: '/shipper/invoice/complete', type: 'confirm', icon: 'fas fa-paper-plane',
                             menuData: {
                                 title: 'Confirm sending email to customer?',
@@ -58,6 +59,7 @@
                                 },
                             }
                         },
+                        @endif
                     ],
                     container: 'pendingInvoicesGrid',
                     url: '/shipper/invoice/search/pending',
@@ -77,6 +79,7 @@
                                     menu: [
                                         {text: 'PDF', route: '/shipper/invoice/downloadPDF', icon: 'fas fa-file-pdf'},
                                         {text: 'XLSX', route: '/shipper/invoice/downloadXLSX', icon: 'far fa-file-excel'},
+                                        @if(auth()->user()->can(['update-invoice']))
                                         {text: 'Set as paid', route: '/shipper/invoice/pay', type: 'confirm', icon: 'fas fa-hand-holding-usd font-weight-bold',
                                             menuData: {
                                                 title: 'Set status to paid?',
@@ -95,6 +98,7 @@
                                                 },
                                             }
                                         },
+                                        @endif
                                         {text: 'Download Pictures', route: '/shipper/invoice/downloadPhotos', icon: 'far fa-file-image-o'},
                                     ],
                                     container: 'completedInvoicesGrid',

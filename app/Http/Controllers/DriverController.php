@@ -484,7 +484,7 @@ class DriverController extends Controller
             Shift::destroy($driver->shift->id);
         }
 
-        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
+        BotAnswers::where('driver_id', $id)->delete();
 
         $driver->status = 'inactive';
         $driver->save();
@@ -500,7 +500,7 @@ class DriverController extends Controller
         $driver->status = 'active';
         $driver->save();
 
-        $botAnswers = BotAnswers::where('driver_id', $id)->delete();
+        BotAnswers::where('driver_id', $id)->delete();
 
         return ['success' => $driver];
 

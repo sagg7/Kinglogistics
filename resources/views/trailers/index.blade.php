@@ -28,8 +28,12 @@
                                 {headerName: 'VIN', field: 'vin'},
                             ],
                             menu: [
+                                @if(auth()->user()->can(['update-trailer']))
                                 {text: 'Edit', route: '/trailer/edit', icon: 'feather icon-edit'},
+                                @endif
+                                @if(auth()->user()->can(['delete-trailer']))
                                 {route: '/trailer/delete', type: 'delete'}
+                                @endif
                             ],
                             container: `grid${tableName}`,
                             url: `/trailer/search/${type}`,

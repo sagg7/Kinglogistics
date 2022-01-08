@@ -6,10 +6,12 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard');
-    Route::get('getData', [DashboardController::class, 'getData'])
-        ->name('dashboard.getData');
-    Route::get('loadSummary', [DashboardController::class, 'loadSummary'])
-        ->name('dashboard.loadSummary');
-    Route::get('testKernel', [DashboardController::class, 'testKernel'])
-        ->name('testKernel');
+    Route::group(['middleware' => ['permission:read-load']], function () {
+        Route::get('getData', [DashboardController::class, 'getData'])
+            ->name('dashboard.getData');
+    });
+    Route::group(['middleware' => ['role:admin']], function () {
+        Route::get('testKernel', [DashboardController::class, 'testKernel'])
+            ->name('testKernel');
+    });
 });

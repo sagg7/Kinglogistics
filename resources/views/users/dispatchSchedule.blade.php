@@ -39,6 +39,7 @@
     @endsection
 
     <div class="card">
+        @if(auth()->user()->can(['create-dispatch-schedule', 'update-dispatch-schedule']))
         <div class="card-header">
             <div class="col-6">
                 {!! Form::label('dispatch', ucfirst(__('dispatcher')), ['class' => 'col-form-label']) !!}
@@ -50,6 +51,7 @@
             </div>
         </div>
         <hr>
+        @endif
         <div class="card-body">
             <div class="card-content">
                 {!! Form::open(['route' => ['user.storeDispatchSchedule'], 'method' => 'post', 'class' => 'form form-vertical', 'id' => 'scheduleForm']) !!}
@@ -117,7 +119,9 @@
                         </table>
                     </div>
                 </div>
+                @if(auth()->user()->can(['create-dispatch-schedule', 'update-dispatch-schedule']))
                 {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
+                @endif
             </div>
         </div>
     </div>

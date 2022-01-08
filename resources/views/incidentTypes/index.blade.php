@@ -22,8 +22,12 @@
                         {headerName: 'Fine', field: 'fine', valueFormatter: moneyFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-incident']))
                         {text: 'Edit', route: '/incidentType/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-incident']))
                         {route: '/incidentType/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/incidentType/search',

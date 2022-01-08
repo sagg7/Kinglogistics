@@ -29,8 +29,10 @@
                     ],
                     menu: [
                         {text: 'Show', route: '/load/show', icon: 'feather icon-eye'},
-                        @if(auth()->guard('web')->check())
+                        @if(auth()->user()->can(['update-load']))
                         {text: 'Edit', route: '/load/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-load']))
                         {route: '/load/delete', type: 'delete'}
                         @endif
                     ],

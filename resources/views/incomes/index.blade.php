@@ -35,8 +35,12 @@
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-income']))
                         {text: 'Edit', route: '/income/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-income']))
                         {route: '/income/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/income/search',

@@ -34,6 +34,7 @@
                 <div id="__chats"></div>
             </div>
 
+            @if(auth()->user()->can(['create-chat']))
             <form action="javascript:void(0);" id="__chat_send_message">
                 <label type="button" for="__chat_append" class="btn primary d-flex align-items-center">
                     <i class="fas fa-paperclip mx-auto"></i>
@@ -42,6 +43,7 @@
                 <input type="text" name="__chat_message" id="__chat_message" placeholder="Send message...">
                 <button type="submit" id="__chat_input" class="btn primary"><i class="fas fa-paper-plane"></i></button>
             </form>
+            @endif
 
             <div class="__preview_image" id="__image_to_send" tabindex="-1">
                 <div class="main">

@@ -15,8 +15,12 @@
                         {headerName: 'Name', field: 'name'},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-zone']))
                         {text: 'Edit', route: '/zone/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-zone']))
                         {route: '/zone/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/zone/search',

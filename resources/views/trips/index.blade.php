@@ -30,8 +30,12 @@
                                 @endif
                             ],
                             menu: [
+                                @if(auth()->user()->can(['update-job']))
                                 {text: 'Edit', route: '/trip/edit', icon: 'feather icon-edit'},
+                                @endif
+                                @if(auth()->user()->can(['delete-job']))
                                 {route: '/trip/delete', type: 'delete'}
+                                @endif
                             ],
                             container: `grid${tableName}`,
                             url: `/trip/search/${type}`,

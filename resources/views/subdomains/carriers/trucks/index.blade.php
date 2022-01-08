@@ -38,12 +38,8 @@
                         {headerName: 'Deposit', field: 'driver', filter:false, sortable: false, valueFormatter: depositFormatter},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['update-truck']))
                         {text: 'Edit', route: '/truck/edit', icon: 'feather icon-edit'},
-                        @endif
-                        @if(auth()->user()->can(['delete-truck']))
                         {route: '/truck/delete', type: 'delete'}
-                        @endif
                     ],
                     container: 'myGrid',
                     url: '/truck/search',

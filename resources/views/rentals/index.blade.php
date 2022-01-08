@@ -52,10 +52,14 @@
                                 {headerName: 'Deposit', field: 'deposit', valueFormatter: moneyFormatter},
                             ],
                             menu: [
+                                @if(auth()->user()->can(['update-rental']))
                                 {text: 'Check out', route: "/inspection/create", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "uninspected"'},
                                 {text: 'Check in', route: "/inspection/endInspection", icon: 'feather icon-edit', type: 'dynamic', conditional:'status == "delivered"'},
                                 {text: 'Edit', route: '/rental/edit', icon: 'feather icon-edit'},
+                                @endif
+                                @if(auth()->user()->can(['delete-rental']))
                                 {route: '/rental/delete', type: 'delete'}
+                                @endif
                             ],
                             container: `grid${tableName}`,
                             url: `/rental/search/${type}`,

@@ -86,39 +86,6 @@
                             return this.eGui;
                         }
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
-                        let menu;
-                        if (type === "deleted") {
-                            menu = [
-                                @if(auth()->user()->can(['delete-driver']))
-                                {text: 'Restore', route: '/driver/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm', menuData: {title: 'Restore driver?'}}
-                                @endif
-                            ];
-                        } else {
-                            menu = [
-                                @if(auth()->user()->can(['update-driver']))
-                                {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
-                                @endif
-                                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))
-                                {
-                                    text: 'End Shift',
-                                    route: "/driver/endShift",
-                                    icon: 'feather icon-x-circle',
-                                    type: 'confirm', conditional: 'status === "pending" || params.data.status === "active" || params.data.status === "ready"',
-                                    menuData: {title: "End driver's shift?"}
-                                },
-                                {
-                                    text: 'Set as Active',
-                                    route: "/driver/setActive",
-                                    icon: 'fas fa-check-circle',
-                                    type: 'confirm', conditional: 'status === "pending" || params.data.status === "ready"',
-                                    menuData: {title: "Set driver as active?"}
-                                },
-                                @endif
-                                @if(auth()->user()->can(['delete-driver']))
-                                {route: '/driver/delete', type: 'delete'},
-                                @endif
-                            ];
-                        }
                         return {
                             columns: [
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
@@ -127,7 +94,6 @@
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
                                 {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],
-                            menu,
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,

@@ -3,8 +3,8 @@
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => ['role:admin|operations|dispatch|safety']], function () {
-    Route::prefix('chat')->group(function () {
+Route::prefix('chat')->group(function () {
+    Route::group(['middleware' => ['permission:read-chat']], function () {
         Route::get('/', [ChatController::class, 'index'])
             ->name('chat.index');
         Route::get('getContacts', [ChatController::class, 'getContacts'])
@@ -13,7 +13,13 @@ Route::group(['middleware' => ['role:admin|operations|dispatch|safety']], functi
             ->name('chat.getChatHistory');
         Route::get('getUnreadCount', [ChatController::class, 'getUnreadCount'])
             ->name('chat.getUnreadCount');
+    });
+    Route::group(['middleware' => ['permission:create-chat']], function () {
         Route::post('sendMessage', [ChatController::class, 'sendMessageAsUser'])
             ->name('chat.sendMessage');
     });
+    /*Route::group(['middleware' => ['permission:update-chat']], function () {
+        });
+        Route::group(['middleware' => ['permission:delete-chat']], function () {
+        });*/
 });

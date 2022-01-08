@@ -138,6 +138,7 @@
                                         <i class="feather icon-search"></i>
                                     </div>
                                 </fieldset>
+                                @if(auth()->user()->can(['create-chat']))
                                 <div class="dropdown">
                                     <button class="btn p-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-bars" style="margin-left: .2rem;"></i>
@@ -146,6 +147,7 @@
                                         <a class="dropdown-item" href="#multiMessage" data-toggle="modal" data-target="#multiMessage"> Send mass message</a>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                         <div id="users-list" class="chat-user-list list-group position-relative">
@@ -192,6 +194,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @if(auth()->user()->can(['create-chat']))
                                 <div class="chat-app-form">
                                     <form class="chat-app-input d-flex" action="javascript:void(0);">
                                         <label for="appendImage" class="btn btn-primary">
@@ -202,6 +205,7 @@
                                         <button type="submit" class="btn btn-primary send"><i class="far fa-paper-plane d-lg-none"></i> <span class="d-none d-lg-block">Send</span></button>
                                     </form>
                                 </div>
+                                @endif
                                 <div class="preview-image" id="imageToSend" tabindex="-1">
                                     <div class="main">
                                         <div class="preview-header">

@@ -22,12 +22,6 @@
                     else
                         return '$0.00';
                 };
-                const dateFormatter = (params) => {
-                    if (params.value)
-                        return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
-                    else
-                        return '';
-                };
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'date'},
@@ -35,8 +29,12 @@
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['update-expense']))
                         {text: 'Edit', route: '/expense/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-expense']))
                         {route: '/expense/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/expense/search',
@@ -46,5 +44,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense']])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-expense']) ? ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense']] : [])@endcomponent
 </x-app-layout>

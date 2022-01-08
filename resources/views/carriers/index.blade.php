@@ -26,7 +26,10 @@
                             default:
                                 menu = [
                                     {text: 'Paperwork', route: '#view-paperwork', icon: 'far fa-eye', type: 'modal'},
+                                    @if(auth()->user()->can(['update-carrier']))
                                     {text: 'Edit', route: '/carrier/edit', icon: 'feather icon-edit'},
+                                    @endif
+                                    @if(auth()->user()->can(['update-carrier-active']))
                                     {
                                         text: 'Prospect',
                                         route: "/carrier/setStatus",
@@ -102,7 +105,10 @@
                                             }
                                         },
                                     },
+                                    @endif
+                                    @if(auth()->user()->can(['delete-carrier']))
                                     {route: '/carrier/delete', type: 'delete'},
+                                    @endif
                                 ];
                                 gridOptions = {
                                     components: {
@@ -223,12 +229,14 @@
                                 break;
                             case "deleted":
                                 menu = [
+                                    @if(auth()->user()->can(['delete-carrier']))
                                     {text: 'Restore', route: '/carrier/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm', menuData: {title: 'Restore carrier?'}}
+                                    @endif
                                 ];
                                 break;
                             case "notRehirable":
                                 menu = [
-                                    @if(auth()->user()->hasRole('admin'))
+                                    @if(auth()->user()->can(['delete-carrier']))
                                     {text: 'Restore', route: '/carrier/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm', menuData: {title: 'Restore carrier?'}}
                                     @endif
                                 ];
