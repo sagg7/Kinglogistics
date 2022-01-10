@@ -9,8 +9,6 @@ Route::prefix('load')->group(function () {
             ->name('load.index');
         Route::get('show/{id}', [LoadController::class, 'show'])
             ->name('load.show');
-        Route::get('search', [LoadController::class, 'search'])
-            ->name('load.search');
     });
     Route::group(['middleware' => ['permission:create-load']], function () {
         Route::get('create', [LoadController::class, 'create'])
@@ -53,5 +51,10 @@ Route::prefix('load')->group(function () {
             ->name('load.replacePhoto');
         Route::post('loadPhoto/{id}/{type}', [LoadController::class, 'loadPhoto'])
             ->name('load.loadPhoto');
+    });
+
+    Route::group(['middleware' => ['permission:read-load|read-load-dispatch']], function () {
+        Route::get('search', [LoadController::class, 'search'])
+            ->name('load.search');
     });
 });
