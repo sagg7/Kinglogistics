@@ -47,8 +47,12 @@
                         {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
+                        @if(auth()->user()->can(['create-carrier']))
                         {text: 'Edit', route: '/charge/edit', icon: 'feather icon-edit'},
+                        @endif
+                        @if(auth()->user()->can(['delete-carrier']))
                         {route: '/charge/delete', type: 'delete'}
+                        @endif
                     ],
                     container: 'myGrid',
                     url: '/charge/search',
@@ -58,5 +62,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/charge/create', 'text' => 'Create Charge']])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-carrier']) ? ['create_btn' => ['url' => '/charge/create', 'text' => 'Create Charge']] : [])@endcomponent
 </x-app-layout>

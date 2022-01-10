@@ -50,5 +50,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', ['create_btn' => ['url' => '/income/create', 'text' => 'Create Income']])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-income']) ? ['create_btn' => ['url' => '/income/create', 'text' => 'Create Income']] : [])@endcomponent
 </x-app-layout>

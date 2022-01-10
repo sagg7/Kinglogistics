@@ -151,16 +151,20 @@
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-id-card"></i><span class="menu-title" data-i18n="User">Drivers</span></a>
                 <ul class="menu-content">
+                    @if(auth()->user()->can(['create-driver']))
                     <li>
                         <a href="/driver/create">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
                         </a>
                     </li>
+                    @endif
+                    @if(auth()->user()->can(['read-driver']))
                     <li>
                         <a href="/driver/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </li>
             @endif
@@ -168,16 +172,20 @@
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-trailer"></i><span class="menu-title" data-i18n="User">Trailers</span></a>
                 <ul class="menu-content">
+                    @if(auth()->user()->can(['create-trailer']))
                     <li>
                         <a href="/trailer/create">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
                         </a>
                     </li>
+                    @endif
+                    @if(auth()->user()->can(['read-trailer']))
                     <li>
                         <a href="/trailer/index">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </li>
             @endif
