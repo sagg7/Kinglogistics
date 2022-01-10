@@ -35,11 +35,15 @@ class TrackingController extends Controller
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
+        $driverId = $request->get('driver_id');
+
         return Driver::with([
-            'locations',
             'carrier:id,name',
             'truck:id,number,driver_id',
         ])
+            ->with('locations', function($q) use ($start, $end){
+                $q->whereBetween('created_at', [$start, $end])->take(1000);
+            })
             ->where(function ($q) use ($user_id, $start, $end) {
                 if (auth()->guard('shipper')->check()) {
                     $q->whereHas('locations', function ($q) use ($user_id, $start, $end) {
@@ -47,8 +51,7 @@ class TrackingController extends Controller
                             $q->whereHas('trip', function ($q) use ($user_id) {
                                 $q->where('shipper_id', $user_id);
                             });
-                        })
-                            ->whereBetween('created_at', [$start, $end]);
+                        });
                     });
                 } else if (auth()->guard('carrier')->check()) {
                     $q->where('carrier_id', auth()->user()->id);
@@ -56,14 +59,14 @@ class TrackingController extends Controller
                 $q->whereHas('locations', function ($q) {
                     $q->whereNotNull('load_id');
                 });
-            })
-            ->withTrashed()
-            ->get()->take(1000);
+                if (!empty($driverId))
+                    $q->where("id", $driverId);
+            })->get();
     }
 
     public function getPinLoadData(Request $request)
     {
-        return Load::with([
+        $load = Load::with([
             'truck:id,number',
             'shipper:id,name',
         ])
@@ -73,6 +76,21 @@ class TrackingController extends Controller
                         $q->where('shipper_id', auth()->user()->id);
                     });
             })
-            ->findOrFail($request->load);
+            ->find($request->load);
+
+        if ($load)
+            return $load;
+        else
+            return Driver::with([
+                'truck:id,number',
+                'shipper:id,name',
+            ])
+                ->where(function ($q) {
+                    if (auth()->guard('shipper')->check())
+                        $q->whereHas('trip', function ($q) {
+                            $q->where('shipper_id', auth()->user()->id);
+                        });
+                })
+                ->find($request->load);
     }
 }

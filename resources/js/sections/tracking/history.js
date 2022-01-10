@@ -263,6 +263,7 @@
             data: {
                 start: start.format('YYYY/MM/DD'),
                 end: end.format('YYYY/MM/DD'),
+                driver: $("[name='driver']").val(),
             },
             success: (res) => {
                 data = res;
