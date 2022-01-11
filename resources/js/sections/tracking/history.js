@@ -159,19 +159,22 @@
         markersArray.forEach(item => {
             if (item.driver.id !== driver_id) {
                 item.marker.setMap(null);
-                if (item.poly.drivenPath)
+                if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
                     item.poly.drivenPath.setMap(null);
+                }
             } else {
                 item.marker.setMap(map);
-                if (item.poly.drivenPath)
+                if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
                     item.poly.drivenPath.setMap(map);
+                }
             }
         });
     }).on('select2:unselect', () => {
         markersArray.forEach(item => {
             item.marker.setMap(map);
-            if (item.poly.drivenPath)
+            if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
                 item.poly.drivenPath.setMap(map);
+            }
         });
     });
     let data = [];
