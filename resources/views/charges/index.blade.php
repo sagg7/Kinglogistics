@@ -47,10 +47,10 @@
                         {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['create-carrier']))
+                        @if(auth()->user()->can(['create-statement']))
                         {text: 'Edit', route: '/charge/edit', icon: 'feather icon-edit'},
                         @endif
-                        @if(auth()->user()->can(['delete-carrier']))
+                        @if(auth()->user()->can(['delete-statement']))
                         {route: '/charge/delete', type: 'delete'}
                         @endif
                     ],

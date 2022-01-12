@@ -20,7 +20,7 @@
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
     @endsection
 
-    @if(auth()->user()->can(['read-load']))
+    @if(auth()->user()->can(['read-load']) || auth()->user()->can(['read-load-dispatch']))
         @include('dashboard.common.loadStatus')
     @endif
 

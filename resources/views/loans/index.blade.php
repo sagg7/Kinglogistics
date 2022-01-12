@@ -38,10 +38,10 @@
                         {headerName: 'Fee', field: 'fee_percentage', valueFormatter: percentageFormatter},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['create-loan']))
+                        @if(auth()->user()->can(['create-statement']))
                         {text: 'Edit', route: '/loan/edit', icon: 'feather icon-edit'},
                         @endif
-                        @if(auth()->user()->can(['delete-loan']))
+                        @if(auth()->user()->can(['delete-statement']))
                         {route: '/loan/delete', type: 'delete'}
                         @endif
                     ],
@@ -53,5 +53,5 @@
         </script>
     @endsection
 
-    @component('components.aggrid-index', auth()->user()->can(['create-load']) ? ['create_btn' => ['url' => '/loan/create', 'text' => 'Create Loan']] : [])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-statement']) ? ['create_btn' => ['url' => '/loan/create', 'text' => 'Create Loan']] : [])@endcomponent
 </x-app-layout>

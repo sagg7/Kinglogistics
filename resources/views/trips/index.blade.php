@@ -63,11 +63,12 @@
 
     <div class="card pills-layout">
         <div class="card-content">
-
+            @if(auth()->user()->can(['create-job']))
             <div class="card-header">
                 <a href="/trip/create" class="btn btn-primary">Create Job</a>
             </div>
             <hr>
+            @endif
 
             <div class="card-body">
                 <div class="row ml-0">

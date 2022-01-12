@@ -33,7 +33,7 @@
                         {headerName: 'Carrier Rate', field: 'carrier_rate', valueFormatter: moneyFormatter},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['read-rate']))
+                        @if(auth()->user()->can(['edit-rate']))
                         {text: 'Edit', route: '/rate/edit', icon: 'feather icon-edit'},
                         @endif
                         @if(auth()->user()->can(['delete-rate']))

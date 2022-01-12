@@ -43,7 +43,7 @@
                         {headerName: 'Carriers', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['update-carrier']))
+                        @if(auth()->user()->can(['update-statement']))
                         {text: 'Edit', route: '/bonus/edit', icon: 'feather icon-edit'},
                         @endif
                         {route: '/bonus/delete', type: 'delete'}
