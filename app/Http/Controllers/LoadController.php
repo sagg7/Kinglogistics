@@ -328,7 +328,7 @@ class LoadController extends Controller
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
-        if (auth()->guard('web')->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))) {
+        if (auth()->guard('web')->check() && auth()->user()->can('read-load-dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
             $select[] = 'customer_reference';
