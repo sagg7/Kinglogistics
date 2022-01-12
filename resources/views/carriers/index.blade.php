@@ -25,7 +25,8 @@
                         switch (type) {
                             default:
                                 menu = [
-                                    {text: 'Paperwork', route: '#view-paperwork', icon: 'far fa-eye', type: 'modal'},
+                                    {text: 'Summary', route: '/carrier/show', icon: 'far fa-eye'},
+                                    {text: 'Paperwork', route: '#view-paperwork', icon: 'far fa-folder-open', type: 'modal'},
                                     @if(auth()->user()->can(['update-carrier']))
                                     {text: 'Edit', route: '/carrier/edit', icon: 'feather icon-edit'},
                                     @endif

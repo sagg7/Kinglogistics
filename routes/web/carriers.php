@@ -8,6 +8,10 @@ Route::prefix('carrier')->group(function () {
     Route::group(['middleware' => ['permission:read-carrier']], function () {
         Route::get('index', [CarrierController::class, 'index'])
             ->name('carrier.index');
+        Route::get('show/{id}', [CarrierController::class, 'show'])
+            ->name('carrier.show');
+        Route::get('summaryData/{id}', [CarrierController::class, 'summaryData'])
+            ->name('carrier.summaryData');
         Route::get('search/{type?}', [CarrierController::class, 'search'])
             ->name('carrier.search');
         Route::get('getCarrierData/{id}', [CarrierController::class, 'getCarrierData'])

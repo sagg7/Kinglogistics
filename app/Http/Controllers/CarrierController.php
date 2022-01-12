@@ -3,16 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierEnum;
+use App\Enums\DriverEnum;
 use App\Enums\RoleSlugs;
 use App\Mail\SendNotificationTemplate;
 use App\Models\Carrier;
 use App\Models\CarrierEquipment;
+use App\Models\Driver;
+use App\Models\Incident;
+use App\Models\Load;
+use App\Models\Rental;
 use App\Models\User;
 use App\Rules\EmailArray;
 use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -145,7 +151,89 @@ class CarrierController extends Controller
      */
     public function show(int $id)
     {
-        //
+        $carrier = Carrier::findOrFail($id);
+        return view('carriers.show', compact('carrier'));
+    }
+
+    public function summaryData(int $id)
+    {
+        $carrier = Carrier::findOrFail($id);
+        $loadsBase = Load::whereHas('driver', function ($q) use ($id) {
+            $q->whereHas('carrier', function ($q) use ($id) {
+                $q->where('carrier_id', $id);
+            });
+        });
+        $now = Carbon::now();
+        $startOfYear = (clone $now)->startOfYear();
+        $aYearAgo = (clone $now)->subtract('year', 1);
+        $startOfWeek = (clone $now)->startOfWeek();
+        $startPastWeek = (clone $now)->subtract('week', 1)->startOfWeek();
+        $endPastWeek = (clone $startPastWeek)->endOfWeek();
+        $startPastMonth = (clone $now)->subtract('month', 1)->startOfMonth();
+        $endPastMonth = (clone $startPastMonth)->endOfMonth();
+
+        // Current Year Query Base
+        $currentYear = (clone $loadsBase)->whereDate('date', '>=', $startOfYear)
+            ->whereDate('date', '<=', $now);
+        // Current Week Query Base
+        $currentWeek = (clone $loadsBase)->whereDate('date', '>=', $startOfWeek)
+            ->whereDate('date', '<=', $now);
+        // Past Week Query Base
+        $pastWeek = (clone $loadsBase)->whereDate('date', '>=', $startPastWeek)
+            ->whereDate('date', '<=', $endPastWeek);
+        // Past Month Query Base
+        $pastMonth = (clone $loadsBase)->whereDate('date', '>=', $startPastMonth)
+            ->whereDate('date', '<=', $endPastMonth);
+
+        // Card #1
+        $incomeYear = $currentYear->sum('rate');
+        // Card #2
+        $incomePastMonth = $pastMonth->sum('rate');
+        // Card #3
+        $incomePastWeek = $pastWeek->sum('rate');
+        // Card #4
+        $incomeWeek = $currentWeek->sum('rate');
+        // Card #5
+        // TODO: RANKING
+        // Card #6
+        // TODO: ALERTS
+        // Card #7
+        $status = ucfirst($carrier->status);
+        // Card #8 Loads Last Week
+        $totalLoadsPastWeek = $pastWeek->count();
+        // Card #9 Loads This Week
+        $totalLoadsWeek = $currentWeek->count();
+        // Card #10 Active Rentals
+        $rentals = Rental::where('carrier_id', $id)
+            ->whereNull('finished_at')
+            ->with('trailer:id,number,status')
+            ->select([
+                'rentals.id',
+                'rentals.trailer_id',
+                'rentals.cost',
+            ])
+            ->get();
+        // Card #10 Active Drivers
+        $drivers = Driver::where('carrier_id', $id)
+            ->where('status', DriverEnum::ACTIVE)
+            ->select([
+                'drivers.id',
+                'drivers.name',
+            ])
+            ->withCount([
+                'loads as loads_count' => function ($q) use ($startOfWeek, $now) {
+                    $q->whereDate('date', '>=', $startOfWeek)
+                        ->whereDate('date', '<=', $now);
+                },
+            ])
+            ->get();
+        // Card #11 Number of Incidents
+        $incidents = Incident::where('carrier_id', $id)
+            ->whereDate('date', '>=', $aYearAgo)
+            ->count();
+
+        return compact('incomeYear', 'incomePastMonth', 'incomePastWeek', 'incomeWeek', 'status',
+            'totalLoadsPastWeek', 'totalLoadsWeek', 'rentals', 'drivers', 'incidents');
     }
 
     /**

@@ -178,7 +178,7 @@
 
     <div class="row text-center">
         <div class="col">
-            <div class="card border-primary" id="count-active">
+            <div class="card border-2 border-primary" id="count-active">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-primary p-50 m-0 mb-1">
@@ -193,7 +193,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-info" id="count-inactive">
+            <div class="card border-2 border-info" id="count-inactive">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-info p-50 m-0 mb-1">
@@ -208,7 +208,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-success" id="count-ready">
+            <div class="card border-2 border-success" id="count-ready">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-success p-50 m-0 mb-1">
@@ -223,7 +223,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-warning" id="count-pending">
+            <div class="card border-2 border-warning" id="count-pending">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-warning p-50 m-0 mb-1">
@@ -238,7 +238,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card border-danger" id="count-error">
+            <div class="card border-2 border-danger" id="count-error">
                 <div class="card-body">
                     <div class="card-content">
                         <div class="avatar bg-rgba-danger p-50 m-0 mb-1">
