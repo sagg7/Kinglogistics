@@ -118,6 +118,8 @@
                                 <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
                             </a>
                         </li>
+                    @endif
+                    @if(auth()->user()->can(['read-statement']))
                         <li>
                             <a href="/charge/index">
                                 <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Charges</span>

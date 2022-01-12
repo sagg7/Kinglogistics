@@ -9,8 +9,6 @@ Route::prefix('user')->group(function () {
             ->name('user.index');
         Route::get('search', [UserController::class, 'search'])
             ->name('user.search');
-        Route::get('searchActive', [UserController::class, 'staffOnTurn'])
-            ->name('user.searchActive');
     });
     Route::group(['middleware' => ['permission:create-staff']], function () {
         Route::get('create', [UserController::class, 'create'])
@@ -33,6 +31,8 @@ Route::prefix('user')->group(function () {
         ->name('user.selection');
     Route::get('profile', [UserController::class, 'profile'])
         ->name('user.profile');
+    Route::get('searchActive', [UserController::class, 'staffOnTurn'])
+        ->name('user.searchActive');
 
     Route::group(['middleware' => ['permission:read-dispatch-schedule']], function () {
         Route::get('dispatchSchedule', [UserController::class, 'dispatchSchedule'])
