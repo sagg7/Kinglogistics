@@ -58,12 +58,12 @@
                 const pendingTable = {
                     columns: [...paymentsColumns, ...[{headerName: 'Status', field: 'status', valueFormatter: capitalizeNameFormatter}]],
                     menu: [
-                        @if(auth()->user()->can(['update-carrier']))
+                        @if(auth()->user()->can(['update-statement']))
                         {text: 'Edit', route: '/carrier/payment/edit', icon: 'feather icon-edit'},
                         @endif
                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
                         {text: 'XLSX', route: '/carrier/payment/downloadXLSX', icon: 'far fa-file-excel'},
-                        @if(auth()->user()->can(['update-carrier']))
+                        @if(auth()->user()->can(['update-statement']))
                         {text: 'Approve', route: "/carrier/payment/approve", icon: 'fas fa-check-circle', type: 'confirm', conditional: 'status === "pending" || params.data.status === "daily"', menuData: {title: 'Set status as an approved payment?'}},
                         {text: 'Send Email & Complete', route: "/carrier/payment/complete", icon: 'fas fa-paper-plane', type: 'confirm', conditional: 'status === "approved"', menuData: {title: 'Confirm sending email to carrier?'}}
                         @endif
@@ -111,7 +111,7 @@
                                     ],
                                     menu: [
                                         {text: 'List', route: '#view-expenses', icon: 'far fa-eye', type: 'modal'},
-                                        @if(auth()->user()->can(['update-carrier']))
+                                        @if(auth()->user()->can(['update-statement']))
                                         {text: 'Complete', route: '/carrier/payment/payCharges', type: 'confirm', icon: 'fas fa-check-circle', menuData: {title: 'Pay off the charges?'}},
                                         @endif
                                     ],

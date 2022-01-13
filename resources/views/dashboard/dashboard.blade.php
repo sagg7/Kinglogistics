@@ -81,7 +81,7 @@
             </div>
         </div>
         @endif
-        @if(auth()->user()->can(['read-jobs']))
+        @if(auth()->user()->can(['read-job']))
         <div class="col-12">
             <div class="card">
                 <div class="card-header align-self-center">
