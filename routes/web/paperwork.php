@@ -21,9 +21,10 @@ Route::prefix('paperwork')->group(function () {
             ->name('paperwork.store');
         Route::post('storeFiles', [PaperworkController::class, 'storeFiles'])
             ->name('paperwork.storeFiles');
-        Route::post('storeTemplate/{id}/{related_id}', [PaperworkController::class, 'storeTemplate'])
-            ->name('paperwork.storeTemplate');
     });
+    Route::post('storeTemplate/{id}/{related_id}', [PaperworkController::class, 'storeTemplate'])
+        ->name('paperwork.storeTemplate');
+
     Route::group(['middleware' => ['permission:update-paperwork']], function () {
         Route::get('edit/{id}', [PaperworkController::class, 'edit'])
             ->name('paperwork.edit');

@@ -215,11 +215,12 @@ class CarrierController extends Controller
             ->get();
         // Card #10 Active Drivers
         $drivers = Driver::where('carrier_id', $id)
-            ->where('status', DriverEnum::ACTIVE)
+            //->where('status', DriverEnum::ACTIVE)
             ->select([
                 'drivers.id',
                 'drivers.name',
             ])
+            ->with('turn')
             ->withCount([
                 'loads as loads_count' => function ($q) use ($startOfWeek, $now) {
                     $q->whereDate('date', '>=', $startOfWeek)
