@@ -12,13 +12,6 @@ class DocumentationController extends Controller
 {
     use GuardFunctions, PaperworkFilesFunctions;
 
-    protected $broker_id;
-
-    public function __construct()
-    {
-        $this->broker_id = 1;
-    }
-
     public function index()
     {
         $guard = $this->getGuard();
@@ -43,7 +36,7 @@ class DocumentationController extends Controller
             ->orderBy('required', 'DESC')
             ->first();
         if ($hasOrientation) {
-            $broker = Broker::findOrFail($this->broker_id);
+            $broker = Broker::findOrFail(session('broker'));
             $text = "The first section of the paperwork has been completed.<br> Contact <strong>$broker->name</strong> to start the orientation paperwork.";
         } else {
             $text = "Shortly we'll be in contact with you to continue the process.";

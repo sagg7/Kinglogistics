@@ -18,6 +18,11 @@ class Rental extends Model
         'finished_at' => 'date:m/d/Y',
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

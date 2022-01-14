@@ -12,6 +12,11 @@ class Trip extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return HasMany
      */

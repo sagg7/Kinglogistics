@@ -26,13 +26,6 @@ class PaperworkController extends Controller
 {
     use GetSelectionData, GetSimpleSearchData, FileUpload, S3Functions, PaperworkFilesFunctions;
 
-    protected $broker_id;
-
-    public function __construct()
-    {
-        $this->broker_id = 1;
-    }
-
     /**
      * @param array $data
      * @param int|null $id
@@ -367,7 +360,7 @@ class PaperworkController extends Controller
 
         if (!$simpleVars) {
             $carrier = null;
-            $company = Broker::find($this->broker_id);
+            $company = Broker::find(session('broker'));
             if (auth()->guard('carrier')->check()) {
                 $carrier = auth()->user();
             } else if (auth()->guard('driver')->check()) {

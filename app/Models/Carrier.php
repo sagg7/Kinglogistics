@@ -17,6 +17,11 @@ class Carrier extends Authenticatable
         'password'
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return HasMany
      */

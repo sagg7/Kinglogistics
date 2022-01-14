@@ -15,6 +15,11 @@ class Expense extends Model
         'date' => 'date:m/d/Y',
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

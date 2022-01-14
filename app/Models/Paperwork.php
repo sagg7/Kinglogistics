@@ -22,6 +22,11 @@ class Paperwork extends Model
         return explode('?', $exploded[count($exploded) - 1])[0];
     }
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     public function shipper(): BelongsTo
     {
         return $this->belongsTo(Shipper::class);

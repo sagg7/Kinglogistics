@@ -18,6 +18,11 @@ class Shipper extends Authenticatable
         return explode(',', $value);
     }
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsToMany
      */

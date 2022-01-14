@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\BrokerCheck;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         'documentation' => \App\Http\Middleware\DocumentationRedirect::class,
+        'broker' => BrokerCheck::class,
     ];
 }

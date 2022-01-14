@@ -16,13 +16,6 @@ class BrokerController extends Controller
 {
     use FileUpload, QuillFormatter, QuillHtmlRendering;
 
-    protected $broker_id;
-
-    public function __construct()
-    {
-        $this->broker_id = 1;
-    }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -30,10 +23,10 @@ class BrokerController extends Controller
      */
     public function profile()
     {
-        $company = Broker::find($this->broker_id);
-        $equipment = Equipment::where('broker_id', $this->broker_id)->first();
+        $company = Broker::find(session('broker'));
+        $equipment = Equipment::where('broker_id', session('broker'))->first();
         !$equipment ?: $equipment->message_json = $this->renderForJsonMessage($equipment->message_json);
-        $service = Service::where('broker_id', $this->broker_id)->first();
+        $service = Service::where('broker_id', session('broker'))->first();
         !$service ?: $service->message_json = $this->renderForJsonMessage($service->message_json);
         $params = compact('company', 'equipment', 'service');
         return view('brokers.profile', $params);
@@ -49,7 +42,7 @@ class BrokerController extends Controller
 
     public function update(Request $request)
     {
-        $company = Broker::find($this->broker_id) ?: new Broker();
+        $company = Broker::find(session('broker')) ?: new Broker();
         $company->name = $request->name;
         $company->contact_phone = $request->contact_phone;
         $company->email = $request->email;
@@ -75,12 +68,12 @@ class BrokerController extends Controller
         DB::transaction(function () use ($request) {
             $content = json_decode($request->message);
 
-            $equipment = Equipment::where('broker_id', $this->broker_id)->first() ?: new Equipment();
-            $equipment->broker_id = $this->broker_id;
+            $equipment = Equipment::where('broker_id', session('broker'))->first() ?: new Equipment();
+            $equipment->broker_id = session('broker');
             $equipment->title = $request->title;
             $equipment->save();
 
-            $html = $this->formatQuillHtml($content, "equipment/$this->broker_id");
+            $html = $this->formatQuillHtml($content, "equipment/session('broker')");
 
             $equipment->message = $html;
             $equipment->message_json = $content->ops;
@@ -97,12 +90,12 @@ class BrokerController extends Controller
         DB::transaction(function () use ($request) {
             $content = json_decode($request->message);
 
-            $service = Service::where('broker_id', $this->broker_id)->first() ?: new service();
-            $service->broker_id = $this->broker_id;
+            $service = Service::where('broker_id', session('broker'))->first() ?: new service();
+            $service->broker_id = session('broker');
             $service->title = $request->title;
             $service->save();
 
-            $html = $this->formatQuillHtml($content, "service/$this->broker_id");
+            $html = $this->formatQuillHtml($content, "service/session('broker')");
 
             $service->message = $html;
             $service->message_json = $content->ops;

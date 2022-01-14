@@ -11,6 +11,11 @@ class Rate extends Model
 {
     use HasFactory;
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

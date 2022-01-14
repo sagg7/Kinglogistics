@@ -30,6 +30,11 @@ class Driver extends Authenticatable implements CanResetPassword
     protected $casts = [
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

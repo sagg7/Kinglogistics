@@ -12,6 +12,11 @@ class Truck extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

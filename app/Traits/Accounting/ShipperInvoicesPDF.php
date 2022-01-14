@@ -11,13 +11,6 @@ trait ShipperInvoicesPDF
 {
     use S3Functions;
 
-    protected $broker_id;
-
-    public function __construct()
-    {
-        $this->broker_id = 1;
-    }
-
     private function generatePDF($id)
     {
         $shipperInvoice = ShipperInvoice::with([
@@ -26,7 +19,7 @@ trait ShipperInvoicesPDF
         ])
             ->findOrFail($id);
 
-        $broker = Broker::findOrFail($this->broker_id);
+        $broker = Broker::findOrFail(session('broker'));
 
         $mpdf = new Mpdf();
         $mpdf->SetHTMLHeader('<div style="text-align: left; font-weight: bold;"><img style="width: 160px;" src=' . asset('images/app/logos/logo.png') . ' alt="Logo"></div>');
@@ -55,7 +48,7 @@ trait ShipperInvoicesPDF
         ])
             ->findOrFail($id);
 
-        $broker = Broker::findOrFail($this->broker_id);
+        $broker = Broker::findOrFail(session('broker'));
         $photos = [];
 
         foreach ($shipperInvoice->loads as $load){
@@ -90,8 +83,7 @@ trait ShipperInvoicesPDF
      */
     private function getPDFBinary($id)
     {
-        $mpdf = $this->generatePDF($id);
-        return $mpdf->Output('', 'S');
+        return $this->generatePDF($id)->Output('', 'S');
     }
 
     /**
@@ -101,7 +93,6 @@ trait ShipperInvoicesPDF
      */
     private function getStatementPhotos($id)
     {
-        $mpdf = $this->generatePicturesPdf($id);
-        return $mpdf->Output('', 'S');
+        return $this->generatePicturesPdf($id)->Output('', 'S');
     }
 }

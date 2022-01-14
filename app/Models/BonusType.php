@@ -10,6 +10,11 @@ class BonusType extends Model
 {
     use HasFactory;
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return HasMany
      */

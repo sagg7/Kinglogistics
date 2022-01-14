@@ -34,6 +34,11 @@ class Load extends Model
         'auto_assigned' => 'boolean',
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

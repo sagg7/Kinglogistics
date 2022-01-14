@@ -16,6 +16,11 @@ class Trailer extends Model
 
     protected $appends = ['shippers_ids'];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return HasMany
      */
