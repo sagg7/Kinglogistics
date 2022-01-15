@@ -63,13 +63,19 @@ trait GenerateLoads
     private function storeUpdate(array $data, int $id = null): Load
     {
         return DB::transaction(function () use ($data, $id) {
-            if ($id)
-                $load = Load::findOrFail($id);
-            else
+            $trip = Trip::findOrFail($data['trip_id']);
+            if (isset($data['broker_id'])) {
+                $data['broker_id'] = $trip->broker_id;
+            }
+            if ($id) {
+                $load = Load::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
+            } else {
                 $load = new Load();
-
-
-            $trip = Trip::find($data['trip_id']);
+                $load->broker_id = $data['broker_id'];
+            }
 
             $load->shipper_id = $trip->shipper_id;
             $load->load_type_id = $data["load_type_id"];
@@ -130,7 +136,7 @@ trait GenerateLoads
              * As the ID's in data property are Strings, we must reload the load to automatically convert the ids to valid int types
              * This small fix were added to avoid type issues in the mobile app.
              * */
-            $load = Load::find($load->id);
+            $load = Load::findOrFail($load->id);
             $load->notified_at = Carbon::now()->format('Y-m-d H:i:s');
 
             if (isset($data["driver_id"]) and $load->notes != 'finished') {

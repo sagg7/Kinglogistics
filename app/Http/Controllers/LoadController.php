@@ -32,8 +32,22 @@ class LoadController extends Controller
     private function createEditParams(): array
     {
         return [
-            'shippers' => [null => 'Select'] + Shipper::pluck('name', 'id')->toArray(),
-            'available_drivers' => [null => 'Select'] + Driver::pluck('name', 'id')->toArray(),
+            'shippers' => [null => 'Select'] + Shipper::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
+            'available_drivers' => [null => 'Select'] + Driver::where(function ($q) {
+                    if (auth()->guard('web')->check()) {
+                        $q->whereHas('broker', function ($q) {
+                            $q->where('id', session('broker'));
+                        });
+                    } else if (auth()->guard('shipper')->check()) {
+                        $q->whereHas('shippers', function ($q) {
+                            $q->where('shipper_id', auth()->user()->id);
+                        });
+                    }
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -86,6 +100,9 @@ class LoadController extends Controller
 
         $drivers = AvailableDriver::with('driver')
             ->whereHas('driver', function ($q) use ($shipper) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
                 // Filter users by current Turn, check if is morning first else night
                 $q->whereHas('turn', function ($r) {
                     $this->filterByActiveTurn($r);
@@ -142,6 +159,7 @@ class LoadController extends Controller
                 }
                 $data['control_number'] = $control_number;
 
+                $data['broker_id'] = session('broker');
                 $load = $this->storeUpdate($data);
 
                 $control_number++;
@@ -162,6 +180,15 @@ class LoadController extends Controller
     public function show(int $id)
     {
         $load = Load::with('driver', 'shipper')
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            })
             ->find($id);
         $params = compact('load') + $this->createEditParams();
         return view('loads.show', $params);
@@ -176,6 +203,9 @@ class LoadController extends Controller
     public function edit(int $id)
     {
         $load = Load::with('driver')
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('load_type:id,name', 'trip:id,name')
             ->find($id);
         $params = compact('load') + $this->createEditParams();
@@ -211,7 +241,10 @@ class LoadController extends Controller
      */
     public function partialUpdate(Request $request, int $id)
     {
-        $load = Load::findOrFail($id);
+        $load = Load::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $load->fill($request->all());
         return $load->update();
     }
@@ -222,7 +255,10 @@ class LoadController extends Controller
      */
     public function markAsInspected(int $id)
     {
-        $load = Load::findOrFail($id);
+        $load = Load::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $load->inspected = 1;
         return ["success" => $load->update()];
     }
@@ -233,7 +269,10 @@ class LoadController extends Controller
      */
     public function unmarkAsInspected(int $id)
     {
-        $load = Load::findOrFail($id);
+        $load = Load::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $load->inspected = null;
         return ["success" => $load->update()];
     }
@@ -242,7 +281,7 @@ class LoadController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
@@ -251,12 +290,12 @@ class LoadController extends Controller
          *
          */
 
-        $load = Load::findOrFail($id);
+        $load = Load::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($load)
-            return ['success' => $load->delete()];
-        else
-            return ['sucess' => false];
+        return ['success' => $load->delete()];
     }
 
     /**
@@ -269,6 +308,9 @@ class LoadController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%")
             ->whereNull("inactive");
 
@@ -319,6 +361,13 @@ class LoadController extends Controller
             "loads.trip_id",
         ];
         $query = Load::with('driver:id,name')
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
@@ -328,7 +377,7 @@ class LoadController extends Controller
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
-        if (auth()->guard('web')->check() && auth()->user()->can('read-load-dispatch')) {
+        if (auth()->guard('web')->check() && $request->dispatch && auth()->user()->can('read-load-dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
             $select[] = 'customer_reference';
@@ -392,7 +441,12 @@ class LoadController extends Controller
 
     public function replacePhoto(Request $request, $id, $type){
 
-        $load_status = LoadStatus::where('load_id', $id)->first();
+        $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->where('load_id', $id)->first();
 
         $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",30);
         if ($type == "to_location") {
@@ -441,7 +495,12 @@ class LoadController extends Controller
     }
 
     public function loadPhoto($id, $type){
-        $load_status = LoadStatus::where('load_id', $id)->first();
+        $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->where('load_id', $id)->first();
 
         $path = "app/public/loads/";
         $this->deleteDirectory($path);
@@ -513,6 +572,9 @@ class LoadController extends Controller
             "loads.inspected",
         ];
         $query = Load::with('driver:id,name')
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('trip:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])

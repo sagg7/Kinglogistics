@@ -69,24 +69,31 @@ class UserController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): User
     {
-        if ($id)
-            $user = User::findOrFail($id);
-        else
-            $user = new User();
+        return DB::transaction(function () use ($request, $id) {
+            if ($id)
+                $user = User::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
+            else {
+                $user = new User();
+                $user->broker_id = session('broker');
+            }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->turn_start = date("H:i:s", strtotime($request->turn_start));
-        $user->turn_end = date("H:i:s", strtotime($request->turn_end));
-        if ($request->password)
-            $user->password = Hash::make($request->password);
-        $user->save();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->turn_start = date("H:i:s", strtotime($request->turn_start));
+            $user->turn_end = date("H:i:s", strtotime($request->turn_end));
+            if ($request->password)
+                $user->password = Hash::make($request->password);
+            $user->save();
 
-        if ($request->role)
-            $user->roles()->sync($request->role);
+            if ($request->role)
+                $user->roles()->sync($request->role);
 
-        return $user;
+            return $user;
+        });
     }
 
     /**
@@ -123,7 +130,10 @@ class UserController extends Controller
      */
     public function edit(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $user->role = $user->getRoleId();
         $params = compact('user') + $this->createEditParams();
         return view('users.edit', $params);
@@ -137,7 +147,10 @@ class UserController extends Controller
      */
     public function profile()
     {
-        $user = User::findOrFail(auth()->user()->id);
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail(auth()->user()->id);
         $params = compact('user');
         return view('users.profile', $params);
     }
@@ -169,7 +182,10 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($user) {
             return ['success' => $user->delete()];
@@ -188,6 +204,9 @@ class UserController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
                 if ($request->type)
@@ -233,6 +252,9 @@ class UserController extends Controller
             "users.email",
             "users.phone",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('roles:name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
@@ -250,6 +272,9 @@ class UserController extends Controller
             "users.email",
             "users.phone",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('roles:name');
         $now = Carbon::now();
         $timeString = $now->toTimeString();
@@ -326,6 +351,11 @@ class UserController extends Controller
         $range = $this->getHoursRange();
         $decodeRange = $this->getHoursRange(true);
         $schedule = DispatchSchedule::with('user:id,name')
+            ->whereHas('user', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->get();
         foreach ($schedule as $i => $item) {
             $schedule[$i]->time_number = array_search($item->time, $decodeRange);
@@ -363,7 +393,12 @@ class UserController extends Controller
 
             // Delete past schedule data
             // TODO: CHANGE WHEN MORE THAN ONE DOMAIN TO FILTER BY DOMAIN DATA
-            DispatchSchedule::truncate();
+            DispatchSchedule::whereHas('user', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
+                ->truncate();
             $current = $formatScheduleArray($request->current);
             $next = $formatScheduleArray($request->next, "next");
             DispatchSchedule::insert(array_merge($current, $next));

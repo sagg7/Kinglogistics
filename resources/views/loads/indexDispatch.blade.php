@@ -245,6 +245,9 @@
                     tableRef: 'tbLoad',
                     successCallback: (params) => {
                         checkDuplicates();
+                    },
+                    searchQueryParams: {
+                        dispatch: 1,
                     }
                 });
 

@@ -36,7 +36,12 @@ class LoanController extends Controller
     private function storeUpdate(Request $request, $id = null): Loan
     {
         if ($id)
-            $loan = Loan::whereNull('is_paid')
+            $loan = Loan::whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
+                ->whereNull('is_paid')
                 ->findOrFail($id);
         else
             $loan = new Loan();
@@ -107,7 +112,12 @@ class LoanController extends Controller
      */
     public function edit(int $id)
     {
-        $loan = Loan::findOrFail($id);
+        $loan = Loan::whereHas('carrier', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->findOrFail($id);
         $params = compact('loan');
         return view('loans.edit', $params);
     }
@@ -137,7 +147,12 @@ class LoanController extends Controller
      */
     public function destroy(int $id)
     {
-        $loan = Loan::findOrFail($id);
+        $loan = Loan::whereHas('carrier', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->findOrFail($id);
 
         if ($loan)
             return ['success' => $loan->delete()];
@@ -181,6 +196,11 @@ class LoanController extends Controller
             "loans.fee_percentage",
             "loans.carrier_id",
         ])
+            ->whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->with('carrier:id,name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');

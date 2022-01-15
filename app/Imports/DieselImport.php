@@ -40,7 +40,10 @@ class DieselImport implements ToArray
         $now = Carbon::now();
         foreach ($array as $idx => $row) {
             if ($idx > 0) {
-                $truck = Truck::where('diesel_card', substr($row[0], 1))->first();
+                $truck = Truck::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->where('diesel_card', substr($row[0], 1))->first();
                 if ($truck) {
                     $toSubmit = [
                         "truck_id" => $truck->id,

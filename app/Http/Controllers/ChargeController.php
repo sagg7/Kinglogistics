@@ -13,7 +13,6 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -45,7 +44,10 @@ class ChargeController extends Controller
     {
         return [
             'periods' => [null => '', PeriodEnum::SINGLE => 'Single', PeriodEnum::WEEKLY => 'Weekly', PeriodEnum::CUSTOM => 'Custom Weeks'],
-            'types' => [null => ''] + ChargeType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + ChargeType::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -58,10 +60,15 @@ class ChargeController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $charge = Charge::whereNull('paid_weeks')
+                $charge = Charge::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->whereNull('paid_weeks')
                     ->findOrFail($id);
-            else
+            else {
                 $charge = new Charge();
+                $charge->broker_id = session('broker');
+            }
 
             $charge->charge_type_id = $request->type;
             $charge->amount = $request->amount;
@@ -168,7 +175,10 @@ class ChargeController extends Controller
      */
     public function edit(int $id)
     {
-        $charge = Charge::findOrFail($id);
+        $charge = Charge::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+                ->findOrFail($id);
         $params = compact('charge') + $this->createEditParams();
         return view('charges.edit', $params);
     }
@@ -195,16 +205,16 @@ class ChargeController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
-        $expense = Charge::findOrFail($id);
+        $expense = Charge::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($expense)
-            return ['success' => $expense->delete()];
-        else
-            return ['success' => false];
+        return ['success' => $expense->delete()];
     }
 
     /**
@@ -243,6 +253,9 @@ class ChargeController extends Controller
             "charges.description",
             "date",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with([
                 'carriers:id,name',
                 'charge_type:id,name',
@@ -255,7 +268,7 @@ class ChargeController extends Controller
             }
         }
 
-        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
     public function uploadDieselExcel(Request $request)

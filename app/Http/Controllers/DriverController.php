@@ -34,7 +34,10 @@ class DriverController extends Controller
     private function createEditParams($id = null): array
     {
         return $this->getTurnsArray() + $this->getPaperworkByType('driver', $id) +
-            ['zones' => [null => 'Select'] + Zone::pluck('name', 'id')->toArray()] +
+            ['zones' => [null => 'Select'] + Zone::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray()] +
             ['language' => ['spanish' => 'Spanish', 'english' => 'English']];
     }
 
@@ -70,11 +73,19 @@ class DriverController extends Controller
                     if (auth()->guard('carrier')->check())
                         $q->where('carrier_id', auth()->user()->id);
                 })
+                    ->where(function ($q) {
+                        if (auth()->guard('web')->check()) {
+                            $q->whereHas('broker', function ($q) {
+                                $q->where('id', session('broker'));
+                            });
+                        }
+                    })
                     ->findOrFail($id);
                 if (auth()->guard('web')->check())
                     $driver->carrier_id = $carrier_id;
             } else {
                 $driver = new Driver();
+                $driver->broker_id = session('broker') ?? auth()->user()->broker_id;
                 $driver->carrier_id = $carrier_id;
             }
 
@@ -86,8 +97,10 @@ class DriverController extends Controller
             if ($id && $request->inactive)
                 $this->endShift($id);
 
-            $driver->turn_id = $request->turn_id;
-            $driver->zone_id = $request->zone_id;
+            if ($request->turn_id)
+                $driver->turn_id = $request->turn_id;
+            if ($request->zone_id)
+                $driver->zone_id = $request->zone_id;
             $driver->phone = $request->phone;
             $driver->address = $request->address;
             $driver->language = $request->language;
@@ -95,7 +108,8 @@ class DriverController extends Controller
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
 
-            $driver->shippers()->sync($request->shippers);
+            if ($request->shippers)
+                $driver->shippers()->sync($request->shippers);
 
             if (!$id) {
                 $host = explode(".", $request->getHost());
@@ -161,6 +175,13 @@ class DriverController extends Controller
             if (auth()->guard('carrier')->check())
                 $q->where('carrier_id', auth()->user()->id);
         })
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->with(['carrier', 'shippers'])
             ->with(['zone:id,name'])
             ->findOrFail($id);
@@ -202,6 +223,9 @@ class DriverController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
                 if ($request->carrier)
@@ -246,10 +270,13 @@ class DriverController extends Controller
      */
     public function destroy(int $id): array
     {
-        $driver = Driver::where(function ($q) {
-            if (auth()->guard('carrier')->check())
-                $q->where('carrier_id', auth()->user()->id);
+        $driver = Driver::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
         })
+            ->where(function ($q) {
+                if (auth()->guard('carrier')->check())
+                    $q->where('carrier_id', auth()->user()->id);
+            })
             ->findOrFail($id);
 
         if ($driver)
@@ -268,6 +295,9 @@ class DriverController extends Controller
             if (auth()->guard('carrier')->check())
                 $q->where('carrier_id', auth()->user()->id);
         })
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->withTrashed()
             ->where('id', $id);
 
@@ -371,6 +401,13 @@ class DriverController extends Controller
             "drivers.inactive",
             "drivers.inactive_observations",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where(function ($q) use ($request, $type) {
                 if (auth()->guard('shipper')->check())
                     $q->whereHas('shippers', function ($q) use ($request) {
@@ -464,7 +501,10 @@ class DriverController extends Controller
 
     public function endShift($id){
 
-        $driver = Driver::find($id);
+        $driver = Driver::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->find($id);
 
         $unfinishedLoads = $driver->loads->filter(function ($load) {
             return !in_array($load->status, [LoadStatusEnum::FINISHED, LoadStatusEnum::UNALLOCATED]);
@@ -496,7 +536,10 @@ class DriverController extends Controller
 
     public function setActive($id){
 
-        $driver = Driver::find($id);
+        $driver = Driver::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $driver->status = 'active';
         $driver->save();
 

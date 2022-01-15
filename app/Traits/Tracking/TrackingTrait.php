@@ -30,6 +30,13 @@ trait TrackingTrait
                 if (auth()->guard('carrier')->check())
                     $q->where('drivers.carrier_id', $user_id);
             })
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             //->whereHas('locations')
             ->with([
                 /*'latestLocation' => function ($q) use ($user_id) {
@@ -68,6 +75,7 @@ trait TrackingTrait
             })
             ->get([
                 'drivers.id',
+                'drivers.broker_id',
                 'drivers.name',
                 'drivers.carrier_id',
                 'driver_locations.id as location_id',
@@ -83,7 +91,7 @@ trait TrackingTrait
                 'shippers.name as shipper_name',
             ]);
 
-        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(1);
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(session('broker') ?? auth()->user()->broker_id);
 
         return compact('data', 'channel', 'event', 'company');
     }

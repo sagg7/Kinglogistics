@@ -74,9 +74,14 @@ class JobOpportunityController extends Controller
         $message = json_decode($request->message);
 
         if ($id)
-            $opportunity = JobOpportunity::findOrFail($id);
-        else
+            $opportunity = JobOpportunity::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $opportunity = new JobOpportunity();
+            $opportunity->broker_id = session('broker');
+        }
         $opportunity->title = $request->title;
         $opportunity->save();
 
@@ -99,7 +104,14 @@ class JobOpportunityController extends Controller
      */
     public function show(int $id)
     {
-        $opportunity = JobOpportunity::with('carriers:id,name')
+        $opportunity = JobOpportunity::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+        })
+            ->with('carriers:id,name')
             ->where(function ($q) {
                 if (auth()->guard('carrier')->check()) {
                     $q->whereHas('carriers', function ($q) {
@@ -125,7 +137,10 @@ class JobOpportunityController extends Controller
      */
     public function edit(int $id)
     {
-        $opportunity = JobOpportunity::with('carriers:id,name')
+        $opportunity = JobOpportunity::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->with('carriers:id,name')
             ->findOrFail($id);
         $params = compact('opportunity');
         return view('jobOpportunities.edit', $params);
@@ -158,7 +173,10 @@ class JobOpportunityController extends Controller
      */
     public function destroy(int $id)
     {
-        $opportunity = JobOpportunity::findOrFail($id);
+        $opportunity = JobOpportunity::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($opportunity && $this->deleteDirectory("jobOpportunity/$opportunity->id")) {
             return ['success' => $opportunity->delete()];
@@ -176,6 +194,13 @@ class JobOpportunityController extends Controller
             "job_opportunities.id",
             "job_opportunities.title",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where(function ($q) {
                 if (auth()->guard('carrier')->check()) {
                     $q->whereHas('carriers', function ($q) {

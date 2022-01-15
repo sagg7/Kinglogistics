@@ -55,9 +55,14 @@ class IncidentTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): IncidentType
     {
         if ($id)
-            $incidentType = IncidentType::findOrFail($id);
-        else
+            $incidentType = IncidentType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $incidentType = new IncidentType();
+            $incidentType->broker_id = session('broker_id');
+        }
 
         $incidentType->name = $request->name;
         $incidentType->fine = $request->fine;
@@ -106,7 +111,10 @@ class IncidentTypeController extends Controller
      */
     public function edit($id)
     {
-        $incidentType = IncidentType::findOrFail($id);
+        $incidentType = IncidentType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('incidentType');
         return view('incidentTypes.edit', $params);
     }
@@ -138,7 +146,10 @@ class IncidentTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $incidentType = IncidentType::findOrFail($id);
+        $incidentType = IncidentType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($incidentType) {
             $message = '';
@@ -162,6 +173,9 @@ class IncidentTypeController extends Controller
             'id',
             DB::raw("CONCAT(name, ' - ', CONCAT('$', FORMAT(fine, 2))) as text"),
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
@@ -177,7 +191,10 @@ class IncidentTypeController extends Controller
             "incident_types.id",
             "incident_types.name",
             "incident_types.fine",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
         if (auth()->guard('shipper')->check())
             $query->where('shipper_id', auth()->user()->id);
 

@@ -97,6 +97,11 @@ class ShipperInvoiceController extends Controller
     public function complete($id)
     {
         $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->where('status', ShipperInvoiceEnum::PENDING)
             ->findOrFail($id);
 
@@ -118,6 +123,11 @@ class ShipperInvoiceController extends Controller
     public function completeAll()
     {
         $invoices = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->where('status', ShipperInvoiceEnum::PENDING)
             ->get();
         foreach ($invoices as $item) {
@@ -143,6 +153,11 @@ class ShipperInvoiceController extends Controller
     {
         // Return invoice from completed to pending
         $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->where('status', ShipperInvoiceEnum::COMPLETED)
             ->findOrFail($id);
 
@@ -156,6 +171,11 @@ class ShipperInvoiceController extends Controller
     {
         // Invoice status from completed to paid
         $payment = ShipperInvoice::with('shipper:id,invoice_email,name')
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->where('status', ShipperInvoiceEnum::COMPLETED)
             ->findOrFail($id);
 
@@ -168,6 +188,11 @@ class ShipperInvoiceController extends Controller
     public function payAll()
     {
         ShipperInvoice::where('status', ShipperInvoiceEnum::COMPLETED)
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->update(['status' => ShipperInvoiceEnum::PAID]);
 
         return ['success' => true];
@@ -214,6 +239,11 @@ class ShipperInvoiceController extends Controller
             "shipper_invoices.total",
             "shipper_invoices.status",
         ])
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->with('shipper:id,name')
             ->with('loads.trip:id,name')
             ->where(function ($q) use ($type) {
@@ -256,7 +286,12 @@ class ShipperInvoiceController extends Controller
         $shipperInvoice = ShipperInvoice::with([
             'shipper:id,name',
             'loads.loadStatus',
-         ])
+        ])
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->findOrFail($id);
 
         $photos = [];

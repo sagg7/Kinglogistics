@@ -48,6 +48,13 @@ class IncidentController extends Controller
             : [];
         return [
             'incident_types' => [null => ''] + IncidentType::select(DB::raw("IF(fine IS NOT NULL, CONCAT(name, ' - ', CONCAT('$', FORMAT(fine, 2))), name) as text"), 'id')
+                    ->where(function ($q) {
+                        if (auth()->guard('web')->check()) {
+                            $q->whereHas('broker', function ($q) {
+                                $q->where('id', session('broker') ?? auth()->user()->broker_id);
+                            });
+                        }
+                    })
                     ->pluck('text', 'id')
                     ->toArray(),
             'sanctions' => [null => '', 'warning' => 'Warning', 'fine' => 'Fine', 'termination' => 'Termination'],

@@ -36,7 +36,7 @@
         placeholder: 'Select',
         allowClear: true,
     };
-    if (carrierSel.lengt > 0) {
+    if (carrierSel.length > 0) {
         _.merge(driverObj, {
             ajax: {
                 url: '/driver/selection',

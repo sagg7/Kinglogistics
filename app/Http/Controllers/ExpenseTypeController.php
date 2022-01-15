@@ -33,9 +33,14 @@ class ExpenseTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): ExpenseType
     {
         if ($id)
-            $type = ExpenseType::findOrFail($id);
-        else
+            $type = ExpenseType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $type = new ExpenseType();
+            $type->broker_id = session('broker');
+        }
 
         $type->name = $request->name;
         $type->save();
@@ -69,7 +74,10 @@ class ExpenseTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $type = ExpenseType::findOrFail($id);
+        $type = ExpenseType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($type) {
             $message = '';
@@ -93,6 +101,9 @@ class ExpenseTypeController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);

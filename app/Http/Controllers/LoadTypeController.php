@@ -54,9 +54,19 @@ class LoadTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): LoadType
     {
         if ($id)
-            $loadType = LoadType::findOrFail($id);
+            $loadType = LoadType::where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            })
+                ->findOrFail($id);
         else {
             $loadType = new LoadType();
+            $loadType->broker_id = session('broker') ?? auth()->user()->broker_id;
             $loadType->shipper_id = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper;
         }
 
@@ -103,7 +113,16 @@ class LoadTypeController extends Controller
      */
     public function edit($id)
     {
-        $loadType = LoadType::findOrFail($id);
+        $loadType = LoadType::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
+        })
+            ->findOrFail($id);
         $params = compact('loadType');
         return view('loadTypes.edit', $params);
     }
@@ -134,7 +153,16 @@ class LoadTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $loadType = LoadType::findOrFail($id);
+        $loadType = LoadType::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
+        })
+            ->findOrFail($id);
 
         if ($loadType) {
             $message = '';
@@ -159,6 +187,13 @@ class LoadTypeController extends Controller
             'id',
             'name as text',
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where("name", "LIKE", "%$request->search%")
             ->where('shipper_id', $shipper);
 
@@ -174,7 +209,16 @@ class LoadTypeController extends Controller
         $query = LoadType::select([
             "load_types.id",
             "load_types.name",
-        ]);
+        ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            });
 
         return $this->multiTabSearchData($query, $request);
     }

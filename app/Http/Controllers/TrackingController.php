@@ -22,7 +22,7 @@ class TrackingController extends Controller
 
     public function history()
     {
-        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(1);
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(session('broker'));
 
         $params = compact('company');
 
@@ -35,16 +35,23 @@ class TrackingController extends Controller
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
-        $driverId = $request->get('driver_id');
+        $driverId = $request->driver_id;
 
         return Driver::with([
             'carrier:id,name',
             'truck:id,number,driver_id',
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->with('locations', function($q) use ($start, $end){
                 $q->whereBetween('created_at', [$start, $end])->take(1000);
             })
-            ->where(function ($q) use ($user_id, $start, $end) {
+            ->where(function ($q) use ($user_id, $start, $end, $driverId) {
                 if (auth()->guard('shipper')->check()) {
                     $q->whereHas('locations', function ($q) use ($user_id, $start, $end) {
                         $q->whereHas('parentLoad', function ($q) use ($user_id) {
@@ -59,7 +66,7 @@ class TrackingController extends Controller
                 $q->whereHas('locations', function ($q) {
                     $q->whereNotNull('load_id');
                 });
-                if (!empty($driverId))
+                if ($driverId)
                     $q->where("id", $driverId);
             })->get();
     }
@@ -70,6 +77,13 @@ class TrackingController extends Controller
             'truck:id,number',
             'shipper:id,name',
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where(function ($q) {
                 if (auth()->guard('shipper')->check())
                     $q->whereHas('trip', function ($q) {

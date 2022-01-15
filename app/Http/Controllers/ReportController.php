@@ -28,6 +28,9 @@ class ReportController extends Controller
                 ->whereDate('finished_timestamp', '>=', $start)
                 ->whereDate('finished_timestamp', '<=', $end);
         })
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with([
                 'loads' => function ($q) use ($start, $end) {
                     $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')

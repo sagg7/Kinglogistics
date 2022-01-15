@@ -26,7 +26,7 @@ class BonusController extends Controller
             'carriers' => ['nullable', 'array', 'exists:carriers,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
-            'date' => ['required', 'date'],
+            'date_submit' => ['required', 'date'],
         ]);
     }
 
@@ -36,7 +36,10 @@ class BonusController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + BonusType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + BonusType::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -49,12 +52,17 @@ class BonusController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $bonus = Bonus::whereHas('carriers', function ($q) {
-                    $q->whereNull('carrier_payment_id');
+                $bonus = Bonus::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
                 })
+                    ->whereHas('carriers', function ($q) {
+                        $q->whereNull('carrier_payment_id');
+                    })
                     ->findOrFail($id);
-            else
+            else {
                 $bonus = new Bonus();
+                $bonus->broker_id = session('broker');
+            }
 
             $bonus->bonus_type_id = $request->type;
             $bonus->amount = $request->amount;
@@ -126,7 +134,10 @@ class BonusController extends Controller
      */
     public function edit(int $id)
     {
-        $bonus = Bonus::findOrFail($id);
+        $bonus = Bonus::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('bonus') + $this->createEditParams();
         return view('bonuses.edit', $params);
     }
@@ -153,16 +164,16 @@ class BonusController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
-        $expense = Bonus::findOrFail($id);
+        $expense = Bonus::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($expense)
-            return ['success' => $expense->delete()];
-        else
-            return ['success' => false];
+        return ['success' => $expense->delete()];
     }
 
     /**
@@ -200,11 +211,11 @@ class BonusController extends Controller
             "bonuses.description",
             "bonuses.date",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with([
-                'carriers' => function ($q) {
-                    $q->select('id','name')
-                        ->skip(0)->take(3);
-                },
+                'carriers',
                 'bonus_type:id,name',
             ]);
 
@@ -215,6 +226,6 @@ class BonusController extends Controller
             }
         }
 
-        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'orWhere');
+        return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 }

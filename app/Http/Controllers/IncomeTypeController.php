@@ -33,9 +33,14 @@ class IncomeTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): IncomeType
     {
         if ($id)
-            $type = IncomeType::findOrFail($id);
-        else
+            $type = IncomeType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $type = new IncomeType();
+            $type->broker_id = session('broker_id');
+        }
 
         $type->name = $request->name;
         $type->save();
@@ -69,7 +74,10 @@ class IncomeTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $type = IncomeType::findOrFail($id);
+        $type = IncomeType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($type) {
             $message = '';
@@ -93,6 +101,9 @@ class IncomeTypeController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);

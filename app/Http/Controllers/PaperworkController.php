@@ -94,9 +94,14 @@ class PaperworkController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $paperwork = Paperwork::findOrFail($id);
-            else
+                $paperwork = Paperwork::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
+            else {
                 $paperwork = new Paperwork();
+                $paperwork->broker_id = session('broker');
+            }
 
             $paperwork->name = $request->name;
             $paperwork->type = $request->type;
@@ -146,7 +151,10 @@ class PaperworkController extends Controller
      */
     public function edit(int $id)
     {
-        $paperwork = Paperwork::with('images')->findOrFail($id);
+        $paperwork = Paperwork::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->with('images')->findOrFail($id);
         $paperwork->mode = $paperwork->template ? 1 : 0;
         $params = compact('paperwork') + $this->createdEditParams();
         return view('paperwork.edit', $params);
@@ -176,7 +184,10 @@ class PaperworkController extends Controller
      */
     public function destroy($id): array
     {
-        $paperwork = Paperwork::findOrFail($id);
+        $paperwork = Paperwork::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         if ($paperwork->file)
             $this->deleteFile($paperwork->file);
         return ['success' => $paperwork->delete()];
@@ -207,6 +218,9 @@ class PaperworkController extends Controller
             "paperwork.type",
             "paperwork.required",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where('type', $type);
 
         return $this->multiTabSearchData($query, $request);
@@ -300,6 +314,15 @@ class PaperworkController extends Controller
                 $fileCount = 1;
                 foreach ($request->file as $i => $file) {
                     $paperwork = PaperworkFile::where('paperwork_id', $i)
+                        ->where(function ($q) {
+                            if (auth()->guard('web')->check()) {
+                                $q->whereHas('parentPaperwork', function ($q) {
+                                    $q->whereHas('broker', function ($q) {
+                                        $q->where('id', session('broker'));
+                                    });
+                                });
+                            }
+                        })
                         ->where('related_id', $request->related_id)
                         ->first();
                     if (!$paperwork)
@@ -323,12 +346,25 @@ class PaperworkController extends Controller
                 }
             } else if ($request->expiration_date) {
                 foreach ($request->expiration_date as $i => $item) {
-                    $paperwork = PaperworkFile::where('paperwork_id', $i)
-                        ->where('related_id', $request->related_id)
-                        ->first();
-                    if (!Carbon::parse($paperwork->expiration_date)->isSameDay(Carbon::parse($request->expiration_date[$i])))
-                        $paperwork->expiration_date = $request->expiration_date[$i];
-                    $paperwork->save();
+                    if ($item) {
+                        $paperwork = PaperworkFile::where('paperwork_id', $i)
+                            ->where(function ($q) {
+                                if (auth()->guard('web')->check()) {
+                                    $q->whereHas('parentPaperwork', function ($q) {
+                                        $q->whereHas('broker', function ($q) {
+                                            $q->where('id', session('broker'));
+                                        });
+                                    });
+                                }
+                            })
+                            ->where('related_id', $request->related_id)
+                            ->first();
+                        if ($paperwork) {
+                            if (!$paperwork->expiration_date || (!Carbon::parse($paperwork->expiration_date)->isSameDay(Carbon::parse($request->expiration_date[$i]))))
+                                $paperwork->expiration_date = $request->expiration_date[$i];
+                            $paperwork->save();
+                        }
+                    }
                 }
             }
 
@@ -338,7 +374,14 @@ class PaperworkController extends Controller
 
     public function showTemplate(Request $request, int $id, int $related_id)
     {
-        $paperwork = Paperwork::with('images')->findOrFail($id);
+        $paperwork = Paperwork::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+        })
+            ->with('images')->findOrFail($id);
         $data = $this->templateToHtml($paperwork, $related_id);
 
         $params = compact('paperwork', 'id', 'related_id', 'data');
@@ -603,7 +646,14 @@ class PaperworkController extends Controller
     public function storeTemplate(Request $request, int $id, int $related_id)
     {
         return DB::transaction(function () use ($request, $id, $related_id) {
-            $paperwork = Paperwork::findOrFail($id);
+            $paperwork = Paperwork::where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
+                ->findOrFail($id);
             $template = PaperworkTemplate::where('related_id', $related_id)
                 ->where('paperwork_id', $id)
                 ->first()
@@ -728,7 +778,14 @@ class PaperworkController extends Controller
 
     public function pdf(Request $request, int $id, int $related_id)
     {
-        $paperwork = Paperwork::find($id);
+        $paperwork = Paperwork::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+        })
+            ->findOrFail($id);
         $template = PaperworkTemplate::where('paperwork_id', $id)
             ->where('related_id', $related_id)
             ->first();

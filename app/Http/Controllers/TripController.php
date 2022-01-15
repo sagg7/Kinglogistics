@@ -26,7 +26,10 @@ class TripController extends Controller
     private function createEditParams(): array
     {
         return [
-            'zones' => [null => ''] + Zone::pluck('name', 'id')->toArray(),
+            'zones' => [null => ''] + Zone::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker') ?? auth()->user()->broker_id);
+                })
+                    ->pluck('name', 'id')->toArray(),
             'statuses' => [null => '', 'stage' => 'Stage', 'loads' => 'Loads'],
         ];
     }
@@ -102,12 +105,24 @@ class TripController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id) {
-                $trip = Trip::findOrFail($id);
+                $trip = Trip::where(function ($q) {
+                    if (auth()->guard('web')->check()) {
+                        $q->whereHas('broker', function ($q) {
+                            $q->where('id', session('broker'));
+                        });
+                    }
+                    if (auth()->guard('shipper')->check()) {
+                        $q->where('shipper_id', auth()->user()->id);
+                    }
+                })
+                    ->findOrFail($id);
                 if ($trip->rate_id != $request->rate_id) {
                     $this->byRateChange($trip, $request->rate_id);
                 }
-            } else
+            } else {
                 $trip = new Trip();
+                $trip->broker_id = session('broker') ?? auth()->user()->broker_id;
+            }
 
             $shipper = auth()->guard('shipper')->check() ? auth()->guard()->user()->id : $request->shipper_id;
 
@@ -164,6 +179,11 @@ class TripController extends Controller
             }
         ])
             ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
                 if (auth()->guard('shipper')->check())
                     $q->where('shipper_id', auth()->user()->id);
             })
@@ -197,7 +217,16 @@ class TripController extends Controller
      */
     public function destroy(int $id)
     {
-        $trip = Trip::findOrFail($id);
+        $trip = Trip::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
+        })
+            ->findOrFail($id);
 
         if ($trip) {
             /*$message = '';
@@ -223,6 +252,11 @@ class TripController extends Controller
         ])
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
                 if (auth()->guard('shipper')->check())
                     $q->where('shipper_id', auth()->user()->id);
                 else if ($request->shipper)
@@ -234,7 +268,16 @@ class TripController extends Controller
 
     public function getTrip(Request $request)
     {
-        return Trip::findOrFail($request->id);
+        return Trip::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
+        })
+            ->findOrFail($request->id);
     }
 
     /**
@@ -273,6 +316,15 @@ class TripController extends Controller
             "trips.origin",
             "trips.destination",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+                if (auth()->guard('shipper')->check())
+                    $q->where('shipper_id', auth()->user()->id);
+            })
             ->with([
                 'zone:id,name',
                 'shipper:id,name',
@@ -308,9 +360,18 @@ class TripController extends Controller
         $turn = Turn::select('*');
         $this->filterByActiveTurn($turn);
         $turn = $turn->first();
-        $trips = Trip::whereHas('loads', function ($q) use ($turn) {
-            $this->loadFilter($q, $turn);
+        $trips = Trip::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+            if (auth()->guard('shipper')->check())
+                $q->where('shipper_id', auth()->user()->id);
         })
+            ->whereHas('loads', function ($q) use ($turn) {
+                $this->loadFilter($q, $turn);
+            })
             ->with([
                 'loads' => function ($q) use ($turn) {
                     $this->loadFilter($q, $turn);

@@ -53,9 +53,14 @@ class ZoneController extends Controller
     private function storeUpdate(Request $request, $id = null): Zone
     {
         if ($id)
-            $zone = Zone::findOrFail($id);
-        else
+            $zone = Zone::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $zone = new Zone();
+            $zone->broker_id = session('broker');
+        }
 
         $zone->name = $request->name;
         $zone->save();
@@ -97,7 +102,10 @@ class ZoneController extends Controller
      */
     public function edit($id)
     {
-        $zone = Zone::findOrFail($id);
+        $zone = Zone::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('zone');
         return view('zones.edit', $params);
     }
@@ -126,7 +134,10 @@ class ZoneController extends Controller
      */
     public function destroy($id)
     {
-        $zone = Zone::findOrFail($id);
+        $zone = Zone::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($zone) {
             $message = '';
@@ -150,6 +161,12 @@ class ZoneController extends Controller
             'id',
             'name as text',
         ])
+
+            ->where(function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker') ?? auth()->user()->broker_id);
+                });
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
@@ -164,7 +181,10 @@ class ZoneController extends Controller
         $query = Zone::select([
             "zones.id",
             "zones.name",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
 
         return $this->multiTabSearchData($query, $request);
     }

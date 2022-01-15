@@ -53,9 +53,14 @@ class TrailerTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): TrailerType
     {
         if ($id)
-            $trailerType = TrailerType::findOrFail($id);
-        else
+            $trailerType = TrailerType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $trailerType = new TrailerType();
+            $trailerType->broker_id = session('broker');
+        }
 
         $trailerType->name = $request->name;
         $trailerType->save();
@@ -100,7 +105,10 @@ class TrailerTypeController extends Controller
      */
     public function edit($id)
     {
-        $trailerType = TrailerType::findOrFail($id);
+        $trailerType = TrailerType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('trailerType');
         return view('trailerTypes.edit', $params);
     }
@@ -131,7 +139,10 @@ class TrailerTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $trailerType = TrailerType::findOrFail($id);
+        $trailerType = TrailerType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($trailerType) {
             $message = '';
@@ -155,6 +166,9 @@ class TrailerTypeController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
@@ -169,7 +183,10 @@ class TrailerTypeController extends Controller
         $query = TrailerType::select([
             "trailer_types.id",
             "trailer_types.name",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
 
         return $this->multiTabSearchData($query, $request);
     }

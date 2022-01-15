@@ -423,7 +423,7 @@ class tableAG {
                 this.gridOptions.columnApi.setColumnPinned(this.pinned, "left");
         });
 
-        let ds = new DataSource({url: this.url, successCallback: this.successCallback});
+        let ds = new DataSource({url: this.url, successCallback: this.successCallback, params: this.searchQueryParams});
         this.dataSource = ds;
         this.gridOptions.api.setServerSideDatasource(ds);
     }

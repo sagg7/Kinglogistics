@@ -34,7 +34,10 @@ class IncomeController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + IncomeType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + IncomeType::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -46,9 +49,14 @@ class IncomeController extends Controller
     private function storeUpdate(Request $request, $id = null): Income
     {
         if ($id)
-            $income = Income::findOrFail($id);
-        else
+            $income = Income::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $income = new Income();
+            $income->broker_id = session('broker');
+        }
 
         $income->type_id = $request->type;
         $income->amount = $request->amount;
@@ -116,7 +124,10 @@ class IncomeController extends Controller
      */
     public function edit(int $id)
     {
-        $income = Income::findOrFail($id);
+        $income = Income::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('income') + $this->createEditParams();
         return view('incomes.edit', $params);
     }
@@ -141,16 +152,16 @@ class IncomeController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Income  $income
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
-        $income = Income::findOrFail($id);
+        $income = Income::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($income)
-            return ['success' => $income->delete()];
-        else
-            return ['success' => false];
+        return ['success' => $income->delete()];
     }
 
     /**
@@ -187,6 +198,9 @@ class IncomeController extends Controller
             "date",
 
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('type:id,name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');

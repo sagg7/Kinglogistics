@@ -31,11 +31,16 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
 
     public function __construct($invoice_id, $writerType = Excel::XLSX)
     {
-        $this->broker = Broker::findOrFail(1);
+        $this->broker = Broker::findOrFail(session('broker'));
         $this->invoice = ShipperInvoice::with([
             'shipper:id,name',
             'loads.driver.truck',
         ])
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->findOrFail($invoice_id);
 
         $this->writerType = $writerType;

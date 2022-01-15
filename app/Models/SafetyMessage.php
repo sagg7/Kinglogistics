@@ -16,6 +16,11 @@ class SafetyMessage extends Model
         'message_json' => 'json',
     ];
 
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
     /**
      * @return BelongsTo
      */

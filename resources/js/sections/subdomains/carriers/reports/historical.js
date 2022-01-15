@@ -157,6 +157,8 @@
                 url: '/report/historicalData',
                 type: 'GET',
                 data: {
+                    start: start.format('YYYY/MM/DD'),
+                    end: end.format('YYYY/MM/DD'),
                 },
                 success: (res) => {
                     rowData = [];

@@ -42,7 +42,7 @@ class BrokerController extends Controller
 
     public function update(Request $request)
     {
-        $company = Broker::find(session('broker')) ?: new Broker();
+        $company = Broker::findOrFail(session('broker'));
         $company->name = $request->name;
         $company->contact_phone = $request->contact_phone;
         $company->email = $request->email;
@@ -73,7 +73,7 @@ class BrokerController extends Controller
             $equipment->title = $request->title;
             $equipment->save();
 
-            $html = $this->formatQuillHtml($content, "equipment/session('broker')");
+            $html = $this->formatQuillHtml($content, "equipment/" . session('broker'));
 
             $equipment->message = $html;
             $equipment->message_json = $content->ops;
@@ -95,7 +95,7 @@ class BrokerController extends Controller
             $service->title = $request->title;
             $service->save();
 
-            $html = $this->formatQuillHtml($content, "service/session('broker')");
+            $html = $this->formatQuillHtml($content, "service/" . session('broker'));
 
             $service->message = $html;
             $service->message_json = $content->ops;

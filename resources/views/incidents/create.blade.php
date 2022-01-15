@@ -3,7 +3,7 @@
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('scripts')
-        <script src="{{ asset('js/sections/incidents/common.min.js?1.0.1') }}"></script>
+        <script src="{{ asset('js/sections/incidents/common.min.js?1.0.2') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
         <script>
             @if(auth()->guard('carrier')->check())

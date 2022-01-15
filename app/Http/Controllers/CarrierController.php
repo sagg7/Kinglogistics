@@ -89,9 +89,13 @@ class CarrierController extends Controller
     private function storeUpdate(Request $request, $id = null): Carrier
     {
         if ($id)
-            $carrier = Carrier::findOrFail($id);
+            $carrier = Carrier::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
         else {
             $carrier = new Carrier();
+            $carrier->broker_id = session('broker');
             if (auth()->user()->hasRole('seller'))
                 $carrier->seller_id = auth()->user()->id;
         }
@@ -136,7 +140,10 @@ class CarrierController extends Controller
 
     public function getCarrierData(int $id)
     {
-        $carrier = Carrier::findOrFail($id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $carrier->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $carrier->id);
@@ -151,13 +158,19 @@ class CarrierController extends Controller
      */
     public function show(int $id)
     {
-        $carrier = Carrier::findOrFail($id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         return view('carriers.show', compact('carrier'));
     }
 
     public function summaryData(int $id)
     {
-        $carrier = Carrier::findOrFail($id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $loadsBase = Load::whereHas('driver', function ($q) use ($id) {
             $q->whereHas('carrier', function ($q) use ($id) {
                 $q->where('carrier_id', $id);
@@ -276,7 +289,10 @@ class CarrierController extends Controller
      */
     public function setStatus(Request $request)
     {
-        $carrier = Carrier::findOrFail($request->id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($request->id);
         switch ($request->status) {
             case "prospect":
                 $status = CarrierEnum::PROSPECT;
@@ -368,7 +384,10 @@ class CarrierController extends Controller
      */
     public function destroy(int $id): array
     {
-        $carrier = Carrier::findOrFail($id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($carrier) {
             $message = '';
@@ -390,7 +409,10 @@ class CarrierController extends Controller
      */
     public function restore(int $id): array
     {
-        $carrier = Carrier::withTrashed()
+        $carrier = Carrier::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->withTrashed()
             ->where('id', $id);
 
         if ($carrier) {
@@ -416,6 +438,9 @@ class CarrierController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%")
             ->whereNull("inactive");
 
@@ -471,7 +496,10 @@ class CarrierController extends Controller
             "carriers.email",
             "carriers.phone",
             "carriers.status",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
 
         $query = $this->filterByType($query, $type);
 

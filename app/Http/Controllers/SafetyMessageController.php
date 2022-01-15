@@ -52,9 +52,14 @@ class SafetyMessageController extends Controller
             $content = json_decode($request->message);
 
             if ($id)
-                $message = SafetyMessage::findOrFail($id);
-            else
+                $message = SafetyMessage::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
+            else {
                 $message = new SafetyMessage();
+                $message->broker_id = session('broker');
+            }
             $message->title = $request->title;
             $message->carrier_id = $request->carrier;
             $message->zone_id = $request->zone;
@@ -156,6 +161,9 @@ class SafetyMessageController extends Controller
             'carrier:id,name',
             'zone:id,name',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->findOrFail($id);
         $params = compact('message') + $this->createEditParams();
         return view('safetyMessages.edit', $params);
@@ -189,7 +197,10 @@ class SafetyMessageController extends Controller
      */
     public function destroy($id)
     {
-        $message = SafetyMessage::findOrFail($id);
+        $message = SafetyMessage::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($message && $this->deleteDirectory("safety_message/$message->id")) {
             return ['success' => $message->delete()];
@@ -206,7 +217,10 @@ class SafetyMessageController extends Controller
         $query = SafetyMessage::select([
             "safety_messages.id",
             "safety_messages.title",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
 
         return $this->multiTabSearchData($query, $request);
     }

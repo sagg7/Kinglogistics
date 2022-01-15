@@ -93,9 +93,13 @@ class TruckController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $truck = Truck::findOrFail($id);
+                $truck = Truck::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
             else {
                 $truck = new Truck();
+                $truck->broker_id = session('broker');
             }
 
             $trailer = Trailer::whereHas('truck')
@@ -167,7 +171,15 @@ class TruckController extends Controller
             'trailer:id,number',
             'seller:id,name',
             'carrier:id,name',
-        ])->find($id);
+        ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
+            ->findOrFail($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $truck->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $truck->id);
@@ -199,7 +211,14 @@ class TruckController extends Controller
      */
     public function destroy($id)
     {
-        $truck = Truck::findOrFail($id);
+        $truck = Truck::where(function ($q) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
+        })
+            ->findOrFail($id);
 
         if ($truck) {
             $message = '';
@@ -224,6 +243,13 @@ class TruckController extends Controller
             'id',
             'number as text',
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where("number", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
                 if (auth()->guard('web')->check() && $request->carrier)
@@ -281,6 +307,13 @@ class TruckController extends Controller
             "trucks.trailer_id",
             "trucks.driver_id",
         ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })
             ->where(function ($q) use ($request) {
                 if (auth()->guard('carrier')->check())
                     $q->where("carrier_id", auth()->user()->id);

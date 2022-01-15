@@ -87,6 +87,11 @@ class CarrierPaymentController extends Controller
             'expenses.type',
             'carrier:id,name',
         ])
+            ->whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->findOrFail($id);
         $bonusTypes = BonusType::pluck('name', 'id')->toArray();
         $expenseTypes = CarrierExpenseType::whereNull('carrier_id')->pluck('name', 'id')->toArray();
@@ -108,6 +113,11 @@ class CarrierPaymentController extends Controller
                 'bonuses',
                 'expenses',
             ])
+                ->whereHas('carrier', function ($q) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                })
                 ->findOrFail($id);
 
             $carrier_id = $carrierPayment->carrier_id;
@@ -173,7 +183,12 @@ class CarrierPaymentController extends Controller
 
     public function approve($id)
     {
-        $payment = CarrierPayment::findOrFail($id);
+        $payment = CarrierPayment::whereHas('carrier', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->findOrFail($id);
         $payment->status = CarrierPaymentEnum::APPROVED;
 
         return ['success' => $payment->save()];
@@ -181,7 +196,12 @@ class CarrierPaymentController extends Controller
 
     public function complete($id)
     {
-        $payment = CarrierPayment::with('carrier:id,invoice_email,name')->findOrFail($id);
+        $payment = CarrierPayment::whereHas('carrier', function ($q) {
+            $q->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
+        })
+            ->with('carrier:id,invoice_email,name')->findOrFail($id);
 
         $emails = explode(',', $payment->carrier->invoice_email);
         try {
@@ -282,6 +302,11 @@ class CarrierPaymentController extends Controller
             "carrier_payments.total",
             "carrier_payments.status",
         ])
+            ->whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->with('carrier:id,name')
             ->where(function ($q) use ($type) {
                 switch ($type) {
@@ -340,6 +365,11 @@ class CarrierPaymentController extends Controller
             "carriers.id",
             "carriers.name",
         ])
+            ->whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->whereHas('expenses', function ($q) {
                 $q->where('non_editable', 1)
                     ->whereNull('carrier_payment_id');

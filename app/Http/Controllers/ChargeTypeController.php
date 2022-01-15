@@ -33,9 +33,14 @@ class ChargeTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): ChargeType
     {
         if ($id)
-            $type = ChargeType::findOrFail($id);
-        else
+            $type = ChargeType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $type = new ChargeType();
+            $type->broker_id = session('broker');
+        }
 
         $type->name = $request->name;
         $type->save();
@@ -69,7 +74,10 @@ class ChargeTypeController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $type = ChargeType::findOrFail($id);
+        $type = ChargeType::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($type) {
             $message = '';
@@ -93,6 +101,9 @@ class ChargeTypeController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);

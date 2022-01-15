@@ -32,6 +32,11 @@ class DashboardController extends Controller
 
         $monday = $monday->format('Y/m/d')." 00:00:00";
         $loads = Load::where(function ($q) use ($request) {
+            if (auth()->guard('web')->check()) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            }
             if (auth()->guard('shipper')->check())
                 $q->where('shipper_id', auth()->user()->id);
             else if (auth()->guard('carrier')->check())

@@ -49,7 +49,10 @@ class TrailerController extends Controller
     private function createEditParams(): array
     {
         return [
-                'trailer_types' => [null => ''] + TrailerType::pluck('name', 'id')->toArray(),
+                'trailer_types' => [null => ''] + TrailerType::whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    })
+                        ->pluck('name', 'id')->toArray(),
                 'chassis_types' => [null => ''] + ChassisType::pluck('name', 'id')->toArray(),
                 'statuses' => [null => ''] + [TrailerEnum::AVAILABLE => 'Available', TrailerEnum::RENTED => 'Rented', TrailerEnum::OUT_OF_SERVICE => 'Ouf of service'],
             ] + $this->getPaperworkByType("trailer");
@@ -85,9 +88,13 @@ class TrailerController extends Controller
     {
         return DB::transaction(function ($q) use ($request, $id) {
             if ($id)
-                $trailer = Trailer::findOrFail($id);
+                $trailer = Trailer::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
             else {
                 $trailer = new Trailer();
+                $trailer->broker_id = session('broker');
                 $trailer->status = TrailerEnum::AVAILABLE;
                 // TODO: CASE FOR CARRIER OWNED TRAILER
                 /*if (false && auth()->guard('carrier')->check())
@@ -142,7 +149,10 @@ class TrailerController extends Controller
      */
     public function edit($id)
     {
-        $trailer = Trailer::with('shippers:id,name')
+        $trailer = Trailer::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->with('shippers:id,name')
             ->find($id);
         $createEdit = $this->createEditParams();
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $trailer->id);
@@ -175,7 +185,10 @@ class TrailerController extends Controller
      */
     public function destroy($id)
     {
-        $trailer = Trailer::findOrFail($id);
+        $trailer = Trailer::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($trailer) {
             $message = '';
@@ -199,6 +212,9 @@ class TrailerController extends Controller
             'id',
             'number as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("number", "LIKE", "%$request->search%")
             /*->whereHas("truck", function ($q) use ($request) {
                 if ($request->driver)
@@ -250,6 +266,9 @@ class TrailerController extends Controller
             "trailers.status",
             "trailers.trailer_type_id",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where(function ($q) use ($request, $type) {
                 if ($request->driver)
                     $q->whereHas('truck', function ($q) use ($request) {
@@ -297,6 +316,9 @@ class TrailerController extends Controller
                 ->with(['carrier:id,name','driver:id,name']);
             }
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where('status', $type)
             ->get();
 

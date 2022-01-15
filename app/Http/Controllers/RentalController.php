@@ -81,9 +81,13 @@ class RentalController extends Controller
     {
         return DB::transaction(function () use ($request, $id) {
             if ($id)
-                $rental = Rental::findOrFail($id);
+                $rental = Rental::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
             else {
                 $rental = new Rental();
+                $rental->broker_id = session('broker');
                 $rental->status = 'uninspected';
             }
 
@@ -150,8 +154,11 @@ class RentalController extends Controller
      */
     public function edit($id)
     {
-        $rental = Rental::with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
-            ->find($id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
+            ->findOrFail($id);
         $params = compact('rental') + $this->createEditParams();
         return view('rentals.edit', $params);
     }
@@ -180,10 +187,14 @@ class RentalController extends Controller
      */
     public function destroy($id)
     {
-        $rental = Rental::findOrFail($id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->with('trailer')
+            ->findOrFail($id);
 
         if ($rental) {
-            $trailer = Trailer::findOrFail($rental->trailer_id);
+            $trailer = $rental->trailer;
             $trailer->status = TrailerEnum::AVAILABLE;
             $trailer->save();
             return ['success' => $rental->delete()];
@@ -240,6 +251,9 @@ class RentalController extends Controller
             "rentals.finished_at",
         ])
             ->with(['carrier:id,name', 'driver:id,name', 'trailer:id,number'])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where('status', $type)
             ->where(function ($q) use ($type, $request) {
                 switch ($type) {
@@ -263,7 +277,10 @@ class RentalController extends Controller
     public function createInspection(Request $request)
     {
         $rental_id = $request->id;
-        $rental = Rental::find($rental_id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($rental_id);
         $inspection_categories = InspectionCategory::select([
             'id',
             'name',
@@ -294,7 +311,10 @@ class RentalController extends Controller
     }
 
     public function storeInspection(Request $request){
-        $rental = Rental::find($request->rental_id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($request->rental_id);
         $inspection_items = $this->createInspectionArray($request, $rental);
         $rental->inspectionItems()->sync($inspection_items);
         $rental->delivered_at = Carbon::now();
@@ -385,7 +405,10 @@ class RentalController extends Controller
     public function createEndRental(Request $request)
     {
         $rental_id = $request->id;
-        $rental = Rental::find($rental_id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($rental_id);
         $inspection_categories = InspectionCategory::select([
             'id',
             'name',
@@ -431,7 +454,10 @@ class RentalController extends Controller
      */
     public function storeEndRental(Request $request)
     {
-        $rental = Rental::find($request->rental_id);
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($request->rental_id);
 
         $inspection_items = $this->createInspectionArray($request, $rental, "return");
         $rental->inspectionItemsReturned()->sync($inspection_items);
@@ -469,7 +495,10 @@ class RentalController extends Controller
             ];
             return response()->json($jsonData);
         }
-        $rental = Rental::find($request->header('rentalId'));
+        $rental = Rental::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($request->header('rentalId'));
         if ($rental->status == 'uninspected'){
             $stage = 'deliver';
             $inspection_photos = new RentalDeliveryPhotos();
@@ -531,6 +560,9 @@ class RentalController extends Controller
         $currentPage = $request->input('page', 0);
         $skip = $resultsPerPage * $currentPage;
         $leased = Rental::select('leased.name as leased_name', 'trailer_number', 'drivers.name as driver_name', 'date', 'rentals.id', 'status')
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->join('leased', 'leased.id', '=', 'leased_id')
             ->join('trailers', 'trailers.id', '=', 'trailer_id')
             ->join('drivers', 'drivers.id', '=', 'driver_id');
@@ -555,6 +587,9 @@ class RentalController extends Controller
             'carrier:id,name',
             'trailer:id,number',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where('status', $type)
             ->where(function ($q) use ($type, $request) {
                 switch ($type) {

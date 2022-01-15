@@ -29,6 +29,18 @@ class AddBrokerIdToMultipleTables extends Migration
             $table->unsignedBigInteger('broker_id')->after('id')->nullable();
             $table->foreign('broker_id')->references('id')->on('brokers')->onDelete('cascade');
         });
+        Schema::table('charges', function (Blueprint $table) {
+            $table->unsignedBigInteger('broker_id')->after('id')->nullable();
+            $table->foreign('broker_id')->references('id')->on('brokers')->onDelete('cascade');
+        });
+        Schema::table('bonuses', function (Blueprint $table) {
+            $table->unsignedBigInteger('broker_id')->after('id')->nullable();
+            $table->foreign('broker_id')->references('id')->on('brokers')->onDelete('cascade');
+        });
+        Schema::table('safety_messages', function (Blueprint $table) {
+            $table->unsignedBigInteger('broker_id')->after('id')->nullable();
+            $table->foreign('broker_id')->references('id')->on('brokers')->onDelete('cascade');
+        });
         Schema::table('drivers', function (Blueprint $table) {
             $table->unsignedBigInteger('broker_id')->after('id')->nullable();
             $table->foreign('broker_id')->references('id')->on('brokers')->onDelete('cascade');
@@ -126,8 +138,16 @@ class AddBrokerIdToMultipleTables extends Migration
             $table->dropForeign('shippers_broker_id_foreign');
             $table->dropColumn(['broker_id']);
         });
-        Schema::table('carriers', function (Blueprint $table) {
-            $table->dropForeign('carriers_broker_id_foreign');
+        Schema::table('charges', function (Blueprint $table) {
+            $table->dropForeign('charges_broker_id_foreign');
+            $table->dropColumn(['broker_id']);
+        });
+        Schema::table('bonuses', function (Blueprint $table) {
+            $table->dropForeign('bonuses_broker_id_foreign');
+            $table->dropColumn(['broker_id']);
+        });
+        Schema::table('safety_messages', function (Blueprint $table) {
+            $table->dropForeign('safety_messages_broker_id_foreign');
             $table->dropColumn(['broker_id']);
         });
         Schema::table('drivers', function (Blueprint $table) {

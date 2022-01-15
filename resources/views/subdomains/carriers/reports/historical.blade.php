@@ -12,7 +12,7 @@
         <script>
             let _aggrid;
         </script>
-        <script src="{{ asset('js/sections/subdomains/carriers/reports/historical.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/subdomains/carriers/reports/historical.min.js?1.0.1') }}"></script>
     @endsection
 
     <div class="row">

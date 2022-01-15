@@ -68,9 +68,14 @@ class ShipperController extends Controller
     private function storeUpdate(Request $request, $id = null): Shipper
     {
         if ($id)
-            $shipper = Shipper::findOrFail($id);
-        else
+            $shipper = Shipper::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $shipper = new Shipper();
+            $shipper->broker_id = session('broker');
+        }
 
         $shipper->name = $request->name;
         $shipper->email = $request->email;
@@ -118,7 +123,10 @@ class ShipperController extends Controller
      */
     public function edit($id)
     {
-        $shipper = Shipper::findOrFail($id);
+        $shipper = Shipper::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('shipper') + $this->createEditParams();
         return view('shippers.edit', $params);
     }
@@ -152,7 +160,10 @@ class ShipperController extends Controller
      */
     public function destroy(int $id)
     {
-        $shipper = Shipper::findOrFail($id);
+        $shipper = Shipper::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($shipper)
             return ['success' => $shipper->delete()];
@@ -170,6 +181,9 @@ class ShipperController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);
@@ -185,7 +199,10 @@ class ShipperController extends Controller
             "shippers.id",
             "shippers.name",
             "shippers.email",
-        ]);
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            });
 
         return $this->multiTabSearchData($query, $request);
     }

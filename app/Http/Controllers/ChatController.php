@@ -26,6 +26,9 @@ class ChatController extends Controller
             })
                 ->orWhereHas('shift');
         })
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->leftJoin('messages', function ($q) {
                 $q->on('messages.driver_id', '=', 'drivers.id')
                     ->on('messages.id', '=', DB::raw('(select max(id) from messages where messages.driver_id = drivers.id)'));
@@ -57,6 +60,11 @@ class ChatController extends Controller
         $driver_id = $request->driver_id;
 
         $query = Message::where('driver_id', $driver_id)
+            ->whereHas('driver', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             //->where('user_id', auth()->user()->id)
             ->orderBy('id', 'desc');
 
@@ -78,6 +86,11 @@ class ChatController extends Controller
 
         $messages = [];
         foreach ($drivers as $driver_id) {
+            $driver = Driver::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($driver_id);
+
             if ($image)
                 $image = $this->uploadImage($image, 'chat');
 
@@ -91,8 +104,6 @@ class ChatController extends Controller
                 $image,
                 $is_bot_sender
             );
-
-            $driver = Driver::find($driver_id);
 
             $driverDevices = $this->getUserDevices($driver);
 

@@ -33,9 +33,14 @@ class BonusTypeController extends Controller
     private function storeUpdate(Request $request, $id = null): BonusType
     {
         if ($id)
-            $type = BonusType::findOrFail($id);
-        else
+            $type = BonusType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $type = new BonusType();
+            $type->broker_id = session('broker');
+        }
 
         $type->name = $request->name;
         $type->save();

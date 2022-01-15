@@ -33,9 +33,14 @@ class RateGroupController extends Controller
     private function storeUpdate(Request $request, $id = null): RateGroup
     {
         if ($id)
-            $rateGroup = RateGroup::findOrFail($id);
-        else
+            $rateGroup = RateGroup::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $rateGroup = new RateGroup();
+            $rateGroup->broker = session('broker');
+        }
 
         $rateGroup->name = $request->name;
         $rateGroup->save();
@@ -86,7 +91,10 @@ class RateGroupController extends Controller
     {
         if (!$id)
             $id = $request->id;
-        $rateGroup = RateGroup::findOrFail($id);
+        $rateGroup = RateGroup::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
         if ($rateGroup) {
             $message = '';
@@ -110,6 +118,9 @@ class RateGroupController extends Controller
             'id',
             'name as text',
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return $this->selectionData($query, $request->take, $request->page);

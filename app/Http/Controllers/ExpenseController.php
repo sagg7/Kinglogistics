@@ -34,7 +34,10 @@ class ExpenseController extends Controller
     private function createEditParams(): array
     {
         return [
-            'types' => [null => ''] + ExpenseType::pluck('name', 'id')->toArray(),
+            'types' => [null => ''] + ExpenseType::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -46,9 +49,14 @@ class ExpenseController extends Controller
     private function storeUpdate(Request $request, $id = null): Expense
     {
         if ($id)
-            $expense = Expense::findOrFail($id);
-        else
+            $expense = Expense::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+        else {
             $expense = new Expense();
+            $expense->broker_id = session('broker');
+        }
 
         $expense->type_id = $request->type;
         $expense->amount = $request->amount;
@@ -116,7 +124,10 @@ class ExpenseController extends Controller
      */
     public function edit(int $id)
     {
-        $expense = Expense::findOrFail($id);
+        $expense = Expense::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('expense') + $this->createEditParams();
         return view('expenses.edit', $params);
     }
@@ -141,16 +152,16 @@ class ExpenseController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Expense  $expense
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
-        $expense = Expense::findOrFail($id);
+        $expense = Expense::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($expense)
-            return ['success' => $expense->delete()];
-        else
-            return ['success' => false];
+        return ['success' => $expense->delete()];
     }
 
     /**
@@ -187,6 +198,9 @@ class ExpenseController extends Controller
             "date",
 
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with('type:id,name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');

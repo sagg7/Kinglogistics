@@ -39,7 +39,10 @@ class RateController extends Controller
     private function createEditParams(): array
     {
         return [
-            'rate_groups' => [null => ''] + RateGroup::pluck('name', 'id')->toArray(),
+            'rate_groups' => [null => ''] + RateGroup::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -53,13 +56,18 @@ class RateController extends Controller
         return DB::transaction(function () use ($request, $id) {
             $ratesValuesChanged = false;
             if ($id) {
-                $rate = Rate::findOrFail($id);
+                $rate = Rate::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->findOrFail($id);
                 if (($rate->shipper_rate != $request->shipper_rate) ||
                     ($rate->carrier_rate != $request->carrier_rate)) {
                     $ratesValuesChanged = true;
                 }
-            } else
+            } else {
                 $rate = new Rate();
+                $rate->broker_id = session('broker_id');
+            }
 
             $rate->rate_group_id = $request->rate_group;
             $rate->shipper_id = $request->shipper;
@@ -136,7 +144,10 @@ class RateController extends Controller
      */
     public function edit(int $id)
     {
-        $rate = Rate::findOrFail($id);
+        $rate = Rate::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
         $params = compact('rate') + $this->createEditParams();
         return view('rates.edit', $params);
     }
@@ -161,16 +172,16 @@ class RateController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(int $id)
     {
-        $rate = Rate::findOrFail($id);
+        $rate = Rate::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
 
-        if ($rate)
-            return ['success' => $rate->delete()];
-        else
-            return ['success' => false];
+        return ['success' => $rate->delete()];
     }
 
     public function selection(Request $request)
@@ -179,6 +190,9 @@ class RateController extends Controller
             'rates.id',
             DB::raw("CONCAT(rate_groups.name, ': ', rates.start_mileage, ' - ', rates.end_mileage, ' miles') as text"),
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->join('rate_groups', 'rate_groups.id', '=', 'rates.rate_group_id')
             ->where('shipper_id', $request->shipper)
             ->where('zone_id', $request->zone)
@@ -226,6 +240,9 @@ class RateController extends Controller
             "rates.shipper_rate",
             "rates.carrier_rate",
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
             ->with([
                 'rate_group:id,name',
                 'shipper:id,name',

@@ -36,7 +36,7 @@ class DocumentationController extends Controller
             ->orderBy('required', 'DESC')
             ->first();
         if ($hasOrientation) {
-            $broker = Broker::findOrFail(session('broker'));
+            $broker = Broker::findOrFail(auth()->user()->id);
             $text = "The first section of the paperwork has been completed.<br> Contact <strong>$broker->name</strong> to start the orientation paperwork.";
         } else {
             $text = "Shortly we'll be in contact with you to continue the process.";
