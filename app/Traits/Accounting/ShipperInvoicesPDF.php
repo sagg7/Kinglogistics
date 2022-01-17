@@ -17,6 +17,11 @@ trait ShipperInvoicesPDF
             'shipper:id,name',
             'loads.driver.truck',
         ])
+            ->whereHas('shipper', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->findOrFail($id);
 
         $broker = Broker::findOrFail(session('broker'));

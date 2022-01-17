@@ -19,6 +19,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcastNow
     public $coords;
     public $speed;
     public $status;
+    public $broker;
 
     /**
      * Create a new event instance.
@@ -31,6 +32,7 @@ class DriverLocationUpdateForKing implements ShouldBroadcastNow
         $this->coords = $coords;
         $this->speed = $speed;
         $this->status = $status;
+        $this->broker = $driver->load('broker')->broker;
     }
 
     public function broadcastWith()
@@ -66,6 +68,6 @@ class DriverLocationUpdateForKing implements ShouldBroadcastNow
     public function broadcastOn()
     {
         // Only users authenticated as admins can join this channel
-        return new PrivateChannel('driver-location-king');
+        return new PrivateChannel('driver-location-king' . $this->broker->id);
     }
 }

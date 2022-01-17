@@ -21,7 +21,7 @@ trait TrackingTrait
             $channel = "driver-location-shipper." . $user_id;
             $event = "DriverLocationUpdateForShipper";
         } else {
-            $channel = "driver-location-king";
+            $channel = "driver-location-king." . $user_id;
             $event = "DriverLocationUpdateForKing";
         }
 

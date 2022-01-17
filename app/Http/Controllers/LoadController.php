@@ -227,6 +227,7 @@ class LoadController extends Controller
          */
         $data = $request->all();
         $data['date'] = $request->date_submit;
+        $data['broker_id'] = session('broker');
         $this->validator($data)->validate();
         $this->storeUpdate($data, $id);
 

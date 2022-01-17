@@ -18,8 +18,8 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int)$user->id === (int)$id;
 });
 
-Broadcast::channel('driver-location-king', function ($user) {
-    return (bool)$user->hasRole(['admin', 'operations', 'dispatch']);
+Broadcast::channel('driver-location-king.{brokerId}', function ($user, $broker_id) {
+    return ((int)$user->broker_id === (int)$broker_id) && ((bool)$user->hasRole(['admin', 'operations', 'dispatch']));
 });
 
 Broadcast::channel('driver-location-carrier.{locationGroupId}', function ($carrier, $carrier_id) {

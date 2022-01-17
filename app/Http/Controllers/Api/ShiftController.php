@@ -100,7 +100,7 @@ class ShiftController extends Controller
         }
 
         // Check if the user can activate its shift, checking current time compared to assigned turn time range
-        if (Broker::find(1)->active_shifts && !$driver->canActiveShift()) { //disable for prefil
+        if (Broker::find($driver->broker_id)->active_shifts && !$driver->canActiveShift()) { //disable for prefil
             return response([
                 'status' => 'error',
                 'message' => __('Your turn is out of time range')
@@ -142,6 +142,9 @@ class ShiftController extends Controller
             ['status', LoadStatusEnum::UNALLOCATED],
             ['driver_id', null]
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', auth()->user()->broker_id);
+            })
             ->first();
 
         if (!empty($load)) {

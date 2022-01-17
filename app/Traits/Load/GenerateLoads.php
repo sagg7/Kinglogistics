@@ -68,8 +68,8 @@ trait GenerateLoads
                 $data['broker_id'] = $trip->broker_id;
             }
             if ($id) {
-                $load = Load::whereHas('broker', function ($q) {
-                    $q->where('id', session('broker'));
+                $load = Load::whereHas('broker', function ($q) use ($data) {
+                    $q->where('id', $data['broker_id']);
                 })
                     ->findOrFail($id);
             } else {

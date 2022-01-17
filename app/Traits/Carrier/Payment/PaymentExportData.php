@@ -14,6 +14,11 @@ trait PaymentExportData
             'expenses.type',
             'bonuses.bonus_type',
         ])
+            ->whereHas('carrier', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->findOrFail($id);
 
         $expenses = [];

@@ -88,6 +88,7 @@ class LoadController extends Controller
         $data['customer_name'] = $trip->customer_name;
         $data['mileage'] = $trip->mileage;
         $data['shipper_id'] = $trip->shipper_id;
+        $data['broker_id'] = $driver->broker_id;
 
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
@@ -110,6 +111,9 @@ class LoadController extends Controller
             'id as key',
             DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
         ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', auth()->user()->broker_id);
+            })
             ->where("name", "LIKE", "%$request->search%");
 
         return response([
@@ -335,7 +339,7 @@ class LoadController extends Controller
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
+        //$load = Load::find($loadId);
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
 
         return response([
