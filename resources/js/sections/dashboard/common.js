@@ -627,10 +627,8 @@
     });
 
     if (typeof window.Echo !== "undefined")
-        console.log('listening');
         window.Echo.private('load-status-update')
             .listen('LoadUpdate', res => {
-                console.log(res);
                 const load = res.load;
                 const status = load.status;
                 let mainIdx = null,
