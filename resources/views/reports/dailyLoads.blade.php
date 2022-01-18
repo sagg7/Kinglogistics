@@ -15,17 +15,21 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <fieldset class="form-group col-4">
+                    <fieldset class="form-group col-3">
                         <label for="dateRange">Graph type</label>
-                        {!! Form::select('graphType', ['trips' => 'Per trips', 'shippers' => 'Per customers'], null, ['class' => 'form-control', 'id' => 'graphType']) !!}
+                        {!! Form::select('graphType', ['trips' => 'Per trips', 'shippers' => 'Per customers', 'total' => 'Total'], null, ['class' => 'form-control', 'id' => 'graphType']) !!}
                     </fieldset>
-                    <fieldset class="form-group col-4">
+                    <fieldset class="form-group col-3">
                         <label for="dateRange">Select Dates</label>
                         <input type="text" id="dateRange" class="form-control">
                     </fieldset>
-                    <fieldset class="form-group col-4">
+                    <fieldset class="form-group col-3">
                         <label for="dateRange">Customer</label>
                         {!! Form::select('shipper_id', [], null, ['class' => 'form-control', 'id' => 'shipper_id']) !!}
+                    </fieldset>
+                    <fieldset class="form-group col-3">
+                        <label for="dateRange">Period</label>
+                        {!! Form::select('period', ['day' => 'Per day', 'week' => 'Per week', 'month' => 'Per month'], null, ['class' => 'form-control', 'id' => 'period']) !!}
                     </fieldset>
                 </div>
             </div>
