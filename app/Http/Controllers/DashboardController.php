@@ -25,12 +25,12 @@ class DashboardController extends Controller
        $end = Carbon::now()->endOfMonth()->endOfDay();*/
         //whereBetween('loads.date', [$start, $end])
         $today = new Carbon();
-        if($today->dayOfWeek == Carbon::MONDAY)
+        if ($today->dayOfWeek === Carbon::MONDAY)
             $monday = $today;
         else
             $monday = new Carbon('last monday');
 
-        $monday = $monday->format('Y/m/d')." 00:00:00";
+        $monday = $monday->startOfDay();
         $loads = Load::where(function ($q) use ($request) {
             if (auth()->guard('web')->check()) {
                 $q->whereHas('broker', function ($q) {
