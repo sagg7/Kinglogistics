@@ -3,7 +3,7 @@
     const dateRange = $('#dateRange');
     const graphType = $('#graphType');
     const shipperSel = $('#shipper_id');
-    const period = $('#period');
+    const periodSel = $('#period');
     const initChart = (obj) => {
         let titleText;
         switch (graphType.val()) {
@@ -15,7 +15,7 @@
                 titleText = 'Finished loads per customer';
                 break;
             case 'total':
-                titleText = 'Finished loads per customer';
+                titleText = 'Finished loads total';
                 break;
         }
         // Line Chart
@@ -95,7 +95,7 @@
                 end: end.format('YYYY/MM/DD'),
                 graph_type: graphType.val(),
                 shipper: shipperSel.val(),
-                period: period.val(),
+                period: periodSel.val(),
             },
             success: (res) => {
                 initChart(res);
@@ -115,7 +115,7 @@
         .on('select2:select', () => {
             getData();
         });
-    period.select2()
+    periodSel.select2()
         .on('select2:select', () => {
             getData();
         });

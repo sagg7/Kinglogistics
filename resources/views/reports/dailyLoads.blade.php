@@ -8,7 +8,7 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
-        <script src="{{ asset('js/sections/reports/dailyLoads.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/reports/dailyLoads.min.js?1.0.1') }}"></script>
     @endsection
 
     <div class="row">
