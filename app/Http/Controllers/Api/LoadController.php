@@ -88,7 +88,7 @@ class LoadController extends Controller
         $data['customer_name'] = $trip->customer_name;
         $data['mileage'] = $trip->mileage;
         $data['shipper_id'] = $trip->shipper_id;
-        $data['broker_id'] = $driver->broker_id;
+        $data['broker_id'] = $driver->broker_id ?? Driver::find($driver->id)->broker_id;
 
         $load = $this->storeUpdate($data);
         $this->switchLoadStatus($load->id, $loadStatus);
