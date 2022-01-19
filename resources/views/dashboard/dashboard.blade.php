@@ -57,7 +57,7 @@
         <div class="col-sm-6 col-12">
             <div class="card">
                 <div class="card-header align-self-center">
-                    <h3>Trailers use</h3>
+                    <h3>Trailers</h3>
                 </div>
                 <div class="card-body">
                     <div class="card-content"  style="height: 360px;">
