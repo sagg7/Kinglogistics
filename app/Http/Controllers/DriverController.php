@@ -378,7 +378,9 @@ class DriverController extends Controller
                         ->orwhere('status', DriverEnum::READY);
                 })
                 ->whereDoesntHave('active_load')
-                ->with('latestLoad');
+                    ->with('latestLoad', function($q) {
+                        $q->with('loadStatus:load_id,finished_timestamp');
+                    });
                 break;
             case 'inactive':
                 $query->where('inactive', 1);

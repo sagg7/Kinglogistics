@@ -35,12 +35,6 @@
                                     return params.value.name;
                                 else
                                     return '';
-                            },
-                            capitalizeStatus = (params) => {
-                                let string = params.value ? params.value.status : 'No load assigned';
-                                if (string === "to_location")
-                                    string = "in transit";
-                                return string.charAt(0).toUpperCase()  + string.slice(1)
                             };
                         const capitalizeFormatter = (params) => {
                             if (params.value)
@@ -58,6 +52,33 @@
                             }
                         }
                         TooltipRenderer.prototype.getGui = () => {
+                            return this.eGui;
+                        }
+                        function StatusTooltip() {}
+                        StatusTooltip.prototype.init = (params) => {
+                            this.eGui = document.createElement('div');
+                            this.eGui.id = `status_tooltip_${params.data.id}`;
+                            let status = '';
+                            if(params.value == null)
+                                status = 'No load assigned'
+                            else {
+                                if(params.value.status === 'finished')
+                                    status = 'No load assigned'
+                                else
+                                status = params.value.status.charAt(0).toUpperCase()  + params.value.status.slice(1);
+                            }
+
+                            this.eGui.innerHTML = status;
+                            console.log(params.value);
+                            if (params.data.latest_load && params.data.latest_load.load_status) {
+
+                                let finish_time = new Date(params.data.latest_load.load_status.finished_timestamp).getTime();
+                                let nowT = now.getTime();
+
+                                new bootstrap.Tooltip(this.eGui, {title: "Last Load: "+msToTime(nowT - finish_time)});
+                            }
+                        }
+                        StatusTooltip.prototype.getGui = () => {
                             return this.eGui;
                         }
                         function StatusRenderer() {}
@@ -124,7 +145,7 @@
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
-                                {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
+                                {headerName: 'Load Status', field: 'latest_load', cellRenderer: StatusTooltip},
                                 {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],
                             menu,
