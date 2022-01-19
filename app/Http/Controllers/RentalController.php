@@ -464,7 +464,9 @@ class RentalController extends Controller
         $rental->finished_at = Carbon::now();
         $rental->status = 'finished';
         $rental->save();
-
+        $rental->trailer->status = TrailerEnum::AVAILABLE;
+        $rental->trailer->save();
+        
         return response()->json([
             'msg' => 'Rental terminated correctly',
             'success' => true
