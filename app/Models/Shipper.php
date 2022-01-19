@@ -23,6 +23,16 @@ class Shipper extends Authenticatable
         return $this->belongsTo(Broker::class);
     }
 
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
+
+    public function loads()
+    {
+        return $this->hasMany(Load::class);
+    }
+
     /**
      * @return BelongsToMany
      */
