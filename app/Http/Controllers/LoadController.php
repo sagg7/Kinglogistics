@@ -442,12 +442,12 @@ class LoadController extends Controller
 
     public function replacePhoto(Request $request, $id, $type){
 
-        $load_status = LoadStatus::/*whereHas('parentLoad', function ($q) {
+        $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
             $q->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             });
         })
-            ->*/where('load_id', $id)->first();
+            ->where('load_id', $id)->first();
 
         $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",30);
         if ($type == "to_location") {
@@ -496,12 +496,12 @@ class LoadController extends Controller
     }
 
     public function loadPhoto($id, $type){
-        $load_status = LoadStatus::/*whereHas('parentLoad', function ($q) {
+        $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
             $q->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             });
         })
-            ->*/where('load_id', $id)->first();
+            ->where('load_id', $id)->first();
 
         $path = "app/public/loads/";
         $this->deleteDirectory($path);
