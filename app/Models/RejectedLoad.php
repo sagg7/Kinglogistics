@@ -23,7 +23,7 @@ class RejectedLoad extends Model
 
     public function parentLoad(): BelongsTo
     {
-        return $this->belongsTo(Load::class);
+        return $this->belongsTo(Load::class, 'load_id');
     }
 
     public function driver(): BelongsTo

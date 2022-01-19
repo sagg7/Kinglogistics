@@ -24,10 +24,8 @@ class BrokerCheck
             // TODO: redirect to expiration view
         }*/
 
-
         if (!session('broker')) {
-            $broker_id = auth()->user()->load('broker')->broker->id;
-            session(['broker' => $broker_id]);
+            session(['broker' => auth()->user()->broker_id]);
         }
 
         return $next($request);
