@@ -15,7 +15,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 class="currency" id="yearIncome"><div class="spinner-grow text-success"></div></h1>
+                    <h1 class="currency" id="yearIncome"><span class="spinner-grow text-success"></span></h1>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 class="currency" id="monthIncome"><div class="spinner-grow text-success"></div></h1>
+                    <h1 class="currency" id="monthIncome"><span class="spinner-grow text-success"></span></h1>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 class="currency" id="lastWeekIncome"><div class="spinner-grow text-success"></div></h1>
+                    <h1 class="currency" id="lastWeekIncome"><span class="spinner-grow text-success"></span></h1>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 class="currency" id="weekIncome"><div class="spinner-grow text-success"></div></h1>
+                    <h1 class="currency" id="weekIncome"><span class="spinner-grow text-success"></span></h1>
                 </div>
             </div>
         </div>
@@ -99,6 +99,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
+                    <h1 id="ranking"><span class="spinner-grow text-warning"></span></h1>
                 </div>
             </div>
         </div>

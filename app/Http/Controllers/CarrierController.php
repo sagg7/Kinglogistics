@@ -174,6 +174,7 @@ class CarrierController extends Controller
             })
                 ->findOrFail($id)
             : auth()->user();
+
         $loadsBase = Load::whereHas('driver', function ($q) use ($id) {
             $q->whereHas('carrier', function ($q) use ($id) {
                 $q->where('carrier_id', $id);
@@ -201,6 +202,39 @@ class CarrierController extends Controller
         $pastMonth = (clone $loadsBase)->whereDate('date', '>=', $startPastMonth)
             ->whereDate('date', '<=', $endPastMonth);
 
+        $carrier->load([
+            'ranking',
+            'rentals' => function ($q) {
+                $q->select([
+                    'rentals.id',
+                    'rentals.carrier_id',
+                    'rentals.trailer_id',
+                    'rentals.cost',
+                ])
+                    ->whereNull('finished_at')
+                    ->with('trailer:id,number,status');
+            },
+            'drivers' => function ($q) use ($startOfWeek, $now) {
+                $q->select([
+                    'drivers.id',
+                    'drivers.carrier_id',
+                    'drivers.name',
+                ])
+                    ->with('turn')
+                    ->withCount([
+                        'loads as loads_count' => function ($q) use ($startOfWeek, $now) {
+                            $q->whereDate('date', '>=', $startOfWeek)
+                                ->whereDate('date', '<=', $now);
+                        },
+                    ]);
+            },
+        ])
+            ->loadCount([
+                'incidents' => function ($q) use ($aYearAgo) {
+                    $q->whereDate('date', '>=', $aYearAgo);
+                }
+            ]);
+
         // Card #1
         $incomeYear = $currentYear->sum('rate');
         // Card #2
@@ -210,7 +244,7 @@ class CarrierController extends Controller
         // Card #4
         $incomeWeek = $currentWeek->sum('rate');
         // Card #5
-        // TODO: RANKING
+        $ranking = $carrier->ranking->ranking ?? "N/A";
         // Card #6
         // TODO: ALERTS
         // Card #7
@@ -220,37 +254,14 @@ class CarrierController extends Controller
         // Card #9 Loads This Week
         $totalLoadsWeek = $currentWeek->count();
         // Card #10 Active Rentals
-        $rentals = Rental::where('carrier_id', $id)
-            ->whereNull('finished_at')
-            ->with('trailer:id,number,status')
-            ->select([
-                'rentals.id',
-                'rentals.trailer_id',
-                'rentals.cost',
-            ])
-            ->get();
+        $rentals = $carrier->rentals;
         // Card #10 Active Drivers
-        $drivers = Driver::where('carrier_id', $id)
-            //->where('status', DriverEnum::ACTIVE)
-            ->select([
-                'drivers.id',
-                'drivers.name',
-            ])
-            ->with('turn')
-            ->withCount([
-                'loads as loads_count' => function ($q) use ($startOfWeek, $now) {
-                    $q->whereDate('date', '>=', $startOfWeek)
-                        ->whereDate('date', '<=', $now);
-                },
-            ])
-            ->get();
+        $drivers = $carrier->drivers;
         // Card #11 Number of Incidents
-        $incidents = Incident::where('carrier_id', $id)
-            ->whereDate('date', '>=', $aYearAgo)
-            ->count();
+        $incidents = $carrier->incidents_count;
 
         return compact('incomeYear', 'incomePastMonth', 'incomePastWeek', 'incomeWeek', 'status',
-            'totalLoadsPastWeek', 'totalLoadsWeek', 'rentals', 'drivers', 'incidents');
+            'totalLoadsPastWeek', 'totalLoadsWeek', 'rentals', 'drivers', 'incidents', 'ranking');
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Chat\MessagesTrait;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\Notifications\PushNotificationsTrait;
+use App\Traits\Ranking\RankingTrait;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
-    use PaymentsAndCollection, GetSelectionData, PushNotificationsTrait, MessagesTrait;
+    use PaymentsAndCollection, GetSelectionData, PushNotificationsTrait, MessagesTrait, RankingTrait;
 
     /**
      * The Artisan commands provided by your application.
@@ -175,6 +176,11 @@ class Kernel extends ConsoleKernel
                 }
             });
         })->weekly()->mondays()->at('00:00');
+
+        // On Mondays at 00:01 hours of the day, calculate Carriers Ranking of the past week
+        $schedule->call(function () {
+            $this->calculateRanking();
+        })->weekly()->mondays()->at('00:01');
     }
 
     /**

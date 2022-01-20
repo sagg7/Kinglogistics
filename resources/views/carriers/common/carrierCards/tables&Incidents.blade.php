@@ -61,7 +61,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 id="incidents"><div class="spinner-grow text-danger"></div></h1>
+                    <h1 id="incidents"><span class="spinner-grow text-danger"></span></h1>
                 </div>
             </div>
         </div>

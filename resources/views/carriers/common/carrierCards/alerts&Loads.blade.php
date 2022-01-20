@@ -35,7 +35,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 id="status"><div class="spinner-grow text-info"></div></h1>
+                    <h1 id="status"><span class="spinner-grow text-info"></span></h1>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 id="lastWeekLoads"><div class="spinner-grow text-info"></div></h1>
+                    <h1 id="lastWeekLoads"><span class="spinner-grow text-info"></span></h1>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <h1 id="weekLoads"><div class="spinner-grow text-info"></div></h1>
+                    <h1 id="weekLoads"><span class="spinner-grow text-info"></span></h1>
                 </div>
             </div>
         </div>

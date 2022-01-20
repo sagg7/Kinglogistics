@@ -61,6 +61,7 @@ let _gridDrivers;
     const monthIncome = $('#monthIncome');
     const lastWeekIncome = $('#lastWeekIncome');
     const weekIncome = $('#weekIncome');
+    const ranking = $('#ranking');
     const lastWeekLoads = $('#lastWeekLoads');
     const weekLoads = $('#weekLoads');
     const incidents = $('#incidents');
@@ -95,6 +96,7 @@ let _gridDrivers;
             monthIncome.text(res.incomePastMonth);
             lastWeekIncome.text(res.incomePastWeek);
             weekIncome.text(res.incomeWeek);
+            ranking.text(res.ranking);
             formatCurrency();
             // Set Simple Data
             carrierStatus.text(res.status);
