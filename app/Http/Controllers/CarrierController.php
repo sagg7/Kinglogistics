@@ -165,12 +165,15 @@ class CarrierController extends Controller
         return view('carriers.show', compact('carrier'));
     }
 
-    public function summaryData(int $id)
+    public function summaryData(int $id = null)
     {
-        $carrier = Carrier::whereHas('broker', function ($q) {
-            $q->where('id', session('broker'));
-        })
-            ->findOrFail($id);
+        $id ?: $id = auth()->user()->id;
+        $carrier = auth()->guard('web')->check()
+            ? Carrier::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id)
+            : auth()->user();
         $loadsBase = Load::whereHas('driver', function ($q) use ($id) {
             $q->whereHas('carrier', function ($q) use ($id) {
                 $q->where('carrier_id', $id);

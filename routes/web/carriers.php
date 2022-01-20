@@ -10,7 +10,7 @@ Route::prefix('carrier')->group(function () {
             ->name('carrier.index');
         Route::get('show/{id}', [CarrierController::class, 'show'])
             ->name('carrier.show');
-        Route::get('summaryData/{id}', [CarrierController::class, 'summaryData'])
+        Route::get('summaryData/{id?}', [CarrierController::class, 'summaryData'])
             ->name('carrier.summaryData');
         Route::get('search/{type?}', [CarrierController::class, 'search'])
             ->name('carrier.search');
