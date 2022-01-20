@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\DriverEnum;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Mail\SendNotificationTemplate;
@@ -371,7 +372,15 @@ class DriverController extends Controller
                 });
                 break;
             case 'awaiting':
-                $query->whereHas('availableDriver');
+                $query->where(function ($q) {
+                    $q->where('status', DriverEnum::ACTIVE)
+                        ->orwhere('status', DriverEnum::PENDING)
+                        ->orwhere('status', DriverEnum::READY);
+                })
+                ->whereDoesntHave('active_load')
+                    ->with('latestLoad', function($q) {
+                        $q->with('loadStatus:load_id,finished_timestamp');
+                    });
                 break;
             case 'inactive':
                 $query->where('inactive', 1);
