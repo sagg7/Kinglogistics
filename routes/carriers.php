@@ -49,6 +49,10 @@ Route::middleware(['auth:carrier','documentation'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])
             ->name('dashboard');
     });
+    Route::prefix('carrier')->group(function () {
+        Route::get('summaryData', [CarrierController::class, 'summaryData'])
+            ->name('carrier.summaryData');
+    });
 
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'profile'])
