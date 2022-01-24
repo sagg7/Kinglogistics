@@ -365,7 +365,7 @@
                     });
 
                 });
-                window.Echo.private('load-status-update')
+               /* window.Echo.private('load-status-update') //fix this
                     .listen('LoadUpdate', res => {
                         if (tbLoad) {
                             const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
@@ -374,7 +374,7 @@
                                 tbLoad.gridOptions.api.setServerSideDatasource(frontData);
                             }
                         }
-                    });
+                    });*/
 
                 const dateRange = $('#dateRange');
                 dateRange.daterangepicker({
