@@ -23,8 +23,7 @@ trait RankingTrait
                 ->whereDate('finished_timestamp', '>=', $weekStart)
                 ->whereDate('finished_timestamp', '<=', $weekEnd);
         };
-        $carriers = Carrier::where('broker_id', session('broker'))
-            ->select([
+        $carriers = Carrier::select([
                 'id',
                 'name',
                 'broker_id',
