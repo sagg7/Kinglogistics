@@ -107,6 +107,12 @@ class LoadController extends Controller
 
     public function getTrips(Request $request)
     {
+        $shippers = [];
+
+        foreach (auth()->user()->shippers() as $shipper){
+            $shippers[] = $shipper->id;
+        }
+
         $query = Trip::select([
             'id as key',
             DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
@@ -114,6 +120,7 @@ class LoadController extends Controller
             ->whereHas('broker', function ($q) {
                 $q->where('id', auth()->user()->broker_id);
             })
+            ->whereIn('shipper_id', $shippers)
             ->where("name", "LIKE", "%$request->search%");
 
         return response([
