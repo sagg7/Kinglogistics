@@ -109,7 +109,7 @@ class LoadController extends Controller
     {
         $shippers = [];
 
-        foreach (auth()->user()->shippers() as $shipper){
+        foreach (auth()->user()->shippers as $shipper){
             $shippers[] = $shipper->id;
         }
 
