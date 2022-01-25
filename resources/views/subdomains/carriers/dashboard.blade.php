@@ -12,9 +12,10 @@
             const echoEvent = "{{ $tracking["event"] }}";
             const company = @json($tracking["company"]);
             const guard = 'carrier';
+            const loadChannelId = userId;
         </script>
         <!--<script src="{{ asset('js/sections/tracking/common.min.js?1.0.7') }}"></script>-->
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.9') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.10') }}"></script>
         <script src="{{ asset('js/sections/carriers/show.min.js?1.0.0') }}"></script>
     @endsection
 

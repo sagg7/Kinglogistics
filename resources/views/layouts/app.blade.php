@@ -101,6 +101,9 @@
         @include("layouts.chat.chatTemplate")
     @endif
     <footer class="footer footer-static footer-light"></footer>
+    <script>
+        const userId = {{ auth()->user()->id }};
+    </script>
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
     <script src="{{ asset("app-assets/vendors/js/pickers/pickadate/picker.js") }}" type="application/javascript"></script>
@@ -125,9 +128,9 @@
     <script src="{{ asset('js/common/master.min.js?1.0.2') }}"></script>
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
-    <script src="{{ asset('js/modules/laravel-echo/echo.js') }}"></script>
+    <script src="{{ asset('js/modules/laravel-echo/echo.js?1.0.0') }}"></script>
     @if(auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
-        <script src="{{ asset("js/sections/chat/bottomChat.min.js") }}"></script>
+        <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.0") }}"></script>
     @endif
 
     <!-- BEGIN: Scripts JS-->

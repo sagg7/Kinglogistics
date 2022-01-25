@@ -41,6 +41,10 @@ class LoadUpdate implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('load-status-update');
+        return [
+            new PrivateChannel('load-status-update-web.' . $this->load->broker_id),
+            new PrivateChannel('load-status-update-carrier.' . $this->load->driver->carrier->id),
+            new PrivateChannel('load-status-update-shipper.' . $this->load->shipper->id),
+        ];
     }
 }

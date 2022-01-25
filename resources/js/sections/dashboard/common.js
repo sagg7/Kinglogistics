@@ -627,7 +627,7 @@
     });
 
     if (typeof window.Echo !== "undefined")
-        window.Echo.private('load-status-update')
+        window.Echo.private(`load-status-update-${guard}.${loadChannelId}`)
             .listen('LoadUpdate', res => {
                 const load = res.load;
                 const status = load.status;

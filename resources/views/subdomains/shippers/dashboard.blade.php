@@ -3,6 +3,7 @@
     @section("scripts")
         <script>
             const guard = 'shipper';
+            const loadChannelId = userId;
             (() => {
                 const options = {
                     series: [{
@@ -60,7 +61,7 @@
                 chart.render();
             })();
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.9') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.10') }}"></script>
     @endsection
 
     @section('modals')

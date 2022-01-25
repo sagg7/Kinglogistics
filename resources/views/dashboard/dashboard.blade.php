@@ -9,10 +9,11 @@
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script>
             const guard = 'web';
+            const loadChannelId = {{ auth()->user()->broker_id }};
             let tbOnCall = null;
             let tbJobs = null;
         </script>
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.9') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.10') }}"></script>
     @endsection
 
     @section('modals')

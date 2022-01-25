@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessPaymentsAndCollection;
-use App\Models\DispatchSchedule;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
