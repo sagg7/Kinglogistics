@@ -41,6 +41,7 @@ class LoadUpdate implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
+        $carrier_id = 0;
         if ($this->load->driver)
             $carrier_id = $this->load->driver->carrier->id;
         return [
