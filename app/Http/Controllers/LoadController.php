@@ -150,7 +150,7 @@ class LoadController extends Controller
                     if ($data['notes'])
                         $data['status'] = 'finished';
                     else
-                        $data['status'] = 'requested';
+                        $data['status'] = 'accepted';
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
