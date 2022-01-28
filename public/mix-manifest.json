@@ -1,5 +1,3 @@
 {
-    "/js/modules/laravel-echo/echo.js": "/js/modules/laravel-echo/echo.js",
-    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js",
-    "/js/sections/chat/bottomChat.min.js": "/js/sections/chat/bottomChat.min.js"
+    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js"
 }
