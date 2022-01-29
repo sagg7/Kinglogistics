@@ -83,6 +83,7 @@ class ReportController extends Controller
                     ->whereBetween('date', [$start, $end])
                     ->select('id', 'load_type_id', 'trip_id', 'date');
             })
+            ->where('shipper_id', auth()->user()->id)
             ->get(['id', 'name']);
     }
 
