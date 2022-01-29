@@ -109,10 +109,10 @@ class ReportController extends Controller
                     $q->where('loads.trip_id', $request->trip);
             });
         })
-            ->withCount('loads', function ($q) {
+            ->withCount('loads', function ($q) use ($request) {
                 $q->where('shipper_id', auth()->user()->id);
             })
-            ->with('loads', function ($q) {
+            ->with('loads', function ($q) use ($request) {
                 $q->orderBy('date')
                 ->select(['id','date','driver_id','control_number','origin','destination'])
                 ->where('shipper_id', auth()->user()->id);
