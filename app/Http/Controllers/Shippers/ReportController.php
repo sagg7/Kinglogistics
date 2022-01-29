@@ -9,6 +9,7 @@ use App\Models\Trailer;
 use App\Models\Trip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use function Clue\StreamFilter\fun;
 
 class ReportController extends Controller
 {
@@ -108,10 +109,13 @@ class ReportController extends Controller
                     $q->where('loads.trip_id', $request->trip);
             });
         })
-            ->withCount('loads')
+            ->withCount('loads', function ($q) {
+                $q->where('shipper_id', auth()->user()->id);
+            })
             ->with('loads', function ($q) {
                 $q->orderBy('date')
-                ->select(['id','date','driver_id','control_number','origin','destination']);
+                ->select(['id','date','driver_id','control_number','origin','destination'])
+                ->where('shipper_id', auth()->user()->id);
             })
             ->get(['id', 'name']);
     }
