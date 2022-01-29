@@ -369,6 +369,13 @@ class LoadController extends Controller
                     });
                 }
             })
+            ->where(function ($q) {
+                if (auth()->guard('shipper')->check()) {
+                    $q->whereHas('shipper', function ($q) {
+                        $q->where('shipper_id', auth()->user()->id);
+                    });
+                }
+            })
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
