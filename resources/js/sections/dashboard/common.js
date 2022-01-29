@@ -630,6 +630,10 @@
         window.Echo.private(`load-status-update-${guard}.${loadChannelId}`)
             .listen('LoadUpdate', res => {
                 const load = res.load;
+                // If the current shipper filter is not the same as the received load, then don't show it
+                if (Number(shipperSel.val()) !== Number(load.shipper.id)) {
+                    return false;
+                }
                 const status = load.status;
                 let mainIdx = null,
                     dataIdx = null;
