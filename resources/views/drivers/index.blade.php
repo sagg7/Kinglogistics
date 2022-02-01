@@ -36,12 +36,24 @@
                                 else
                                     return '';
                             };
-                        const capitalizeFormatter = (params) => {
-                            if (params.value)
-                                return params.value.charAt(0).toUpperCase()  + params.value.slice(1);
+                        const capitalizeFormatter = (value) => {
+                            if (value)
+                                return value.charAt(0).toUpperCase()  + value.slice(1);
                             else
                                 return '';
                         };
+                        const msToTime = (duration) => {
+                            let minutes = Math.floor((duration / (1000 * 60)) % 60),
+                                hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+                            hours = (hours < 10) ? "0" + hours : hours;
+                            minutes = (minutes < 10) ? "0" + minutes : minutes;
+                            if (hours > 0)
+                                return hours + " hours " + minutes + " minutes";
+                            else
+                                return minutes + " minutes";
+
+                        }
                         function TooltipRenderer() {}
                         TooltipRenderer.prototype.init = (params) => {
                             this.eGui = document.createElement('div');
@@ -58,24 +70,17 @@
                         StatusTooltip.prototype.init = (params) => {
                             this.eGui = document.createElement('div');
                             this.eGui.id = `status_tooltip_${params.data.id}`;
-                            let status = '';
-                            if(params.value == null)
-                                status = 'No load assigned'
-                            else {
-                                if(params.value.status === 'finished')
-                                    status = 'No load assigned'
-                                else
-                                status = params.value.status.charAt(0).toUpperCase()  + params.value.status.slice(1);
+                            let status;
+                            if (!params.value || params.value.status === 'finished') {
+                                status = 'No load assigned';
+                            } else {
+                                status = capitalizeFormatter(params.value.status);
                             }
-
                             this.eGui.innerHTML = status;
-                            console.log(params.value);
                             if (params.data.latest_load && params.data.latest_load.load_status) {
-
-                                let finish_time = new Date(params.data.latest_load.load_status.finished_timestamp).getTime();
-                                let nowT = now.getTime();
-
-                                new bootstrap.Tooltip(this.eGui, {title: "Last Load: "+msToTime(nowT - finish_time)});
+                                const finish_time = new Date(params.data.latest_load.load_status.finished_timestamp).getTime();
+                                const nowT = now.getTime();
+                                new bootstrap.Tooltip(this.eGui, {title: `Last Load: ${msToTime(nowT - finish_time)}`});
                             }
                         }
                         StatusTooltip.prototype.getGui = () => {
@@ -85,21 +90,21 @@
                         StatusRenderer.prototype.init = (params) => {
                             this.eGui = document.createElement('div');
 
-
-                            if(params.value === 'pending'){
-                                let created = new Date(params.data.bot_answer.updated_at).getTime();
-                                let nowT = now.getTime();
+                            const status = capitalizeFormatter(params.value);
+                            if (params.value === 'pending') {
+                                const created = new Date(params.data.bot_answer.updated_at).getTime();
+                                const nowT = now.getTime();
                                 let color = 'green';
-                                if ((nowT - created) > 1000*60*10){
-                                    if ((nowT - created) > 1000*60*20)
+                                if ((nowT - created) > 1000 * 60 * 10) {
+                                    if ((nowT - created) > 1000 * 60 * 20)
                                         color = 'red';
                                     else
                                         color = 'orange'
                                 }
-                                this.eGui.innerHTML = `<div class="text-center" style="color: ${color};">${params.value}</div>`;
+                                this.eGui.innerHTML = `<div style="color: ${color};">${status}</div>`;
                                 new bootstrap.Tooltip(this.eGui, {title: msToTime(nowT - created)});
                             } else {
-                                this.eGui.innerHTML = `<div class="text-center">${params.value}</div>`;
+                                this.eGui.innerHTML = `<div>${status}</div>`;
                             }
 
                         }
@@ -164,7 +169,7 @@
                         };
                     },
                     initTables = (type) => {
-                        let table = `tb${type.replace(/^\w/, (c) => c.toUpperCase())}`;
+                        const table = `tb${type.replace(/^\w/, (c) => c.toUpperCase())}`;
                         if (!window[table])
                             window[table] = new tableAG(tableProperties(`${type}`));
                     },
@@ -180,20 +185,70 @@
                     activePane(id);
                 });
                 activePane($('.tab-pane.active').attr('id'));
+
+                const updateTablesParams = (params) => {
+                    if (tbMorning) {
+                        tbMorning.searchQueryParams = _.merge(tbMorning.searchQueryParams, params);
+                        tbMorning.updateSearchQuery();
+                    }
+                    if (tbNight) {
+                        tbNight.searchQueryParams = _.merge(tbNight.searchQueryParams, params);
+                        tbNight.updateSearchQuery();
+                    }
+                    if (tbAwaiting) {
+                        tbAwaiting.searchQueryParams = _.merge(tbAwaiting.searchQueryParams, params);
+                        tbAwaiting.updateSearchQuery();
+                    }
+                    if (tbInactive) {
+                        tbInactive.searchQueryParams = _.merge(tbInactive.searchQueryParams, params);
+                        tbInactive.updateSearchQuery();
+                    }
+                }
+                const clearTablesParams = (paramName) => {
+                    if (tbMorning) {
+                        paramName.forEach(name => {
+                            tbMorning.searchQueryParams[name] = null;
+                        });
+                        tbMorning.updateSearchQuery();
+                    }
+                    if (tbNight) {
+                        paramName.forEach(name => {
+                            tbNight.searchQueryParams[name] = null;
+                        });
+                        tbNight.updateSearchQuery();
+                    }
+                    if (tbAwaiting) {
+                        paramName.forEach(name => {
+                            tbAwaiting.searchQueryParams[name] = null;
+                        });
+                        tbAwaiting.updateSearchQuery();
+                    }
+                    if (tbInactive) {
+                        paramName.forEach(name => {
+                            tbInactive.searchQueryParams[name] = null;
+                        });
+                        tbInactive.updateSearchQuery();
+                    }
+                }
+                $('#shipper').select2({
+                    ajax: {
+                        url: '/shipper/selection',
+                        data: (params) => {
+                            return {
+                                search: params.term,
+                                page: params.page || 1,
+                                take: 15,
+                            };
+                        },
+                    },
+                    placeholder: 'Select',
+                    allowClear: true,
+                }).on('select2:select', (e) => {
+                    updateTablesParams({shipper: e.params.data.id});
+                }).on('select2:unselect', () => {
+                    clearTablesParams(['shipper']);
+                });
             })();
-
-            function msToTime(duration) {
-                var minutes = Math.floor((duration / (1000 * 60)) % 60),
-                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-
-                hours = (hours < 10) ? "0" + hours : hours;
-                minutes = (minutes < 10) ? "0" + minutes : minutes;
-                if (hours > 0)
-                    return hours + " hours " + minutes + " minutes";
-                else
-                    return minutes + " minutes";
-
-            }
         </script>
     @endsection
 
@@ -270,6 +325,18 @@
                         <h2 class="text-bold-700">Error</h2>
                         <span class="font-large-1">0</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <fieldset class="form-group col-6">
+                        {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
+                        {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                    </fieldset>
                 </div>
             </div>
         </div>
