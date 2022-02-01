@@ -14,6 +14,7 @@
                 tbInactive = null;
             (() => {
                 let now = null;
+                let globlalSearchQueryParams = null;
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
                     countActive = $('#count-active').find('span'),
@@ -92,17 +93,18 @@
 
                             const status = capitalizeFormatter(params.value);
                             if (params.value === 'pending') {
-                                const created = new Date(params.data.bot_answer.updated_at).getTime();
+                                const created = params.data.bot_answer ? new Date(params.data.bot_answer.updated_at).getTime() : null;
                                 const nowT = now.getTime();
                                 let color = 'green';
-                                if ((nowT - created) > 1000 * 60 * 10) {
+                                if (created && (nowT - created) > 1000 * 60 * 10) {
                                     if ((nowT - created) > 1000 * 60 * 20)
                                         color = 'red';
                                     else
                                         color = 'orange'
                                 }
                                 this.eGui.innerHTML = `<div style="color: ${color};">${status}</div>`;
-                                new bootstrap.Tooltip(this.eGui, {title: msToTime(nowT - created)});
+                                if (created)
+                                    new bootstrap.Tooltip(this.eGui, {title: msToTime(nowT - created)});
                             } else {
                                 this.eGui.innerHTML = `<div>${status}</div>`;
                             }
@@ -157,6 +159,7 @@
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,
+                            searchQueryParams: globlalSearchQueryParams,
                             successCallback: (params) => {
                                 if (params.count) {
                                     setCount(params.count);
@@ -188,6 +191,7 @@
 
                 const updateTablesParams = (params) => {
                     if (tbMorning) {
+                        globlalSearchQueryParams = _.merge(tbMorning.searchQueryParams, params);
                         tbMorning.searchQueryParams = _.merge(tbMorning.searchQueryParams, params);
                         tbMorning.updateSearchQuery();
                     }
