@@ -110,12 +110,14 @@ class ReportController extends Controller
             });
         })
             ->withCount(['loads' => function ($q) use ($request) {
-                $q->where('shipper_id', auth()->user()->id);
+                $q->where('shipper_id', auth()->user()->id)
+                    ->where('status', 'finished');
             }])
             ->with(['loads' => function ($q) use ($request) {
                 $q->orderBy('date')
                 ->select(['id','date','driver_id','control_number','origin','destination'])
-                ->where('shipper_id', auth()->user()->id);
+                ->where('shipper_id', auth()->user()->id)
+                    ->where('status', 'finished');
             }])
             ->get(['id', 'name']);
     }
