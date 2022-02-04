@@ -217,7 +217,7 @@ class ReportController extends Controller
             }
             else {
                 $total += $item;
-                $average[] = Round($total / $key);
+                $average[] = Round($total / ($key +1));
             }
             
         }
@@ -238,3 +238,4 @@ class ReportController extends Controller
         return ['series' => $series, 'categories' => $dates];
     }
 }
+
