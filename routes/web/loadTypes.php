@@ -8,7 +8,7 @@ Route::prefix('loadType')->group(function () {
         Route::get('index', [LoadTypeController::class, 'index'])
             ->name('loadType.index');
     });
-    Route::group(['middleware' => ['permission:read-load|permission:create-load']], function () {
+    Route::group(['middleware' => ['permission:read-load|create-load']], function () {
         Route::get('search', [LoadTypeController::class, 'search'])
             ->name('loadType.search');
         Route::get('selection', [LoadTypeController::class, 'selection'])
