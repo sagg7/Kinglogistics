@@ -515,10 +515,10 @@
             '<table class="table">' +
             '<thead>' +
             '<tr>' +
-            (guard !== 'shipper' ? `<th>Shipper</th>` : '') +
+            (guard !== 'shipper' ? `<th>Customer</th>` : '') +
             '<th>Driver</th>' +
             '<th>Truck#</th>' +
-            (guard !== 'carrier' ? `<th>Carrier</th>` : '<th></th>') + (guard === 'shipper' ? `<th></th>` : '') +
+            (guard === 'web' ? `<th>Carrier</th>` : '<th></th>') + (guard === 'shipper' ? `<th></th>` : '') +
             '</tr>' +
             '</thead>' +
             '<tbody>' +
@@ -526,7 +526,7 @@
             (guard !== 'shipper' ? `<td>${data.shipper.name}</td>` : '') +
             `<td>${data.driver ? data.driver.name : ''}</td>` +
             `<td>${data.truck ? data.truck.number : ''}</td>` +
-            (guard !== 'carrier' ? `<td>${data.driver ? data.driver.carrier.name : ''}</td>` : '<td></td>') +
+            (guard === 'carrier' ? `<td>${data.driver ? data.driver.carrier.name : ''}</td>` : '<td></td>') +
             '</tr>' +
             '<tr>' +
             '<th>Load type</th>' +
@@ -581,12 +581,12 @@
         modalSpinner.removeClass('d-none');
         modalContent.addClass('d-none');
         modalContent.html('<div class="table-responsive"><table class="table table-hover" id="loadTableSummary"><thead><tr>' +
-            (guard !== 'shipper' ? `<th>Shipper</th>` : '') +
+            (guard !== 'shipper' ? `<th>Customer</th>` : '') +
             '<th>Origin</th>' +
             '<th>Destination</th>' +
             '<th>Driver</th>' +
             '<th>Truck#</th>' +
-            (guard !== 'carrier' ? '<th>Carrier</th>' : '') +
+            (guard === 'carrier' ? '<th>Carrier</th>' : '') +
             '</tr></thead><tbody></tbody></table></div>');
         const loadTable = $('#loadTableSummary'),
             tbody = loadTable.find('tbody');
@@ -602,7 +602,7 @@
                 `<td>${item.destination}</td>` +
                 `<td>${item.driver ? item.driver.name : ''}</td>` +
                 `<td>${item.truck ? item.truck.number : ''}</td>` +
-                (guard !== 'carrier' ? `<td>${item.driver ? item.driver.carrier.name : ''}</td></tr>` : '');
+                (guard === 'carrier' ? `<td>${item.driver ? item.driver.carrier.name : ''}</td></tr>` : '');
         });
         tbody.html(html);
         idArr.forEach((id, i) => {
@@ -627,9 +627,13 @@
     });
 
     if (typeof window.Echo !== "undefined")
-        window.Echo.private('load-status-update')
+        window.Echo.private(`load-status-update-${guard}.${loadChannelId}`)
             .listen('LoadUpdate', res => {
                 const load = res.load;
+                // If the current shipper filter is not the same as the received load, then don't show it
+                if (Number(shipperSel.val()) !== Number(load.shipper.id)) {
+                    return false;
+                }
                 const status = load.status;
                 let mainIdx = null,
                     dataIdx = null;

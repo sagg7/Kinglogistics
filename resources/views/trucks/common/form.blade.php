@@ -22,7 +22,6 @@
                         @enderror
                     </div>
                 @endif
-                @if(auth()->guard('carrier')->check())
                     <div class="form-group col-md-6">
                         {!! Form::label('trailer_id', ucfirst(__('trailer')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('trailer_id', [], $truck->trailer_id ?? null, ['class' => 'form-control' . ($errors->first('trailer_id') ? ' is-invalid' : '')]) !!}
@@ -32,7 +31,6 @@
                         </span>
                         @enderror
                     </div>
-                    @endif
                     <div class="form-group col-md-6">
                         {!! Form::label('driver_id', ucfirst(__('driver')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('driver_id', [], $truck->driver_id ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : '')]) !!}

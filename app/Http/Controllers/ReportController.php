@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class ReportController extends Controller
 {
     public function dailyLoads(Request $request)
@@ -16,7 +17,8 @@ class ReportController extends Controller
         return view('reports.dailyLoads');
     }
 
-    private function compareDates($a, $b) {
+    private function compareDates($a, $b)
+    {
         //$a = Carbon::parse($a);
         return $a->isAfter($b);
     }
@@ -25,21 +27,27 @@ class ReportController extends Controller
     {
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
-
+        $goal = null;
+        $count2 = [];
+        
         // TODO: FORMAT DATA TO SHOW FOR PERIOD FILTER, RIGHT NOW THE DATES ARE KINDA WEIRD ON THE GRAPH AND GOTTA SHOW NEW READABLE FORMATS
         switch ($request->period) {
             default:
             case 'day':
                 $date_group = DB::raw("DATE(finished_timestamp) AS date_group");
                 $date_readable_format = "M d";
+                $goal = 250;
+                
                 break;
             case 'week':
                 $date_group = DB::raw("CONCAT(YEAR(finished_timestamp), '/', WEEK(finished_timestamp, 1)) AS date_group");
                 $date_readable_format = "M d";
+                $goal = 250 * 7;
                 break;
             case 'month':
                 $date_group = DB::raw("CONCAT(YEAR(finished_timestamp), '/', MONTH(finished_timestamp)) AS date_group");
                 $date_readable_format = "M";
+                $goal = 250 * $end->day;
                 break;
         }
 
@@ -95,8 +103,8 @@ class ReportController extends Controller
             default:
             case "trips": // Format the data per trip
                 $query = Trip::whereHas('broker', function ($q) {
-                        $q->where('id', session('broker'));
-                    })
+                    $q->where('id', session('broker'));
+                })
                     ->with([
                         'loads' => function ($q) use ($filterLoads) {
                             $filterLoads($q);
@@ -120,7 +128,7 @@ class ReportController extends Controller
                         'data' => $count,
                     ];
                 }
-            break;
+                break;
             case "shippers":
                 $query = Shipper::whereHas('broker', function ($q) {
                     $q->where('id', session('broker'));
@@ -153,13 +161,22 @@ class ReportController extends Controller
                 $filterLoads($query);
                 $query = $query->get();
                 $count = [];
+                
+                
+
                 foreach ($query as $load) {
                     $storeData($load, $count);
+                    $count2[] = $goal; 
                 }
+
+            
+
                 $series[] = [
                     'data' => $count,
                     'name' => 'Loads',
                 ];
+
+
                 break;
         }
 
@@ -186,6 +203,39 @@ class ReportController extends Controller
             $dates[$key] = Carbon::parse($date)->format($date_readable_format);
         }
 
+        $average = [];
+        $total = null;
+        $contador = null;
+        foreach($data as $key => $item){
+
+            if($key  == 0){
+                $average[] = $item; 
+             $total = $item;
+            }elseif ($key > 30){
+                $total += $item - $data [$key - 30];
+                $average[] = Round($total / 30);
+            }
+            else {
+                $total += $item;
+                $average[] = Round($total / ($key +1));
+            }
+            
+        }
+      
+		 if (isset($average) && ($request->graph_type == 'total'))
+            $series[] = [
+                'data' => $average,
+                'name' => 'Average',
+            ];
+
+        if (isset($count2) && ($request->graph_type == 'total'))
+            $series[] = [
+                'data' => $count2,
+                'name' => 'Goal',
+            ];
+
+    
         return ['series' => $series, 'categories' => $dates];
     }
 }
+

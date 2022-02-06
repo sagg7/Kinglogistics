@@ -107,6 +107,12 @@ class LoadController extends Controller
 
     public function getTrips(Request $request)
     {
+        $shippers = [];
+
+        foreach (auth()->user()->shippers as $shipper){
+            $shippers[] = $shipper->id;
+        }
+
         $query = Trip::select([
             'id as key',
             DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
@@ -114,6 +120,7 @@ class LoadController extends Controller
             ->whereHas('broker', function ($q) {
                 $q->where('id', auth()->user()->broker_id);
             })
+            ->whereIn('shipper_id', $shippers)
             ->where("name", "LIKE", "%$request->search%");
 
         return response([
@@ -206,7 +213,7 @@ class LoadController extends Controller
 
     public function reject(Request $request)
     {
-        $driver = auth()->user();
+       /* $driver = auth()->user();
         $loadId = $request->get('load_id');
 
         // Register load rejection
@@ -214,7 +221,7 @@ class LoadController extends Controller
              'load_id' => $loadId,
              'driver_id' => $driver->id,
          ]);*/
-
+/*
         // Remove the driver from this load
         $load = Load::where('status', LoadStatusEnum::REQUESTED)->find($loadId);
         if (!$load) {
@@ -241,7 +248,7 @@ class LoadController extends Controller
              * just ignore that exception
              **/
 
-            $this->endShift($driver);
+      /*      $this->endShift($driver);
 
             return response([
                 'status' => 'ok',
@@ -267,7 +274,7 @@ class LoadController extends Controller
             'reached_max_rejections' => false,
             'load_status' => LoadStatusEnum::UNALLOCATED,
             'load_status_details' => new LoadStatusResource($load->loadStatus)
-        ]);
+        ]);*/
 
     }
 

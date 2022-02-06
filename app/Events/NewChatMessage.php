@@ -16,6 +16,7 @@ class NewChatMessage implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
+    public $driver;
 
     /**
      * Create a new event instance.
@@ -25,6 +26,8 @@ class NewChatMessage implements ShouldBroadcastNow
     public function __construct($message)
     {
         $this->message = $message;
+        $this->message->load('driver');
+        $this->driver = $this->message->driver;
     }
 
     /**
@@ -34,6 +37,6 @@ class NewChatMessage implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('chat');
+        return new PrivateChannel('chat.' . $this->driver->broker_id);
     }
 }
