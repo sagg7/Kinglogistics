@@ -349,38 +349,49 @@ class DriverController extends Controller
      * @param $type
      * @return mixed
      */
-    private function filterByType($query, $type)
+    private function filterByType($query, $type, Request $request)
     {
         switch ($type)
         {
+            case 'dispatch':
+                $query->where('status', DriverEnum::ACTIVE)
+                    ->orwhere('status', DriverEnum::PENDING)
+                    ->orwhere('status', DriverEnum::READY)
+                    ->orWhere('status', DriverEnum::INACTIVE);
+                break;
             case 'morning':
                 $query->where(function ($q) {
-                    /*$q->whereHas('shift')
-                        ->orWhereHas('turn', function ($q) {
-                            $this->filterByActiveTurn($q);
-                        });*/
                     $q->where('turn_id', 1);
                 });
                 break;
             case 'night':
                 $query->where(function ($q) {
-                    /*$q->whereDoesntHave('shift')
-                        ->orWhereHas('turn', function ($q) {
-                            $this->filterByInactiveTurn($q);
-                        });*/
                     $q->where('turn_id', 2);
                 });
                 break;
+            case 'active':
+                $query->where('status', DriverEnum::ACTIVE)
+                    ->orwhere('status', DriverEnum::PENDING)
+                    ->orwhere('status', DriverEnum::READY);
+                break;
+            case 'loaded':
             case 'awaiting':
                 $query->where(function ($q) {
                     $q->where('status', DriverEnum::ACTIVE)
                         ->orwhere('status', DriverEnum::PENDING)
                         ->orwhere('status', DriverEnum::READY);
-                })
-                ->whereDoesntHave('active_load')
-                    ->with('latestLoad', function($q) {
-                        $q->with('loadStatus:load_id,finished_timestamp');
-                    });
+                });
+                if ($type === 'awaiting') {
+                    $query->whereDoesntHave('active_load');
+                    if (!$request->dispatch) {
+                        $query->with('latestLoad', function ($q) {
+                            $q->with('loadStatus:load_id,finished_timestamp');
+                        });
+                    }
+                }
+                if ($type === 'loaded') {
+                    $query->whereHas('active_load');
+                }
                 break;
             case 'inactive':
                 $query->where('inactive', 1);
@@ -395,11 +406,14 @@ class DriverController extends Controller
 
     /**
      * @param Request $request
-     * @param string|null $type
+     * @param string|array|null $type
      * @return array
      */
-    public function search(Request $request, string $type = null): array
+    public function search(Request $request, $type = null): array
     {
+        if (!$type) {
+            $type = $request->type ?? null;
+        }
         $query = Driver::select([
             "drivers.id",
             "drivers.name",
@@ -409,6 +423,8 @@ class DriverController extends Controller
             "drivers.status",
             "drivers.inactive",
             "drivers.inactive_observations",
+            "drivers.phone",
+            "drivers.broker_id",
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -418,7 +434,7 @@ class DriverController extends Controller
                 }
             })
             ->where(function ($q) use ($request, $type) {
-                if (auth()->guard('shipper')->check())
+                if (auth()->guard('shipper')->check()) {
                     $q->whereHas('shippers', function ($q) use ($request) {
                         $q->where('id', auth()->user()->id);
                     })
@@ -429,12 +445,15 @@ class DriverController extends Controller
                                 });
                             });
                         });
-                if ($request->driver)
+                }
+                if ($request->driver) {
                     $q->where('id', $request->driver);
-                if ($request->shipper)
+                }
+                if ($request->shipper) {
                     $q->whereHas('shippers', function ($q) use ($request) {
                         $q->where('id', $request->shipper);
                     });
+                }
                         //->orWhereHas('truck', function ($q) use ($request) {
                         //    $q->whereHas('trailer', function ($q) use ($request) {
                         //        $q->whereHas('shippers', function ($q) use ($request) {
@@ -442,17 +461,18 @@ class DriverController extends Controller
                         //        });
                         //    });
                         //});
-                if ($request->trip)
+                if ($request->trip) {
                     $q->whereHas('active_load', function ($q) use ($request) {
                         $q->where('trip_id', $request->trip_id);
-                });
-                if ($type !== 'inactive')
+                    });
+                }
+                if (is_array($type) ? !in_array("inactive", $type, true) || !in_array("dispatch", $type, true) : $type !== 'inactive') {
                     $q->whereNull('inactive');
+                }
             });
 
+
         if ($request->graph) {
-            $query->where(function ($q) use ($request) {
-            });
             $all = $query->get();
             $morning = [
                 'active' => 0,
@@ -469,33 +489,93 @@ class DriverController extends Controller
                 'error' => 0,
             ];
             foreach ($all as $item) {
-                if ($item->turn_id == 1) {
+                if ($item->turn_id === 1) {
                     $morning[$item->status]++;
                 } else {
                     $night[$item->status]++;
                 }
             }
-
             return compact('morning', 'night');
         }
 
-        $query->with([
-            'truck:driver_id,number',
-            'zone:id,name',
-            'carrier:id,name',
-            'botAnswer',
-            'latestLoad' => function ($q) {
-                $q->where('status', '!=', 'finished')
-                    ->select('status', 'driver_id');
-            },
-            'shift:id,driver_id',
-        ]);
+        $customSearch = [];
+        if ($request->dispatch) {
+            if ($request->count) {
+                $morningQuery = (clone $query)->where('turn_id', 1);
+                $nightQuery = (clone $query)->where('turn_id', 2);
+                return [
+                    "morning" => [
+                        "active" => $this->filterByType((clone $morningQuery), 'active', $request)->count(),
+                        "inactive" => $this->filterByType((clone $morningQuery), 'inactive', $request)->count(),
+                        "awaiting" => $this->filterByType((clone $morningQuery), 'awaiting', $request)->count(),
+                        "loaded" => $this->filterByType((clone $morningQuery), 'loaded', $request)->count(),
+                    ],
+                    "night" => [
+                        "active" => $this->filterByType((clone $nightQuery), 'active', $request)->count(),
+                        "inactive" => $this->filterByType((clone $nightQuery), 'inactive', $request)->count(),
+                        "awaiting" => $this->filterByType((clone $nightQuery), 'awaiting', $request)->count(),
+                        "loaded" => $this->filterByType((clone $nightQuery), 'loaded', $request)->count(),
+                    ],
+                ];
+            }
+            $array = $request->searchable;
+            foreach ($array as $idx => $item) {
+                switch ($item) {
+                    case 'trailer':
+                    case 'carrier_phone':
+                        unset($array[$idx]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            $request->searchable = $array;
+            $query->with([
+                'carrier:id,name,phone',
+                'truck' => function ($q) {
+                    $q->with(['trailer:id,number'])
+                        ->select('driver_id', 'trailer_id');
+                },
+            ]);
+            if ($request->search) {
+                $customSearch = function ($q) use ($request) {
+                    $search = $request->search;
+                    $q->orWhere(function ($q) use ($search) {
+                        $q->whereHas('carrier', function ($q) use ($search) {
+                            $q->where('phone', 'LIKE', "%$search%");
+                        })
+                            ->orWhereHas('truck', function ($q) use ($search) {
+                                $q->whereHas('trailer', function ($q) use ($search) {
+                                    $q->where('number', 'LIKE', "%$search%");
+                                });
+                            });
+                    });
+                };
+            }
+        } else {
+            $query->with([
+                'truck:driver_id,number',
+                'zone:id,name',
+                'carrier:id,name',
+                'botAnswer',
+                'latestLoad' => function ($q) {
+                    $q->where('status', '!=', 'finished')
+                        ->select('status', 'driver_id');
+                },
+                'shift:id,driver_id',
+            ]);
+        }
 
-        $query = $this->filterByType($query, $type);
+        if (is_array($type)) {
+            foreach ($type as $item) {
+                $query = $this->filterByType($query, $item, $request);
+            }
+        } else {
+            $query = $this->filterByType($query, $type, $request);
+        }
 
-        $result = $this->multiTabSearchData($query, $request, 'getRelationArray', 'where');
-        if ($request->startRow == 0) {
-            $result = $this->multiTabSearchData($query, $request, 'getRelationArray', 'where', true);
+        $result = $this->multiTabSearchData($query, $request, 'getRelationArray', 'where', $customSearch);
+        if ($request->startRow == 0 && !$request->dispatch) {
             $result["count"] = [
                 "active" => (clone $query)->where('status', 'active')->count(),
                 "inactive" => (clone $query)->where('status', 'inactive')->count(),

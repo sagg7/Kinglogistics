@@ -10,6 +10,7 @@
                 <div class="text-center">
                     <h2 class="mb-2">Loads Status</h2>
                 </div>
+                @if(!isset($showFilters) || $showFilters)
                 <div class="row text-left">
                     @if(!auth()->guard('shipper')->check())
                         <div class="col col-sm-4">
@@ -34,6 +35,7 @@
                         </div>
                     @endif
                 </div>
+                @endif
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead>

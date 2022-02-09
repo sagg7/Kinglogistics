@@ -4,6 +4,9 @@
 
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
+        @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
+        @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
+        @include("loads.common.modals.driverStatus")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -456,8 +459,73 @@
 
                 window.location = "{{url("load/pictureReport")}}?" + $.param(query);
             }
+            const guard = 'web';
         </script>
+        <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js') }}"></script>
     @endsection
+
+    @include('dashboard.common.loadStatus', ['showFilters' => false])
+
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body text-center">
+                        <h3>Driver Status</h3>
+                        <div class="row">
+                            <div class="col-lg-6 col-12">
+                                <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
+                                        data-target="#driverStatusModal" id="morning_dispatch">Morning</button>
+                                <table class="table table-striped table-bordered mt-1" id="morningTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Active</th>
+                                        <th>Inactive</th>
+                                        <th>Awaiting</th>
+                                        <th>Loaded</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
+                                        data-target="#driverStatusModal" id="night_dispatch">Night</button>
+                                <table class="table table-striped table-bordered mt-1" id="nightTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Active</th>
+                                        <th>Inactive</th>
+                                        <th>Awaiting</th>
+                                        <th>Loaded</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="card">
         <div class="card-content">
@@ -480,7 +548,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
-                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()" _blank><i class="fas fa-file-image"></i> Picture Report</a>
+                                <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>
                         </div>
                     </fieldset>

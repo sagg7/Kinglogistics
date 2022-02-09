@@ -14,6 +14,9 @@ class DashboardController extends Controller
 
     public function index()
     {
+        if (auth()->user()->hasRole('dispatch')) {
+            return redirect()->route('load.indexDispatch');
+        }
         return view('dashboard.dashboard');
     }
 

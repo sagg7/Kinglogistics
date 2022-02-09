@@ -15,7 +15,8 @@
             const loadChannelId = userId;
         </script>
         <!--<script src="{{ asset('js/sections/tracking/common.min.js?1.0.7') }}"></script>-->
-        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.12') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.13') }}"></script>
         <script src="{{ asset('js/sections/carriers/show.min.js?1.0.0') }}"></script>
     @endsection
 

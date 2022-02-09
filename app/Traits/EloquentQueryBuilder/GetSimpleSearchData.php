@@ -49,7 +49,7 @@ trait GetSimpleSearchData
         return response()->json($params);
     }
 
-    private function multiTabSearchData($query, $request, $relationsFunc = null, $mainStatement = 'where')
+    private function multiTabSearchData($query, $request, $relationsFunc = null, $mainStatement = 'where', $customSearch = null)
     {
         // Skip-Take data
         $take = $request->endRow;
@@ -81,7 +81,7 @@ trait GetSimpleSearchData
             }
         }
 
-        $query->$mainStatement(function ($q) use ($request, $relationships) {
+        $query->$mainStatement(function ($q) use ($request, $relationships, $customSearch) {
             if ($request->filterModel)
                 foreach ($request->filterModel as $key => $item) {
                     $filterArr = $this->generateFilters($item['filterType'], $item['type'], $item['filter']);
@@ -92,7 +92,7 @@ trait GetSimpleSearchData
                     });
                 }
 
-            if ($request->searchable)
+            if ($request->searchable) {
                 $q->where(function ($q) use ($request, $relationships) {
                     $first = true;
                     foreach ($request->searchable as $i => $item) {
@@ -110,6 +110,10 @@ trait GetSimpleSearchData
                             $first = false;
                     }
                 });
+                if ($customSearch) {
+                    $customSearch($q);
+                }
+            }
         });
 
         $sortAfterQuery = null;
