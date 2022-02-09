@@ -24,7 +24,7 @@
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbLoad = null;
+            let tbLoad = null;
             (() => {
                 class FrontDataSource {
                     constructor(data) {
@@ -346,7 +346,7 @@
                     content.removeClass('d-none');
                     initUpload();
 
-                    var cropper = new Slim(document.getElementById('editImg'),{
+                    const cropper = new Slim(document.getElementById('editImg'),{
                         crop: {
                             x: 0,
                             y: 0,
@@ -425,53 +425,27 @@
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
                 });
-            })();
-
-            function downloadDispatch(){
-                    var query = {
-                        dateRange: dateRange.value,
-                        shipper: $("#shipper").val(),
-                    }
-
-                    window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
-                /*$.ajax({
-                    url: "{{url("load/DownloadExcelReport")}}",
-                    type: 'GET',
-                    data: {
-                        dateRange: dateRange.value,
-                        shipper: $("#shipper").val(),
-                    },
-                    success: (res) => {
-                        if (res.success)
-                            window.location = '/jobOpportunity/index';
-                        else
-                            throwErrorMsg();
-                    },
-                    error: (res) => {
-                        let errors = `<ul class="text-left">`;
-                        Object.values(res.responseJSON.errors).forEach((error) => {
-                            errors += `<li>${error}</li>`;
+                $('#downloadDispatch').click(() => {
+                    window.location = "{{url("load/DownloadExcelReport")}}?" +
+                        $.param({
+                            dateRange: dateRange[0].value,
+                            shipper: $("#shipper").val(),
                         });
-                        errors += `</ul>`;
-                        throwErrorMsg(errors, {timer: false});
-                    },
-                });*/
-            }
-
-            function openPicReport() {
-                var query = {
-                    dateRange: dateRange.value,
-                    shipper: $("#shipper").val(),
-                }
-
-                window.location = "{{url("load/pictureReport")}}?" + $.param(query);
-            }
+                });
+                $('#openPicReport').click(() => {
+                    window.location = "{{url("load/pictureReport")}}?" +
+                        $.param({
+                            dateRange: dateRange[0].value,
+                            shipper: $("#shipper").val(),
+                        });
+                });
+            })();
             const guard = 'web';
         </script>
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js?1.0.0') }}"></script>
     @endsection
 
     @include('dashboard.common.loadStatus', ['showFilters' => false])
@@ -548,7 +522,7 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
+                                <a class="dropdown-item" id="downloadDispatch" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>
                         </div>

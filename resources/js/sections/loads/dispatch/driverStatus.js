@@ -3,34 +3,39 @@
     const tableNight = $('#nightTable');
     const modalId = '#driverStatusModal';
     const modal = $(modalId);
-    $.ajax({
-        url: '/driver/search',
-        data: {
-            dispatch: true,
-            count: true,
-        },
-        success: (res) => {
-            const morningTbody = tableMorning.find('tbody');
-            morningTbody.empty();
-            morningTbody.append(
-                `<tr><td><a class="d-block" id="morning_active" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.active}</a></td>` +
-                `<td><a class="d-block" id="morning_inactive" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.inactive}</a></td>` +
-                `<td><a class="d-block" id="morning_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.awaiting}</a></td>` +
-                `<td><a class="d-block" id="morning_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.loaded}</a></td></tr>`
-            );
-            const nightTbody = tableNight.find('tbody');
-            nightTbody.empty();
-            nightTbody.append(
-                `<tr><td><a class="d-block" id="night_active" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.active}</a></td>` +
-                `<td><a class="d-block" id="night_inactive" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.inactive}</a></td>` +
-                `<td><a class="d-block" id="night_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.awaiting}</a></td>` +
-                `<td><a class="d-block" id="night_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.loaded}</a></td></tr>`
-            );
-        },
-        error: () => {
-            throwErrorMsg();
-        }
-    });
+    const shipper = $('#shipper');
+    const getDriverStatus = () => {
+        $.ajax({
+            url: '/driver/search',
+            data: {
+                dispatch: true,
+                count: true,
+                shipper: shipper.val(),
+            },
+            success: (res) => {
+                const morningTbody = tableMorning.find('tbody');
+                morningTbody.empty();
+                morningTbody.append(
+                    `<tr><td><a class="d-block" id="morning_active" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.active}</a></td>` +
+                    `<td><a class="d-block" id="morning_inactive" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.inactive}</a></td>` +
+                    `<td><a class="d-block" id="morning_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.awaiting}</a></td>` +
+                    `<td><a class="d-block" id="morning_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.loaded}</a></td></tr>`
+                );
+                const nightTbody = tableNight.find('tbody');
+                nightTbody.empty();
+                nightTbody.append(
+                    `<tr><td><a class="d-block" id="night_active" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.active}</a></td>` +
+                    `<td><a class="d-block" id="night_inactive" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.inactive}</a></td>` +
+                    `<td><a class="d-block" id="night_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.awaiting}</a></td>` +
+                    `<td><a class="d-block" id="night_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.loaded}</a></td></tr>`
+                );
+            },
+            error: () => {
+                throwErrorMsg();
+            }
+        });
+    };
+    getDriverStatus();
     let clickedType = null;
     let tbDriverStatus = null;
     const nameFormatter = (params) => {
@@ -82,5 +87,8 @@
                 tbDriverStatus.updateSearchQuery();
             }
         }
+    });
+    shipper.change(() => {
+        getDriverStatus();
     });
 })();
