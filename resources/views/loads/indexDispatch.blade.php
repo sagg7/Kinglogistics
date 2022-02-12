@@ -1,15 +1,17 @@
 <x-app-layout>
-    <x-slot name="crumb_section">Load</x-slot>
-    <x-slot name="crumb_subsection">View</x-slot>
+    <x-slot name="crumb_section">Dispatch</x-slot>
+    <x-slot name="crumb_subsection">Dashboard</x-slot>
 
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
+        @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation"])
         @include("loads.common.modals.driverStatus")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
+        <link href="{{ asset('css/loadDispatch.css') }}" rel="stylesheet">
         <link href="{{ asset('js/modules/slim/slim.min.css') }}" rel="stylesheet">
     @endsection
     @section("scripts")
@@ -19,6 +21,7 @@
         <script defer>
             var tbLoad = null;
             (() => {
+                let now = null;
                 class FrontDataSource {
                     constructor(data) {
                         this.load = data.load;
@@ -49,18 +52,56 @@
                     else
                         return '';
                 };
+                const truckFormatter = (params) => {
+                    if (params.value)
+                        return params.value.number;
+                    else
+                        return '';
+                };
+                function loadTimeRenderer() {}
+                loadTimeRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    if(!now)
+                        now = new Date(params.now);
+
+                    const created = new Date(params.value).getTime();
+                    let nowT = now.getTime();
+
+                    if (params.data.status === 'finished')
+                        nowT = new Date(params.data.finished_timestamp).getTime();
+
+                    let color = 'black';
+                    if((nowT - created) > 4*1000*60*60 || params.data.status === 'unallocated' || params.data.status === 'requested' || params.data.status === 'accepted')
+                        color = 'red'
+                    this.eGui.innerHTML = `<span style="color: ${color}">${msToTime(nowT - created)}</span>`;
+                }
+                loadTimeRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
                 const emptyFormatter = (params) => {
                     if (params.value)
                         return params.value;
                     else
                         return 'ㅤ';
                 };
-                const JobFormatter = (params) => {
-                    if (params.value)
-                        return params.value.name;
-                    else
-                        return 'ㅤ';
-                };
+                function JobRenderer() {}
+                JobRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    this.eGui.innerHTML = `${params.value.name}`;
+                    new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                }
+                JobRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
+                function PoRenderer() {}
+                PoRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    this.eGui.innerHTML = `${params.value}`;
+                    new bootstrap.Tooltip(this.eGui, {title: `Load type - ${params.data.load_type.name} miles`});
+                }
+                PoRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
                 const capitalizeStatus = (params) => {
                     let string = params.value ? params.value : '';
                     if (string === "to_location")
@@ -109,6 +150,19 @@
                     this.eGui.innerHTML = `<div class="text-center ${colorClass} colors-container" style="width: 4px;">&nbsp;</div>`;
                 }
                 StatusBarRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
+                function DateRenderer() {}
+                DateRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    let string = `<div class="text-center"><i class="fas fa-arrow-circle-right"></i>${params.data.accepted_timestamp}<br>`;
+                    if(params.data.finished_timestamp)
+                        string += `<i class="fas fa-arrow-circle-left"></i>${params.value}</div>`;
+
+                    this.eGui.innerHTML = string;
+                    new bootstrap.Tooltip(this.eGui, {title: `→Accepted at \n ←Finished at`});
+                }
+                DateRenderer.prototype.getGui = () => {
                     return this.eGui;
                 }
                 let reference = {};
@@ -182,15 +236,20 @@
                 tbLoad = new tableAG({
                     columns: [
                         {headerName: '', field: 'inspected', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
-                        {headerName: 'Accepted at', field: 'accepted_timestamp'},
-                        {headerName: 'Finished at', field: 'finished_timestamp'},
+                        {headerName: 'Timestamp', field: 'finished_timestamp', cellRenderer: DateRenderer},
+                        {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
+                        {headerName: 'Carrier', field: 'driver.carrier', valueFormatter: nameFormatter},
                         {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
                         {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'Customer Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
+                        {headerName: 'C Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
                         {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'Job', field: 'trip', editable: true, valueFormatter: JobFormatter},
+                        {headerName: 'Tons', field: 'tons', valueFormatter: emptyFormatter},
+                        {headerName: 'Job', field: 'trip', editable: false, cellRenderer: JobRenderer},
+                        {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
+                        {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
                         {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
+                        {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: loadTimeRenderer},
                     ],
                     menu: [
                         @if(auth()->user()->can(['update-load-dispatch']))
@@ -215,6 +274,9 @@
                                     params.api.redrawRows();
                                 }
                             }
+                        },
+                        {
+                            text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
                         },
                         @endif
                     ],
@@ -242,12 +304,29 @@
                                 }
                             });
                         },
+                        components: {
+                            OptionModalFunc: (modalId, loadId) => {
+                                const modal = $(`${modalId}`),
+                                    content = modal.find('.content-body');
+                                content.html('<div class="form-group col-12">'
+                                                +'<label for="observations" class="col-form-label">Observations</label>'
+                                                +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
+                                            +'</div>');
+                                $('.modal-spinner').addClass('d-none');
+                                modal.modal('show');
+                            }
+                        },
                     },
                     container: 'myGrid',
                     url: '/load/search',
                     tableRef: 'tbLoad',
                     successCallback: (params) => {
+                        now = new Date(params.now);
                         checkDuplicates();
+                        setTimeout(() => {
+                            $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
+                            console.log($("i.fa-arrow-circle-right"));
+                        }, 300);
                     },
                     searchQueryParams: {
                         dispatch: 1,
@@ -314,6 +393,8 @@
                             btn.text(btnText).prop('disabled', false);
                         });
                     });
+
+
                 }
 
                 $('#view-photo').on('show.bs.modal', function(e) {
@@ -458,6 +539,19 @@
                 }
 
                 window.location = "{{url("load/pictureReport")}}?" + $.param(query);
+            }
+
+            const msToTime = (duration) => {
+                let minutes = Math.floor((duration / (1000 * 60)) % 60),
+                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+                hours = (hours < 10) ? "0" + hours : hours;
+                minutes = (minutes < 10) ? "0" + minutes : minutes;
+                if (hours > 0)
+                    return hours + " h " + minutes + " m";
+                else
+                    return minutes + " m";
+
             }
             const guard = 'web';
         </script>

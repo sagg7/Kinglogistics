@@ -326,10 +326,19 @@ class LoadController extends Controller
     {
         switch ($item) {
             case 'driver':
+            case 'driver.carrier':
+            case 'shipper':
+            case 'load_type':
             case 'trip':
                 $array = [
                     'relation' => $item,
                     'column' => 'name',
+                ];
+                break;
+            case 'truck':
+                $array = [
+                    'relation' => $item,
+                    'column' => 'number',
                 ];
                 break;
             default:
@@ -359,9 +368,31 @@ class LoadController extends Controller
             "loads.driver_id",
             "loads.status",
             "loads.inspected",
+            "loads.tons",
             "loads.trip_id",
+            "loads.truck_id",
+            "loads.mileage",
+            "loads.shipper_id",
+            "loads.customer_po",
+            "loads.load_type_id",
         ];
-        $query = Load::with('driver:id,name')
+        $query = Load::with([
+                'driver' => function ($q) {
+                    $q->with([
+                        'shift.chassisType',
+                        'carrier:id,name',
+                    ])
+                        ->select([
+                            'drivers.id',
+                            'drivers.name',
+                            'drivers.carrier_id',
+                        ]);
+                },
+                'trip:id,name',
+                'truck:id,number',
+                'shipper:id,name',
+                'load_type:id,name',
+            ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
                     $q->whereHas('broker', function ($q) {
@@ -380,8 +411,7 @@ class LoadController extends Controller
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
-            })
-            ->with('trip:id,name');
+            });
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }

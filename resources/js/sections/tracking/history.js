@@ -106,7 +106,7 @@
         return marker;
     };
     const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 39.8097343, lng: -98.5556199 },
+        center: { lat: 32.7096373, lng: -103.1525477 },
         zoom: 10,
         disableDefaultUI: true,
         zoomControl: true,

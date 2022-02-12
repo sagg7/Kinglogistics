@@ -37,6 +37,8 @@ class TrackingController extends Controller
 
         $driverId = $request->driver_id;
 
+
+
         return Driver::with([
             'carrier:id,name',
             'truck:id,number,driver_id',
@@ -49,7 +51,8 @@ class TrackingController extends Controller
                 }
             })
             ->with('locations', function($q) use ($start, $end){
-                $q->whereBetween('created_at', [$start, $end])->take(1000);
+                $q->whereBetween('created_at', [$start, $end])
+                    ->whereNotNull('load_id')->take(1000);
             })
             ->where(function ($q) use ($user_id, $start, $end, $driverId) {
                 if (auth()->guard('shipper')->check()) {
@@ -63,8 +66,9 @@ class TrackingController extends Controller
                 } else if (auth()->guard('carrier')->check()) {
                     $q->where('carrier_id', auth()->user()->id);
                 }
-                $q->whereHas('locations', function ($q) {
-                    $q->whereNotNull('load_id');
+                $q->whereHas('locations', function ($q) use ($start, $end) {
+                    $q->whereNotNull('load_id')
+                      ->whereBetween('created_at', [$start, $end]);
                 });
                 if ($driverId)
                     $q->where("id", $driverId);
