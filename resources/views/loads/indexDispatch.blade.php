@@ -2,6 +2,13 @@
     <x-slot name="crumb_section">Dispatch</x-slot>
     <x-slot name="crumb_subsection">Dashboard</x-slot>
 
+    @section('head')
+        <style>
+        #morningTable th, #nightTable th {
+            padding: 5px;
+        }
+        </style>
+    @endsection
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
@@ -495,6 +502,7 @@
                             shipper: e.params.data.id,
                         });
                     tbLoad.updateSearchQuery();
+                    filtersChange($('#costumerTable'));
                 }).on('select2:unselect', () => {
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
@@ -559,62 +567,89 @@
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/customerStatus.js') }}"></script>
     @endsection
 
     @include('dashboard.common.loadStatus', ['showFilters' => false])
-
+  
     <div class="row">
-        <div class="col-lg-6 col-12">
+        <div class="col-md-6 col-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body text-center">
                         <h3>Driver Status</h3>
-                        <div class="row">
-                            <div class="col-lg-6 col-12">
-                                <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
-                                        data-target="#driverStatusModal" id="morning_dispatch">Morning</button>
-                                <table class="table table-striped table-bordered mt-1" id="morningTable">
-                                    <thead>
-                                    <tr>
-                                        <th>Active</th>
-                                        <th>Inactive</th>
-                                        <th>Awaiting</th>
-                                        <th>Loaded</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-lg-6 col-12">
-                                <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
-                                        data-target="#driverStatusModal" id="night_dispatch">Night</button>
-                                <table class="table table-striped table-bordered mt-1" id="nightTable">
-                                    <thead>
-                                    <tr>
-                                        <th>Active</th>
-                                        <th>Inactive</th>
-                                        <th>Awaiting</th>
-                                        <th>Loaded</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
+                                data-target="#driverStatusModal" id="morning_dispatch">Morning</button>
+                        <table class="table table-striped table-bordered mt-1" id="morningTable">
+                            <thead>
+                            <tr>
+                                <th>Active</th>
+                                <th>Inactive</th>
+                                <th>Awaiting</th>
+                                <th>Loaded</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
+                                data-target="#driverStatusModal" id="night_dispatch">Night</button>
+                        <table class="table table-striped table-bordered mt-1" id="nightTable">
+                            <thead>
+                            <tr>
+                                <th>Active</th>
+                                <th>Inactive</th>
+                                <th>Awaiting</th>
+                                <th>Loaded</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body text-center">
+                        <h3>Customer Status</h3>
+
+                        <table class="table table-striped table-bordered mt-1" id="costumerTable">
+                            <thead>
+                            <tr>
+                                <th >Name</th>
+                                <th>AVG Waiting Per Load</th>
+                                <th>Truck Active Required</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                      
                     </div>
                 </div>
             </div>
@@ -632,7 +667,7 @@
 
                     <fieldset class="form-group col-6">
                         {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
-                        {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                        {!! Form::select('shipper', [], null, ['class' => 'form-control', 'id'=>'shipper']) !!}
                     </fieldset>
 
                     <fieldset class="form-group col-1">

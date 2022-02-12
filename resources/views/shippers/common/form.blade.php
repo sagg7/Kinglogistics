@@ -62,6 +62,17 @@
                 </div>
                 @endif
             </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    {!! Form::label('trucks_required', ucfirst(__('trucks required')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('trucks_required', $shipper->trucks_required ?? null, ['class' => 'form-control' . ($errors->first('trucks_required') ? ' is-invalid' : '')]) !!}
+                    @error('trucks_required')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+            </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
     </div> <!-- end card-body -->

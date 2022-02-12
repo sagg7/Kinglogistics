@@ -30,6 +30,13 @@ Route::prefix('shipper')->group(function () {
     Route::get('selection', [ShipperController::class, 'selection'])
         ->name('shipper.selection');
 
+    Route::group(['middleware' => ['permission:read-customer']], function () {
+        Route::get('status/{customerId?}', [ShipperController::class, 'shipperStatus'])
+            ->name('shipper.status');
+      
+    });
+        
+
     Route::prefix('invoice')->group(function () {
         Route::group(['middleware' => ['permission:read-invoice']], function () {
             Route::get('/', [ShipperInvoiceController::class, 'index'])
