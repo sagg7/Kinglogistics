@@ -28,6 +28,11 @@ class Shipper extends Authenticatable
         return $this->hasMany(Trip::class);
     }
 
+    public function drivers()
+    {
+        return $this->belongsToMany(Driver::class);
+    }
+
     public function loads()
     {
         return $this->hasMany(Load::class);

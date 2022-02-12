@@ -9,6 +9,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ShipperController extends Controller
 {
@@ -80,6 +81,7 @@ class ShipperController extends Controller
         $shipper->name = $request->name;
         $shipper->email = $request->email;
         $shipper->invoice_email = $request->invoice_email;
+        $shipper->trucks_required = $request->trucks_required;
         if ($request->password)
             $shipper->password = Hash::make($request->password);
         if ($request->payment_days)
@@ -206,4 +208,62 @@ class ShipperController extends Controller
 
         return $this->multiTabSearchData($query, $request);
     }
+
+    public function shipperStatus(Request $request)
+    {
+        $start = Carbon::now()->subHour(1000);
+        $end = Carbon::now();
+        $shipper_id = $request->shipper_id;
+
+
+        $shippers = Shipper::with(['loads'=> function($q) use ($start,$end,$shipper_id){
+           
+            $q->whereBetween('loads.date', [$start, $end]);
+            if($shipper_id){
+                $q->where('shipper_id',$shipper_id);
+            }
+        }])
+        ->withCount(['drivers' => function($q){
+            $q->where('status', 'active');
+        }]);
+        if($shipper_id){
+            $shippers->where('id',$shipper_id);
+        }
+        $shippers = $shippers->get();
+        $shipperAvg= [];
+        foreach($shippers as $key => $shipper){
+           
+            $totalTime = 0;
+            $date = null; 
+            $count = 0;
+        
+           foreach($shipper->loads as $load){
+                if($date == null){
+                    $date = $load->date;
+                }else{
+                    
+                    $totalTime += Carbon::parse($load->date)->diffInMinutes($date); 
+                    $date =$load->date;
+                    //echo "$load->date ----$date ---- $totalTime ---- $count <BR>";
+                }
+                $count++;
+           }
+            $truck_required =$shipper->trucks_required;
+            $active_drivers = $shipper->drivers_count;
+            $truck_required_exist = 0;
+            if ($active_drivers > 0)
+                $truck_required_exist = $truck_required ? round($active_drivers * 100 / $truck_required) : 0;
+
+           if($count != 0)
+            $shipperAvg[] = ['name'=>$shipper->name,'avg'=>round($totalTime/$count), 'trucks_required'=>$shipper->trucks_required, 'active_drivers' => $shipper->drivers_count, 'percentage' => $truck_required_exist];
+        }
+        return $shipperAvg;
+    
+    }
+
+
+
+
+    
 }
+

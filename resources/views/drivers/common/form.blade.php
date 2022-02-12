@@ -3,7 +3,7 @@
         <div class="card-content">
             <div class="row">
                 @if(auth()->guard('web')->check())
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         {!! Form::label('carrier_id', ucfirst(__('carrier')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('carrier_id', isset($driver) ? [$driver->carrier_id => $driver->carrier->name] : [], $driver->carrier_id ?? null, ['class' => 'form-control' . ($errors->first('carrier_id') ? ' is-invalid' : '')]) !!}
                         @error('carrier_id')
@@ -12,7 +12,7 @@
                         </span>
                         @enderror
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('shippers[]', [], $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
                         @error('shippers')
@@ -21,7 +21,7 @@
                         </span>
                         @enderror
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         {!! Form::label('turn_id', ucfirst(__('turn')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('turn_id', $turns, isset($driver) ? $driver->turn_id : null, ['class' => 'form-control select2' . ($errors->first('turn_id') ? ' is-invalid' : '')]) !!}
                         @error('turn_id')
@@ -34,6 +34,15 @@
                         {!! Form::label('zone_id', ucfirst(__('zone')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('zone_id', $zones, isset($driver) ? $driver->zone_id : null, ['class' => 'form-control' . ($errors->first('zone_id') ? ' is-invalid' : '')]) !!}
                         @error('zone_id')
+                        <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                        @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        {!! Form::label('truck_id', ucfirst(__('truck')), ['class' => 'col-form-label']) !!}
+                        {!! Form::select('truck_id', [], isset($driver) ? $driver->truck_id : null, ['class' => 'form-control' . ($errors->first('truck_id') ? ' is-invalid' : '')]) !!}
+                        @error('truck_id')
                         <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
                     </span>

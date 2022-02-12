@@ -421,6 +421,7 @@
                             shipper: e.params.data.id,
                         });
                     tbLoad.updateSearchQuery();
+                    filtersChange($('#costumerTable'));
                 }).on('select2:unselect', () => {
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
@@ -472,10 +473,11 @@
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/customerStatus.js') }}"></script>
     @endsection
 
     @include('dashboard.common.loadStatus', ['showFilters' => false])
-
+  
     <div class="row">
         <div class="col-md-6 col-12">
             <div class="card">
@@ -526,6 +528,38 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body text-center">
+                        <h3>Customer Status</h3>
+
+                        <table class="table table-striped table-bordered mt-1" id="costumerTable">
+                            <thead>
+                            <tr>
+                                <th >Name</th>
+                                <th>AVG Waiting Per Load</th>
+                                <th>Truck Active Required</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="card">
@@ -539,7 +573,7 @@
 
                     <fieldset class="form-group col-6">
                         {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
-                        {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                        {!! Form::select('shipper', [], null, ['class' => 'form-control', 'id'=>'shipper']) !!}
                     </fieldset>
 
                     <fieldset class="form-group col-1">
