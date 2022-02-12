@@ -211,14 +211,13 @@ class ShipperController extends Controller
 
     public function shipperStatus(Request $request)
     {
-        $start = Carbon::now()->subHour(6);
+        $start = Carbon::now()->subHour(12);
         $end = Carbon::now();
         $shipper_id = $request->shipper_id;
 
 
-        $shippers = Shipper::with(['loads'=> function($q) use ($start,$end,$shipper_id){
-
-            $q->whereBetween('loads.date', [$start, $end]);
+        $shippers = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
+            $q->whereBetween('accepted_timestamp', [$start, $end]);
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
             }
@@ -231,19 +230,20 @@ class ShipperController extends Controller
         }
         $shippers = $shippers->get();
         $shipperAvg= [];
+
         foreach($shippers as $key => $shipper){
 
             $totalTime = 0;
             $date = null;
             $count = 0;
 
-           foreach($shipper->loads as $load){
+           foreach($shipper->loadStatus as $load){
                 if($date == null){
-                    $date = $load->date;
+                    $date = $load->accepted_timestamp;
                 }else{
 
-                    $totalTime += Carbon::parse($load->date)->diffInMinutes($date);
-                    $date =$load->date;
+                    $totalTime += Carbon::parse($load->accepted_timestamp)->diffInMinutes($date);
+                    $date =$load->accepted_timestamp;
                     //echo "$load->date ----$date ---- $totalTime ---- $count <BR>";
                 }
                 $count++;
