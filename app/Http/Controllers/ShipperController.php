@@ -211,13 +211,13 @@ class ShipperController extends Controller
 
     public function shipperStatus(Request $request)
     {
-        $start = Carbon::now()->subHour(1000);
+        $start = Carbon::now()->subHour(6);
         $end = Carbon::now();
         $shipper_id = $request->shipper_id;
 
 
         $shippers = Shipper::with(['loads'=> function($q) use ($start,$end,$shipper_id){
-           
+
             $q->whereBetween('loads.date', [$start, $end]);
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
@@ -232,17 +232,17 @@ class ShipperController extends Controller
         $shippers = $shippers->get();
         $shipperAvg= [];
         foreach($shippers as $key => $shipper){
-           
+
             $totalTime = 0;
-            $date = null; 
+            $date = null;
             $count = 0;
-        
+
            foreach($shipper->loads as $load){
                 if($date == null){
                     $date = $load->date;
                 }else{
-                    
-                    $totalTime += Carbon::parse($load->date)->diffInMinutes($date); 
+
+                    $totalTime += Carbon::parse($load->date)->diffInMinutes($date);
                     $date =$load->date;
                     //echo "$load->date ----$date ---- $totalTime ---- $count <BR>";
                 }
@@ -258,12 +258,12 @@ class ShipperController extends Controller
             $shipperAvg[] = ['name'=>$shipper->name,'avg'=>round($totalTime/$count), 'trucks_required'=>$shipper->trucks_required, 'active_drivers' => $shipper->drivers_count, 'percentage' => $truck_required_exist];
         }
         return $shipperAvg;
-    
+
     }
 
 
 
 
-    
+
 }
 
