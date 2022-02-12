@@ -104,7 +104,7 @@
                 PoRenderer.prototype.init = (params) => {
                     this.eGui = document.createElement('div');
                     this.eGui.innerHTML = `${params.value}`;
-                    new bootstrap.Tooltip(this.eGui, {title: `Load type - ${params.data.load_type.name} miles`});
+                    new bootstrap.Tooltip(this.eGui, {title: `Load type - ${params.data.load_type.name}`});
                 }
                 PoRenderer.prototype.getGui = () => {
                     return this.eGui;
