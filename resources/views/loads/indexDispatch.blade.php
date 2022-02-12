@@ -570,8 +570,6 @@
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.js') }}"></script>
     @endsection
 
-    @include('dashboard.common.loadStatus', ['showFilters' => false])
-  
     <div class="row">
         <div class="col-md-6 col-12">
             <div class="card">
@@ -649,12 +647,14 @@
                             </tr>
                             </tbody>
                         </table>
-                      
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    @include('dashboard.common.loadStatus', ['showFilters' => false])
 
     <div class="card">
         <div class="card-content">

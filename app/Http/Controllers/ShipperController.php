@@ -230,7 +230,6 @@ class ShipperController extends Controller
         }
         $shippers = $shippers->get();
         $shipperAvg= [];
-
         foreach($shippers as $key => $shipper){
 
             $totalTime = 0;

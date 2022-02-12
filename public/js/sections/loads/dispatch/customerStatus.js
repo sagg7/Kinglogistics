@@ -26,7 +26,7 @@ function filtersChange(tablecostumer){
          count++;
          }
          totalAVG = (acumAvg/count);
-         totalTAR = (acumTAR/count);
+         totalTAR = Math.round(acumTAR/count);
   //  console.log($totalAVG, $totalTAR, $count);
           let color = 'black';
 
