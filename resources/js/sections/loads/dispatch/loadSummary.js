@@ -2,11 +2,15 @@
     const loadSummary = [];
     const summaryArea = $('#loads-summary');
     const summaryTable = summaryArea.find('table');
+    const shipper = $('#shipper');
     const getLoadsData = () => {
         summaryTable.find('h2').text(0);
         $.ajax({
             url: '/dashboard/getData',
             type: 'GET',
+            data: {
+                shipper: shipper.val(),
+            },
             success: (res) => {
                 if (res.loads) {
                     Object.entries(res.loads).forEach(item => {
@@ -34,5 +38,8 @@
         const status = loadSummary.find(obj => obj.status === id);
         if (status)
             showStatusModal(status);
+    });
+    shipper.change(() => {
+        getLoadsData();
     });
 })();
