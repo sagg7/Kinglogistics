@@ -40,6 +40,7 @@
             showStatusModal(status);
     });
     shipper.change(() => {
+        loadSummary.length = 0;
         getLoadsData();
     });
 })();

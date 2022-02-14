@@ -332,7 +332,6 @@
                         checkDuplicates();
                         setTimeout(() => {
                             $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
-                            console.log($("i.fa-arrow-circle-right"));
                         }, 300);
                     },
                     searchQueryParams: {
@@ -565,8 +564,8 @@
         </script>
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.js') }}"></script>
     @endsection
 

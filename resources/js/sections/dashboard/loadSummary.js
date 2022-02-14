@@ -68,7 +68,6 @@ const showLoadModal = (data) => {
     modal.modal('show');
 };
 const showStatusModal = (status) => {
-    console.log(status);
     const capitalizeString = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
