@@ -396,7 +396,7 @@ class DriverController extends Controller
                 $query->where('status', DriverEnum::INACTIVE);
                 break;
             case 'down':
-                $query->orWhere('inactive', 1);
+                $query->where('inactive', 1);
                 break;
             case 'deleted':
                 $query->onlyTrashed();

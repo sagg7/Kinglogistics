@@ -376,7 +376,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-inactive" aria-expanded="false">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-down" aria-expanded="false">
                                     Inactive Down
                                 </a>
                             </li>
