@@ -41,7 +41,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         {!! Form::label('truck_id', ucfirst(__('truck')), ['class' => 'col-form-label']) !!}
-                        {!! Form::select('truck_id', [], isset($driver) ? $driver->truck_id : null, ['class' => 'form-control' . ($errors->first('truck_id') ? ' is-invalid' : '')]) !!}
+                        {!! Form::select('truck_id',  isset($driver) && ($driver->truck) ? [$driver->truck_id => $driver->truck->number ] : [], $driver->truck_id ?? null, ['class' => 'form-control' . ($errors->first('truck_id') ? ' is-invalid' : '')]) !!}
                         @error('truck_id')
                         <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>

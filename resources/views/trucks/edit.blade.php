@@ -7,12 +7,6 @@
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script>
             (() => {
-                @if($truck->driver)
-                $("#driver_id")
-                    .html(`<option value="{{ $truck->driver_id }}">{{ $truck->driver->name }}</option>`)
-                    .val({{ $truck->driver_id }})
-                    .trigger('change');
-                @endif
                 @if($truck->trailer)
                 $("#trailer_id")
                     .html(`<option value="{{ $truck->trailer_id }}">{{ $truck->trailer->number }}</option>`)

@@ -37,6 +37,12 @@
                                 else
                                     return '';
                             };
+                        const truckFormatter = (params) => {
+                            if (params.value)
+                                return params.value.number;
+                            else
+                                return '';
+                        };
                         const capitalizeFormatter = (value) => {
                             if (value)
                                 return value.charAt(0).toUpperCase()  + value.slice(1);
@@ -150,6 +156,7 @@
                         return {
                             columns: [
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
+                                {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', cellRenderer: StatusTooltip},

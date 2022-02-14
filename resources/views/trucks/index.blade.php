@@ -31,7 +31,7 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Number', field: 'number'},
-                        {headerName: 'Driver', field: 'driver', valueFormatter: driverFormatter},
+                        {headerName: 'Carrier', field: 'carrier', valueFormatter: driverFormatter},
                         {headerName: 'Trailer', field: 'trailer', valueFormatter: trailerFormatter},
                         {headerName: 'Plate', field: 'plate'},
                         {headerName: 'VIN', field: 'vin'},

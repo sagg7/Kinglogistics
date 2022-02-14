@@ -274,6 +274,7 @@ class TruckController extends Controller
     {
         switch ($item) {
             case 'driver':
+            case 'carrier':
                 $array = [
                     'relation' => $item,
                     'column' => 'name',
@@ -305,7 +306,7 @@ class TruckController extends Controller
             "trucks.plate",
             "trucks.vin",
             "trucks.trailer_id",
-            "trucks.driver_id",
+            "trucks.carrier_id",
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -332,19 +333,8 @@ class TruckController extends Controller
                     });
             })
             ->with([
-                'driver' => function ($q) use ($request) {
-                    $q->with([
-                        'active_rental:driver_id,deposit,deposit_is_paid',
-                        'shippers' => function ($q) use ($request) {
-                            if ($request->shipper) {
-                                $q->where('id', $request->shipper);
-                            }
-                            $q->select('id', 'name');
-                        },
-                    ])
-                        ->select('id', 'name');
-                },
                 'trailer:id,number',
+                'carrier:id,name',
             ]);
 
         if ($request->graph) {
