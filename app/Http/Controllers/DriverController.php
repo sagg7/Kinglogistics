@@ -394,7 +394,9 @@ class DriverController extends Controller
                 break;
             case 'inactive':
                 $query->where('status', DriverEnum::INACTIVE);
-                    //->orWhere('inactive', 1);
+                break;
+            case 'down':
+                $query->orWhere('inactive', 1);
                 break;
             case 'deleted':
                 $query->onlyTrashed();
@@ -466,9 +468,9 @@ class DriverController extends Controller
                         $q->where('trip_id', $request->trip_id);
                     });
                 }
-                /*if (is_array($type) ? !in_array("inactive", $type, true) || !in_array("dispatch", $type, true) : $type !== 'inactive') {
+                if ($type !== 'down') {
                     $q->whereNull('inactive');
-                }*/
+                }
             });
 
 
