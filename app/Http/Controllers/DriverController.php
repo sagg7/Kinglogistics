@@ -355,10 +355,12 @@ class DriverController extends Controller
         switch ($type)
         {
             case 'dispatch':
-                $query->where('status', DriverEnum::ACTIVE)
-                    ->orwhere('status', DriverEnum::PENDING)
-                    ->orwhere('status', DriverEnum::READY)
-                    ->orWhere('status', DriverEnum::INACTIVE);
+                $query->where(function ($q) {
+                    $q->where('status', DriverEnum::ACTIVE)
+                        ->orwhere('status', DriverEnum::PENDING)
+                        ->orwhere('status', DriverEnum::READY)
+                        ->orWhere('status', DriverEnum::INACTIVE);
+                });
                 break;
             case 'morning':
                 $query->where(function ($q) {
@@ -371,12 +373,8 @@ class DriverController extends Controller
                 });
                 break;
             case 'active':
-                $query->where('status', DriverEnum::ACTIVE)
-                    ->orwhere('status', DriverEnum::PENDING)
-                    ->orwhere('status', DriverEnum::READY);
-                break;
-            case 'loaded':
             case 'awaiting':
+            case 'loaded':
                 $query->where(function ($q) {
                     $q->where('status', DriverEnum::ACTIVE)
                         ->orwhere('status', DriverEnum::PENDING)
@@ -395,7 +393,8 @@ class DriverController extends Controller
                 }
                 break;
             case 'inactive':
-                $query->where('inactive', 1);
+                $query->where('status', DriverEnum::INACTIVE);
+                    //->orWhere('inactive', 1);
                 break;
             case 'deleted':
                 $query->onlyTrashed();
@@ -467,9 +466,9 @@ class DriverController extends Controller
                         $q->where('trip_id', $request->trip_id);
                     });
                 }
-                if (is_array($type) ? !in_array("inactive", $type, true) || !in_array("dispatch", $type, true) : $type !== 'inactive') {
+                /*if (is_array($type) ? !in_array("inactive", $type, true) || !in_array("dispatch", $type, true) : $type !== 'inactive') {
                     $q->whereNull('inactive');
-                }
+                }*/
             });
 
 
