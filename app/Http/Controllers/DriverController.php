@@ -145,7 +145,6 @@ class DriverController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-
         return view('drivers.create', $params);
     }
 
@@ -187,6 +186,7 @@ class DriverController extends Controller
             ->with(['carrier', 'shippers'])
             ->with(['zone:id,name'])
             ->findOrFail($id);
+
         $createEdit = $this->createEditParams($id);
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
@@ -425,6 +425,7 @@ class DriverController extends Controller
             "drivers.inactive_observations",
             "drivers.phone",
             "drivers.broker_id",
+            "drivers.truck_id",
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -554,7 +555,7 @@ class DriverController extends Controller
             }
         } else {
             $query->with([
-                'truck:driver_id,number',
+                'truck:id,number',
                 'zone:id,name',
                 'carrier:id,name',
                 'botAnswer',

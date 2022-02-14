@@ -115,11 +115,11 @@ class Driver extends Authenticatable implements CanResetPassword
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function truck(): HasOne
+    public function truck(): BelongsTo
     {
-        return $this->hasOne(Truck::class);
+        return $this->BelongsTo(Truck::class);
     }
 
     /**
