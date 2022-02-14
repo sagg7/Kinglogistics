@@ -92,6 +92,7 @@ class DriverController extends Controller
 
             $driver->name = $request->name;
             $driver->email = $request->email;
+            $driver->truck_id = $request->truck_id;
             if ($request->password)
                 $driver->password = Hash::make($request->password);
 
