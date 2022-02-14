@@ -14,7 +14,7 @@ class AddTruckIdToDriversTable extends Migration
     public function up()
     {
         Schema::table('drivers', function (Blueprint $table) {
-            $table->unsignedBigInteger('truckId')->after('status')->nullable();
+            $table->unsignedBigInteger('truck_id')->after('status')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddTruckIdToDriversTable extends Migration
     public function down()
     {
         Schema::table('drivers', function (Blueprint $table) {
-            $table->dropColumn(['truckId']);
+            $table->dropColumn(['truck_id']);
         });
     }
 }
