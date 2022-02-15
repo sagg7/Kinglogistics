@@ -6,6 +6,7 @@ use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Models\AvailableDriver;
 use App\Models\Shift;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 trait ShiftTrait
@@ -15,6 +16,8 @@ trait ShiftTrait
     {
         // Create and assign the shift to provided driver
         $driver->shift()->create($payload);
+
+        $driver->workedHour()->create();
 
         if (!$load) {
             $this->registryInAvailableDriversQueue($driver);
@@ -40,6 +43,14 @@ trait ShiftTrait
 
         if (!empty($driver->shift)) {
             Shift::destroy($driver->shift->id);
+            $driver->load('activeWorkedHour');
+            if ($driver->activeWorkedHour) {
+                $now = Carbon::now();
+                $minutesWorked = Carbon::parse($driver->activeWorkedHour->shift_start)->diffInMinutes($now);
+                $driver->activeWorkedHour->shift_end = $now;
+                $driver->activeWorkedHour->worked_hours = $minutesWorked / 60;
+                $driver->activeWorkedHour->save();
+            }
         }
         $driver->status = 'inactive';
         $driver->save();

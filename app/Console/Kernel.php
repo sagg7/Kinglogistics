@@ -7,11 +7,14 @@ use App\Models\BotAnswers;
 use App\Models\BotQuestions;
 use App\Models\DispatchSchedule;
 use App\Models\Driver;
+use App\Models\DriverWorkedHour;
+use App\Models\Shift;
 use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Chat\MessagesTrait;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\Notifications\PushNotificationsTrait;
 use App\Traits\Ranking\RankingTrait;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
@@ -160,6 +163,36 @@ class Kernel extends ConsoleKernel
 //
         //    $this->dischargeDrivers($drivers);
         //})->daily()->at('18:15');
+
+        $schedule->call(function () {
+            $drivers = Driver::whereHas('shift', function ($q) {
+                $q->where('created_at', '<', Carbon::parse('-24 hours'));
+            })
+                ->whereDoesntHave('active_load')
+                ->with([
+                    'shift',
+                    'workedHour' => function ($q) {
+                        $q->whereNull('shift_end');
+                    }
+                ])
+                ->get();
+            if ($drivers) {
+                $shiftsToDelete = [];
+                $workedHoursToDelete = [];
+                foreach ($drivers as $driver) {
+                    $shiftsToDelete[] = $driver->shift->id;
+                    foreach ($driver->workedHour as $item) {
+                        $workedHoursToDelete[] = $item->id;
+                    }
+                }
+                if (count($shiftsToDelete) > 0) {
+                    Shift::whereIn('id', $shiftsToDelete)->delete();
+                }
+                if (count($workedHoursToDelete) > 0) {
+                    DriverWorkedHour::whereIn('id', $workedHoursToDelete)->delete();
+                }
+            }
+        })->daily();
 
         // On Mondays at 00:00 hours of the day, change the dispatch schedule to the programmed next week
         $schedule->call(function () {
