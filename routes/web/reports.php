@@ -9,5 +9,9 @@ Route::prefix('report')->group(function () {
             ->name('report.dailyLoads');
         Route::get('dailyLoadsData', [ReportController::class, 'dailyLoadsData'])
             ->name('report.dailyLoadsData');
+        Route::get('activeTime', [ReportController::class, 'activeTime'])
+            ->name('report.activeTime');
+        Route::get('activeTimeData', [ReportController::class, 'activeTimeData'])
+            ->name('report.activeTimeData');
     });
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrier;
 use App\Models\Load;
 use App\Models\Shipper;
 use App\Models\Trip;
@@ -27,9 +28,8 @@ class ReportController extends Controller
     {
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
-        $goal = null;
         $count2 = [];
-        
+
         // TODO: FORMAT DATA TO SHOW FOR PERIOD FILTER, RIGHT NOW THE DATES ARE KINDA WEIRD ON THE GRAPH AND GOTTA SHOW NEW READABLE FORMATS
         switch ($request->period) {
             default:
@@ -37,7 +37,6 @@ class ReportController extends Controller
                 $date_group = DB::raw("DATE(finished_timestamp) AS date_group");
                 $date_readable_format = "M d";
                 $goal = 250;
-                
                 break;
             case 'week':
                 $date_group = DB::raw("CONCAT(YEAR(finished_timestamp), '/', WEEK(finished_timestamp, 1)) AS date_group");
@@ -161,22 +160,16 @@ class ReportController extends Controller
                 $filterLoads($query);
                 $query = $query->get();
                 $count = [];
-                
-                
 
                 foreach ($query as $load) {
                     $storeData($load, $count);
-                    $count2[] = $goal; 
+                    $count2[] = $goal;
                 }
-
-            
 
                 $series[] = [
                     'data' => $count,
                     'name' => 'Loads',
                 ];
-
-
                 break;
         }
 
@@ -205,23 +198,19 @@ class ReportController extends Controller
 
         $average = [];
         $total = null;
-        $contador = null;
-        foreach($data as $key => $item){
-
-            if($key  == 0){
-                $average[] = $item; 
-             $total = $item;
-            }elseif ($key > 30){
+        foreach ($data as $key => $item) {
+            if ($key == 0) {
+                $average[] = $item;
+                $total = $item;
+            } elseif ($key > 30) {
                 $total += $item - $data [$key - 30];
                 $average[] = Round($total / 30);
-            }
-            else {
+            } else {
                 $total += $item;
-                $average[] = Round($total / ($key +1));
+                $average[] = Round($total / ($key + 1));
             }
-            
         }
-      
+
 		 if (isset($average) && ($request->graph_type == 'total'))
             $series[] = [
                 'data' => $average,
@@ -234,8 +223,113 @@ class ReportController extends Controller
                 'name' => 'Goal',
             ];
 
-    
+
         return ['series' => $series, 'categories' => $dates];
+    }
+
+
+    public function activeTime()
+    {
+        return view('reports.activeTime');
+    }
+
+    public function activeTimeData(Request $request)
+    {
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfWeek();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfWeek()->endOfDay();
+
+        $driversWorkedHoursFilter = function ($q) use ($start, $end) {
+            $q->whereBetween('shift_start', [$start, $end])
+                ->orWhereBetween('shift_end', [$start, $end])
+                ->orWhereNull('shift_end');
+        };
+        $now = Carbon::now();
+        $query = Carrier::whereHas('drivers', function ($q) use ($driversWorkedHoursFilter) {
+            $q->whereHas('worked_hours', function ($q) use ($driversWorkedHoursFilter) {
+                $driversWorkedHoursFilter($q);
+            });
+        })
+            ->with([
+                'drivers' => function ($q) use($start, $end, $driversWorkedHoursFilter) {
+                    $q->whereHas('worked_hours', function ($q) use ($driversWorkedHoursFilter) {
+                        $driversWorkedHoursFilter($q);
+                    })
+                        ->with([
+                            'worked_hours' => function ($q) use ($driversWorkedHoursFilter) {
+                                $driversWorkedHoursFilter($q);
+                            },
+                            'loads' => function ($q) use ($start, $end) {
+                                $q->join('load_statuses', 'load_statuses.load_id', 'loads.id')
+                                    ->whereBetween('accepted_timestamp', [$start, $end])
+                                    ->orWhereBetween('finished_timestamp', [$start, $end])
+                                    ->orWhereNull('finished_timestamp');
+                            }
+                        ]);
+                }
+            ])
+            ->get();
+
+        $dateRangeHoursTotal = $start->diffInMinutes($end) / 60;
+        $driversData = [];
+        $carriersData = [];
+        foreach ($query as $idx => $carrier) {
+            $carrierWorkedHours = 0;
+            $carrierTrucks = [];
+            foreach ($carrier->drivers as $driver) {
+                $driver_worked_hours = 0;
+                // Calculate the worked time data
+                foreach ($driver->worked_hours as $item) {
+                    $shift_start = Carbon::parse($item->shift_start);
+                    $isBeforeStartFilter = $shift_start->isBefore($start);
+                    if ($isBeforeStartFilter || !$item->shift_end) {
+                        // If there's no shift_end timestamp, then use Carbon::now()
+                        $shift_end = $item->shift_end ? Carbon::parse($item->shift_end) : $now;
+                        // If the shift started before the filter $start date, use the $start value instead
+                        if ($isBeforeStartFilter) {
+                            $shift_start = $start;
+                        }
+                        // Sum the worked hours
+                        $driver_worked_hours += (Carbon::parse($shift_start)->diffInMinutes($shift_end)) / 60;
+                    } else {
+                        // Sum the db calculated worked hours
+                        $driver_worked_hours += $item->worked_hours;
+                    }
+                }
+                $driver_loaded_time = 0; // Represents the sum of all the time the driver had a load (from accepted_timestamp to finished_timestamp)
+                foreach ($driver->loads as $load) {
+                    // If the load has a truck_id, and it hasn't been stored on the carrierTrucks array
+                    if ($load->truck_id && !in_array($load->truck_id, $carrierTrucks, false)) {
+                        $carrierTrucks[] = $load->truck_id;
+                    }
+                    // Calculate active time on load
+                    $accepted_timestamp = Carbon::parse($load->accepted_timestamp);
+                    $finished_timestamp = $load->finished_timestamp ? Carbon::parse($load->finished_timestamp) : $now;
+                    // If the accepted timestamp is before the filter $start date, use $start value instead
+                    if ($accepted_timestamp->isBefore($start)) {
+                        $accepted_timestamp = $start;
+                    }
+                    $driver_loaded_time += ($accepted_timestamp->diffInMinutes($finished_timestamp)) / 60;
+                }
+                $driversData[] = [
+                    'id' => $driver->id,
+                    'carrier_id' => $driver->carrier_id,
+                    'name' => $driver->name,
+                    'active_time' => $driver_worked_hours,
+                    'inactive_time' => $dateRangeHoursTotal - $driver_worked_hours, // The inactive time is calculated via the total of hours on the week minus the driver worked hours sum
+                    'loaded_time' => $driver_loaded_time,
+                    'waiting_time' => $driver_worked_hours - $driver_loaded_time, // The total active time of the driver minus the time it had a load assigned
+                ];
+                $carrierWorkedHours += $driver_worked_hours;
+            }
+            $carriersData[] = [
+                'id' => $carrier->id,
+                'name' => $carrier->name,
+                'active_time' => $carrierWorkedHours,
+                'trucks' => count($carrierTrucks), // Gets the quantity of unique trucks used on the loads
+            ];
+        }
+
+        return compact('driversData', 'carriersData');
     }
 }
 

@@ -404,6 +404,13 @@
                         </a>
                     </li>
                 </ul>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/report/activeTime">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Active Time</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             @endif
             <li class="navigation-header">

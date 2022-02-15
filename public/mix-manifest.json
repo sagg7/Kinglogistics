@@ -1,6 +1,3 @@
 {
-    "/js/sections/loads/dispatch/driverStatus.min.js": "/js/sections/loads/dispatch/driverStatus.min.js",
-    "/js/sections/loads/dispatch/loadSummary.min.js": "/js/sections/loads/dispatch/loadSummary.min.js",
-    "/js/sections/dashboard/loadSummary.min.js": "/js/sections/dashboard/loadSummary.min.js",
-    "/js/sections/drivers/common.min.js": "/js/sections/drivers/common.min.js"
+    "/js/sections/reports/activeTime.min.js": "/js/sections/reports/activeTime.min.js"
 }
