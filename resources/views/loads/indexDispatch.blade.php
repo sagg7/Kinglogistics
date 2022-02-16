@@ -80,7 +80,10 @@
                     let color = 'black';
                     if((nowT - created) > 4*1000*60*60 || params.data.status === 'unallocated' || params.data.status === 'requested' || params.data.status === 'accepted')
                         color = 'red'
-                    this.eGui.innerHTML = `<span style="color: ${color}">${msToTime(nowT - created)}</span>`;
+                    let classU = "";
+                    if(params.data.status !== "finished")
+                        classU = "update"
+                    this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
                 }
                 loadTimeRenderer.prototype.getGui = () => {
                     return this.eGui;
@@ -506,6 +509,10 @@
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
                 });
+
+                setTimeout(() => {
+                    addTime();
+                }, 1000);
             })();
 
             function downloadDispatch(){
@@ -548,16 +555,28 @@
                 window.location = "{{url("load/pictureReport")}}?" + $.param(query);
             }
 
+            function addTime() {
+                $(".update").each(function (index){
+                    let time = parseFloat($(this).attr('time'))+1000;
+                    $(this).html(msToTime(time));
+                    $(this).attr('time', time);
+                });
+                setTimeout(() => {
+                    addTime();
+                }, 1000);
+            }
+
             const msToTime = (duration) => {
-                let minutes = Math.floor((duration / (1000 * 60)) % 60),
+                let seconds = Math.floor((duration / (1000)) % 60),
+                    minutes = Math.floor((duration / (1000 * 60)) % 60),
                     hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
 
                 hours = (hours < 10) ? "0" + hours : hours;
                 minutes = (minutes < 10) ? "0" + minutes : minutes;
                 if (hours > 0)
-                    return hours + " h " + minutes + " m";
+                    return hours + " h " + minutes + " m " + seconds + " s";
                 else
-                    return minutes + " m";
+                    return minutes + " m " + seconds + " s";
 
             }
             const guard = 'web';
@@ -574,7 +593,7 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body text-center">
-                        <h3>Driver Status</h3>
+                        <h3>Truck Status</h3>
                         <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
                                 data-target="#driverStatusModal" id="morning_dispatch">Morning</button>
                         <table class="table table-striped table-bordered mt-1" id="morningTable">

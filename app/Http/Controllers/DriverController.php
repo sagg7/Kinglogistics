@@ -504,8 +504,8 @@ class DriverController extends Controller
         $customSearch = [];
         if ($request->dispatch) {
             if ($request->count) {
-                $morningQuery = (clone $query)->where('turn_id', 1);
-                $nightQuery = (clone $query)->where('turn_id', 2);
+                $morningQuery = (clone $query)->where('turn_id', 1)->wherehas('truck');
+                $nightQuery = (clone $query)->where('turn_id', 2)->wherehas('truck');
                 return [
                     "morning" => [
                         "active" => $this->filterByType((clone $morningQuery), 'active', $request)->count(),
@@ -533,11 +533,12 @@ class DriverController extends Controller
                 }
             }
             $request->searchable = $array;
-            $query->with([
+            $query->wherehas('truck')
+                ->with([
                 'carrier:id,name,phone',
                 'truck' => function ($q) {
                     $q->with(['trailer:id,number'])
-                        ->select('driver_id', 'trailer_id');
+                        ->select('id', 'trailer_id', 'number');
                 },
             ]);
             if ($request->search) {

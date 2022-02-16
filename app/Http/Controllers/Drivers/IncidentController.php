@@ -19,7 +19,7 @@ class IncidentController extends Controller
     private function createEditParams(): array
     {
         return [
-            'sanctions' => [null => '', 'warning' => 'Warning', 'fine' => 'Fine', 'termination' => 'Termination'],
+            'sanctions' => [null => '', 'warning' => 'Warning', 'fine' => 'Fine', 'termination' => 'Termination', 'followUp' => 'Follow up', 'actionless' => 'Not action need it'],
         ];
     }
 

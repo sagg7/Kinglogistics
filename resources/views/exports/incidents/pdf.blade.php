@@ -59,7 +59,7 @@
             <thead>
             <tr>
                 <th>Description</th>
-                <th>Driver excuse</th>
+                <th>Driver statement</th>
             </tr>
             </thead>
             <tbody>

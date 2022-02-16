@@ -21,7 +21,7 @@ class CreateIncidentsTable extends Migration
             $table->unsignedBigInteger('truck_id');
             $table->unsignedBigInteger('trailer_id');
             $table->unsignedBigInteger('user_id');
-            $table->enum('sanction', ['warning', 'fine', 'termination']);
+            $table->enum('sanction', ['warning', 'fine', 'termination', 'followUp', 'actionless']);
             $table->date('date');
             $table->string('location');
             $table->string('description', 512)->nullable();
