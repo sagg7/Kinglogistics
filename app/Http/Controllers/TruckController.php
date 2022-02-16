@@ -335,6 +335,7 @@ class TruckController extends Controller
             ->with([
                 'trailer:id,number',
                 'carrier:id,name',
+                'driver.shippers',
             ]);
 
         if ($request->graph) {
@@ -352,11 +353,17 @@ class TruckController extends Controller
                 }
             };
             foreach ($query as $item) {
-                if (!$item->driver || count($item->driver->shippers) === 0) {
+                if (!$item->driver){
                     $sortShipper('Unassigned');
                 } else {
-                    foreach ($item->driver->shippers as $shipper) {
-                        $sortShipper($shipper->name);
+                    foreach ($item->driver as $driver){
+                        if (count($driver->shippers) === 0) {
+                            $sortShipper('Unassigned');
+                        } else {
+                            foreach ($driver->shippers as $shipper) {
+                                $sortShipper($shipper->name);
+                            }
+                        }
                     }
                 }
             }
