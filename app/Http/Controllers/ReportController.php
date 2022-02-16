@@ -269,7 +269,8 @@ class ReportController extends Controller
             ])
             ->get();
 
-        $dateRangeHoursTotal = $start->diffInMinutes($end) / 60;
+        $rangeEnd = $end->isAfter($now) ? $now : $end;
+        $dateRangeHoursTotal = $start->diffInMinutes($rangeEnd) / 60;
         $driversData = [];
         $carriersData = [];
         foreach ($query as $idx => $carrier) {
