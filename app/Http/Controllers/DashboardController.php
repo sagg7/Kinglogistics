@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Driver;
 use App\Models\Load;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;

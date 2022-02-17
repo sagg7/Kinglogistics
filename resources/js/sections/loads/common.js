@@ -52,10 +52,10 @@
                         id: e.params.data.id,
                     },
                     success: (res) => {
-                        origin.val(res.origin);
-                        originCoords.val(res.origin_coords).trigger('change');
-                        destination.val(res.destination);
-                        destinationCoords.val(res.destination_coords).trigger('change');
+                        origin.val(res.trip_origin ? res.trip_origin.name : '');
+                        originCoords.val(res.trip_origin ? res.trip_origin.coords : '').trigger('change');
+                        destination.val(res.trip_destination ? res.trip_destination.name : '');
+                        destinationCoords.val(res.trip_destination ? res.trip_destination.coords : '').trigger('change');
                         customerName.val(res.customer_name);
                         mileage.val(res.mileage);
                     },

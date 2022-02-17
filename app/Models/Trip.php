@@ -48,4 +48,14 @@ class Trip extends Model
     {
         return $this->belongsTo(Rate::class);
     }
+
+    public function trip_origin(): BelongsTo
+    {
+        return $this->belongsTo(Origin::class, 'origin_id');
+    }
+
+    public function trip_destination(): BelongsTo
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
+    }
 }
