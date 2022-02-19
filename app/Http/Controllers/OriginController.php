@@ -152,7 +152,7 @@ class OriginController extends Controller
             'name AS text',
         ])
             ->where("name", "LIKE", "%$request->search%")
-            ->where('id', session('broker'));
+            ->where('broker_id', session('broker'));
 
         return $this->selectionData($query, $request->take, $request->page);
     }
