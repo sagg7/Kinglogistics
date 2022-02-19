@@ -164,7 +164,7 @@ class OriginController extends Controller
             'name',
             'coords',
         ])
-            ->where('id', session('broker'));
+            ->where('broker_id', session('broker'));
 
         return $this->multiTabSearchData($query, $request);
     }
