@@ -11,7 +11,7 @@
             var tbMorning = null,
                 tbNight = null,
                 tbAwaiting = null,
-                tbInactive = null;
+                tbDown = null;
             (() => {
                 let now = null;
                 let globlalSearchQueryParams = null;
@@ -37,6 +37,12 @@
                                 else
                                     return '';
                             };
+                        const truckFormatter = (params) => {
+                            if (params.value)
+                                return params.value.number;
+                            else
+                                return '';
+                        };
                         const capitalizeFormatter = (value) => {
                             if (value)
                                 return value.charAt(0).toUpperCase()  + value.slice(1);
@@ -150,6 +156,7 @@
                         return {
                             columns: [
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
+                                {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
                                 {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', cellRenderer: StatusTooltip},
@@ -203,9 +210,9 @@
                         tbAwaiting.searchQueryParams = _.merge(tbAwaiting.searchQueryParams, params);
                         tbAwaiting.updateSearchQuery();
                     }
-                    if (tbInactive) {
-                        tbInactive.searchQueryParams = _.merge(tbInactive.searchQueryParams, params);
-                        tbInactive.updateSearchQuery();
+                    if (tbDown) {
+                        tbDown.searchQueryParams = _.merge(tbDown.searchQueryParams, params);
+                        tbDown.updateSearchQuery();
                     }
                 }
                 const clearTablesParams = (paramName) => {
@@ -227,11 +234,11 @@
                         });
                         tbAwaiting.updateSearchQuery();
                     }
-                    if (tbInactive) {
+                    if (tbDown) {
                         paramName.forEach(name => {
-                            tbInactive.searchQueryParams[name] = null;
+                            tbDown.searchQueryParams[name] = null;
                         });
-                        tbInactive.updateSearchQuery();
+                        tbDown.updateSearchQuery();
                     }
                 }
                 $('#shipper').select2({
@@ -369,7 +376,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-inactive" aria-expanded="false">
+                                <a class="nav-link d-flex py-75" data-toggle="pill" href="#pane-down" aria-expanded="false">
                                     Inactive Down
                                 </a>
                             </li>
@@ -392,8 +399,8 @@
                             <div role="tabpanel" class="tab-pane" id="pane-awaiting" aria-labelledby="pane-awaiting" aria-expanded="true">
                                 <div id="gridAwaiting"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="pane-inactive" aria-labelledby="pane-inactive" aria-expanded="true">
-                                <div id="gridInactive"></div>
+                            <div role="tabpanel" class="tab-pane" id="pane-down" aria-labelledby="pane-down" aria-expanded="true">
+                                <div id="gridDown"></div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="pane-deleted" aria-labelledby="pane-deleted" aria-expanded="true">
                                 <div id="gridDeleted"></div>

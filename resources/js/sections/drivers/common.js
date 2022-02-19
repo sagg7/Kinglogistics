@@ -21,6 +21,7 @@
             url: '/truck/selection',
             data: (params) => {
                 return {
+                    carrier: $('#carrier_id').val(),
                     search: params.term,
                     page: params.page || 1,
                     take: 15,

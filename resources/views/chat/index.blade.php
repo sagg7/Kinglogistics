@@ -31,7 +31,6 @@
     @section("scripts")
         <script>
             const contacts = @json($contacts);
-            const userId = {{ auth()->user()->id }};
         </script>
         <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.1') }}"></script>
     @endsection

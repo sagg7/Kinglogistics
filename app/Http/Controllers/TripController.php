@@ -42,21 +42,25 @@ class TripController extends Controller
             'zone_id' => ['required', 'exists:zones,id'],
             'shipper_id' => ['required', 'exists:shippers,id'],
             'rate_id' => ['required', 'exists:rates,id'],
-            'origin' => ['required', 'string', 'max:255'],
-            'origin_coords' => ['required', 'string', 'max:255'],
-            'destination' => ['required', 'string', 'max:255'],
-            'destination_coords' => ['required', 'string', 'max:255'],
+            'origin_id' => ['required', 'exists:origins,id'],
+            'destination_id' => ['required', 'exists:destinations,id'],
+            //'origin' => ['required', 'string', 'max:255'],
+            //'origin_coords' => ['required', 'string', 'max:255'],
+            //'destination' => ['required', 'string', 'max:255'],
+            //'destination_coords' => ['required', 'string', 'max:255'],
             'mileage' => ['required', 'numeric'],
             'status' => ['required'],
             'status_current' => ['numeric'],
             'status_total' => ['numeric'],
         ], [
-            'origin_coords.required' => 'The origin map location is required',
-            'destination_coords.required' => 'The destination map location is required',
+            //'origin_coords.required' => 'The origin map location is required',
+            //'destination_coords.required' => 'The destination map location is required',
         ], [
             'shipper_id' => 'shipper',
             'zone_id' => 'zone',
             'rate_id' => 'rate',
+            'origin_id' => 'origin',
+            'destination_id' => 'destination',
         ]);
     }
 
@@ -129,12 +133,14 @@ class TripController extends Controller
             $trip->zone_id = $request->zone_id;
             $trip->shipper_id = $shipper;
             $trip->rate_id = $request->rate_id;
+            $trip->origin_id = $request->origin_id;
+            $trip->destination_id = $request->destination_id;
             $trip->name = $request->name;
             $trip->customer_name = $request->customer_name;
-            $trip->origin = $request->origin;
-            $trip->origin_coords = $request->origin_coords;
-            $trip->destination = $request->destination;
-            $trip->destination_coords = $request->destination_coords;
+            //$trip->origin = $request->origin;
+            //$trip->origin_coords = $request->origin_coords;
+            //$trip->destination = $request->destination;
+            //$trip->destination_coords = $request->destination_coords;
             $trip->mileage = $request->mileage;
             $trip->status = $request->status;
             $trip->status_current = $request->status_current;
@@ -167,6 +173,8 @@ class TripController extends Controller
         $trip = Trip::with([
             'zone:id,name',
             'shipper:id,name',
+            'trip_origin:id,name',
+            'trip_destination:id,name',
             'rate' => function ($q) {
                 $q->with('rate_group:id,name')
                     ->select([
@@ -213,9 +221,9 @@ class TripController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function destroy(int $id)
+    public function destroy(int $id): array
     {
         $trip = Trip::where(function ($q) {
             if (auth()->guard('web')->check()) {
@@ -228,27 +236,18 @@ class TripController extends Controller
         })
             ->findOrFail($id);
 
-        if ($trip) {
-            /*$message = '';
-            if ($trip->loads()->first())
-                $message .= "•" . $this->generateCrudMessage(4, 'Trip', ['constraint' => 'loads']) . "<br>";
-            if ($message)
-                return ['success' => false, 'msg' => $message];
-            else*/
-            return ['success' => $trip->delete()];
-        } else
-            return ['success' => false];
+        return ['success' => $trip->delete()];
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    public function selection(Request $request)
+    public function selection(Request $request): array
     {
         $query = Trip::select([
             'id',
-            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as text"),
+            'name AS text',
         ])
             ->where("name", "LIKE", "%$request->search%")
             ->where(function ($q) use ($request) {
@@ -277,6 +276,10 @@ class TripController extends Controller
             if (auth()->guard('shipper')->check())
                 $q->where('shipper_id', auth()->user()->id);
         })
+            ->with([
+                'trip_origin',
+                'trip_destination',
+            ])
             ->findOrFail($request->id);
     }
 

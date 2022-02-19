@@ -56,6 +56,12 @@
         else
             return '';
     };
+    const truckFormatter = (params) => {
+        if (params.value)
+            return params.value.number;
+        else
+            return '';
+    };
     modal.on('show.modal.bs', (e) => {
         const clicked = $(e.relatedTarget);
         const id = clicked.attr('id');
@@ -64,6 +70,7 @@
             tbDriverStatus = new tableAG({
                 container: 'driverStatusTable',
                 columns: [
+                    {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter},
                     {headerName: 'Chassis Nº', field: 'trailer', valueFormatter: trailerNumberFormatter},
                     {headerName: 'Driver', field: 'name'},
                     {headerName: 'Phone', field: 'phone'},

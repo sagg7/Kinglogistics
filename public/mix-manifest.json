@@ -1,7 +1,5 @@
 {
-    "/js/sections/loads/dispatch/driverStatus.min.js": "/js/sections/loads/dispatch/driverStatus.min.js",
-    "/js/sections/loads/dispatch/loadSummary.min.js": "/js/sections/loads/dispatch/loadSummary.min.js",
-    "/js/sections/loads/dispatch/customerStatus.min.js": "/js/sections/loads/dispatch/customerStatus.min.js",
-    "/js/sections/loads/dispatch/createDispatchReport.min.js": "/js/sections/loads/dispatch/createDispatchReport.min.js",
-    "/js/sections/dashboard/loadSummary.min.js": "/js/sections/dashboard/loadSummary.min.js"
+    "/js/sections/loads/common.min.js": "/js/sections/loads/common.min.js",
+    "/js/sections/trips/common.min.js": "/js/sections/trips/common.min.js",
+    "/js/sections/trips/location.min.js": "/js/sections/trips/location.min.js"
 }

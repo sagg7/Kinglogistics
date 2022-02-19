@@ -104,3 +104,10 @@ $('input[data-email=multi]').focusout((e) => {
         throwErrorMsg(`The following email addresses were not valid:<br><br>${errors}`);
     input.val(string);
 });
+(() => {
+    moment.updateLocale('en', {
+        week: {
+            dow : 1, // Monday is the first day of the week.
+        }
+    });
+})()

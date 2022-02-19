@@ -310,10 +310,27 @@
                     </li>
                     @endif
                     @if(auth()->user()->can(['read-job']))
-                    <li>
-                        <a href="/trip/index">
+                    <li class="has-sub">
+                        <a href="#">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Jobs</span>
                         </a>
+                        <ul class="menu-content">
+                            <li class="pl-1">
+                                <a href="/trip/index">
+                                    <i class="fas fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
+                                </a>
+                            </li>
+                            <li class="pl-1">
+                                <a href="/trip/origin/index">
+                                    <i class="fas fa-circle"></i><span class="menu-item" data-i18n="View">Origins</span>
+                                </a>
+                            </li>
+                            <li class="pl-1">
+                                <a href="/trip/destination/index">
+                                    <i class="fas fa-circle"></i><span class="menu-item" data-i18n="View">Destinations</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     @endif
                     @if(auth()->user()->can(['read-rate']))
@@ -401,6 +418,13 @@
                     <li>
                         <a href="/report/dailyLoads">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Daily Loads</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/report/activeTime">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Active Time</span>
                         </a>
                     </li>
                 </ul>

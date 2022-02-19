@@ -145,7 +145,6 @@ class DriverController extends Controller
     public function create()
     {
         $params = $this->createEditParams();
-
         return view('drivers.create', $params);
     }
 
@@ -187,6 +186,7 @@ class DriverController extends Controller
             ->with(['carrier', 'shippers'])
             ->with(['zone:id,name'])
             ->findOrFail($id);
+
         $createEdit = $this->createEditParams($id);
         $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $driver->id);
         $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $driver->id);
@@ -394,7 +394,9 @@ class DriverController extends Controller
                 break;
             case 'inactive':
                 $query->where('status', DriverEnum::INACTIVE);
-                    //->orWhere('inactive', 1);
+                break;
+            case 'down':
+                $query->where('inactive', 1);
                 break;
             case 'deleted':
                 $query->onlyTrashed();
@@ -425,6 +427,7 @@ class DriverController extends Controller
             "drivers.inactive_observations",
             "drivers.phone",
             "drivers.broker_id",
+            "drivers.truck_id",
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -466,9 +469,9 @@ class DriverController extends Controller
                         $q->where('trip_id', $request->trip_id);
                     });
                 }
-                /*if (is_array($type) ? !in_array("inactive", $type, true) || !in_array("dispatch", $type, true) : $type !== 'inactive') {
+                if ($type !== 'down') {
                     $q->whereNull('inactive');
-                }*/
+                }
             });
 
 
@@ -501,8 +504,8 @@ class DriverController extends Controller
         $customSearch = [];
         if ($request->dispatch) {
             if ($request->count) {
-                $morningQuery = (clone $query)->where('turn_id', 1);
-                $nightQuery = (clone $query)->where('turn_id', 2);
+                $morningQuery = (clone $query)->where('turn_id', 1)->wherehas('truck');
+                $nightQuery = (clone $query)->where('turn_id', 2)->wherehas('truck');
                 return [
                     "morning" => [
                         "active" => $this->filterByType((clone $morningQuery), 'active', $request)->count(),
@@ -530,11 +533,12 @@ class DriverController extends Controller
                 }
             }
             $request->searchable = $array;
-            $query->with([
+            $query->wherehas('truck')
+                ->with([
                 'carrier:id,name,phone',
                 'truck' => function ($q) {
                     $q->with(['trailer:id,number'])
-                        ->select('driver_id', 'trailer_id');
+                        ->select('id', 'trailer_id', 'number');
                 },
             ]);
             if ($request->search) {
@@ -554,7 +558,7 @@ class DriverController extends Controller
             }
         } else {
             $query->with([
-                'truck:driver_id,number',
+                'truck:id,number',
                 'zone:id,name',
                 'carrier:id,name',
                 'botAnswer',

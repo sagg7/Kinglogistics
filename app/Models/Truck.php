@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,11 +19,11 @@ class Truck extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @return HasMany
      */
-    public function driver(): BelongsTo
+    public function driver(): HasMany
     {
-        return $this->belongsTo(Driver::class);
+        return $this->HasMany(Driver::class);
     }
 
     /**

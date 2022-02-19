@@ -41,7 +41,7 @@
                     {!! Form::textarea('description', $incident->description ?? null, ['class' => 'form-control', 'rows' => 5, 'readonly']) !!}
                 </div>
                 <div class="form-group col-md-6">
-                    {!! Form::label('excuse', ucfirst(__('driver excuse')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('excuse', ucfirst(__('driver statement')), ['class' => 'col-form-label']) !!}
                     {!! Form::textarea('excuse', $incident->excuse ?? null, ['class' => 'form-control', 'rows' => 5, 'readonly']) !!}
                 </div>
                 <div class="form-group col-md-6 text-center">

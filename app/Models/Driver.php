@@ -115,11 +115,11 @@ class Driver extends Authenticatable implements CanResetPassword
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function truck(): HasOne
+    public function truck(): BelongsTo
     {
-        return $this->hasOne(Truck::class);
+        return $this->BelongsTo(Truck::class);
     }
 
     /**
@@ -193,6 +193,16 @@ class Driver extends Authenticatable implements CanResetPassword
         return $this->hasOne(Shift::class);
     }
 
+    public function workedHour(): HasMany
+    {
+        return $this->hasMany(DriverWorkedHour::class);
+    }
+
+    public function activeWorkedHour(): HasOne
+    {
+        return $this->hasOne(DriverWorkedHour::class)->whereNull('shift_end');
+    }
+
     public function safetyMessages(): BelongsToMany
     {
         return $this->belongsToMany(SafetyMessage::class);
@@ -233,10 +243,10 @@ class Driver extends Authenticatable implements CanResetPassword
             // The shift is "broken" in two different days by midnight, should do an extra validation
             $canActivate =
                 // The current moment is after the start of the turn and has not passed the midnight
-                $now->isAfter($turn->start) && $now->isAfter($turn->end)
+                ($now->isAfter($turn->start) && $now->isAfter($turn->end))
                 ||
                 // The current moment is before the end of the turn and has been passed the midnight
-                $now->isBefore($turn->end) && $now->isBefore($turn->start);
+                ($now->isBefore($turn->end) && $now->isBefore($turn->start));
         } else {
             // Normal turn, just check between times
             $canActivate = $now->isBetween($turn->start, $turn->end);
@@ -254,6 +264,14 @@ class Driver extends Authenticatable implements CanResetPassword
     public function botAnswer(): HasOne
     {
         return $this->hasOne(BotAnswers::class)->latest();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function worked_hours(): HasMany
+    {
+        return $this->hasMany(DriverWorkedHour::class);
     }
 
 }
