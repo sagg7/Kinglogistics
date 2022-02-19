@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Load;
 use App\Models\Shipper;
 use App\Models\Trip;
+use App\Models\User;
+use App\Models\LoadStatus;
+use App\Models\dispatch_report;
+use App\Models\Driver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +20,65 @@ class ReportController extends Controller
     {
         return view('reports.dailyLoads');
     }
+
+    public function createDailyDispatchReport(Load $load,Driver $driver,LoadStatus $Load_statuse ){
+        $name = auth()->user()->name;
+        $userId = auth()->user()->id;
+        $now = Carbon::now();
+        $params = [
+            'name'=> $name,
+            'date'=> $now->format('d-m-Y'),
+            'hours' => $now->toTimeString(),
+            'active_loads' => $load::where('status','!=','finished')
+                            ->where('broker_id', session('broker'))->count(),
+            'active_drivers' => $driver::where('status','!=','inactive')
+                            ->where('broker_id', session('broker'))->count(),
+            'inactive_drivers' => $driver::where('status','==','inactive')
+                            ->where('broker_id', session('broker'))->count(),
+            'loads_finalized' => $load::where('dispatch_id',$userId)
+                            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+                            ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
+                             ->where('broker_id', session('broker'))->count(),
+            // 'loads_finalized' =>1,
+            'worked_time' => 60.60,
+            "dispatch_score" => 98,
+            'score_app_usage'=> 92.22,
+            // Session::where('user_id',$userId)->first()->date
+            // 'tiempo' => $now->toDateTimeString()
+        ];
+        return $params;
+    }
+
+
+    public function storeDispatchReport(Request $request, Load $load,Driver $driver,LoadStatus $Load_statuse){ 
+        $dispatch_report = new dispatch_report();
+        $name = auth()->user()->name;
+        $userId = auth()->user()->id;
+        $now = Carbon::now();
+        $dispatch_report->dispatch_id = auth()->user()->id;  
+        $dispatch_report->date = Carbon::now();  
+        $dispatch_report->active_loads = $load::where('status','!=','finished')
+        ->where('broker_id', session('broker'))->count();  
+        $dispatch_report->active_drivers = $driver::where('status','!=','inactive')
+        ->where('broker_id', session('broker'))->count();  
+        $dispatch_report->inactive_drivers = $driver::where('status','==','inactive')
+        ->where('broker_id', session('broker'))->count();  
+        $dispatch_report->well_status = $request->wellStatus;  
+        $dispatch_report->loads_finalized = $load::where('dispatch_id',$userId)
+        ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+        ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
+         ->where('broker_id', session('broker'))->count();  
+        $dispatch_report->worked_time = 60.60;  
+        // $dispatch_report->worked_time = $request->worked_time;  
+        $dispatch_report->dispatch_score = 98;  
+        // $dispatch_report->dispatch_score = $request->dispatch_score;  
+        $dispatch_report->score_app_usage = 92.22;
+        // $dispatch_report->score_app_usage = $request->score_app_usage;
+        $dispatch_report->description = $request->situationDescription;  
+        $dispatch_report->save();
+        
+        return ['success' => true, 'data' => $dispatch_report];
+        }
 
     private function compareDates($a, $b)
     {

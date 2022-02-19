@@ -15,6 +15,7 @@
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
         @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation"])
         @include("loads.common.modals.driverStatus")
+        @include("loads.common.modals.createDispatchReport")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -501,7 +502,7 @@
                             shipper: e.params.data.id,
                         });
                     tbLoad.updateSearchQuery();
-                    filtersChange($('#costumerTable'));
+                    filtersChange($('#customerTable'));
                 }).on('select2:unselect', () => {
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
@@ -548,6 +549,9 @@
                 window.location = "{{url("load/pictureReport")}}?" + $.param(query);
             }
 
+
+
+      
             const msToTime = (duration) => {
                 let minutes = Math.floor((duration / (1000 * 60)) % 60),
                     hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
@@ -566,7 +570,8 @@
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/loadSummary.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js?1.0.0') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/customerStatus.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
     @endsection
 
     <div class="row">
@@ -619,13 +624,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-12">
+        <div class="col-md-6 col-12" >
             <div class="card">
                 <div class="card-content">
-                    <div class="card-body text-center">
+                    <div class="card-body text-center table-responsive" style="height:355px ">
                         <h3>Customer Status</h3>
 
-                        <table class="table table-striped table-bordered mt-1" id="costumerTable">
+                        <table class="table table-striped table-bordered mt-1" id="customerTable">
                             <thead>
                             <tr>
                                 <th >Name</th>
@@ -633,18 +638,24 @@
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                            </tr>
-                            <tr>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                            </tr>
-                            </tbody>
+                            
+                                <tbody >
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                 
+                                    <tr >
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                               
+                                </tbody>
+                          
+                         
+                            
                         </table>
 
                     </div>
@@ -675,8 +686,10 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                <a class="dropdown-item" id="genDisReport" data-toggle="modal" data-target="#createDispatchReportModal"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
+ 
                             </div>
                         </div>
                     </fieldset>

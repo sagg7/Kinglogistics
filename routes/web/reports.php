@@ -10,4 +10,11 @@ Route::prefix('report')->group(function () {
         Route::get('dailyLoadsData', [ReportController::class, 'dailyLoadsData'])
             ->name('report.dailyLoadsData');
     });
+
+    Route::group(['middleware' => ['permission:update-load-dispatch']], function () {
+        Route::get('dailyDispatchReport', [ReportController::class, 'createDailyDispatchReport'])
+            ->name('report.createDailyDispatchReport');
+        Route::post('storeDispatchReport', [ReportController::class, 'storeDispatchReport'])
+            ->name('report.storeDispatchReport');
+    });
 });
