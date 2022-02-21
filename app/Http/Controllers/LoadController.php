@@ -67,7 +67,8 @@ class LoadController extends Controller
      */
     public function indexDispatch()
     {
-        return view('loads.indexDispatch');
+        $params = $this->createEditParams();
+        return view('loads.indexDispatch', $params);
     }
 
     /**

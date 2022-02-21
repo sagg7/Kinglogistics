@@ -80,7 +80,7 @@
             <hr>
             <div class="row">
                 <div class="form-group col-md-4">
-                    {!! Form::label('origin_id', ucfirst(__('origin_id')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('origin_id', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('origin_id', isset($trip->origin_id) ? [$trip->origin_id => $trip->trip_origin->name] : [], $trip->origin_id ?? null, ['class' => 'form-control' . ($errors->first('origin_id') ? ' is-invalid' : '')]) !!}
                     @error('origin_id')
                     <span class="invalid-feedback" role="alert">
@@ -89,7 +89,7 @@
                     @enderror
                 </div>
                 <div class="form-group col-md-4">
-                    {!! Form::label('destination_id', ucfirst(__('destination_id')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('destination_id', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('destination_id', isset($trip->destination_id) ? [$trip->destination_id => $trip->trip_destination->name] : [], $trip->destination_id ?? null, ['class' => 'form-control' . ($errors->first('destination_id') ? ' is-invalid' : '')]) !!}
                     @error('destination_id')
                     <span class="invalid-feedback" role="alert">
