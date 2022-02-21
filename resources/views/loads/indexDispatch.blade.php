@@ -540,7 +540,7 @@
                         url: `/load/search?type=${type}`,
                         tableRef: `tb${tableName}`,
                         successCallback: (params) => {
-                            //checkDuplicates(null, (type === 'active') ? tbLoadActive : tbLoadFinished );
+                            checkDuplicates(null, (type === 'active') ? tbLoadActive : tbLoadFinished );
                             setTimeout(() => {
                                 $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
                             }, 300);
@@ -612,20 +612,23 @@
                 }, 1000);
             }
 
-            function msToTime(duration) {
+            function msToTime(duration, showSeconds = true) {
                 let seconds = Math.floor((duration / (1000)) % 60),
                     minutes = Math.floor((duration / (1000 * 60)) % 60),
                     hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
-                    days = Math.floor((duration / (1000 * 60 * 60 * 24)) % 1);
+                    days = Math.floor((duration / (1000 * 60 * 60 * 24)));
 
                 hours = (hours < 10) ? "0" + hours : hours;
                 minutes = (minutes < 10) ? "0" + minutes : minutes;
+                let secs = "";
+                if(showSeconds)
+                    secs = seconds + " s";
                 if(days > 0)
-                    return days + " d " +hours + " h " + minutes + " m " + seconds + " s";
+                    return days + " d " +hours + " h " + minutes + " m " + secs;
                 else if (hours > 0)
-                    return hours + " h " + minutes + " m " + seconds + " s";
+                    return hours + " h " + minutes + " m " + secs;
                 else
-                    return minutes + " m " + seconds + " s";
+                    return minutes + " m " + secs;
             }
             const guard = 'web';
         </script>
@@ -693,18 +696,19 @@
                 <div class="card-content">
                     <div class="card-body text-center table-responsive" style="height:355px ">
                         <h3>Customer Status</h3>
-
                         <table class="table table-striped table-bordered mt-1" id="customerTable">
                             <thead>
                             <tr>
-                                <th >Name</th>
+                                <th>Name</th>
                                 <th>AVG Waiting Per Load</th>
+                                <th>AVG Load Time</th>
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
 
                             <tbody >
                             <tr >
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
