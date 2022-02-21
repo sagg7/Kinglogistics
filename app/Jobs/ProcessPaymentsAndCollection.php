@@ -32,6 +32,6 @@ class ProcessPaymentsAndCollection implements ShouldQueue, ShouldBeUnique
     public function handle()
     {
         $this->shipperInvoices();
-        $this->carrierPayments();
+        //$this->carrierPayments();
     }
 }

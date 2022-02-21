@@ -50,7 +50,9 @@ class TrackingController extends Controller
                     });
                 }
             })
-            ->with('locations', function($q) use ($start, $end){
+            ->with('locations', function($q) use ($start, $end, $driverId){
+                if ($driverId)
+                    $q->where("driver_id", $driverId);
                 $q->whereBetween('created_at', [$start, $end])
                     ->whereNotNull('load_id')->take(1000);
             })

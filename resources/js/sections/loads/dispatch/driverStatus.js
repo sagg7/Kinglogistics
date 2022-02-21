@@ -21,6 +21,7 @@
                     `<td><a class="d-block" id="morning_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.awaiting}</a></td>` +
                     `<td><a class="d-block" id="morning_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.morning.loaded}</a></td></tr>`
                 );
+                $("#morning_dispatch").html(`Morning - ${res.morning.active + res.morning.inactive}`);
                 const nightTbody = tableNight.find('tbody');
                 nightTbody.empty();
                 nightTbody.append(
@@ -29,6 +30,8 @@
                     `<td><a class="d-block" id="night_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.awaiting}</a></td>` +
                     `<td><a class="d-block" id="night_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.loaded}</a></td></tr>`
                 );
+                $("#night_dispatch").html(`Nigth - ${res.night.active + res.night.inactive}`);
+
             },
             error: () => {
                 throwErrorMsg();

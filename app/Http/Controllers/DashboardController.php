@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\Load;
+use App\Models\ShipperInvoice;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -108,6 +110,17 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
+       $invoices = ShipperInvoice::where('status', '=', 'pending')
+            ->with('loads')->get();
+        foreach ( $invoices as $invoice){
+            $total = 0;
+            foreach ($invoice->loads as $load){
+                $total += $load->shipper_rate;
+            }
+            echo $invoice->custom_id." - ".$invoice->total." - ".$total."<BR>";
+            $invoice->total = $total;
+            $invoice->save();
+        }
         //$this->carrierPayments();
         //ProcessPaymentsAndCollection::dispatch()->afterCommit();
         //$this->shipperInvoices();

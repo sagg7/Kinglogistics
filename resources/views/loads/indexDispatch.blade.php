@@ -27,321 +27,14 @@
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbLoad = null;
+            let tbLoadActive = null;
+            let tbLoadFinished = null;
+            let now = null;
             (() => {
-                let now = null;
-                class FrontDataSource {
-                    constructor(data) {
-                        this.load = data.load;
-                    }
-                    getRows(params) {
-                        const current = tbLoad.dataSource.data;
-                        const idx = current.rows.findIndex(obj => Number(obj.id) === Number(this.load.id));
-                        if (idx) {
-                            /*switch (this.load.status) {
-                                case 'finished':
-                                    _.remove(current.rows, obj => Number(obj.id) === Number(this.load.id));
-                                    break;
-                                default:
-                                    break;
-                            }*/
-                            current.rows[idx] = this.load;
-                            params.successCallback(current.rows, current.lastRow);
-                        } else {
-                            current.rows.unshift(this.load);
-                            params.successCallback(current.rows, current.lastRow);
-                        }
-                        return false;
-                    }
-                }
-                const nameFormatter = (params) => {
-                    if (params.value)
-                        return params.value.name;
-                    else
-                        return '';
-                };
-                const truckFormatter = (params) => {
-                    if (params.value)
-                        return params.value.number;
-                    else
-                        return '';
-                };
-                function loadTimeRenderer() {}
-                loadTimeRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    if(!now)
-                        now = new Date(params.now);
 
-                    const created = new Date(params.value).getTime();
-                    let nowT = now.getTime();
-
-                    if (params.data.status === 'finished')
-                        nowT = new Date(params.data.finished_timestamp).getTime();
-
-                    let color = 'black';
-                    if((nowT - created) > 4*1000*60*60 || params.data.status === 'unallocated' || params.data.status === 'requested' || params.data.status === 'accepted')
-                        color = 'red'
-                    let classU = "";
-                    if(params.data.status !== "finished")
-                        classU = "update"
-                    this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
-                }
-                loadTimeRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
-                const emptyFormatter = (params) => {
-                    if (params.value)
-                        return params.value;
-                    else
-                        return 'ㅤ';
-                };
-                function JobRenderer() {}
-                JobRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    this.eGui.innerHTML = `${params.value.name}`;
-                    new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
-                }
-                JobRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
-                function PoRenderer() {}
-                PoRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    this.eGui.innerHTML = `${params.value}`;
-                    new bootstrap.Tooltip(this.eGui, {title: `Load type - ${params.data.load_type.name}`});
-                }
-                PoRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
-                const capitalizeStatus = (params) => {
-                    let string = params.value ? params.value : '';
-                    if (string === "to_location")
-                        string = "in transit";
-                    return string.charAt(0).toUpperCase()  + string.slice(1)
-                };
-                function PhotosRenderer() {}
-                PhotosRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    if (params.value) {
-                        let html = '',
-                            photos = [],
-                            photosId = [];
-                        if (params.value.to_location_voucher_image_url){
-                            photos.push(params.value.to_location_voucher_image_url);
-                            photosId.push(params.value.load_id+'/to_location');
-                        } else {
-                            photos.push("{{url("images/app/nonupdated.png")}}");
-                            photosId.push(params.value.load_id+'/to_location');
-                        }
-                        if (params.value.finished_voucher_image_url){
-                            photos.push(params.value.finished_voucher_image_url);
-                            photosId.push(params.value.load_id+'/finished');
-                        } else {
-                            photos.push("{{url("images/app/nonupdated.png")}}");
-                            photosId.push(params.value.load_id+'/finished');
-                        }
-                        photos.forEach((item, index) => {
-                            html += `<a class="avatar" href="#view-photo" data-toggle="modal" data-target="#view-photo"><img src="${item}" customid="${photosId[index]}" alt="photo" width="32" height="32"></a>`;
-                        });
-                        this.eGui.innerHTML = html;
-                    }
-                }
-                PhotosRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
-                function StatusBarRenderer() {}
-                StatusBarRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    let colorClass;
-                    if (params.value)
-                        colorClass = 'bg-success';
-                    else
-                        colorClass = 'bg-warning';
-
-                    this.eGui.innerHTML = `<div class="text-center ${colorClass} colors-container" style="width: 4px;">&nbsp;</div>`;
-                }
-                StatusBarRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
-                function DateRenderer() {}
-                DateRenderer.prototype.init = (params) => {
-                    this.eGui = document.createElement('div');
-                    let string = `<div class="text-center"><i class="fas fa-arrow-circle-right"></i>${params.data.accepted_timestamp}<br>`;
-                    if(params.data.finished_timestamp)
-                        string += `<i class="fas fa-arrow-circle-left"></i>${params.value}</div>`;
-
-                    this.eGui.innerHTML = string;
-                    new bootstrap.Tooltip(this.eGui, {title: `→Accepted at \n ←Finished at`});
-                }
-                DateRenderer.prototype.getGui = () => {
-                    return this.eGui;
-                }
                 let reference = {};
                 let control = {};
                 let bol = {};
-                const checkDuplicates = (type = null) => {
-                    tbLoad.dataSource.data.rows.forEach(item => {
-                        if (!type || type === 'control_number') {
-                            if (item.control_number) {
-                                if (!control[item.control_number]) {
-                                    control[item.control_number] = {
-                                        count: 1,
-                                        ids: [],
-                                    };
-                                } else if (control[item.control_number]['ids'].find(obj => obj === item.id)) {
-                                    return;
-                                } else
-                                    control[item.control_number]['count']++;
-                                control[item.control_number]['ids'].push(item.id);
-                            }
-                        }
-                        if (!type || type === 'customer_reference') {
-                            if (item.customer_reference) {
-                                if (!reference[item.customer_reference]) {
-                                    reference[item.customer_reference] = {
-                                        count: 1,
-                                        ids: [],
-                                    };
-                                } else if (reference[item.customer_reference]['ids'].find(obj => obj === item.id)) {
-                                    return;
-                                } else
-                                    reference[item.customer_reference]['count']++;
-                                reference[item.customer_reference]['ids'].push(item.id);
-                            }
-                        }
-                        if (!type || type === 'bol') {
-                            if (item.bol) {
-                                if (!bol[item.bol]) {
-                                    bol[item.bol] = {
-                                        count: 1,
-                                        ids: [],
-                                    };
-                                } else if (bol[item.bol]['ids'].find(obj => obj === item.id)) {
-                                    return;
-                                } else
-                                    bol[item.bol]['count']++;
-                                bol[item.bol]['ids'].push(item.id);
-                            }
-                        }
-                    });
-                    if (!type || type === 'control_number') {
-                        tbLoad.columnDefs[5].cellClass = params => {
-                            if (params.value && control[params.value] && control[params.value]['count'] > 1)
-                                return 'bg-danger text-white';
-                        }
-                    }
-                    if (!type || type === 'customer_reference') {
-                        tbLoad.columnDefs[6].cellClass = params => {
-                            if (params.value && reference[params.value] && reference[params.value]['count'] > 1)
-                                return 'bg-danger text-white';
-                        }
-                    }
-                    if (!type || type === 'bol') {
-                        tbLoad.columnDefs[7].cellClass = params => {
-                            if (params.value && bol[params.value] && bol[params.value]['count'] > 1)
-                                return 'bg-danger text-white';
-                        }
-                    }
-                    tbLoad.gridOptions.api.setColumnDefs(tbLoad.columnDefs);
-                }
-                tbLoad = new tableAG({
-                    columns: [
-                        {headerName: '', field: 'inspected', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
-                        {headerName: 'Timestamp', field: 'finished_timestamp', cellRenderer: DateRenderer},
-                        {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter},
-                        {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
-                        {headerName: 'Carrier', field: 'driver.carrier', valueFormatter: nameFormatter},
-                        {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
-                        {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'C Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
-                        {headerName: 'Tons', field: 'tons', valueFormatter: emptyFormatter},
-                        {headerName: 'Job', field: 'trip', editable: false, cellRenderer: JobRenderer},
-                        {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
-                        {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
-                        {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
-                        {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: loadTimeRenderer},
-                    ],
-                    menu: [
-                            @if(auth()->user()->can(['update-load-dispatch']))
-                        {
-                            text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
-                            menuData: {
-                                title: 'Confirm marking load as inspected?',
-                                stopReloadOnConfirm: true,
-                                afterConfirmFunction: (params) => {
-                                    params.node.data.inspected = 1;
-                                    params.api.redrawRows();
-                                }
-                            },
-                        },
-                        {
-                            text: 'Unmark as inspected', route: '/load/unmarkAsInspected', icon: 'feather icon-x-circle', type: 'confirm', conditional: 'inspected !== null',
-                            menuData: {
-                                title: 'Confirm unmarking load as inspected?',
-                                stopReloadOnConfirm: true,
-                                afterConfirmFunction: (params) => {
-                                    params.node.data.inspected = null;
-                                    params.api.redrawRows();
-                                }
-                            }
-                        },
-                        {
-                            text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
-                        },
-                        @endif
-                    ],
-                    gridOptions: {
-                        PhotosRenderer: PhotosRenderer,
-                        StatusBarRenderer: StatusBarRenderer,
-                        undoRedoCellEditing: true,
-                        onCellEditingStopped: function (event) {
-                            checkDuplicates(event.colDef.field);
-                            if (event.value === '' || typeof event.value === "undefined") {
-                                tbLoad.gridOptions.api.undoCellEditing();
-                                return;
-                            }
-                            const formData = new FormData();
-                            formData.append(event.colDef.field, event.value);
-                            $.ajax({
-                                url: `/load/partialUpdate/${event.data.id}`,
-                                type: 'POST',
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                error: () => {
-                                    tbLoad.gridOptions.api.undoCellEditing();
-                                    throwErrorMsg();
-                                }
-                            });
-                        },
-                        components: {
-                            OptionModalFunc: (modalId, loadId) => {
-                                const modal = $(`${modalId}`),
-                                    content = modal.find('.content-body');
-                                content.html('<div class="form-group col-12">'
-                                    +'<label for="observations" class="col-form-label">Observations</label>'
-                                    +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
-                                    +'</div>');
-                                $('.modal-spinner').addClass('d-none');
-                                modal.modal('show');
-                            }
-                        },
-                    },
-                    container: 'myGrid',
-                    url: '/load/search',
-                    tableRef: 'tbLoad',
-                    successCallback: (params) => {
-                        now = new Date(params.now);
-                        checkDuplicates();
-                        setTimeout(() => {
-                            $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
-                        }, 300);
-                    },
-                    searchQueryParams: {
-                        dispatch: 1,
-                    }
-                });
 
                 const handleRequest = (xhr) => {
                     xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
@@ -415,7 +108,7 @@
                         anchor = $(e.relatedTarget),
                         modalSpinner = modalBody.find('.modal-spinner'),
                         img = anchor.find('img');
-                    content.html(`
+                        content.html(`
                             <div class="slim" id="editImg"
                                  data-service="{{ url('load/replacePhoto') }}/${img.attr('customid')}"
                                  data-fetcher="fetch.php"
@@ -459,16 +152,16 @@
                     });
 
                 });
-                /* window.Echo.private('load-status-update') //fix this
-                     .listen('LoadUpdate', res => {
-                         if (tbLoad) {
-                             const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
-                             if (find) {
-                                 const frontData = new FrontDataSource({load: res.load});
-                                 tbLoad.gridOptions.api.setServerSideDatasource(frontData);
-                             }
-                         }
-                     });*/
+               /* window.Echo.private('load-status-update') //fix this
+                    .listen('LoadUpdate', res => {
+                        if (tbLoad) {
+                            const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
+                            if (find) {
+                                const frontData = new FrontDataSource({load: res.load});
+                                tbLoad.gridOptions.api.setServerSideDatasource(frontData);
+                            }
+                        }
+                    });*/
 
                 const dateRange = $('#dateRange');
                 dateRange.daterangepicker({
@@ -476,13 +169,20 @@
                     startDate: moment().startOf('month'),
                     endDate: moment().endOf('month'),
                 }, (start, end, label) => {
-                    tbLoad.searchQueryParams = _.merge(
-                        tbLoad.searchQueryParams,
+                    tbLoadActive.searchQueryParams = _.merge(
+                        tbLoadActive.searchQueryParams,
                         {
                             start: start.format('YYYY/MM/DD'),
                             end: end.format('YYYY/MM/DD'),
                         });
-                    tbLoad.updateSearchQuery();
+                    tbLoadActive.updateSearchQuery();
+                    tbLoadFinished.searchQueryParams = _.merge(
+                        tbLoadFinished.searchQueryParams,
+                        {
+                            start: start.format('YYYY/MM/DD'),
+                            end: end.format('YYYY/MM/DD'),
+                        });
+                    tbLoadFinished.updateSearchQuery();
                 });
 
                 $('#shipper').select2({
@@ -499,30 +199,379 @@
                     placeholder: 'Select',
                     allowClear: true,
                 }).on('select2:select', (e) => {
-                    tbLoad.searchQueryParams = _.merge(
-                        tbLoad.searchQueryParams,
+                    tbLoadActive.searchQueryParams = _.merge(
+                        tbLoadActive.searchQueryParams,
                         {
                             shipper: e.params.data.id,
                         });
-                    tbLoad.updateSearchQuery();
-                    filtersChange($('#customerTable'));
+                    tbLoadActive.updateSearchQuery();
+                    tbLoadFinished.searchQueryParams = _.merge(
+                        tbLoadFinished.searchQueryParams,
+                        {
+                            shipper: e.params.data.id,
+                        });
+                    tbLoadFinished.updateSearchQuery();
+                    filtersChange($('#costumerTable'));
                 }).on('select2:unselect', () => {
-                    tbLoad.searchQueryParams.shipper = null;
-                    tbLoad.updateSearchQuery();
+                    tbLoadFinished.searchQueryParams.shipper = null;
+                    tbLoadFinished.updateSearchQuery();
                 });
+
+                let tableProperties = (type) => {
+
+                    class FrontDataSource {
+                        constructor(data) {
+                            this.load = data.load;
+                        }
+                        getRows(params) {
+                            let current = null;
+                            if (type === 'active')
+                                current = tbLoadActive.dataSource.data;
+                            else
+                                current = tbLoadFinished.dataSource.data;
+
+                            const idx = current.rows.findIndex(obj => Number(obj.id) === Number(this.load.id));
+                            if (idx) {
+                                /*switch (this.load.status) {
+                                    case 'finished':
+                                        _.remove(current.rows, obj => Number(obj.id) === Number(this.load.id));
+                                        break;
+                                    default:
+                                        break;
+                                }*/
+                                current.rows[idx] = this.load;
+                                params.successCallback(current.rows, current.lastRow);
+                            } else {
+                                current.rows.unshift(this.load);
+                                params.successCallback(current.rows, current.lastRow);
+                            }
+                            return false;
+                        }
+                    }
+
+                    const checkDuplicates = (numberType = null, current) => {
+                        current.dataSource.data.rows.forEach(item => {
+                            if (!numberType || numberType === 'control_number') {
+                                if (item.control_number) {
+                                    if (!control[item.control_number]) {
+                                        control[item.control_number] = {
+                                            count: 1,
+                                            ids: [],
+                                        };
+                                    } else if (control[item.control_number]['ids'].find(obj => obj === item.id)) {
+                                        return;
+                                    } else
+                                        control[item.control_number]['count']++;
+                                    control[item.control_number]['ids'].push(item.id);
+                                }
+                            }
+                            if (!numberType || numberType === 'customer_reference') {
+                                if (item.customer_reference) {
+                                    if (!reference[item.customer_reference]) {
+                                        reference[item.customer_reference] = {
+                                            count: 1,
+                                            ids: [],
+                                        };
+                                    } else if (reference[item.customer_reference]['ids'].find(obj => obj === item.id)) {
+                                        return;
+                                    } else
+                                        reference[item.customer_reference]['count']++;
+                                    reference[item.customer_reference]['ids'].push(item.id);
+                                }
+                            }
+                            if (!numberType || numberType === 'bol') {
+                                if (item.bol) {
+                                    if (!bol[item.bol]) {
+                                        bol[item.bol] = {
+                                            count: 1,
+                                            ids: [],
+                                        };
+                                    } else if (bol[item.bol]['ids'].find(obj => obj === item.id)) {
+                                        return;
+                                    } else
+                                        bol[item.bol]['count']++;
+                                    bol[item.bol]['ids'].push(item.id);
+                                }
+                            }
+                        });
+                        if (!numberType || numberType === 'control_number') {
+                            current.columnDefs[5].cellClass = params => {
+                                if (params.value && control[params.value] && control[params.value]['count'] > 1)
+                                    return 'bg-danger text-white';
+                            }
+                        }
+                        if (!numberType || numberType === 'customer_reference') {
+                            current.columnDefs[6].cellClass = params => {
+                                if (params.value && reference[params.value] && reference[params.value]['count'] > 1)
+                                    return 'bg-danger text-white';
+                            }
+                        }
+                        if (!numberType || numberType === 'bol') {
+                            current.columnDefs[7].cellClass = params => {
+                                if (params.value && bol[params.value] && bol[params.value]['count'] > 1)
+                                    return 'bg-danger text-white';
+                            }
+                        }
+                        current.gridOptions.api.setColumnDefs(current.columnDefs);
+                    }
+
+                    const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
+                    let menu;
+                    let gridOptions = {};
+                    let previousModalId = null;
+                    switch (type) {
+                        default:
+                            menu = [
+                                    @if(auth()->user()->can(['update-load-dispatch']))
+                                {
+                                    text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
+                                    menuData: {
+                                        title: 'Confirm marking load as inspected?',
+                                        stopReloadOnConfirm: true,
+                                        afterConfirmFunction: (params) => {
+                                            params.node.data.inspected = 1;
+                                            params.api.redrawRows();
+                                        }
+                                    },
+                                },
+                                {
+                                    text: 'Unmark as inspected', route: '/load/unmarkAsInspected', icon: 'feather icon-x-circle', type: 'confirm', conditional: 'inspected !== null',
+                                    menuData: {
+                                        title: 'Confirm unmarking load as inspected?',
+                                        stopReloadOnConfirm: true,
+                                        afterConfirmFunction: (params) => {
+                                            params.node.data.inspected = null;
+                                            params.api.redrawRows();
+                                        }
+                                    }
+                                },
+                                {
+                                    text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
+                                },
+                                @endif
+                            ];
+                            gridOptions = {
+                                PhotosRenderer: PhotosRenderer,
+                                StatusBarRenderer: StatusBarRenderer,
+                                undoRedoCellEditing: true,
+                                onCellEditingStopped: function (event) {
+                                    let table = null;
+                                    if(type === 'active')
+                                        table = tbLoadActive;
+                                    else
+                                        table = tbLoadFinished;
+
+                                    checkDuplicates(event.colDef.field, table);
+                                    if (event.value === '' || typeof event.value === "undefined") {
+                                        table.gridOptions.api.undoCellEditing();
+                                        return;
+                                    }
+                                    const formData = new FormData();
+                                    formData.append(event.colDef.field, event.value);
+                                    $.ajax({
+                                        url: `/load/partialUpdate/${event.data.id}`,
+                                        type: 'POST',
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        error: () => {
+                                            table.gridOptions.api.undoCellEditing();
+                                            throwErrorMsg();
+                                        }
+                                    });
+                                },
+                                components: {
+                                    OptionModalFunc: (modalId, loadId) => {
+                                        const modal = $(`${modalId}`),
+                                            content = modal.find('.content-body');
+                                        content.html('<div class="form-group col-12">'
+                                            +'<label for="observations" class="col-form-label">Observations</label>'
+                                            +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
+                                            +'</div>');
+                                        $('.modal-spinner').addClass('d-none');
+                                        modal.modal('show');
+                                    }
+                                },
+                            };
+                            break;
+                        case "active":
+                        case "finished":
+
+                    }
+                    const nameFormatter = (params) => {
+                        if (params.value)
+                            return params.value.name;
+                        else
+                            return '';
+                    };
+                    const truckFormatter = (params) => {
+                        if (params.value)
+                            return params.value.number;
+                        else
+                            return '';
+                    };
+                    function loadTimeRenderer() {}
+                    loadTimeRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        if(!now)
+                            now = new Date(params.now);
+
+                        const created = new Date(params.value).getTime();
+                        let nowT = now.getTime();
+
+                        if (params.data.status === 'finished')
+                            nowT = new Date(params.data.finished_timestamp).getTime();
+
+                        let color = 'black';
+                        if((nowT - created) > 4*1000*60*60 || params.data.status === 'unallocated' || params.data.status === 'requested' || params.data.status === 'accepted')
+                            color = 'red'
+                        let classU = "";
+                        if(params.data.status !== "finished")
+                            classU = "update"
+                        this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
+                    }
+                    loadTimeRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    const emptyFormatter = (params) => {
+                        if (params.value)
+                            return params.value;
+                        else
+                            return 'ㅤ';
+                    };
+                    function JobRenderer() {}
+                    JobRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        this.eGui.innerHTML = `${params.value.name}`;
+                        new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                    }
+                    JobRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    function PoRenderer() {}
+                    PoRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        this.eGui.innerHTML = `${params.value}`;
+                        new bootstrap.Tooltip(this.eGui, {title: `Load type - ${params.data.load_type.name}`});
+                    }
+                    PoRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    const capitalizeStatus = (params) => {
+                        let string = params.value ? params.value : '';
+                        if (string === "to_location")
+                            string = "in transit";
+                        return string.charAt(0).toUpperCase()  + string.slice(1)
+                    };
+                    function PhotosRenderer() {}
+                    PhotosRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        if (params.value) {
+                            let html = '',
+                                photos = [],
+                                photosId = [];
+                            if (params.value.to_location_voucher_image_url){
+                                photos.push(params.value.to_location_voucher_image_url);
+                                photosId.push(params.value.load_id+'/to_location');
+                            } else {
+                                photos.push("{{url("images/app/nonupdated.png")}}");
+                                photosId.push(params.value.load_id+'/to_location');
+                            }
+                            if (params.value.finished_voucher_image_url){
+                                photos.push(params.value.finished_voucher_image_url);
+                                photosId.push(params.value.load_id+'/finished');
+                            } else {
+                                photos.push("{{url("images/app/nonupdated.png")}}");
+                                photosId.push(params.value.load_id+'/finished');
+                            }
+                            photos.forEach((item, index) => {
+                                html += `<a class="avatar" href="#view-photo" data-toggle="modal" data-target="#view-photo"><img src="${item}" customid="${photosId[index]}" alt="photo" width="32" height="32"></a>`;
+                            });
+                            this.eGui.innerHTML = html;
+                        }
+                    }
+                    PhotosRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    function StatusBarRenderer() {}
+                    StatusBarRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        let colorClass;
+                        if (params.value)
+                            colorClass = 'bg-success';
+                        else
+                            colorClass = 'bg-warning';
+
+                        this.eGui.innerHTML = `<div class="text-center ${colorClass} colors-container" style="width: 4px;">&nbsp;</div>`;
+                    }
+                    StatusBarRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    function DateRenderer() {}
+                    DateRenderer.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        let string = `<div class="text-center"><i class="fas fa-arrow-circle-right"></i>${params.data.accepted_timestamp}<br>`;
+                        if(params.data.finished_timestamp)
+                            string += `<i class="fas fa-arrow-circle-left"></i>${params.value}</div>`;
+
+                        this.eGui.innerHTML = string;
+                        new bootstrap.Tooltip(this.eGui, {title: `→Accepted at \n ←Finished at`});
+                    }
+                    DateRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
+                    return {
+                        columns: [
+                            {headerName: '', field: 'inspected', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
+                            {headerName: 'Timestamp', field: 'finished_timestamp', cellRenderer: DateRenderer},
+                            {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter},
+                            {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
+                            {headerName: 'Carrier', field: 'driver.carrier', valueFormatter: nameFormatter},
+                            {headerName: 'Photos', field: 'load_status', filter: false, cellRenderer: PhotosRenderer},
+                            {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
+                            {headerName: 'C Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
+                            {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
+                            {headerName: 'Tons', field: 'tons', valueFormatter: emptyFormatter},
+                            {headerName: 'Job', field: 'trip', editable: false, cellRenderer: JobRenderer},
+                            {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
+                            {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
+                            {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
+                            {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: loadTimeRenderer},
+                        ],
+                        menu,
+                        gridOptions,
+                        container: `grid${tableName}`,
+                        url: `/load/search?type=${type}`,
+                        tableRef: `tb${tableName}`,
+                        successCallback: (params) => {
+                            //checkDuplicates(null, (type === 'active') ? tbLoadActive : tbLoadFinished );
+                            setTimeout(() => {
+                                $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
+                            }, 300);
+                            now = new Date(params.now);
+                        },
+                        searchQueryParams: {
+                            dispatch: 1,
+                        }
+                    };
+                };
+
+
+                window['tbLoadActive'] = new tableAG(tableProperties(`active`));
+                window['tbLoadFinished'] = new tableAG(tableProperties(`finished`));
+
 
                 setTimeout(() => {
                     addTime();
                 }, 1000);
             })();
+                function downloadDispatch(){
+                    var query = {
+                        dateRange: dateRange.value,
+                        shipper: $("#shipper").val(),
+                    }
 
-            function downloadDispatch(){
-                var query = {
-                    dateRange: dateRange.value,
-                    shipper: $("#shipper").val(),
-                }
-
-                window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
+                    window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
                 /*$.ajax({
                     url: "{{url("load/DownloadExcelReport")}}",
                     type: 'GET',
@@ -567,18 +616,20 @@
                 }, 1000);
             }
 
-            const msToTime = (duration) => {
+            function msToTime(duration) {
                 let seconds = Math.floor((duration / (1000)) % 60),
                     minutes = Math.floor((duration / (1000 * 60)) % 60),
-                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+                    hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
+                    days = Math.floor((duration / (1000 * 60 * 60 * 24)) % 1);
 
                 hours = (hours < 10) ? "0" + hours : hours;
                 minutes = (minutes < 10) ? "0" + minutes : minutes;
-                if (hours > 0)
+                if(days > 0)
+                    return days + " d " +hours + " h " + minutes + " m " + seconds + " s";
+                else if (hours > 0)
                     return hours + " h " + minutes + " m " + seconds + " s";
                 else
                     return minutes + " m " + seconds + " s";
-
             }
             const guard = 'web';
         </script>
@@ -596,7 +647,7 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body text-center">
-                        <h3>Truck Status</h3>
+                        <h3>Shift Truck Status</h3>
                         <button class="btn btn-block btn-outline-primary" type="button" data-toggle="modal"
                                 data-target="#driverStatusModal" id="morning_dispatch">Morning</button>
                         <table class="table table-striped table-bordered mt-1" id="morningTable">
@@ -668,11 +719,7 @@
                                 <td>0</td>
                                 <td>0</td>
                             </tr>
-
                             </tbody>
-
-
-
                         </table>
 
                     </div>
@@ -703,10 +750,8 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                <a class="dropdown-item" id="genDisReport" data-toggle="modal" data-target="#createDispatchReportModal"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
-
                             </div>
                         </div>
                     </fieldset>
@@ -715,5 +760,10 @@
         </div>
     </div>
 
-    <x-aggrid-index></x-aggrid-index>
+    <div class="col-xs-12 col-sm-12">
+        <div class="card-content">
+            <div id="gridActive"></div>
+            <div id="gridFinished"></div>
+        </div>
+    </div>
 </x-app-layout>

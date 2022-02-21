@@ -29,7 +29,7 @@ use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
-    protected $customDate = "2021-10-25";
+    protected $customDate = "2022-02-13";
 
     use CarrierPaymentsPDF;
     /**
@@ -115,14 +115,14 @@ trait PaymentsAndCollection
                 ->whereHas('driver')
                 ->whereHas('shipper', function($q) {
                     // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
-                    $q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
+                    //$q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
                 })
                 ->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
-                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
+                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
+                    //$q->whereDate('finished_timestamp', '<=', $carbon_now);
                 })
                 ->whereNotNull('inspected')
-                ->where('status', 'finished')
+                ->where('loads.status', 'finished')
                 ->with([
                     'shipper',
                     'trip.rate',
@@ -161,8 +161,8 @@ trait PaymentsAndCollection
                     foreach ($trip['load_groups'] as $group) {
                         if (count($group['loads']) > 0) {
                             $shipper_invoice = new ShipperInvoice();
-                            //$shipper_invoice->date = $this->customDate;
-                            $shipper_invoice->date = $carbon_now;
+                            $shipper_invoice->date = $this->customDate;
+                            //$shipper_invoice->date = $carbon_now;
                             $shipper_invoice->shipper_id = $shipper_id;
                             $shipper_invoice->save();
                             $invoice_total = 0;
@@ -180,7 +180,8 @@ trait PaymentsAndCollection
                             $expense->amount = (1.5 * $invoice_total) / 100;
                             $expense->type_id = 1; // Hardcoded value that represents the "Invoice Commission"
                             $expense->description = "Invoice commission";
-                            $expense->date = $carbon_now;
+                            //$expense->date = $carbon_now;
+                            $expense->date = $this->customDate;
                             $expense->shipper_invoice_id = $shipper_invoice->id;
                             $expense->save();
                         }
@@ -360,14 +361,15 @@ trait PaymentsAndCollection
             CarrierExpense::insert($new_expenses);
             $carrier_payments = [];
             $loads = Load::whereNull('carrier_payment_id')
-                ->whereHas('driver')
-                ->where('status', 'finished')
-                // CONDITION OF AT LEAST ONLY PAST WEEK LOADS
-                ->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
-                    $q->whereDate('finished_timestamp', '<=', $carbon_now);
-                })
-                ->whereNotNull('inspected')
+                //->whereHas('driver')
+                //->where('status', 'finished')
+                //// CONDITION OF AT LEAST ONLY PAST WEEK LOADS
+                //->whereHas('loadStatus', function ($q) use ($carbon_now) {
+                //    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
+                //    $q->whereDate('finished_timestamp', '<=', $carbon_now);
+                //})
+                //->whereNotNull('inspected')
+                    ->wherein('shipper_invoice_id', [])
                 ->with([
                     'shipper',
                     'driver.carrier',
@@ -409,8 +411,8 @@ trait PaymentsAndCollection
             foreach ($carrier_payments as $carrier_id => $payment) {
                 // Create the new carrier payment
                 $carrier_payment = new CarrierPayment();
-                //$carrier_payment->date = $this->customDate;
-                $carrier_payment->date = $carbon_now;
+                $carrier_payment->date = $this->customDate;
+                //$carrier_payment->date = $carbon_now;
                 $carrier_payment->carrier_id = $carrier_id;
                 $carrier_payment->save();
                 // Init the gross amount variable

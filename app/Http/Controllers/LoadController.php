@@ -412,9 +412,22 @@ class LoadController extends Controller
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
             });
+        if ($request->type) {
+            if($request->type == 'active'){
+                $query->where('loads.status', '!=','finished');
+                if (empty($request->sortModel))
+                    $query->orderBy('accepted_timestamp', 'desc');
+            }
+            else {
+                $query->where('loads.status', 'finished');
+                if (empty($request->sortModel))
+                    $query->orderBy('finished_timestamp', 'desc');
+            }
+        }
         if (!$request->sortModel) {
             $query->orderByDesc('date');
         }
+
         if (auth()->guard('web')->check() && $request->dispatch && auth()->user()->can('read-load-dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
                 ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
@@ -423,8 +436,6 @@ class LoadController extends Controller
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
 
-            if (empty($request->sortModel))
-                $query->orderBy('finished_timestamp', 'desc');
         } else {
             if (isset($request->searchable)) {
                 $array = $request->searchable;
