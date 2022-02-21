@@ -756,10 +756,23 @@
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-12">
-        <div class="card-content">
-            <div id="gridActive"></div>
-            <div id="gridFinished"></div>
+    <div class="card">
+        <div class="card-body">
+            <div class="card-content">
+                <h3>Active Loads</h3>
+                <hr>
+                <div id="gridActive"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="card-content">
+                <h3>Finished Loads</h3>
+                <hr>
+                <div id="gridFinished"></div>
+            </div>
         </div>
     </div>
 </x-app-layout>

@@ -31,6 +31,12 @@
     @endsection
 
     {!! Form::open(['route' => ['load.update', $load->id], 'method' => 'post', 'class' => 'form form-vertical', 'id' => 'loadForm']) !!}
-    @include('loads.common.form')
+    <div class="card">
+        <div class="card-body">
+            <div class="card-content">
+                @include('loads.common.form')
+            </div>
+        </div>
+    </div>
     {!! Form::close() !!}
 </x-app-layout>
