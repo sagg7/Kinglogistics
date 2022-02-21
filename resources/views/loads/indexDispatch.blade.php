@@ -321,85 +321,7 @@
                     let menu;
                     let gridOptions = {};
                     let previousModalId = null;
-                    switch (type) {
-                        default:
-                            menu = [
-                                    @if(auth()->user()->can(['update-load-dispatch']))
-                                {
-                                    text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
-                                    menuData: {
-                                        title: 'Confirm marking load as inspected?',
-                                        stopReloadOnConfirm: true,
-                                        afterConfirmFunction: (params) => {
-                                            params.node.data.inspected = 1;
-                                            params.api.redrawRows();
-                                        }
-                                    },
-                                },
-                                {
-                                    text: 'Unmark as inspected', route: '/load/unmarkAsInspected', icon: 'feather icon-x-circle', type: 'confirm', conditional: 'inspected !== null',
-                                    menuData: {
-                                        title: 'Confirm unmarking load as inspected?',
-                                        stopReloadOnConfirm: true,
-                                        afterConfirmFunction: (params) => {
-                                            params.node.data.inspected = null;
-                                            params.api.redrawRows();
-                                        }
-                                    }
-                                },
-                                {
-                                    text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
-                                },
-                                @endif
-                            ];
-                            gridOptions = {
-                                PhotosRenderer: PhotosRenderer,
-                                StatusBarRenderer: StatusBarRenderer,
-                                undoRedoCellEditing: true,
-                                onCellEditingStopped: function (event) {
-                                    let table = null;
-                                    if(type === 'active')
-                                        table = tbLoadActive;
-                                    else
-                                        table = tbLoadFinished;
 
-                                    checkDuplicates(event.colDef.field, table);
-                                    if (event.value === '' || typeof event.value === "undefined") {
-                                        table.gridOptions.api.undoCellEditing();
-                                        return;
-                                    }
-                                    const formData = new FormData();
-                                    formData.append(event.colDef.field, event.value);
-                                    $.ajax({
-                                        url: `/load/partialUpdate/${event.data.id}`,
-                                        type: 'POST',
-                                        data: formData,
-                                        contentType: false,
-                                        processData: false,
-                                        error: () => {
-                                            table.gridOptions.api.undoCellEditing();
-                                            throwErrorMsg();
-                                        }
-                                    });
-                                },
-                                components: {
-                                    OptionModalFunc: (modalId, loadId) => {
-                                        const modal = $(`${modalId}`),
-                                            content = modal.find('.content-body');
-                                        content.html('<div class="form-group col-12">'
-                                            +'<label for="observations" class="col-form-label">Observations</label>'
-                                            +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
-                                            +'</div>');
-                                        $('.modal-spinner').addClass('d-none');
-                                        modal.modal('show');
-                                    }
-                                },
-                            };
-                            break;
-                        case "active":
-                        case "finished":
-
-                    }
                     const nameFormatter = (params) => {
                         if (params.value)
                             return params.value.name;
@@ -522,6 +444,78 @@
                     DateRenderer.prototype.getGui = () => {
                         return this.eGui;
                     }
+                    menu = [
+                            @if(auth()->user()->can(['update-load-dispatch']))
+                        {
+                            text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
+                            menuData: {
+                                title: 'Confirm marking load as inspected?',
+                                stopReloadOnConfirm: true,
+                                afterConfirmFunction: (params) => {
+                                    params.node.data.inspected = 1;
+                                    params.api.redrawRows();
+                                }
+                            },
+                        },
+                        {
+                            text: 'Unmark as inspected', route: '/load/unmarkAsInspected', icon: 'feather icon-x-circle', type: 'confirm', conditional: 'inspected !== null',
+                            menuData: {
+                                title: 'Confirm unmarking load as inspected?',
+                                stopReloadOnConfirm: true,
+                                afterConfirmFunction: (params) => {
+                                    params.node.data.inspected = null;
+                                    params.api.redrawRows();
+                                }
+                            }
+                        },
+                        {
+                            text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
+                        },
+                        @endif
+                    ];
+                    gridOptions = {
+                        PhotosRenderer: PhotosRenderer,
+                        StatusBarRenderer: StatusBarRenderer,
+                        undoRedoCellEditing: true,
+                        onCellEditingStopped: function (event) {
+                            let table = null;
+                            if(type === 'active')
+                                table = tbLoadActive;
+                            else
+                                table = tbLoadFinished;
+
+                            checkDuplicates(event.colDef.field, table);
+                            if (event.value === '' || typeof event.value === "undefined") {
+                                table.gridOptions.api.undoCellEditing();
+                                return;
+                            }
+                            const formData = new FormData();
+                            formData.append(event.colDef.field, event.value);
+                            $.ajax({
+                                url: `/load/partialUpdate/${event.data.id}`,
+                                type: 'POST',
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                error: () => {
+                                    table.gridOptions.api.undoCellEditing();
+                                    throwErrorMsg();
+                                }
+                            });
+                        },
+                        components: {
+                            OptionModalFunc: (modalId, loadId) => {
+                                const modal = $(`${modalId}`),
+                                    content = modal.find('.content-body');
+                                content.html('<div class="form-group col-12">'
+                                    +'<label for="observations" class="col-form-label">Observations</label>'
+                                    +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
+                                    +'</div>');
+                                $('.modal-spinner').addClass('d-none');
+                                modal.modal('show');
+                            }
+                        },
+                    };
                     return {
                         columns: [
                             {headerName: '', field: 'inspected', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
