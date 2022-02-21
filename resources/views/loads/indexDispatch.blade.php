@@ -163,7 +163,7 @@
                         }
                     });*/
 
-                const dateRange = $('#dateRange');
+                let dateRange = $('#dateRange');
                 dateRange.daterangepicker({
                     format: 'YYYY/MM/DD',
                     startDate: moment().startOf('month'),
@@ -215,6 +215,8 @@
                 }).on('select2:unselect', () => {
                     tbLoadFinished.searchQueryParams.shipper = null;
                     tbLoadFinished.updateSearchQuery();
+                    tbLoadActive.searchQueryParams.shipper = null;
+                    tbLoadActive.updateSearchQuery();
                 });
 
                 let tableProperties = (type) => {
@@ -557,8 +559,8 @@
                 };
 
 
-                window['tbLoadActive'] = new tableAG(tableProperties(`active`));
-                window['tbLoadFinished'] = new tableAG(tableProperties(`finished`));
+               tbLoadActive = new tableAG(tableProperties(`active`));
+               tbLoadFinished = new tableAG(tableProperties(`finished`));
 
 
                 setTimeout(() => {
