@@ -4,9 +4,9 @@
 
     @section('head')
         <style>
-        #morningTable th, #nightTable th {
-            padding: 5px;
-        }
+            #morningTable th, #nightTable th {
+                padding: 5px;
+            }
         </style>
     @endsection
     @section('modals')
@@ -15,6 +15,7 @@
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
         @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation"])
         @include("loads.common.modals.driverStatus")
+        @include("loads.common.modals.createDispatchReport")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -262,7 +263,7 @@
                         {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: loadTimeRenderer},
                     ],
                     menu: [
-                        @if(auth()->user()->can(['update-load-dispatch']))
+                            @if(auth()->user()->can(['update-load-dispatch']))
                         {
                             text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
                             menuData: {
@@ -319,9 +320,9 @@
                                 const modal = $(`${modalId}`),
                                     content = modal.find('.content-body');
                                 content.html('<div class="form-group col-12">'
-                                                +'<label for="observations" class="col-form-label">Observations</label>'
-                                                +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
-                                            +'</div>');
+                                    +'<label for="observations" class="col-form-label">Observations</label>'
+                                    +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
+                                    +'</div>');
                                 $('.modal-spinner').addClass('d-none');
                                 modal.modal('show');
                             }
@@ -414,7 +415,7 @@
                         anchor = $(e.relatedTarget),
                         modalSpinner = modalBody.find('.modal-spinner'),
                         img = anchor.find('img');
-                        content.html(`
+                    content.html(`
                             <div class="slim" id="editImg"
                                  data-service="{{ url('load/replacePhoto') }}/${img.attr('customid')}"
                                  data-fetcher="fetch.php"
@@ -458,16 +459,16 @@
                     });
 
                 });
-               /* window.Echo.private('load-status-update') //fix this
-                    .listen('LoadUpdate', res => {
-                        if (tbLoad) {
-                            const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
-                            if (find) {
-                                const frontData = new FrontDataSource({load: res.load});
-                                tbLoad.gridOptions.api.setServerSideDatasource(frontData);
-                            }
-                        }
-                    });*/
+                /* window.Echo.private('load-status-update') //fix this
+                     .listen('LoadUpdate', res => {
+                         if (tbLoad) {
+                             const find = tbLoad.dataSource.data.rows.find(obj => Number(obj.id) === Number(res.load.id));
+                             if (find) {
+                                 const frontData = new FrontDataSource({load: res.load});
+                                 tbLoad.gridOptions.api.setServerSideDatasource(frontData);
+                             }
+                         }
+                     });*/
 
                 const dateRange = $('#dateRange');
                 dateRange.daterangepicker({
@@ -504,7 +505,7 @@
                             shipper: e.params.data.id,
                         });
                     tbLoad.updateSearchQuery();
-                    filtersChange($('#costumerTable'));
+                    filtersChange($('#customerTable'));
                 }).on('select2:unselect', () => {
                     tbLoad.searchQueryParams.shipper = null;
                     tbLoad.updateSearchQuery();
@@ -516,12 +517,12 @@
             })();
 
             function downloadDispatch(){
-                    var query = {
-                        dateRange: dateRange.value,
-                        shipper: $("#shipper").val(),
-                    }
+                var query = {
+                    dateRange: dateRange.value,
+                    shipper: $("#shipper").val(),
+                }
 
-                    window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
+                window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
                 /*$.ajax({
                     url: "{{url("load/DownloadExcelReport")}}",
                     type: 'GET',
@@ -640,13 +641,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-12">
+        <div class="col-md-6 col-12" >
             <div class="card">
                 <div class="card-content">
-                    <div class="card-body text-center">
+                    <div class="card-body text-center table-responsive" style="height:355px ">
                         <h3>Customer Status</h3>
 
-                        <table class="table table-striped table-bordered mt-1" id="costumerTable">
+                        <table class="table table-striped table-bordered mt-1" id="customerTable">
                             <thead>
                             <tr>
                                 <th >Name</th>
@@ -654,18 +655,24 @@
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
-                            <tbody>
+
+                            <tbody >
                             <tr>
                                 <td>0</td>
                                 <td>0</td>
                                 <td>0</td>
                             </tr>
-                            <tr>
+
+                            <tr >
                                 <td>0</td>
                                 <td>0</td>
                                 <td>0</td>
                             </tr>
+
                             </tbody>
+
+
+
                         </table>
 
                     </div>
@@ -696,8 +703,10 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                <a class="dropdown-item" id="genDisReport" data-toggle="modal" data-target="#createDispatchReportModal"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
+
                             </div>
                         </div>
                     </fieldset>
