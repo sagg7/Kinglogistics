@@ -50,6 +50,8 @@ trait GenerateLoads
             'origin_coords.required' => 'The origin map location is required',
             'destination_coords.required' => 'The destination map location is required',
         ], [
+            'shipper_id' => 'customer',
+            'trip_id' => 'trip',
             'load_type_id' => 'load type',
             'driver_id' => 'driver',
         ]);
@@ -120,7 +122,7 @@ trait GenerateLoads
                 $loadStatus->load_id = $load->id;
                 $loadStatus->unallocated_timestamp = Carbon::now();
                 $loadStatus->accepted_timestamp = Carbon::now();
-                if ($load->notes == 'finished'){
+                if ($load->notes === 'finished'){
                     $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->requested_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->accepted_timestamp = Carbon::parse($data["date"]);

@@ -10,17 +10,22 @@
         <script defer>
             let tbAG = null;
             (() => {
-                const latitudeFormatter = (params) => {
-                    return params.value.split(',')[0];
+                function CoordsLinkRenderer() {}
+                CoordsLinkRenderer.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    const coords = params.value;
+                    const arr = coords.split(',');
+                    const latitude = Number(arr[0]).toFixed(5);
+                    const longitude = Number(arr[1]).toFixed(5);
+                    this.eGui.innerHTML = `<a href="http://www.google.com/maps/place/${coords}" target="_blank">${latitude},${longitude}</a>`;
                 }
-                const longitudeFormatter = (params) => {
-                    return params.value.split(',')[1];
+                CoordsLinkRenderer.prototype.getGui = () => {
+                    return this.eGui;
                 }
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Name', field: 'name'},
-                        {headerName: 'Latitude', field: 'coords', valueFormatter: latitudeFormatter},
-                        {headerName: 'Longitude', field: 'coords', valueFormatter: longitudeFormatter},
+                        {headerName: 'Latitude', field: 'coords', cellRenderer: CoordsLinkRenderer},
                     ],
                     menu: [
                         @if(auth()->user()->can(['update-job']))

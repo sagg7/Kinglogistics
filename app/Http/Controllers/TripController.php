@@ -30,7 +30,6 @@ class TripController extends Controller
                     $q->where('id', session('broker') ?? auth()->user()->broker_id);
                 })
                     ->pluck('name', 'id')->toArray(),
-            'statuses' => [null => '', 'stage' => 'Stage', 'loads' => 'Loads'],
         ];
     }
 
@@ -44,19 +43,12 @@ class TripController extends Controller
             'rate_id' => ['required', 'exists:rates,id'],
             'origin_id' => ['required', 'exists:origins,id'],
             'destination_id' => ['required', 'exists:destinations,id'],
-            //'origin' => ['required', 'string', 'max:255'],
-            //'origin_coords' => ['required', 'string', 'max:255'],
-            //'destination' => ['required', 'string', 'max:255'],
-            //'destination_coords' => ['required', 'string', 'max:255'],
             'mileage' => ['required', 'numeric'],
             'status' => ['required'],
             'status_current' => ['numeric'],
             'status_total' => ['numeric'],
-        ], [
-            //'origin_coords.required' => 'The origin map location is required',
-            //'destination_coords.required' => 'The destination map location is required',
-        ], [
-            'shipper_id' => 'shipper',
+        ], [], [
+            'shipper_id' => 'customer',
             'zone_id' => 'zone',
             'rate_id' => 'rate',
             'origin_id' => 'origin',
@@ -137,14 +129,7 @@ class TripController extends Controller
             $trip->destination_id = $request->destination_id;
             $trip->name = $request->name;
             $trip->customer_name = $request->customer_name;
-            //$trip->origin = $request->origin;
-            //$trip->origin_coords = $request->origin_coords;
-            //$trip->destination = $request->destination;
-            //$trip->destination_coords = $request->destination_coords;
             $trip->mileage = $request->mileage;
-            $trip->status = $request->status;
-            $trip->status_current = $request->status_current;
-            $trip->status_total = $request->status_total;
             $trip->save();
 
             return $trip;
@@ -380,11 +365,21 @@ class TripController extends Controller
                     $this->loadFilter($q, $turn);
                     $q->select(['loads.id', 'trip_id', 'accepted_timestamp', 'finished_timestamp', 'unallocated_timestamp']);
                 },
+                'trip_destination:id,status_current,status_total',
             ])
-            ->get();
+            ->get(['id', 'name', 'mileage', 'destination_id', 'status', 'status_current', 'status_total']);
 
         foreach ($trips as $trip) {
-            $trip->percentage = $trip->status_current ? ($trip->status_current * 100) / $trip->status_total : 0;
+            if ($trip->trip_destination) {
+                $current_status = $trip->trip_destination->status_current;
+                $status_total = $trip->trip_destination->status_total;
+                $trip->status_current = $current_status;
+                $trip->status_total = $status_total;
+            } else {
+                $current_status = $trip->status_current;
+                $status_total = $trip->status_total;
+            }
+            $trip->percentage = $current_status ? ($current_status * 100) / $status_total : 0;
             $avgMinutesSum = 0;
             $avgMinutesCount = 0;
             $loadTimeSum = 0;

@@ -8,6 +8,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -157,14 +158,32 @@ class OriginController extends Controller
         return $this->selectionData($query, $request->take, $request->page);
     }
 
-    public function search(Request $request)
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function search(Request $request): array
     {
+        $customSearch = [];
+
         $query = Origin::select([
             'id',
             'name',
             'coords',
         ])
-            ->where('broker_id', session('broker'));
+            ->where('broker_id', session('broker'))
+            ->with([
+                'trips' => function ($q) {
+                    $q->select('id', 'origin_id')
+                        ->withCount('loads')
+                        ->withCount([
+                            'loads AS loads_tons_sum' => function ($q) {
+                                $q->select(DB::raw('SUM(tons) tons_sum'));
+                                    //->where('tons', 'regexp', '^[0-9]+$');
+                            }
+                        ]);
+                }
+            ]);
 
         return $this->multiTabSearchData($query, $request);
     }

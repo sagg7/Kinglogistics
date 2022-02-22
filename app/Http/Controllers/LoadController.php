@@ -148,10 +148,11 @@ class LoadController extends Controller
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)){ //temporary
                     $data['driver_id'] = $request->driver_id;
-                    if ($data['notes'] == 'finished')
+                    if ($data['notes'] === "finished") {
                         $data['status'] = 'finished';
-                    else
+                    } else {
                         $data['status'] = 'accepted';
+                    }
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
@@ -168,6 +169,10 @@ class LoadController extends Controller
                 event(new LoadUpdate($load));
             }
         });
+
+        if ($request->ajax()) {
+            return ['success' => true];
+        }
 
         return redirect()->route('load.index');
     }
