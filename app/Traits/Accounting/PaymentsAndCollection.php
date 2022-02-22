@@ -157,11 +157,13 @@ trait PaymentsAndCollection
             }
             foreach ($shipper_invoices as $shipper_id => $invoice) {
                 // Iterate through the load grouping
+                $customId = ShipperInvoice::where('shipper_id', $shipper_id)->max('custom_id');
                 foreach ($invoice as $trip) {
                     foreach ($trip['load_groups'] as $group) {
                         if (count($group['loads']) > 0) {
                             $shipper_invoice = new ShipperInvoice();
                             $shipper_invoice->date = $customDate;
+                            $shipper_invoice->custom_id = ++$customId;
                             //$shipper_invoice->date = $carbon_now;
                             $shipper_invoice->shipper_id = $shipper_id;
                             $shipper_invoice->save();

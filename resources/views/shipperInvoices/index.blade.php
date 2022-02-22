@@ -4,6 +4,15 @@
 
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "view-expenses", "title" => "Charges List"])
+        @include("common.modals.genericAjaxLoading", ["id" => "run-invoices", "title" => "Run Invoices", "content" => Form::label('date', ucfirst(__('Select maximum load date')), ['class' => 'col-form-label']).
+                        '<div style = "min-height: 400px">
+                            <div class="input-group id="date-div">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-calendar-alt"></i></span>
+                                </div>'.
+                                Form::text("date", (date('N', time()) == 1) ? date('Y-m-d') : date('Y-m-d', strtotime('last Monday')) ?? null, ['class' => 'form-control pickadate-months-year']).
+                        '</div><div id=loader></div></div>' ,
+                        'footerButton' => '<button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" id="button-run">Submit</button>'])
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -170,6 +179,26 @@
                     else
                         throwErrorMsg('There are no completed invoices');
                 });
+
+                $('#runInvoices').click(function (e) {
+                    $("#run-invoices").modal("show");
+                });
+                $('#button-run').click(function (e) {
+                    $.ajax({
+                        url: '/shipper/invoice/runInvoices/',
+                        type: 'POST',
+                        data: {
+                            date: $('[name=date]').val()
+                        },
+                        success: (res) => {
+                            throwErrorMsg("The invoices are being created please wait a minute", {"title": "Success!", "type": "success"})
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    });
+                    $("#run-invoices").modal("hide");
+                });
             })();
         </script>
     @endsection
@@ -187,6 +216,9 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                             <a class="dropdown-item" id="completeAll"><i class="fas fa-paper-plane"></i> Send Emails & Complete</a>
+                            @if(auth()->user()->can(['update-invoice']))
+                                <a class="dropdown-item" id="runInvoices"><i class="fas fa-file-invoice"></i> Run invoices</a>
+                            @endif
                         </div>
                     </div>
                 </div>
