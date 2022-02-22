@@ -216,7 +216,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                             <a class="dropdown-item" id="completeAll"><i class="fas fa-paper-plane"></i> Send Emails & Complete</a>
-                            @if(auth()->user()->can(['update-invoice']))
+                            @if(auth()->user()->can(['create-invoice']))
                                 <a class="dropdown-item" id="runInvoices"><i class="fas fa-file-invoice"></i> Run invoices</a>
                             @endif
                         </div>
