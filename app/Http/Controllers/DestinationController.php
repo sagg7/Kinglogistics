@@ -8,6 +8,7 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -16,11 +17,24 @@ class DestinationController extends Controller
 {
     use GetSelectionData, GetSimpleSearchData;
 
+    /**
+     * @return array
+     */
+    private function createEditParams(): array
+    {
+        return [
+            'statuses' => ['stage' => 'Stage', 'loads' => 'Loads'],
+        ];
+    }
+
     private function validator(array $data)
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'coords' => ['required', 'string', 'max:255'],
+            'status' => ['required'],
+            'status_current' => ['numeric'],
+            'status_total' => ['numeric'],
         ], [
             'coords.required' => 'The destination map location is required',
         ]);
@@ -54,6 +68,9 @@ class DestinationController extends Controller
 
         $destination->name = $request->name;
         $destination->coords = $request->coords;
+        $destination->status = $request->status;
+        $destination->status_current = $request->status_current;
+        $destination->status_total = $request->status_total;
         $destination->save();
 
         return $destination;
@@ -66,7 +83,8 @@ class DestinationController extends Controller
      */
     public function create(): View
     {
-        return view('trips.destinations.create');
+        $params = $this->createEditParams();
+        return view('trips.destinations.create', $params);
     }
 
     /**
@@ -106,7 +124,7 @@ class DestinationController extends Controller
     {
         $destination = Destination::where('id', session('broker'))
             ->findOrFail($id);
-        $params = compact('destination');
+        $params = compact('destination') + $this->createEditParams();
         return view('trips.destinations.edit', $params);
     }
 
@@ -157,15 +175,45 @@ class DestinationController extends Controller
         return $this->selectionData($query, $request->take, $request->page);
     }
 
-    public function search(Request $request)
+    /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
     {
+        return null;
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function search(Request $request): array
+    {
+        $customSearch = [];
+
         $query = Destination::select([
             'id',
             'name',
             'coords',
+            'status',
+            'status_current',
+            'status_total',
         ])
-            ->where('broker_id', session('broker'));
+            ->where('broker_id', session('broker'))
+            ->with([
+                'trips' => function ($q) {
+                    $q->select('trips.id', 'destination_id')
+                        ->withCount('loads')
+                        ->withCount([
+                            'loads AS loads_tons_sum' => function ($q) {
+                                $q->select(DB::raw('SUM(tons) tons_sum'));
+                                    //->where('tons', 'regexp', '^[0-9]+$');
+                            }
+                        ]);
+                }
+            ]);
 
-        return $this->multiTabSearchData($query, $request);
+        return $this->multiTabSearchData($query, $request, 'getRelationArray', 'where', $customSearch);
     }
 }

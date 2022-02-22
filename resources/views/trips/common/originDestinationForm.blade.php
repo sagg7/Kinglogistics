@@ -29,6 +29,37 @@
                     </div>
                 </div>
             </div>
+            @isset($statuses)
+            <div class="row">
+                <div class="form-group col-md-4">
+                    {!! Form::label('status', ucfirst(__('status')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('status', $statuses, $model->status ?? null, ['class' => 'form-control select2' . ($errors->first('status') ? ' is-invalid' : '')]) !!}
+                    @error('status')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-4">
+                    {!! Form::label('status_current', ucfirst(__('status current')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('status_current', $model->status_current ?? null, ['class' => 'form-control' . ($errors->first('status_current') ? ' is-invalid' : '')]) !!}
+                    @error('status_current')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-4">
+                    {!! Form::label('status_total', ucfirst(__('status total')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('status_total', $model->status_total ?? null, ['class' => 'form-control' . ($errors->first('status_total') ? ' is-invalid' : '')]) !!}
+                    @error('status_total')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+            </div>
+            @endisset
             <div class="form-group">
                 {!! Form::hidden('coords', $model->coords ?? null, ['class' => 'form-control' . ($errors->first('coords') ? ' is-invalid' : '')]) !!}
                 @error('coords')
