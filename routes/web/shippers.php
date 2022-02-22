@@ -33,9 +33,9 @@ Route::prefix('shipper')->group(function () {
     Route::group(['middleware' => ['permission:read-customer']], function () {
         Route::get('status/{customerId?}', [ShipperController::class, 'shipperStatus'])
             ->name('shipper.status');
-      
+
     });
-        
+
 
     Route::prefix('invoice')->group(function () {
         Route::group(['middleware' => ['permission:read-invoice']], function () {
@@ -51,6 +51,8 @@ Route::prefix('shipper')->group(function () {
                 ->name('invoice.downloadPhotos');
         });
         Route::group(['middleware' => ['permission:create-invoice']], function () {
+            Route::post('runInvoices', [ShipperInvoiceController::class, 'runInvoices'])
+                ->name('invoice.runInvoices');
         });
         Route::group(['middleware' => ['permission:update-invoice']], function () {
             Route::post('complete/{id}', [ShipperInvoiceController::class, 'complete'])

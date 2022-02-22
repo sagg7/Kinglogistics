@@ -18,8 +18,13 @@
                 @endisset
             </div>
             <div class="modal-footer">
+            @isset($footerButton)
+                {!! $footerButton !!}
+            @else
                 <button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" data-dismiss="modal">Close</button>
+            @endisset
             </div>
+
         </div>
     </div>
 </div>

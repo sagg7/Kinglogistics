@@ -29,7 +29,7 @@ use Mpdf\MpdfException;
 
 trait PaymentsAndCollection
 {
-    protected $customDate = "2022-02-13";
+    //protected $customDate = "2022-02-13";
 
     use CarrierPaymentsPDF;
     /**
@@ -106,9 +106,9 @@ trait PaymentsAndCollection
         return $rate;
     }
 
-    private function shipperInvoices()
+    private function shipperInvoices($customDate)
     {
-        DB::transaction(function () {
+        DB::transaction(function () use ($customDate) {
             $carbon_now = Carbon::now();
             $loads = Load::join('drivers', 'drivers.id', '=', 'driver_id')
                 ->whereNull('shipper_invoice_id')
@@ -117,8 +117,8 @@ trait PaymentsAndCollection
                     // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
                     //$q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
                 })
-                ->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                    $q->whereDate('finished_timestamp', '<=', $this->customDate);
+                ->whereHas('loadStatus', function ($q) use ($customDate, $carbon_now) {
+                    $q->whereDate('finished_timestamp', '<=', $customDate);
                     //$q->whereDate('finished_timestamp', '<=', $carbon_now);
                 })
                 ->whereNotNull('inspected')
@@ -161,7 +161,7 @@ trait PaymentsAndCollection
                     foreach ($trip['load_groups'] as $group) {
                         if (count($group['loads']) > 0) {
                             $shipper_invoice = new ShipperInvoice();
-                            $shipper_invoice->date = $this->customDate;
+                            $shipper_invoice->date = $customDate;
                             //$shipper_invoice->date = $carbon_now;
                             $shipper_invoice->shipper_id = $shipper_id;
                             $shipper_invoice->save();
@@ -181,7 +181,7 @@ trait PaymentsAndCollection
                             $expense->type_id = 1; // Hardcoded value that represents the "Invoice Commission"
                             $expense->description = "Invoice commission";
                             //$expense->date = $carbon_now;
-                            $expense->date = $this->customDate;
+                            $expense->date = $customDate;
                             $expense->shipper_invoice_id = $shipper_invoice->id;
                             $expense->save();
                         }
@@ -234,9 +234,9 @@ trait PaymentsAndCollection
         });
     }
 
-    private function carrierPayments()
+    private function carrierPayments($customDate)
     {
-        DB::transaction(function () {
+        DB::transaction(function () use ($customDate) {
             $new_expenses = [];
             $charges = Charge::with('carriers')
                 ->get();
@@ -365,7 +365,7 @@ trait PaymentsAndCollection
                 //->where('status', 'finished')
                 //// CONDITION OF AT LEAST ONLY PAST WEEK LOADS
                 //->whereHas('loadStatus', function ($q) use ($carbon_now) {
-                //    //$q->whereDate('finished_timestamp', '<=', $this->customDate);
+                //    //$q->whereDate('finished_timestamp', '<=', $customDate);
                 //    $q->whereDate('finished_timestamp', '<=', $carbon_now);
                 //})
                 //->whereNotNull('inspected')
@@ -411,7 +411,7 @@ trait PaymentsAndCollection
             foreach ($carrier_payments as $carrier_id => $payment) {
                 // Create the new carrier payment
                 $carrier_payment = new CarrierPayment();
-                $carrier_payment->date = $this->customDate;
+                $carrier_payment->date = $customDate;
                 //$carrier_payment->date = $carbon_now;
                 $carrier_payment->carrier_id = $carrier_id;
                 $carrier_payment->save();

@@ -19,8 +19,10 @@ class ProcessPaymentsAndCollection implements ShouldQueue, ShouldBeUnique
      *
      * @return void
      */
-    public function __construct()
+    protected $date;
+    public function __construct($date)
     {
+        $this->date = $date;
         $this->onQueue('accounting');
     }
 
@@ -31,7 +33,7 @@ class ProcessPaymentsAndCollection implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
-        $this->shipperInvoices();
-        //$this->carrierPayments();
+        $this->shipperInvoices($this->date);
+        $this->carrierPayments($this->date);
     }
 }

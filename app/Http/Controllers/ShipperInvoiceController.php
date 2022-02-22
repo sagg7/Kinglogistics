@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ShipperInvoiceEnum;
 use App\Exports\ShipperInvoiceExport;
+use App\Jobs\ProcessPaymentsAndCollection;
 use App\Mail\SendShipperInvoices;
 use App\Models\ShipperInvoice;
 use App\Traits\Accounting\ShipperInvoicesPDF;
@@ -306,5 +307,11 @@ class ShipperInvoiceController extends Controller
         $title = "Shipper Invoice - " . $shipperInvoice->shipper->name ."  - " . $shipperInvoice->date->format('m/d/Y');
         return view('exports.shipperInvoices.invoicePictures', compact('title', 'shipperInvoice', 'photos', 'id'));
 
+    }
+
+    public function runInvoices(Request $request)
+    {
+        //ProcessPaymentsAndCollection::dispatch(($request->date))->afterCommit();
+        return ['success' => false];
     }
 }
