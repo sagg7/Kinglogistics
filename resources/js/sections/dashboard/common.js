@@ -93,7 +93,7 @@
     const tripsStatusFormatter = (params) => {
         if (params.value)
             return params.value.charAt(0).toUpperCase()  + params.value.slice(1)
-                + `${params.data.status_current} of ${params.data.status_total}`;
+                + ` ${params.data.status_current} of ${params.data.status_total}`;
         else
             return '';
     };

@@ -51,11 +51,13 @@ class Trip extends Model
 
     public function trip_origin(): BelongsTo
     {
-        return $this->belongsTo(Origin::class, 'origin_id');
+        return $this->belongsTo(Origin::class, 'origin_id')
+            ->withTrashed();
     }
 
     public function trip_destination(): BelongsTo
     {
-        return $this->belongsTo(Destination::class, 'destination_id');
+        return $this->belongsTo(Destination::class, 'destination_id')
+            ->withTrashed();
     }
 }

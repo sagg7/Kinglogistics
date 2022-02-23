@@ -18,7 +18,9 @@
         @include("loads.common.modals.createDispatchReport")
         @include("loads.common.modals.DispatchReportModal")
         @include("common.modals.genericAjaxLoading", ["id" => "showDispatchReport", "title" => "Dispatch Report"])
-
+        @include("loads.common.modals.createLoad")
+        @include("loads.common.modals.viewOrigins")
+        @include("loads.common.modals.viewDestinations")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -34,7 +36,6 @@
             let tbLoadFinished = null;
             let now = null;
             (() => {
-
                 let reference = {};
                 let control = {};
                 let bol = {};
@@ -104,7 +105,6 @@
                 }
 
                 $('#view-photo').on('show.bs.modal', function(e) {
-
                     const modal = $(e.currentTarget),
                         modalBody = modal.find('.modal-body'),
                         content = modal.find('.content-body'),
@@ -126,7 +126,7 @@
                     content.removeClass('d-none');
                     initUpload();
 
-                    var cropper = new Slim(document.getElementById('editImg'),{
+                    const cropper = new Slim(document.getElementById('editImg'),{
                         crop: {
                             x: 0,
                             y: 0,
@@ -166,7 +166,7 @@
                         }
                     });*/
 
-                let dateRange = $('#dateRange');
+                const dateRange = $('#dateRange');
                 dateRange.daterangepicker({
                     format: 'YYYY/MM/DD',
                     startDate: moment().startOf('month'),
@@ -223,8 +223,7 @@
                 });
 
                 let tableProperties = (type) => {
-
-                    class FrontDataSource {
+                    /*class FrontDataSource {
                         constructor(data) {
                             this.load = data.load;
                         }
@@ -243,7 +242,7 @@
                                         break;
                                     default:
                                         break;
-                                }*/
+                                }/
                                 current.rows[idx] = this.load;
                                 params.successCallback(current.rows, current.lastRow);
                             } else {
@@ -252,7 +251,7 @@
                             }
                             return false;
                         }
-                    }
+                    }*/
 
                     const checkDuplicates = (numberType = null, current) => {
                         current.dataSource.data.rows.forEach(item => {
@@ -300,19 +299,19 @@
                             }
                         });
                         if (!numberType || numberType === 'control_number') {
-                            current.columnDefs[5].cellClass = params => {
+                            current.columnDefs[6].cellClass = params => {
                                 if (params.value && control[params.value] && control[params.value]['count'] > 1)
                                     return 'bg-danger text-white';
                             }
                         }
                         if (!numberType || numberType === 'customer_reference') {
-                            current.columnDefs[6].cellClass = params => {
+                            current.columnDefs[7].cellClass = params => {
                                 if (params.value && reference[params.value] && reference[params.value]['count'] > 1)
                                     return 'bg-danger text-white';
                             }
                         }
                         if (!numberType || numberType === 'bol') {
-                            current.columnDefs[7].cellClass = params => {
+                            current.columnDefs[8].cellClass = params => {
                                 if (params.value && bol[params.value] && bol[params.value]['count'] > 1)
                                     return 'bg-danger text-white';
                             }
@@ -321,10 +320,6 @@
                     }
 
                     const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
-                    let menu;
-                    let gridOptions = {};
-                    let previousModalId = null;
-
                     const nameFormatter = (params) => {
                         if (params.value)
                             return params.value.name;
@@ -337,8 +332,8 @@
                         else
                             return '';
                     };
-                    function loadTimeRenderer() {}
-                    loadTimeRenderer.prototype.init = (params) => {
+                    function LoadTimeRenderer() {}
+                    LoadTimeRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
                         if(!now)
                             now = new Date(params.now);
@@ -357,7 +352,7 @@
                             classU = "update"
                         this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
                     }
-                    loadTimeRenderer.prototype.getGui = () => {
+                    LoadTimeRenderer.prototype.getGui = () => {
                         return this.eGui;
                     }
                     const emptyFormatter = (params) => {
@@ -437,7 +432,7 @@
                     function DateRenderer() {}
                     DateRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
-                        let string = `<div class="text-center"><i class="fas fa-arrow-circle-right"></i>${params.data.accepted_timestamp}<br>`;
+                        let string = `<div class="text-center" style="line-height: 15px;"><i class="fas fa-arrow-circle-right"></i>${params.data.accepted_timestamp}<br>`;
                         if(params.data.finished_timestamp)
                             string += `<i class="fas fa-arrow-circle-left"></i>${params.value}</div>`;
 
@@ -447,8 +442,8 @@
                     DateRenderer.prototype.getGui = () => {
                         return this.eGui;
                     }
-                    menu = [
-                            @if(auth()->user()->can(['update-load-dispatch']))
+                    const menu = [
+                        @if(auth()->user()->can(['update-load-dispatch']))
                         {
                             text: 'Mark as inspected', route: '/load/markAsInspected', icon: 'feather icon-check-circle', type: 'confirm', conditional: 'inspected === null',
                             menuData: {
@@ -476,9 +471,7 @@
                         },
                         @endif
                     ];
-                    gridOptions = {
-                        PhotosRenderer: PhotosRenderer,
-                        StatusBarRenderer: StatusBarRenderer,
+                    const gridOptions = {
                         undoRedoCellEditing: true,
                         onCellEditingStopped: function (event) {
                             let table = null;
@@ -535,7 +528,7 @@
                             {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
                             {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
                             {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
-                            {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: loadTimeRenderer},
+                            {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: LoadTimeRenderer},
                         ],
                         menu,
                         gridOptions,
@@ -544,9 +537,6 @@
                         tableRef: `tb${tableName}`,
                         successCallback: (params) => {
                             checkDuplicates(null, (type === 'active') ? tbLoadActive : tbLoadFinished );
-                            setTimeout(() => {
-                                $("i.fa-arrow-circle-right").parents('div').css("line-height", "15px");
-                            }, 300);
                             now = new Date(params.now);
                         },
                         searchQueryParams: {
@@ -555,22 +545,19 @@
                     };
                 };
 
-
-               tbLoadActive = new tableAG(tableProperties(`active`));
-               tbLoadFinished = new tableAG(tableProperties(`finished`));
-
+                tbLoadActive = new tableAG(tableProperties(`active`));
+                tbLoadFinished = new tableAG(tableProperties(`finished`));
 
                 setTimeout(() => {
                     addTime();
                 }, 1000);
             })();
-                function downloadDispatch(){
-                    var query = {
-                        dateRange: dateRange.value,
-                        shipper: $("#shipper").val(),
-                    }
 
-                    window.location = "{{url("load/DownloadExcelReport")}}?" + $.param(query);
+            function downloadDispatch() {
+                window.location = "{{url("load/DownloadExcelReport")}}?" + $.param({
+                    dateRange: dateRange.value,
+                    shipper: $("#shipper").val(),
+                });
                 /*$.ajax({
                     url: "{{url("load/DownloadExcelReport")}}",
                     type: 'GET',
@@ -596,17 +583,15 @@
             }
 
             function openPicReport() {
-                var query = {
+                window.location = "{{url("load/pictureReport")}}?" + $.param({
                     dateRange: dateRange.value,
                     shipper: $("#shipper").val(),
-                }
-
-                window.location = "{{url("load/pictureReport")}}?" + $.param(query);
+                });
             }
 
             function addTime() {
-                $(".update").each(function (index){
-                    let time = parseFloat($(this).attr('time'))+1000;
+                $(".update").each(function (index) {
+                    let time = parseFloat($(this).attr('time')) + 1000;
                     $(this).html(msToTime(time));
                     $(this).attr('time', time);
                 });
@@ -625,10 +610,10 @@
                 hours = (hours < 10) ? "0" + hours : hours;
                 minutes = (minutes < 10) ? "0" + minutes : minutes;
                 let secs = "";
-                if(showSeconds)
+                if (showSeconds)
                     secs = seconds + " s";
-                if(days > 0)
-                    return days + " d " +hours + " h " + minutes + " m " + secs;
+                if (days > 0)
+                    return days + " d " + hours + " h " + minutes + " m " + secs;
                 else if (hours > 0)
                     return hours + " h " + minutes + " m " + secs;
                 else
@@ -643,6 +628,8 @@
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/DispatchReport.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection
 
     <div class="row">
@@ -712,19 +699,18 @@
                 <div class="card-content">
                     <div class="card-body text-center table-responsive" style="height:355px ">
                         <h3>Customer Status</h3>
+
                         <table class="table table-striped table-bordered mt-1" id="customerTable">
                             <thead>
                             <tr>
-                                <th>Name</th>
+                                <th >Name</th>
                                 <th>AVG Waiting Per Load</th>
-                                <th>AVG Load Time</th>
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
 
                             <tbody >
                             <tr >
-                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -766,6 +752,24 @@
                             </div>
                         </div>
                     </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createLoadModal">Create load</button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewOriginsModal">View Origins</button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewDestinationsModal">View Destinations</button>
+                    </div>
                 </div>
             </div>
         </div>

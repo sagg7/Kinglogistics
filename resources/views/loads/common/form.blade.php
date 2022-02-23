@@ -206,4 +206,4 @@
         @enderror
     </div>
 </div>
-{!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
+{!! Form::button('Submit', ['class' => 'btn btn-primary btn-block ' . (isset($ajax) ? 'submit-ajax' : ''), 'type' => 'submit']) !!}

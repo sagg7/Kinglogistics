@@ -101,5 +101,50 @@
         });
         if (shipperSel.length > 0 && !shipperSel.val())
             tripSel.prop('disabled', true).trigger('change');
+        const createLoadModal = $('#createLoadModal');
+        if (createLoadModal.length > 0) {
+            createLoadModal.on('hidden.modal.bs', () => {
+                createLoadModal.find('input, select, textarea').val('').trigger('change');
+                createLoadModal.find('#shipper_id').trigger('select2:unselect');
+            });
+            $('#loadForm').submit(e => {
+                e.preventDefault();
+                const form = $(e.currentTarget);
+                const formData = new FormData(form[0]);
+                const url = form.attr('action');
+                $.ajax({
+                    url,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: (res) => {
+                        if (res.success) {
+                            // If it has notes, the load is stored as finished, thus updating the finished table
+                            if (formData.get('notes') === "finished") {
+                                tbLoadActive.updateSearchQuery();
+                            } else { // Else update the active table
+                                tbLoadFinished.updateSearchQuery();
+                            }
+                            createLoadModal.modal('hide');
+                        } else {
+                            throwErrorMsg();
+                        }
+                    },
+                    error: (res) => {
+                        let errors = `<ul class="text-left">`;
+                        Object.values(res.responseJSON.errors).forEach(msgs => {
+                            msgs.forEach(msg => {
+                                errors += `<li>${msg}</li>`;
+                            });
+                        });
+                        errors += `</ul>`;
+                        throwErrorMsg(errors, {timer: false});
+                    }
+                }).always(() => {
+                    removeAjaxLoaders();
+                });
+            });
+        }
     }
 })();

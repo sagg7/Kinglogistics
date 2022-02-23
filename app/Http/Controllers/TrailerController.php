@@ -329,7 +329,7 @@ class TrailerController extends Controller
         foreach ($trailers as $trailer) {
             $data[] = [
                 'number' => $trailer->number,
-                'carrier' => isset($trailer->rentals[0]) ? $trailer->rentals[0]->carrier->name : null,
+                'carrier' => isset($trailer->rentals[0]) ? (isset($trailer->rentals[0]->carrier)) ? $trailer->rentals[0]->carrier->name : null : null,
                 'driver' => (isset($trailer->rentals[0]) && isset($trailer->rentals[0]->driver)) ? $trailer->rentals[0]->driver->name : null,
                 'trailer_type' => $trailer->trailer_type->name,
                 'chassis_type' => $trailer->chassis_type->name,
