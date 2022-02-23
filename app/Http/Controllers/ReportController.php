@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function Clue\StreamFilter\fun;
 
 class ReportController extends Controller
 {
@@ -22,64 +23,204 @@ class ReportController extends Controller
         return view('reports.dailyLoads');
     }
 
-    public function createDailyDispatchReport(Load $load,Driver $driver,LoadStatus $Load_statuse ){
+    public function createDailyDispatchReport(){
         $name = auth()->user()->name;
         $userId = auth()->user()->id;
         $now = Carbon::now();
+     
+
+        //avg
+        $start = Carbon::now()->subHour(12);
+        $end = Carbon::now();
+        $loadsAccepted = Load::join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+        ->whereBetween('accepted_timestamp', [$start, $end]);
+        $loads = $loadsAccepted->get();
+        $shipperAvg = [];
+        $totalTime = 0;
+        $date = null;
+        $count = 0;
+        foreach ($loads as $key => $load) {
+            if ($date != null) {
+                $totalTime += Carbon::parse($load->accepted_timestamp)->diffInMinutes($date);
+            }
+            $date = $load->accepted_timestamp;
+            $count++;
+        }
+        // Time of session vs schedule
+        $dateIn = DB::table('sessions')
+        ->select('last_activity')
+        ->where('user_id', $userId)
+        ->first()->last_activity;
+        //worked_time: calcular date in vs now();
+        $worked_time = Carbon::parse($dateIn)->diffInMinutes($now);
+
+
+        $max_load = dispatch_report::max('loads_finalized'); 
+        $loads_finalized = Load::where('dispatch_id',$userId)
+        ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+        ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
+         ->where('broker_id', session('broker'))->count();
+         //total loads
+         $total_loads =0;
+         if($loads_finalized!=0)
+            $total_loads =($loads_finalized/$max_load)*100;
+
+        $active_loads = Load::where('status','!=','finished')
+        ->where('broker_id', session('broker'))->count();
+        //this is just an if to know if we have 0 
+        if($active_loads != 0 && $loads_finalized != 0){
+            $loads_pending_to_shift = ($active_loads/$loads_finalized)*100;
+        }else $loads_pending_to_shift = 0;
+        
+
+        $load_time_avg =round(($count !== 0) ? $totalTime/$count : 0);
+        $active_drivers=Driver::where('status','!=','inactive')
+                            ->where('broker_id', session('broker'))->whereHas('truck')->count();
+        //conver each variable to porcentage to get 100% of dispatch_score
+        $load_time_avg_score = ($load_time_avg*5)/100;
+        $worked_time_score = ($worked_time*5)/100;
+        $total_loads_score = ($total_loads*30)/100;
+        $score_app_usage_score = ($loads_pending_to_shift*30)/100;
+        $active_drivers_score = ($active_drivers*30)/100;
+        
         $params = [
             'name'=> $name,
             'date'=> $now->format('d-m-Y'),
             'hours' => $now->toTimeString(),
-            'active_loads' => $load::where('status','!=','finished')
-                            ->where('broker_id', session('broker'))->count(),
-            'active_drivers' => $driver::where('status','!=','inactive')
-                            ->where('broker_id', session('broker'))->count(),
-            'inactive_drivers' => $driver::where('status','==','inactive')
-                            ->where('broker_id', session('broker'))->count(),
-            'loads_finalized' => $load::where('dispatch_id',$userId)
-                            ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
-                            ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
-                             ->where('broker_id', session('broker'))->count(),
-            // 'loads_finalized' =>1,
-            'worked_time' => 60.60,
-            "dispatch_score" => 98,
-            'score_app_usage'=> 92.22,
-            // Session::where('user_id',$userId)->first()->date
-            // 'tiempo' => $now->toDateTimeString()
+            'active_loads' => $active_loads,
+            // Metric to get dispatch_score "Active drivers or truck active = 30%"
+            'active_drivers' => $active_drivers,
+            'inactive_drivers' => Driver::where('status','==','inactive')
+                            ->where('broker_id', session('broker'))->whereHas('truck')->count(),
+            'loads_finalized' => $loads_finalized,
+            //Metric to get loads to pending at the time end shift 30% 
+            'loads_pending_to_shift'=> $loads_pending_to_shift,
+            // Metric to get dispatch_score "Total loads vs max load = 30%"
+            'total_loads'=> $total_loads,
+            // Metric to get dispatch_score "Avg to receive load = 5%"
+            'Load_time_avg' => $load_time_avg,
+            //"session time vs shedule = 5%"
+            'worked_time' => $worked_time,
+            "dispatch_score" => ($load_time_avg_score + $worked_time_score +  $total_loads_score + $score_app_usage_score + $active_drivers_score),
+            'score_app_usage'=> $loads_pending_to_shift,
+
         ];
         return $params;
     }
 
 
-    public function storeDispatchReport(Request $request, Load $load,Driver $driver,LoadStatus $Load_statuse){ 
+    public function storeDispatchReport(Request $request){ 
         $dispatch_report = new dispatch_report();
-        $name = auth()->user()->name;
+         $name = auth()->user()->name;
         $userId = auth()->user()->id;
         $now = Carbon::now();
-        $dispatch_report->dispatch_id = auth()->user()->id;  
-        $dispatch_report->date = Carbon::now();  
-        $dispatch_report->active_loads = $load::where('status','!=','finished')
-        ->where('broker_id', session('broker'))->count();  
-        $dispatch_report->active_drivers = $driver::where('status','!=','inactive')
-        ->where('broker_id', session('broker'))->count();  
-        $dispatch_report->inactive_drivers = $driver::where('status','==','inactive')
-        ->where('broker_id', session('broker'))->count();  
-        $dispatch_report->well_status = $request->wellStatus;  
-        $dispatch_report->loads_finalized = $load::where('dispatch_id',$userId)
+     
+
+        //avg
+        $start = Carbon::now()->subHour(12);
+        $end = Carbon::now();
+        $loadsAccepted = Load::join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+        ->whereBetween('accepted_timestamp', [$start, $end]);
+        $loads = $loadsAccepted->get();
+        $shipperAvg = [];
+        $totalTime = 0;
+        $date = null;
+        $count = 0;
+        foreach ($loads as $key => $load) {
+            if ($date != null) {
+                $totalTime += Carbon::parse($load->accepted_timestamp)->diffInMinutes($date);
+            }
+            $date = $load->accepted_timestamp;
+            $count++;
+        }
+        // Time of session vs schedule
+        $dateIn = DB::table('sessions')
+        ->select('last_activity')
+        ->where('user_id', $userId)
+        ->first()->last_activity;
+        //worked_time: calcular date in vs now();
+        $worked_time = Carbon::parse($dateIn)->diffInMinutes($now);
+
+        
+        $max_load = dispatch_report::max('loads_finalized'); 
+        $loads_finalized = Load::where('dispatch_id',$userId)
         ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
         ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
-         ->where('broker_id', session('broker'))->count();  
-        $dispatch_report->worked_time = 60.60;  
-        // $dispatch_report->worked_time = $request->worked_time;  
-        $dispatch_report->dispatch_score = 98;  
-        // $dispatch_report->dispatch_score = $request->dispatch_score;  
-        $dispatch_report->score_app_usage = 92.22;
-        // $dispatch_report->score_app_usage = $request->score_app_usage;
+         ->where('broker_id', session('broker'))->count();
+         //total loads
+         $total_loads =0;
+         if($loads_finalized!=0)
+            $total_loads =($loads_finalized/$max_load)*100;
+
+        $active_loads = Load::where('status','!=','finished')
+        ->where('broker_id', session('broker'))->count();
+        //this is just an if to know if we have 0 
+        if($active_loads != 0 && $loads_finalized != 0){
+            $loads_pending_to_shift = ($active_loads/$loads_finalized)*100;
+        }else $loads_pending_to_shift = 0;
+        
+
+        $load_time_avg =round(($count !== 0) ? $totalTime/$count : 0);
+        $active_drivers=Driver::where('status','!=','inactive')
+                            ->where('broker_id', session('broker'))->whereHas('truck')->count();
+        //conver each variable to porcentage to get 100% of dispatch_score
+        $load_time_avg_score = ($load_time_avg*5)/100;
+        $worked_time_score = ($worked_time*5)/100;
+        $total_loads_score = ($total_loads*30)/100;
+        $score_app_usage_score = ($loads_pending_to_shift*30)/100;
+        $active_drivers_score = ($active_drivers*30)/100;
+        
+
+        $dispatch_report->dispatch_id = $userId;  
+        $dispatch_report->date = $now;  
+        $dispatch_report->active_loads = $active_loads;  
+        $dispatch_report->active_drivers = $active_drivers;  
+        $dispatch_report->inactive_drivers = Driver::where('status','==','inactive')
+        ->where('broker_id', session('broker'))->count();  
+        $dispatch_report->well_status = $request->wellStatus;  
+        $dispatch_report->loads_finalized = $loads_finalized;  
+        $dispatch_report->worked_time = $worked_time;   
+        $dispatch_report->dispatch_score = ($load_time_avg_score + $worked_time_score +  $total_loads_score + $score_app_usage_score + $active_drivers_score);  
+        $dispatch_report->score_app_usage = $loads_pending_to_shift;
         $dispatch_report->description = $request->situationDescription;  
         $dispatch_report->save();
         
         return ['success' => true, 'data' => $dispatch_report];
-        }
+    }
+
+    public function getDispatchReport(){
+        $report = dispatch_report::with('dispatch')
+                    ->whereHas('dispatch', function($q){
+                        $q->where('broker_id', session('broker'));
+                    })
+                    ->orderBy('date', 'desc')->take(10)->get();
+        return $report;
+    }
+
+    public function showDispatchReportById($id,LoadStatus $Load_statuse ){
+        $report = dispatch_report::find($id);
+        $Formated =Carbon::createFromFormat('Y-m-d H:i:s', $report->date);
+        $dateFormated = $Formated->format('m-d-Y');
+        $hoursFormated = $Formated->format('H:i');
+
+        $params = [
+            'name'=> $report->dispatch->name,
+            'date'=> $dateFormated, 
+            'hours' => $hoursFormated,
+            'active_loads' => $report->active_loads,
+            'active_drivers' => $report->active_drivers,
+            'inactive_drivers' => $report->inactive_drivers,
+            'loads_finalized' => $report->loads_finalized,
+            'worked_time' => $report->worked_time,
+            "dispatch_score" => $report->dispatch_score,
+            'score_app_usage'=> $report->score_app_usage,
+            'well_status'=> $report->well_status,
+            'description'=> $report->description
+        ];
+        // dd($hoursFormated);
+        return $params;
+    }
+
 
     private function compareDates($a, $b)
     {

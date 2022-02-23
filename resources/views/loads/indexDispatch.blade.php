@@ -4,9 +4,9 @@
 
     @section('head')
         <style>
-            #morningTable th, #nightTable th {
-                padding: 5px;
-            }
+        #morningTable th, #nightTable th {
+            padding: 5px;
+        }
         </style>
     @endsection
     @section('modals')
@@ -16,6 +16,9 @@
         @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation"])
         @include("loads.common.modals.driverStatus")
         @include("loads.common.modals.createDispatchReport")
+        @include("loads.common.modals.DispatchReportModal")
+        @include("common.modals.genericAjaxLoading", ["id" => "showDispatchReport", "title" => "Dispatch Report"])
+
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -612,6 +615,7 @@
                 }, 1000);
             }
 
+
             function msToTime(duration, showSeconds = true) {
                 let seconds = Math.floor((duration / (1000)) % 60),
                     minutes = Math.floor((duration / (1000 * 60)) % 60),
@@ -638,8 +642,20 @@
         <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
-
+        <script src="{{ asset('js/sections/loads/dispatch/DispatchReport.min.js') }}"></script>
     @endsection
+
+    <div class="row">
+        <div class="col-md-12 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body text-center">
+                        <button class="btn btn-primary btn-block waves-effect waves-light" onclick="getDispatchReport()">Dispatch Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>                
+    </div>
 
     <div class="row">
         <div class="col-md-6 col-12">
@@ -744,6 +760,7 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                <a class="dropdown-item" id="genDisReport" data-toggle="modal" data-target="#createDispatchReportModal"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>

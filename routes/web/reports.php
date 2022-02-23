@@ -13,6 +13,10 @@ Route::prefix('report')->group(function () {
             ->name('report.activeTime');
         Route::get('activeTimeData', [ReportController::class, 'activeTimeData'])
             ->name('report.activeTimeData');
+        Route::get('getDispatchReport', [ReportController::class, 'getDispatchReport'])
+            ->name('report.getDispatchReport');
+        Route::get('showDispatchReportById/{id}', [ReportController::class, 'showDispatchReportById'])
+            ->name('report.showDispatchReportById');
     });
 
     Route::group(['middleware' => ['permission:update-load-dispatch']], function () {
