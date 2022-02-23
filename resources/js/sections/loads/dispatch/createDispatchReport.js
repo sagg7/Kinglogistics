@@ -35,14 +35,14 @@ function fillFormDispatchReport(formDispatchReport) {
                 `<div class="col-md-3">${res.active_loads}</div>` +
                 `</div><br>` +
                 `<div class="row">` +
-                `<div class="col-md-3">Active Truck:</div>` +
+                `<div class="col-md-3">Active Trucks:</div>` +
                 `<div class="col-md-3">${res.active_drivers}</div>` +
-                `<div class="col-md-3">Inactive Truck:</div>` +
+                `<div class="col-md-3">Inactive Trucks:</div>` +
                 `<div class="col-md-3">${res.inactive_drivers}</div>` +
                 `</div><br>` +
                 `<div class="row">` +
                 `<div class="col-md-3">Time in Dispatch:</div>` +
-                `<div class="col-md-3">${res.worked_time}</div>` +
+                `<div class="col-md-3">${msToTime(res.worked_time*1000*60, false)}</div>` +
                 `<div class="col-md-3">Loads Dispatch:</div>` +
                 `<div class="col-md-3">${res.loads_finalized}</div>` +
                 `</div><br>` +

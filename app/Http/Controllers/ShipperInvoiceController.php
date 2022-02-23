@@ -311,7 +311,7 @@ class ShipperInvoiceController extends Controller
 
     public function runInvoices(Request $request)
     {
-        ProcessPaymentsAndCollection::dispatch(($request->date))->afterCommit();
-        return ['success' => false];
+        ProcessPaymentsAndCollection::dispatch(str_replace("/","-",$request->date))->afterCommit();
+        return ['success' => true, 'date' => str_replace("/","-",$request->date)];
     }
 }

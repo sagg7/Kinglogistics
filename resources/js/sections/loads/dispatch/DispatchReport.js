@@ -14,7 +14,7 @@ function getDispatchReport() {
         for(var i=0; i < res.length; i++)
         {
 
-            customerForm.append(   
+            customerForm.append(
                 `<tr id="${res[i].id}" class="reports"><td>${res[i].dispatch.name}</td>` +
                 `<td>${res[i].date}</td>` +
               `</tr>` );
@@ -29,7 +29,7 @@ function getDispatchReport() {
             $.ajax({
                 type: 'GET',
                 url: '/report/showDispatchReportById/'+id,
-                data:{    
+                data:{
                 'name': $("params.name").val(),
                 'date': $("params.date").val(),
                 'hours': $("params.hours").val(),
@@ -41,9 +41,9 @@ function getDispatchReport() {
                 'dispatch_score':$("params.dispatch_score").val(),
                 'score_app_usage':$("params.score_app_usage").val(),
                  'well_status':$("params.well_status").val(),
-                 'description':$("params.description").val(),   
-            } ,  
-               
+                 'description':$("params.description").val(),
+            } ,
+
                 success: (res) => {
                     let showDispatchReport =  $("#showDispatchReport");
                     showDispatchReport.modal('show');
@@ -72,7 +72,7 @@ function getDispatchReport() {
                         `</div><br>` +
                         `<div class="row">` +
                         `<div class="col-md-3">Time in Dispatch:</div>` +
-                        `<div class="col-md-3">${res.worked_time}</div>` +
+                        `<div class="col-md-3">${msToTime(res.worked_time*1000*60, false)}</div>` +
                         `<div class="col-md-3">Loads Dispatch:</div>` +
                         `<div class="col-md-3">${res.loads_finalized}</div>` +
                         `</div><br>` +
@@ -87,11 +87,11 @@ function getDispatchReport() {
                         `<div class="col-md-3">${res.well_status}</div>` +
                         `<div class="col-md-3">Description</div>` +
                         `<div class="col-md-3">${res.description}</div>` +
-                        `</div><br>` 
+                        `</div><br>`
                     )
-     
-                
-    
+
+
+
                 },
                 error: () => {
                     throwErrorMsg();

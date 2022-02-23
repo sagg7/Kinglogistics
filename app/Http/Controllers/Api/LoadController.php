@@ -14,6 +14,7 @@ use App\Models\AppConfig;
 use App\Models\AvailableDriver;
 use App\Models\BotAnswers;
 use App\Models\Broker;
+use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
@@ -368,6 +369,7 @@ class LoadController extends Controller
 
         $load = Load::find($loadId);
         $load->bol = $request->get('bol');
+        $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);

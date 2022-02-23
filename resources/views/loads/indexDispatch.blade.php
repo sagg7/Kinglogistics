@@ -632,16 +632,25 @@
         <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection
 
-    <div class="row">
-        <div class="col-md-12 col-12">
-            <div class="card">
-                <div class="card-content">
-                    <div class="card-body text-center">
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createLoadModal">Create load</button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewOriginsModal">View Origins</button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewDestinationsModal">View Destinations</button>
+                    </div>
+                    <div class="col">
                         <button class="btn btn-primary btn-block waves-effect waves-light" onclick="getDispatchReport()">Dispatch Report</button>
                     </div>
                 </div>
             </div>
-        </div>                
+        </div>
     </div>
 
     <div class="row">
@@ -752,24 +761,6 @@
                             </div>
                         </div>
                     </fieldset>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-content">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createLoadModal">Create load</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewOriginsModal">View Origins</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#viewDestinationsModal">View Destinations</button>
-                    </div>
                 </div>
             </div>
         </div>

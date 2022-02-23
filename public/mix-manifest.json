@@ -1,5 +1,4 @@
 {
-    "/js/sections/loads/common.min.js": "/js/sections/loads/common.min.js",
-    "/js/sections/loads/dispatch/originsAndDestinations.min.js": "/js/sections/loads/dispatch/originsAndDestinations.min.js",
-    "/js/sections/dashboard/common.min.js": "/js/sections/dashboard/common.min.js"
+    "/js/sections/loads/dispatch/customerStatus.min.js": "/js/sections/loads/dispatch/customerStatus.min.js",
+    "/js/sections/loads/dispatch/createDispatchReport.min.js": "/js/sections/loads/dispatch/createDispatchReport.min.js"
 }

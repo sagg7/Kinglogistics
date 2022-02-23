@@ -15,8 +15,7 @@ function filtersChange(tableCustomer){
             {
                 let shipper = res.shipperAvg[i];
                 let color = 'black';
-                console.log(shipper);
-
+                
                 if(shipper.percentage < 100){
                     color="red";
                 }

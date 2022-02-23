@@ -3,6 +3,7 @@
 namespace App\Traits\Load;
 
 use App\Models\AvailableDriver;
+use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadStatus;
@@ -130,6 +131,8 @@ trait GenerateLoads
                     $loadStatus->to_location_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->arrived_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->finished_timestamp = Carbon::parse($data["date"]);
+                    $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
+                    $load->save();
                 }
 
                 $loadStatus->save();

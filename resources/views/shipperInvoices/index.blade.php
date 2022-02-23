@@ -188,7 +188,7 @@
                         url: '/shipper/invoice/runInvoices/',
                         type: 'POST',
                         data: {
-                            date: $('[name=date]').val()
+                            date: $('[name=date_submit]').val()
                         },
                         success: (res) => {
                             throwErrorMsg("The invoices are being created please wait a minute", {"title": "Success!", "type": "success"})
