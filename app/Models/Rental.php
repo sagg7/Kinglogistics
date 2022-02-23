@@ -28,7 +28,7 @@ class Rental extends Model
      */
     public function carrier(): BelongsTo
     {
-        return $this->belongsTo(Carrier::class);
+        return $this->belongsTo(Carrier::class)->withTrashed();
     }
 
     /**
