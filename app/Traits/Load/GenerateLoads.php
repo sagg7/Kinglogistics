@@ -131,7 +131,7 @@ trait GenerateLoads
                     $loadStatus->to_location_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->arrived_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->finished_timestamp = Carbon::parse($data["date"]);
-                    $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
+                    //$load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
                     $load->save();
                 }
 
