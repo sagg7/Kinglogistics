@@ -466,7 +466,7 @@ class RentalController extends Controller
         $rental->save();
         $rental->trailer->status = TrailerEnum::AVAILABLE;
         $rental->trailer->save();
-        
+
         return response()->json([
             'msg' => 'Rental terminated correctly',
             'success' => true
@@ -618,12 +618,14 @@ class RentalController extends Controller
                 'period' => ucfirst($rental->period),
                 'cost' => $rental->cost,
                 'deposit' => $rental->deposit,
+                'delivered_at' => $rental->delivered_at,
+                'finished_at' => $rental->finished_at,
             ];
         }
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Date", "Carrier", "Driver", "Trailer", "Period", "Cost", "Deposit"],
+            "headers" => ["Date", "Carrier", "Driver", "Trailer", "Period", "Cost", "Deposit", "Delivered At", "Finished At"],
             "formats" => [
                 'F' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
                 'G' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
