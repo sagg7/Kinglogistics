@@ -406,4 +406,10 @@ class UserController extends Controller
             return ['success' => true];
         });
     }
+
+    public function spotterCheckInOut(){
+        return view('users.checkInOut');
+    }
+
+
 }
