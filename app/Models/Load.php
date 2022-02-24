@@ -20,6 +20,7 @@ class Load extends Model
         'control_number',
         'customer_reference',
         'bol',
+        'tons',
     ];
 
     /**
@@ -29,6 +30,7 @@ class Load extends Model
         'date' => 'date:m/d/Y',
         'weight' => 'decimal:2',
         'mileage' => 'decimal:2',
+        'tons' => 'string',
         'rate' => 'decimal:2',
         'shipper_rate' => 'decimal:2',
         'auto_assigned' => 'boolean',

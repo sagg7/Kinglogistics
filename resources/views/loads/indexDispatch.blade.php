@@ -523,7 +523,7 @@
                             {headerName: 'Control #', field: 'control_number', editable: true, valueFormatter: emptyFormatter},
                             {headerName: 'C Reference', field: 'customer_reference', editable: true, valueFormatter: emptyFormatter},
                             {headerName: 'BOL', field: 'bol', editable: true, valueFormatter: emptyFormatter},
-                            {headerName: 'Tons', field: 'tons', valueFormatter: emptyFormatter},
+                            {headerName: 'Tons', field: 'tons', editable: true, valueFormatter: emptyFormatter},
                             {headerName: 'Job', field: 'trip', editable: false, cellRenderer: JobRenderer},
                             {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
                             {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
