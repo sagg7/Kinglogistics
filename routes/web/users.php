@@ -26,6 +26,7 @@ Route::prefix('user')->group(function () {
         Route::post('delete/{id}', [UserController::class, 'destroy'])
             ->name('user.delete');
     });
+
     // LEAVE OUT SELECTION IN CASE IT IS USED IN OTHER AREAS WITH DIFFERENT PERMISSIONS
     Route::get('selection', [UserController::class, 'selection'])
         ->name('user.selection');
@@ -41,5 +42,9 @@ Route::prefix('user')->group(function () {
     Route::group(['middleware' => ['permission:create-dispatch-schedule|update-dispatch-schedule']], function () {
         Route::post('storeDispatchSchedule', [UserController::class, 'storeDispatchSchedule'])
             ->name('user.storeDispatchSchedule');
+    });
+    Route::group(['middleware' => ['permission:read-staff']], function () {
+        Route::get('spotterCheckInOut', [UserController::class, 'spotterCheckInOut'])
+            ->name('user.spotterCheckInOut');
     });
 });

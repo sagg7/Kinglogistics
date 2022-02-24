@@ -70,6 +70,13 @@
                         </a>
                     </li>
                     @endif
+                    {{-- @if(auth()->user()->hasRole('spotter')||auth()->user()->hasRole('admin')) --}}
+                    <li>
+                        <a href="/user/spotterCheckInOut">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Spotter Check In/out</span>
+                        </a>
+                    </li>
+                    {{-- @endif --}}
                 </ul>
             </li>
             @endif

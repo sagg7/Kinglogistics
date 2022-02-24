@@ -41,9 +41,9 @@ function getDispatchReport() {
                 'dispatch_score':$("params.dispatch_score").val(),
                 'score_app_usage':$("params.score_app_usage").val(),
                  'well_status':$("params.well_status").val(),
-                 'description':$("params.description").val(),
-            } ,
-
+                 'description':$("params.description").val(),   
+            } ,  
+            
                 success: (res) => {
                     let showDispatchReport =  $("#showDispatchReport");
                     showDispatchReport.modal('show');
