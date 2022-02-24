@@ -44,9 +44,6 @@ class TripController extends Controller
             'origin_id' => ['required', 'exists:origins,id'],
             'destination_id' => ['required', 'exists:destinations,id'],
             'mileage' => ['required', 'numeric'],
-            'status' => ['required'],
-            'status_current' => ['numeric'],
-            'status_total' => ['numeric'],
         ], [], [
             'shipper_id' => 'customer',
             'zone_id' => 'zone',
