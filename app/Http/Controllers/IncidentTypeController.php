@@ -61,7 +61,7 @@ class IncidentTypeController extends Controller
                 ->findOrFail($id);
         else {
             $incidentType = new IncidentType();
-            $incidentType->broker_id = session('broker_id');
+            $incidentType->broker_id = session('broker');
         }
 
         $incidentType->name = $request->name;

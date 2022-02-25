@@ -66,7 +66,7 @@ class RateController extends Controller
                 }
             } else {
                 $rate = new Rate();
-                $rate->broker_id = session('broker_id');
+                $rate->broker_id = session('broker');
             }
 
             $rate->rate_group_id = $request->rate_group;
