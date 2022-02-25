@@ -712,14 +712,16 @@
                         <table class="table table-striped table-bordered mt-1" id="customerTable">
                             <thead>
                             <tr>
-                                <th >Name</th>
-                                <th>AVG Waiting Per Load</th>
+                                <th>Name</th>
+                                <th>AVG waiting per load</th>
+                                <th>AVG aoad time</th>
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
 
                             <tbody >
                             <tr >
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
