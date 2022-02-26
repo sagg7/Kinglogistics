@@ -14,10 +14,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\CRUD\crudMessage;
 
 class TrailerController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions, crudMessage;
 
     /**
      * @param array $data

@@ -6,6 +6,7 @@ use App\Models\Carrier;
 use App\Models\Trailer;
 use App\Models\Truck;
 use App\Models\User;
+use App\Traits\CRUD\crudMessage;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TruckController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions, crudMessage;
 
     /**
      * @param array $data
