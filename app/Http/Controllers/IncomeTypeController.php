@@ -39,7 +39,7 @@ class IncomeTypeController extends Controller
                 ->findOrFail($id);
         else {
             $type = new IncomeType();
-            $type->broker_id = session('broker_id');
+            $type->broker_id = session('broker');
         }
 
         $type->name = $request->name;

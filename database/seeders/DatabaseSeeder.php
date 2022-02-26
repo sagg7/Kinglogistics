@@ -22,8 +22,12 @@ class DatabaseSeeder extends Seeder
 
         // \App\Models\User::factory(10)->create();
         $this->call(RolesSeeder::class);
+        $this->call(PermissionsSeeder::class);
         $this->call(UsersSeeder::class);
         $this->call(TrailerTypesSeeder::class);
         $this->call(CarrierTestSeeder::class);
+        $this->call(TurnsSeeder::class);
+        $this->call(InspectionCategoriesSeeder::class);
+        $this->call(InspectionItemsSeeder::class);
     }
 }
