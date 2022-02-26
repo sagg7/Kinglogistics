@@ -194,7 +194,7 @@ class TrailerController extends Controller
         if ($trailer) {
             $message = '';
             if ($trailer->rentals()->first())
-                $message .= "•" . $this->generateCrudMessage(4, 'Trailer', ['constraint' => 'rentals']) . "<br>";
+                $message .= "•" . $this->generateCrudMessage(4, 'Trailer') . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];
             else
