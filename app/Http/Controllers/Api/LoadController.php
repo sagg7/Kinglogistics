@@ -369,7 +369,7 @@ class LoadController extends Controller
 
         $load = Load::find($loadId);
         $load->bol = $request->get('bol');
-        $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
+       // $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);
