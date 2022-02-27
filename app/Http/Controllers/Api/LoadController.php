@@ -116,7 +116,8 @@ class LoadController extends Controller
 
         $query = Trip::select([
             'id as key',
-            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
+            //DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
+            "name as value",
         ])
             ->whereHas('broker', function ($q) {
                 $q->where('id', auth()->user()->broker_id);
