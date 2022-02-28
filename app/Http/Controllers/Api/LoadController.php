@@ -75,17 +75,17 @@ class LoadController extends Controller
         $data['status'] = $loadStatus;
         $data['load_type_id'] = 1; //need to change this to null in database;
         $data['control_number'] = $request->control_number ?? "undefined";
-        $data['origin'] = null;
+        //$data['origin'] = null;
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
 
-        $trip = Trip::find($request->trip_id);
+        $trip = Trip::find($request->trip_id)->with('trip_origin');
         // Trip related info
         $data['id'] = $trip->id;
-        $data['origin'] = $trip->origin;
-        $data['origin_coords'] = $trip->origin_coords;
-        $data['destination'] = $trip->destination;
-        $data['destination_coords'] = $trip->destination_coords;
+        $data['origin'] = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
+        $data['origin_coords'] = $trip->trip_origin ? $trip->trip_origin->coords : $trip->origin_coords;
+        $data['destination'] = $trip->trip_destination ? $trip->trip_destination->name : $trip->destination;
+        $data['destination_coords'] = $trip->trip_destination ? $trip->trip_destination->coords : $trip->destination_coords;
         $data['customer_name'] = $trip->customer_name;
         $data['mileage'] = $trip->mileage;
         $data['shipper_id'] = $trip->shipper_id;
