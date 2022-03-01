@@ -1,4 +1,3 @@
 {
-    "/js/sections/loads/dispatch/customerStatus.min.js": "/js/sections/loads/dispatch/customerStatus.min.js",
-    "/js/sections/loads/dispatch/createDispatchReport.min.js": "/js/sections/loads/dispatch/createDispatchReport.min.js"
+    "/js/sections/users/checkInOut.min.js": "/js/sections/users/checkInOut.min.js"
 }
