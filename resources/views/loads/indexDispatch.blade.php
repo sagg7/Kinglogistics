@@ -824,7 +824,7 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                <a class="dropdown-item" id="genDisReport" data-toggle="modal" data-target="#createDispatchReportModal"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
+                                <a class="dropdown-item" id="genDisReport" onclick="fillFormDispatchReport()"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
                             </div>

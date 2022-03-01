@@ -1,9 +1,10 @@
-function fillFormDispatchReport(formDispatchReport) {
+function fillFormDispatchReport() {
+    let formDispatchReport = $("#createDispatchReportModal")
     $.ajax({
         type: 'GET',
         url: '/report/dailyDispatchReport',
         data: {
-            //   'shipper_id' : $('#shipper').val()
+            //'shipper_id' : $('#shipper').val()
             'name': $("params.name").val(),
             'date': $("params.date").val(),
             'hours': $("params.hours").val(),
@@ -63,18 +64,13 @@ function fillFormDispatchReport(formDispatchReport) {
             throwErrorMsg();
         }
     });
+    $("#createDispatchReportModal").modal('show');
 }
 
 
 (() => {
-
-
-    fillFormDispatchReport($('#createDispatchReportModal'));
-
-
     $('#submitDispatchReport').submit(function(e){
         e.preventDefault();
-        console.log("eee");
         let modal = $('#createDispatchReportModal'),
             form = modal.find("textarea").serialize();
         $.ajax({

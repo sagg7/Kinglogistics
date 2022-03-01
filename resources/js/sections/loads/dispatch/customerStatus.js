@@ -19,7 +19,7 @@ function filtersChange(tableCustomer){
                 if(shipper.percentage < 100){
                     color="red";
                 }
-                if (shipper.avg > 0)
+                if (shipper.avg > 0 || shipper.loadTime > 0)
                     customerTbody.append(    `<tr><td>${shipper.name}</td>` +
                         `<td>${msToTime(shipper.avg*60*1000, false)}</td>` +
                         `<td>${msToTime(shipper.loadTime*60*1000, false)}</td>` +

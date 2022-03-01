@@ -220,10 +220,9 @@ class TruckController extends Controller
             }
         })
             ->findOrFail($id);
-
         if ($truck) {
             $message = '';
-            if ($truck->driver)
+            if (count($truck->driver) > 0)
                 $message .= "•" . $this->generateCrudMessage(4, 'Truck', ['constraint' => 'driver']) . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];

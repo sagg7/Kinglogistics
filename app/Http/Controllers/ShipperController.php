@@ -217,7 +217,8 @@ class ShipperController extends Controller
 
 
         $shippersAccepted = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
-            $q->whereBetween('accepted_timestamp', [$start, $end]);
+            $q->whereBetween('accepted_timestamp', [$start, $end])
+                ->orderBy('accepted_timestamp', 'asc');
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
             }
@@ -231,7 +232,8 @@ class ShipperController extends Controller
         }
 
         $shippersfinished = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
-            $q->whereBetween('finished_timestamp', [$start, $end]);
+            $q->whereBetween('finished_timestamp', [$start, $end])
+                ->orderBy('finished_timestamp', 'asc');
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
             }
@@ -246,7 +248,7 @@ class ShipperController extends Controller
         foreach($shippers as $key => $shipper){
 
             $totalTime = 0;
-            $date = null;
+            $date = $start;
             $count = 0;
 
            foreach($shipper->loadStatus as $load){
