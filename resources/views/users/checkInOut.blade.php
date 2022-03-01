@@ -59,22 +59,26 @@
                 };
                 //Format to get time and date sort
                 let checkInTime = (params) => {
-                    if (params.value)
-                    var res = new Date(params.data.check_in);
+                    if (params.value){
+                        var res = new Date(params.data.check_in);
                     let hours = res.getHours();
                     let minutes = "0" + res.getMinutes();
                     let seconds = "0" + res.getSeconds();
                     let formattedTime = hours + ':' + minutes.substr(-2)   + ' '+ (res.getMonth()+1)+"/"+res.getDate()+"/"+res.getFullYear();
                         return (formattedTime);
+                    }
+                  
                 };
                 let checkOutTime = (params) => {
-                    if (params.value)
-                    var res = new Date(params.data.check_out);
+                    if (params.value){
+                        var res = new Date(params.data.check_out);
                     let hours = res.getHours();
                     let minutes = "0" + res.getMinutes();
                     let seconds = "0" + res.getSeconds();
                     let formattedTime = hours + ':' + minutes.substr(-2)  + ' '+ (res.getMonth()+1)+"/"+res.getDate()+"/"+res.getFullYear();
                         return (formattedTime);
+                    }
+                  
                 };
                 
                 //This is the seconder
