@@ -467,6 +467,7 @@ class ReportController extends Controller
                         $driversWorkedHoursFilter($q);
                     })
                         ->with([
+                            'truck:id,number',
                             'worked_hours' => function ($q) use ($driversWorkedHoursFilter) {
                                 $driversWorkedHoursFilter($q);
                             },
@@ -525,6 +526,7 @@ class ReportController extends Controller
                 }
                 $driversData[] = [
                     'id' => $driver->id,
+                    'truck' => $driver->truck,
                     'carrier_id' => $driver->carrier_id,
                     'name' => $driver->name,
                     'active_time' => $driver_worked_hours,

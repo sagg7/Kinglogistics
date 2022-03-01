@@ -12,6 +12,7 @@
     const driversTable = new simpleTableAG({
         id: 'dataTable',
         columns: [
+            {headerName: "Truck", field: "truck"},
             {headerName: "Driver", field: "driver"},
             {headerName: "Carrier", field: "carrier"},
             {headerName: "Waiting time", field: "waiting_time", valueFormatter: hourFormatter},
@@ -137,6 +138,7 @@
                 res.driversData.forEach(item => {
                     const carrier = res.carriersData.find(obj => obj.id === item.carrier_id);
                     rowData.push({
+                        truck: item.truck ? item.truck.number : "",
                         driver: item.name,
                         carrier: carrier.name,
                         waiting_time: item.waiting_time.toFixed(2),
