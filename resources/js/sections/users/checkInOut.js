@@ -33,12 +33,6 @@ function submitCheckIn() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                 },
-                complete: () => {
-                    if (btn) {
-                        btn.find('.spinner-border').addClass('d-none');
-                        btn.find('.btn-text').removeClass('d-none').prop('disabled', false);
-                    }
-                },
                 success: (res) => {
                     throwErrorMsg("Report Generated correctly", {"title": "Success!", "type": "success"});
                     checkId = res.data.id;
@@ -89,12 +83,6 @@ function submitCheckOut() {
                     data: {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
-                    },
-                    complete: () => {
-                        if (btn) {
-                            btn.find('.spinner-border').addClass('d-none');
-                            btn.find('.btn-text').removeClass('d-none').prop('disabled', false);
-                        }
                     },
                     success: (res) => {
                         throwErrorMsg("Report Generated correctly", {"title": "Success!", "type": "success"});
