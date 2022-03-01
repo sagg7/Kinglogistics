@@ -39,6 +39,8 @@ Route::prefix('load')->group(function () {
             ->name('load.DownloadExcelReport');
         Route::post('loadPhoto/{id}/{type}', [LoadController::class, 'loadPhoto'])
             ->name('load.loadPhoto');
+        Route::get('getLoadNote/{id}', [LoadController::class, 'getLoadNote'])
+            ->name('load.getLoadNote');
     });
     Route::group(['middleware' => ['permission:create-load-dispatch']], function () {
     });
@@ -51,6 +53,10 @@ Route::prefix('load')->group(function () {
             ->name('load.unmarkAsInspected');
         Route::post('replacePhoto/{id}/{type}', [LoadController::class, 'replacePhoto'])
             ->name('load.replacePhoto');
+        Route::post('addObservation/{id}', [LoadController::class, 'addObservation'])
+            ->name('load.addObservation');
+        Route::post('transferJob/{id}', [LoadController::class, 'transferJob'])
+            ->name('load.transferJob');
     });
 
     Route::group(['middleware' => ['permission:read-load|read-load-dispatch']], function () {

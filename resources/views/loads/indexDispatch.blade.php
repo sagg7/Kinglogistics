@@ -13,7 +13,14 @@
         @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
-        @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation"])
+        @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation", "content" =>
+        Form::label('description', ucfirst(__('description')), ['class' => 'col-form-label']).
+        Form::textarea('description', null, ['class' => 'form-control', 'rows' => 5, 'maxlength' => 512]),
+        'footerButton' => '<button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" id="sendObservation">Submit</button>'])
+        @include("common.modals.genericAjaxLoading", ["id" => "transferJob", "title" => "Transfer Job", "content" =>
+        Form::label('jobs', ucfirst(__('jobs')), ['class' => 'col-form-label']).
+        Form::select('jobs', $jobs, null, ['class' => 'form-control select2']),
+        'footerButton' => '<button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" id="transferJobButton">Submit</button>'])
         @include("loads.common.modals.driverStatus")
         @include("loads.common.modals.createDispatchReport")
         @include("loads.common.modals.DispatchReportModal")
@@ -35,6 +42,7 @@
             let tbLoadActive = null;
             let tbLoadFinished = null;
             let now = null;
+            let loadId = null;
             (() => {
                 let reference = {};
                 let control = {};
@@ -364,7 +372,7 @@
                     function JobRenderer() {}
                     JobRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
-                        this.eGui.innerHTML = `${params.value.name}`;
+                        this.eGui.innerHTML = `<a onclick="transferJobModal(${params.data.id})">${params.value.name}</a>`;
                         new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
                     }
                     JobRenderer.prototype.getGui = () => {
@@ -379,12 +387,19 @@
                     PoRenderer.prototype.getGui = () => {
                         return this.eGui;
                     }
-                    const capitalizeStatus = (params) => {
+                    function statusRenderer() {}
+                    statusRenderer.prototype.init = (params) => {
                         let string = params.value ? params.value : '';
                         if (string === "to_location")
                             string = "in transit";
-                        return string.charAt(0).toUpperCase()  + string.slice(1)
-                    };
+                        string = string.charAt(0).toUpperCase()  + string.slice(1)
+                        this.eGui = document.createElement('div');
+                        this.eGui.innerHTML = `${params.value}`;
+                        new bootstrap.Tooltip(this.eGui, {title: `${params.data.notes}`});
+                    }
+                    statusRenderer.prototype.getGui = () => {
+                        return this.eGui;
+                    }
                     function PhotosRenderer() {}
                     PhotosRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
@@ -500,13 +515,21 @@
                             });
                         },
                         components: {
-                            OptionModalFunc: (modalId, loadId) => {
+                            OptionModalFunc: (modalId, load_id) => {
+                                loadId = load_id;
                                 const modal = $(`${modalId}`),
                                     content = modal.find('.content-body');
                                 content.html('<div class="form-group col-12">'
                                     +'<label for="observations" class="col-form-label">Observations</label>'
                                     +'<textarea class="form-control" rows="5" maxlength="512" name="observations" cols="50" id="observations"></textarea>'
                                     +'</div>');
+                                $.ajax({
+                                    url: `/load/getLoadNote/${loadId}`,
+                                    type: 'GET',
+                                    success: (res) => {
+                                        $('#observations').val(res)
+                                    }
+                                });
                                 $('.modal-spinner').addClass('d-none');
                                 modal.modal('show');
                             }
@@ -527,7 +550,7 @@
                             {headerName: 'Job', field: 'trip', editable: false, cellRenderer: JobRenderer},
                             {headerName: 'PO', field: 'customer_po', editable: false, cellRenderer: PoRenderer},
                             {headerName: 'Customer', field: 'shipper', editable: false, valueFormatter: nameFormatter},
-                            {headerName: 'Status', field: 'status', valueFormatter: capitalizeStatus},
+                            {headerName: 'Status', field: 'status', cellRenderer: statusRenderer},
                             {headerName: 'Load time', field: 'accepted_timestamp', cellRenderer: LoadTimeRenderer},
                         ],
                         menu,
@@ -551,7 +574,48 @@
                 setTimeout(() => {
                     addTime();
                 }, 1000);
+
+                $('#sendObservation').click(function (e) {
+                    $.ajax({
+                        url: `/load/addObservation/${loadId}`,
+                        type: 'POST',
+                        data: {
+                            observation: $('#observations').val()
+                        },
+                        success: (res) => {
+                            throwErrorMsg("The invoices are being created please wait a minute", {"title": "Success!", "type": "success"})
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    });
+                    $("#AddObservation").modal("hide");
+                });
+
+                $('#transferJobButton').click(function (e) {
+                    $.ajax({
+                        url: `/load/transferJob/${loadId}`,
+                        type: 'POST',
+                        data: {
+                            trip_id: $('#jobs').val()
+                        },
+                        success: (res) => {
+                            throwErrorMsg("Job transfer succeeded", {"title": "Success!", "type": "success"});
+                            tbLoadActive.updateSearchQuery();
+                            tbLoadFinished.updateSearchQuery();
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    });
+                    $("#transferJob").modal("hide");
+                });
             })();
+
+            function transferJobModal(id){
+                loadId = id;
+                $("#transferJob").modal("show");
+            }
 
             function downloadDispatch() {
                 window.location = "{{url("load/DownloadExcelReport")}}?" + $.param({
@@ -600,6 +664,10 @@
                 }, 1000);
             }
 
+            function addObservation($id){
+                loadId = $id;
+                $('#AddObservation').modal('show');
+            }
 
             function msToTime(duration, showSeconds = true) {
                 let seconds = Math.floor((duration / (1000)) % 60),
@@ -631,7 +699,6 @@
         <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection
-
     <div class="card">
         <div class="card-content">
             <div class="card-body">
