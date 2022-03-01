@@ -368,9 +368,16 @@ class LoadController extends Controller
             return response('You must attach a valid voucher', 400);
         }
 
+        $date = Carbon::now();
+
         $load = Load::find($loadId);
         $load->bol = $request->get('bol');
-       // $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
+
+        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+            ->where('time', $date->format("H").':00:00')->first();
+        if ($dispatch)
+            $load->dispatch_id = $dispatch->user_id;
+
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);

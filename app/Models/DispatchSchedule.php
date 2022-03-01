@@ -25,7 +25,7 @@ class DispatchSchedule extends Model
         $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
         ->where('time', $date->format("H").':00:00')->first();
         if ($dispatch)
-            return $dispatch->user;
+            return $dispatch->user_id;
         else
             return null;
     }
