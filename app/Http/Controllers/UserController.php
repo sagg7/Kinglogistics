@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DispatchSchedule;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\CheckInOut;
 use App\Traits\EloquentQueryBuilder\agFilter;
 use App\Traits\EloquentQueryBuilder\EloquentFiltering;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
@@ -240,6 +241,28 @@ class UserController extends Controller
         return $array;
     }
 
+        /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationCheckInArray($item): ?array
+    {
+        switch ($item) {
+            case 'user':
+                $array = [
+                    'relation' => 'user',
+                    'column' => 'name',
+                ];
+                break;
+            default:
+                $array = null;
+                break;
+        }
+
+        return $array;
+    }
+
+
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -408,8 +431,62 @@ class UserController extends Controller
     }
 
     public function spotterCheckInOut(){
-        return view('users.checkInOut');
+        $user_id = auth()->user()->id;
+        $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
+        return view('users.checkInOut',compact('checkTime'));
     }
 
+    public function storeCheckIn(Request $request){
+        $user_id = auth()->user()->id;
+
+        $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
+        if($checkTime){
+            return ['You cannot check in if you already have an open session' => false];
+        }else {
+        $checkInOut = new CheckInOut;
+        $checkInOut->user_id = $user_id;
+        // $checkInOut->latitude_check_in = '32.4033303';
+        // $checkInOut->longitude_check_in = '-104.2120453';
+        $checkInOut->latitude_check_in = $request->lng;
+        $checkInOut->longitude_check_in = $request->lat;
+        $checkInOut->check_in = Carbon::now('America/Chicago');
+        $checkInOut->save();
+        return ['success' => true, 'data' => $checkInOut];}
+    }
+    public function storeCheckOut($id, Request $request){
+        $checkInOut = CheckInOut::find($id);
+          $now = Carbon::now('America/Chicago');  
+            $timeCheckIn = $checkInOut->check_in; 
+            // $checkInOut->latitude_check_out ='32.4033303';
+            // $checkInOut->longitude_check_out = '-104.2120453';
+            $checkInOut->latitude_check_out =$request->lat;
+            $checkInOut->longitude_check_out = $request->lng;
+            $checkInOut->check_out = $now;
+            $checkInOut->worked_hours = Carbon::parse($timeCheckIn)->diffInMinutes($now);
+            $checkInOut->save();
+            return ['success' => true, 'data' => $checkInOut];
+    }
+
+  
+    public function searchCheckInOut(Request $request)
+    {
+        $query = CheckInOut::select([
+            "id",
+            "latitude_check_in",
+            "longitude_check_in",
+            "latitude_check_out",
+            "longitude_check_out",
+            "check_in",
+            "check_out",
+            "worked_hours",
+            "user_id",
+        ])
+            /*->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })*/
+            ->with('user:id,name');
+
+        return $this->multiTabSearchData($query, $request,'getRelationCheckInArray');
+    }
 
 }

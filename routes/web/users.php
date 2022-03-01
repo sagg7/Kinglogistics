@@ -47,4 +47,16 @@ Route::prefix('user')->group(function () {
         Route::get('spotterCheckInOut', [UserController::class, 'spotterCheckInOut'])
             ->name('user.spotterCheckInOut');
     });
+    Route::group(['middleware' => ['permission:read-staff']], function () {
+        Route::get('searchCheckInOut', [UserController::class, 'searchCheckInOut'])
+            ->name('user.searchCheckInOut');
+    });
+    Route::group(['middleware' => ['permission:create-staff']], function () {
+        Route::post('storeCheckIn', [UserController::class, 'storeCheckIn'])
+            ->name('user.storeCheckIn');
+    });
+    Route::group(['middleware' => ['permission:create-staff']], function () {
+        Route::post('storeCheckOut/{id}', [UserController::class, 'storeCheckOut'])
+            ->name('user.storeCheckOut');
+    });
 });
