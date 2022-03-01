@@ -13,7 +13,7 @@ function getCheckInModal() {
 
     bodyToCheckIn.append(
         `<div class="text-center">` +
-        ` <button type="button" class="btn btn-success btn-circle btn-xl" onclick=submitCheckIn() data-dismiss="modal">Click to Check In</button>` +
+        ` <button type="button" class="btn btn-success btn-circle btn-xl" onclick="submitCheckIn()" data-dismiss="modal">Check In</button>` +
         `</div>`);
 
 }
@@ -68,7 +68,7 @@ function getCheckOutModal(id) {
 
     bodyToCheckIn.append(
         `<div class="text-center">` +
-        ` <button type="button" class="btn btn-danger btn-circle btn-xl" onclick="submitCheckOut()" data-dismiss="modal">Click to Check Out</button>`+
+        ` <button type="button" class="btn btn-danger btn-circle btn-xl" onclick="submitCheckOut()" data-dismiss="modal">Check Out</button>`+
         `</div>`);
 }
 

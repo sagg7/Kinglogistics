@@ -441,11 +441,11 @@ class UserController extends Controller
 
         $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
         if($checkTime){
-            return ['You cannot check in if you already have an open session' => false];
+            return ['success' => false];
         }else {
         $checkInOut = new CheckInOut;
         $checkInOut->user_id = $user_id;
-        // $checkInOut->latitude_check_in = '32.4033303';
+        // $checkInOut->latitude_check_in = '33.4033303';
         // $checkInOut->longitude_check_in = '-104.2120453';
         $checkInOut->latitude_check_in = $request->lng;
         $checkInOut->longitude_check_in = $request->lat;
@@ -457,7 +457,7 @@ class UserController extends Controller
         $checkInOut = CheckInOut::find($id);
           $now = Carbon::now('America/Chicago');  
             $timeCheckIn = $checkInOut->check_in; 
-            // $checkInOut->latitude_check_out ='32.4033303';
+            // $checkInOut->latitude_check_out ='37.4033303';
             // $checkInOut->longitude_check_out = '-104.2120453';
             $checkInOut->latitude_check_out =$request->lat;
             $checkInOut->longitude_check_out = $request->lng;

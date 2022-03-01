@@ -19,7 +19,7 @@
                         {{-- {{$checkTime[0]) ? $checkTime[0]->id :  0 }} --}}
                         {{-- @dd($checkTime) --}}
                         {{-- @if($checkTime) --}}
-                        <button id="checkOutId" type="button" class="btn btn-primary" onclick="getCheckOutModal()">Make Check Out</button>
+                        <button id="checkOutId" type="button" class="btn btn-primary" style="display: none" onclick="getCheckOutModal()">Make Check Out</button>
                         {{-- @else --}}
                         <button id="checkInId" type="button" class="btn btn-primary"  onclick="getCheckInModal()">Make Check In</button>
                         {{-- @endif --}}
@@ -32,6 +32,30 @@
     
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
+        <style>
+        .btn-circle.btn-xl {
+        width: 90px;
+        height: 90px;
+        padding: 10px 16px;
+         border-radius: 45px;
+        font-size: 16px;
+        line-height: 1.33;
+        font-weight: bold;
+    
+}
+
+        .btn-circle {
+            width: 30px;
+         height: 30px;
+         padding: 6px 0px;
+         border-radius: 15px;
+         text-align: center;
+         font-size: 12px;
+         line-height: 1.42857;
+        }
+
+
+        </style>
     @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
@@ -46,10 +70,29 @@
                     // const arr = coords.split(',');
                     // const latitude = Number(arr[0]).toFixed(5);
                     // const longitude = Number(arr[1]).toFixed(5);
-                    this.eGui.innerHTML = `<a href="http://www.google.com/maps/place/${params.value},${params.data.longitude_check_in}" target="_blank">${params.data.latitude_check_in},${params.data.longitude_check_in}</a>`;
-                    this.eGui.innerHTML = `<a href="http://www.google.com/maps/place/${params.value},${params.data.longitude_check_out}" target="_blank">${params.data.latitude_check_out},${params.data.longitude_check_out}</a>`;
+                    this.eGui.innerHTML = `<a href="http://www.google.com/maps/place/${params.data.latitude_check_in},${params.data.longitude_check_in}" target="_blank">${params.data.latitude_check_in},${params.data.longitude_check_in}</a>`; 
                 }
+
+                function CoordsLinkRenderer2() {}
+                CoordsLinkRenderer2.prototype.init = (params) => {
+                    this.eGui = document.createElement('div');
+                    // const coords = params.value;
+                    // const arr = coords.split(',');
+                    // const latitude = Number(arr[0]).toFixed(5);
+                    // const longitude = Number(arr[1]).toFixed(5);
+                    if(params.data.latitude_check_out){
+                    this.eGui.innerHTML = `<a href="http://www.google.com/maps/place/${params.data.latitude_check_out},${params.data.longitude_check_out}" target="_blank">${params.data.latitude_check_out},${params.data.longitude_check_out}</a>`; 
+                        }else{  this.eGui.innerHTML= ``}
+                }
+
+
+
                 CoordsLinkRenderer.prototype.getGui = () => {
+                    return this.eGui;
+                }
+
+
+                CoordsLinkRenderer2.prototype.getGui = () => {
                     return this.eGui;
                 }
 
@@ -122,7 +165,7 @@
                     columns: [
                         {headerName: 'Name', field: 'user', valueFormatter: userName},
                         {headerName: 'Check In Geolocation', field: 'latitude_check_in', cellRenderer: CoordsLinkRenderer},
-                        {headerName: 'Check Out Geolocation', field: 'latitude_check_out', cellRenderer: CoordsLinkRenderer},
+                        {headerName: 'Check Out Geolocation', field: 'latitude_check_out', cellRenderer: CoordsLinkRenderer2},
                         {headerName: 'Check In', field: 'check_in', valueFormatter: checkInTime},
                         {headerName: 'Check Out', field: 'check_out', valueFormatter: checkOutTime},
                         {headerName: 'Worked Time', field: 'worked_hours', valueFormatter: msToTimeLet},
