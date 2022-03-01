@@ -25,43 +25,40 @@ function showPosition(position) {
 
 function submitCheckIn() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position: GeolocationPosition) => {
-                $.ajax({
-                    url: `/user/storeCheckIn`,
-                    type: 'POST',
-                    data: {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    },
-                    complete: () => {
-                        if (btn) {
-                            btn.find('.spinner-border').addClass('d-none');
-                            btn.find('.btn-text').removeClass('d-none').prop('disabled', false);
-                        }
-                    },
-                    success: (res) => {
-                        throwErrorMsg("Report Generated correctly", {"title": "Success!", "type": "success"});
-                        checkId = res.data.id;
-                        $('#checkOutId').show();
-                        $('#checkInId').hide();
-                       
-                    },
-                    error: (res) => {
-            
-                        throwErrorMsg('You cannot check in if you already have an open session');
-                    },
-                });
-            },
-            () => {
-                throwErrorMsg();
-            }
-        );
+        navigator.geolocation.getCurrentPosition(function (position){
+            $.ajax({
+                url: `/user/storeCheckIn`,
+                type: 'POST',
+                data: {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                },
+                complete: () => {
+                    if (btn) {
+                        btn.find('.spinner-border').addClass('d-none');
+                        btn.find('.btn-text').removeClass('d-none').prop('disabled', false);
+                    }
+                },
+                success: (res) => {
+                    throwErrorMsg("Report Generated correctly", {"title": "Success!", "type": "success"});
+                    checkId = res.data.id;
+                    $('#checkOutId').show();
+                    $('#checkInId').hide();
+
+                },
+                error: (res) => {
+
+                    throwErrorMsg('You cannot check in if you already have an open session');
+                },
+            });
+        });
     } else {
         // Browser doesn't support Geolocation
         throwErrorMsg("Browser doesn't support Geolocation");
     }
 }
+
+
 
 
 function getCheckOutModal(id) {
@@ -85,8 +82,7 @@ function getCheckOutModal(id) {
 function submitCheckOut() {
     // alert(checkId);
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position: GeolocationPosition) => {
+        navigator.geolocation.getCurrentPosition(function (position) {
                 $.ajax({
                     url: `/user/storeCheckOut/${checkId}`,
                     type: 'POST',
@@ -106,13 +102,10 @@ function submitCheckOut() {
                         checkOutId.hide();
                     },
                     error: (res) => {
-                
+
                         throwErrorMsg('You cannot check out if you dont have open session');
                     },
                 });
-            },
-            () => {
-                throwErrorMsg();
             }
         );
     } else {
@@ -128,8 +121,8 @@ function submitCheckOut() {
 if(checkId!=0){
     checkOutId.show();
     checkInId.hide();
-    
- 
+
+
 }else if(checkId==0){
     checkInId.show();
     checkOutId.hide();}
