@@ -28,7 +28,7 @@
         </style>
     @endsection
     @section("scripts")
-        <script src="{{ asset('js/sections/exports/rentals/inspection.min.js') }}" defer></script>
+        <script src="{{ asset('js/sections/exports/rentals/inspection.min.js?1.0.0') }}" defer></script>
     @endsection
     <x-slot name="title">Rental Inspection</x-slot>
     <x-slot name="advanced"></x-slot>
