@@ -11,7 +11,5 @@ class InspectionItem extends Model
 
     //REFERENCIA A TABLA EN LA BD
     protected $table = 'inspection_items';
-    protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
-
 }

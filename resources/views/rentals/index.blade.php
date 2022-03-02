@@ -67,9 +67,16 @@
                         };
                         switch (type) {
                             case 'delivered':
+                                properties.menu = [
+                                    {text: 'Check out PDF', route: '/inspection/downloadInspectionDeliveryPDF', icon: 'fas fa-file-pdf'},
+                                ].concat(properties.menu);
                                 properties.columns =  [{headerName: 'Delivery date', field: 'delivered_at'}, ...properties.columns];
                                 break;
                             case 'finished':
+                                properties.menu = [
+                                    {text: 'Check out PDF', route: '/inspection/downloadInspectionDeliveryPDF', icon: 'fas fa-file-pdf'},
+                                    {text: 'Check in PDF', route: '/inspection/downloadInspectionReturnedPDF', icon: 'fas fa-file-pdf'},
+                                ].concat(properties.menu);
                                 properties.columns =  [{headerName: 'Finish date', field: 'finished_at'}, ...properties.columns];
                                 break;
                         }

@@ -25,7 +25,7 @@
                                     </div>
                                     <div id="collapse{{ $category->id }}" class="panel-collapse collapse" role="tabpanel">
                                         <div class="panel-body" style="position: relative;">
-                                            @if($catJSON->type == 'options')
+                                            @if($catJSON->type === 'options')
                                                 <table class="table table-striped table-os-bottom table-hover">
                                                     <thead>
                                                     <tr>
@@ -82,7 +82,7 @@
                                                 </table>
                                             @endif
 
-                                            @if($catJSON->type == 'inputs')
+                                            @if($catJSON->type === 'inputs')
                                                 <table class="table table-striped table-os-bottom table-hover">
                                                     <thead>
                                                     <tr>
@@ -121,22 +121,23 @@
                                                 </table>
                                             @endif
 
-                                            @if($catJSON->type == 'coords')
+                                            @if($catJSON->type === 'coords')
                                                 <div class="row">
                                                     <div class="col-sm-4 col-md-6">
                                                         <div class="condition-background-select">
                                                             <select name="condition-background" id="conditionBackground" tabindex="-1" aria-hidden="true" @if(isset($is_deliver)){{ 'disabled' }}@endif>
-                                                                <option value="1" data-img="{{ asset('images/app/trailers/sandbox.png')}}">Sandox</option>
-                                                                <option value="2" data-img="{{ asset('images/app/trailers/sandbox.png')}}">HiCrush</option>
+                                                                @foreach($coordsTemplates as $id => $template)
+                                                                    <option value="{{ $id }}" data-img="{{ $template["img_src"] }}">{{ $template["text"] }}</option>
+                                                                @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
                                                     @if(!isset($is_deliver))
                                                         <div class="col-sm-8 col-md-6">
                                                             <div class="condition-buttons">
-                                                                <button type="button" data-type="impact">Golpes</button>
-                                                                <button type="button" data-type="broken">Roto o Estrellado</button>
-                                                                <button type="button" data-type="scratch">Rayones</button>
+                                                                <button type="button" data-type="impact">Hits</button>
+                                                                <button type="button" data-type="broken">Broken</button>
+                                                                <button type="button" data-type="scratch">Scratches</button>
                                                                 <button type="button" data-type="eraser" class="eraser"><span class="fas fa-eraser"></span></button>
                                                             </div>
                                                         </div>
@@ -147,7 +148,7 @@
                                                        original="@if(isset($inspection_items[38])){{ $inspection_items[38] }}@endif" @if(isset($is_deliver)){{ 'disabled' }}@endif>
                                             @endif
 
-                                            @if($catJSON->type == 'base64')
+                                            @if($catJSON->type === 'base64')
                                                 <div class="signature-wrapper-{{ $category->id }}">
                                                     @if($category->id == 7 && isset($inspection_items[40]) || $category->id == 8 && isset($inspection_items[41]))
                                                         <input type="hidden" name="modified" value="false" @if(isset($is_deliver)){{ 'disabled' }}@endif>
@@ -161,7 +162,7 @@
                                                 <input type="text" hidden name="signature-{{ $category->id }}" id="signatureInput-{{ $category->id }}" @if(isset($is_deliver)){{ 'disabled' }}@endif>
                                             @endif
 
-                                            @if($catJSON->type == 'text-area')
+                                            @if($catJSON->type === 'text-area')
                                                 <div class="k-form-group">
                                                     <textarea class="form-control form-control-alternative" name="commentInspection" id="commentInspection" rows="3" placeholder="Write a comment here ...">{{ $inspection_items[39] ?? null }}</textarea>
                                                 </div>
@@ -170,32 +171,30 @@
                                     </div>
                                 </div>
                             @endforeach
-                                <div class="panel panel-default" id="getPhotos">
-                                    <div class="panel-heading" role="tab">
-                                        <h4 class="panel-title">
-                                            <a role="button" data-toggle="collapse" data-parent="#inspectionAccordion" href="#collapsePhotos" aria-expanded="true" aria-controls="collapsePhotos">
-                                                Add photos
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapsePhotos" class="panel-collapse collapse" role="tabpanel">
-                                        <div class="panel-body" style="position: relative;">
-                                            <div class="card shadow border-0">
-                                                <div class="card-header bg-transparent pb-5">
-                                                    <div class="btn-wrapper text-center">
-                                                        {!!Form::open(['route' => 'rental.uploadPhoto',
-                                                                'method'=>'POST','id'=>'hiddenForm','class' =>'hidden','files'=>true,'role'=>'form'])!!}
-                                                        <input type="text" id="deleteId" class="hidden" name="deleteId">
-                                                        <input name="newImage" type="file" id="newImage" class="hidden" accept="image/*" multiple>
-                                                        <button id="submitOrderImages" class="hidden"></button>
-                                                        {!!Form::close()!!}
-                                                        <div class="os-sphere-photos" id="imagesCollapse">
-                                                            <div class="photos-wrapper">
-                                                                <div class="photo-preview upload" id="uploadImage">
-                                                                    <div data-uploader='#newImage' id="imageUploader"
-                                                                         class="center plus-wrapper" data-uploadingmessage>
-                                                                        <div class="fas fa-camera fa-5x"></div>
-                                                                    </div>
+                            <div class="panel panel-default" id="getPhotos">
+                                <div class="panel-heading" role="tab">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#inspectionAccordion" href="#collapsePhotos" aria-expanded="true" aria-controls="collapsePhotos">
+                                            Add photos
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapsePhotos" class="panel-collapse collapse" role="tabpanel">
+                                    <div class="panel-body" style="position: relative;">
+                                        <div class="card shadow border-0">
+                                            <div class="card-header bg-transparent pb-5">
+                                                <div class="btn-wrapper text-center">
+                                                    {!!Form::open(['route' => 'rental.uploadPhoto', 'method'=>'POST','id'=>'hiddenForm','class' =>'hidden','files'=>true,'role'=>'form'])!!}
+                                                    <input type="text" id="deleteId" class="hidden" name="deleteId">
+                                                    <input name="newImage" type="file" id="newImage" class="hidden" accept="image/*" multiple>
+                                                    <button id="submitOrderImages" class="hidden"></button>
+                                                    {!!Form::close()!!}
+                                                    <div class="os-sphere-photos" id="imagesCollapse">
+                                                        <div class="photos-wrapper">
+                                                            <div class="photo-preview upload" id="uploadImage">
+                                                                <div data-uploader='#newImage' id="imageUploader"
+                                                                     class="center plus-wrapper" data-uploadingmessage>
+                                                                    <div class="fas fa-camera fa-5x"></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -205,11 +204,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="panel-heading" role="tab" style="background-color:#36A66C !important; margin-top:5px">
+                            </div>
+                            <div class="panel panel-default" id="annex">
+                                <div class="panel-heading" role="tab">
                                     <h4 class="panel-title">
-                                        <a role="button" href="#vehicleInspection" aria-expanded="true" id="inspectionBtn">Save</a>
+                                        <a role="button" data-toggle="collapse" data-parent="#inspectionAccordion" href="#collapseAnnex" aria-expanded="true" aria-controls="collapseAnnex">
+                                            @if($type === "deliver"){{ 'Rental check out pdf annex' }}@else{{ 'Rental check in pdf annex' }}@endif
+                                        </a>
                                     </h4>
                                 </div>
+                                <div id="collapseAnnex" class="panel-collapse collapse" role="tabpanel">
+                                    <div class="panel-body text-left">
+                                        <div class="form-group">
+                                            {!! nl2br(e($rental->broker->config->rental_inspection_check_out_annex ?? $rental->broker->config->rental_inspection_check_in_annex ?? null))  !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-heading" role="tab" style="background-color:#36A66C !important; margin-top:5px">
+                                <h4 class="panel-title">
+                                    <a role="button" href="#vehicleInspection" aria-expanded="true" id="inspectionBtn">Save</a>
+                                </h4>
+                            </div>
                         </div>
 
                     </div>
@@ -219,8 +235,6 @@
         </div>
     </div>
     <!-- End Modal Content -->
-
-    </div>
     @include('rentals.modals.slider')
     @section('head')
         <style>
@@ -239,14 +253,13 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
         @include('public.imageUploaderJs')
         <script>
-            $("#inspectionBtn").click(function (e)
-            {
+            $("#inspectionBtn").click(function (e) {
                 let submit = $("#inspectionBtn");
                 submit.html("<i class=\"fa fa-spinner fa-spin\"></i> Loading").addClass("disabled");
                 e.preventDefault();
 
-                var formAction = $('form[name=inspectionForm]').attr('action');
-                var formData = new FormData(document.getElementById('inspectionForm'));
+                const formAction = $('form[name=inspectionForm]').attr('action');
+                const formData = new FormData(document.getElementById('inspectionForm'));
                 let error = '';
                 formData.forEach(function (i,o){
                     if (i == "" && o != "deleteId" && o != "commentInspection"  && o != "signature-8"  && o != "signature-7" ){
@@ -433,7 +446,6 @@
                                 break;
                             default:
                                 return false;
-                                break;
                         }
 
                         if (typeof (skipSave) == "undefined" || !skipSave) {
@@ -530,44 +542,6 @@
                     });
                     @endif
                     condBckgnd.select2();
-
-                    let options = {
-                            geometry: {
-                                startAngle: 180,
-                                endAngle: 0
-                            },
-                            scale: {
-                                startValue: 0,
-                                endValue: 1,
-                                tickInterval: .125,
-                                label: {
-                                    customizeText: function (arg) {
-                                        return arg.valueText * 8 + "/8";
-                                    }
-                                }
-                            }
-                        },
-                        gasChart = $('#gasChart'),
-                        triangle = $('#triangleMarker');
-                    triangle.dxCircularGauge($.extend(true, {}, options, {
-                        value: gasChart.val(),
-                        // subvalues: [2, 8],
-                        subvalueIndicator: {
-                            type: "triangleMarker",
-                            color: "#8FBC8F"
-                        }
-                    }));
-                    gasChart.change(function () {
-                        triangle.dxCircularGauge($.extend(true, {}, options, {
-                            value: $(this).val(),
-                            // subvalues: [2, 8],
-                            subvalueIndicator: {
-                                type: "triangleMarker",
-                                color: "#8FBC8F"
-                            }
-                        }));
-                    });
-
                 });
                 $(".panel-heading").click(function (){
                     $(".panel-collapse.collapse").collapse('hide');

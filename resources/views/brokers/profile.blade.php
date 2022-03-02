@@ -163,6 +163,30 @@
                     submitQuill(e, 'service');
                 });
             })();
+
+            (() => {
+                $('#rentalsForm').submit(e => {
+                    e.preventDefault();
+                    const form = $(e.currentTarget);
+                    const formData = new FormData(form[0]);
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (res) => {
+                            if (!res.success)
+                                throwErrorMsg();
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    }).always(() => {
+                        removeAjaxLoaders();
+                    });
+                });
+            })();
         </script>
         <script src="{{ asset('js/common/initSignature.min.js?1.0.2') }}"></script>
     @endsection
@@ -186,7 +210,12 @@
             </div>
         </div>
     @endsection
-    @component('components.nav-pills-form', ['pills' => [['name' => 'Information', 'pane' => 'pane-info'],['name' => 'Equipment', 'pane' => 'pane-equipment'],['name' => 'Services', 'pane' => 'pane-service']]])
+    @component('components.nav-pills-form', ['pills' => [
+    ['name' => 'Information', 'pane' => 'pane-info'],
+    ['name' => 'Equipment', 'pane' => 'pane-equipment'],
+    ['name' => 'Services', 'pane' => 'pane-service'],
+    ['name' => 'Rentals', 'pane' => 'pane-rentals'],
+    ]])
         <div role="tabpanel" class="tab-pane active" id="pane-info" aria-expanded="true">
             {!! Form::open(['route' => ['company.update', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical with-sig-pad', 'enctype' => 'multipart/form-data', 'id' => 'profileForm']) !!}
             @include('brokers.common.form')
@@ -200,6 +229,11 @@
         <div role="tabpanel" class="tab-pane" id="pane-service" aria-expanded="false">
             {!! Form::open(['route' => ['company.service', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data', 'id' => 'serviceForm']) !!}
             @include('brokers.common.quillForm', ['title' => $service->title ?? null, 'id' => 'service'])
+            {!! Form::close() !!}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="pane-rentals" aria-expanded="false">
+            {!! Form::open(['route' => ['company.rentals', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical', 'id' => 'rentalsForm']) !!}
+            @include('brokers.common.rentals', ['title' => $service->title ?? null, 'id' => 'rentals'])
             {!! Form::close() !!}
         </div>
     @endcomponent

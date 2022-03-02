@@ -36,6 +36,12 @@ Route::prefix('rental')->group(function () {
 });
 
 Route::prefix('inspection')->group(function () {
+    Route::group(['middleware' => ['permission:read-rental']], function () {
+        Route::get('downloadInspectionDeliveryPDF/{id}', [RentalController::class, 'downloadInspectionDeliveryPDF'])
+            ->name('trailer.downloadInspectionDeliveryPDF');
+        Route::get('downloadInspectionReturnedPDF/{id}', [RentalController::class, 'downloadInspectionReturnedPDF'])
+            ->name('trailer.downloadInspectionReturnedPDF');
+    });
     Route::group(['middleware' => ['permission:update-rental']], function () {
         Route::get('create/{id}', [RentalController::class, 'createInspection'])
             ->name('inspection.create');
