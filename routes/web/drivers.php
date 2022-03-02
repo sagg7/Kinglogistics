@@ -9,6 +9,9 @@ Route::prefix('driver')->group(function () {
             ->name('driver.index');
         Route::get('search/{type?}', [DriverController::class, 'search'])
             ->name('driver.search');
+        Route::get('downloadExcel', [DriverController::class, 'downloadExcel'])
+            ->name('driver.downloadExcel');
+
     });
     Route::group(['middleware' => ['permission:create-driver']], function () {
         Route::get('create', [DriverController::class, 'create'])

@@ -10,6 +10,7 @@ use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\LoadStatus;
 use App\Models\Shipper;
+use App\Models\Trip;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
@@ -32,6 +33,10 @@ class LoadController extends Controller
     private function createEditParams(): array
     {
         return [
+            'jobs' => [null => 'Select'] + Trip::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
             'shippers' => [null => 'Select'] + Shipper::whereHas('broker', function ($q) {
                     $q->where('id', session('broker'));
                 })
@@ -379,6 +384,7 @@ class LoadController extends Controller
             "loads.truck_id",
             "loads.mileage",
             "loads.shipper_id",
+            "loads.notes",
             "loads.customer_po",
             "loads.load_type_id",
         ];
@@ -664,5 +670,42 @@ class LoadController extends Controller
         }
 
         return view('exports.loads.loadPictures', compact('loads'));
+    }
+
+    public function addObservation(Request $request, $id): array
+    {
+        $load = Load::find($id);
+        $load->notes = $request->observation;
+        if ($load->save())
+            return ['success' => true, 'load' => $load];
+        else
+            return ['success' => false];
+    }
+
+    public function getLoadNote($id){
+        $load = Load::find($id);
+        return $load->notes;
+    }
+
+
+    public function transferJob(Request $request, $id): array
+    {
+        $load = Load::find($id);
+        $trip = Trip::find($request->trip_id);
+        $load->shipper_id = $trip->shipper_id;
+        $load->trip_id = $trip->id;
+        $load->origin = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
+        $load->origin_coords = $trip->trip_origin ? $trip->trip_origin->coords : $trip->origin_coords;
+        $load->destination = $trip->trip_destination ? $trip->trip_destination->name : $trip->destination;
+        $load->destination_coords = $trip->trip_destination ? $trip->trip_destination->coords : $trip->destination_coords;
+        $load->customer_name = $trip->customer_name;
+        $load->mileage = $trip->mileage;
+        $load->rate = $trip->rate->carrier_rate;
+        $load->shipper_rate = $trip->rate->shipper_rate;
+
+        if ($load->save())
+            return ['success' => true, 'load' => $load];
+        else
+            return ['success' => false];
     }
 }

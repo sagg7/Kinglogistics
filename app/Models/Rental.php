@@ -44,7 +44,7 @@ class Rental extends Model
      */
     public function trailer(): BelongsTo
     {
-        return $this->belongsTo(Trailer::class);
+        return $this->belongsTo(Trailer::class)->withTrashed();
     }
 
 

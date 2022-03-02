@@ -75,17 +75,17 @@ class LoadController extends Controller
         $data['status'] = $loadStatus;
         $data['load_type_id'] = 1; //need to change this to null in database;
         $data['control_number'] = $request->control_number ?? "undefined";
-        $data['origin'] = null;
+        //$data['origin'] = null;
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
 
-        $trip = Trip::find($request->trip_id);
+        $trip = Trip::find($request->trip_id)->with('trip_origin')->first();
         // Trip related info
         $data['id'] = $trip->id;
-        $data['origin'] = $trip->origin;
-        $data['origin_coords'] = $trip->origin_coords;
-        $data['destination'] = $trip->destination;
-        $data['destination_coords'] = $trip->destination_coords;
+        $data['origin'] = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
+        $data['origin_coords'] = $trip->trip_origin ? $trip->trip_origin->coords : $trip->origin_coords;
+        $data['destination'] = $trip->trip_destination ? $trip->trip_destination->name : $trip->destination;
+        $data['destination_coords'] = $trip->trip_destination ? $trip->trip_destination->coords : $trip->destination_coords;
         $data['customer_name'] = $trip->customer_name;
         $data['mileage'] = $trip->mileage;
         $data['shipper_id'] = $trip->shipper_id;
@@ -116,7 +116,8 @@ class LoadController extends Controller
 
         $query = Trip::select([
             'id as key',
-            DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
+            //DB::raw("CONCAT(name, ': ', origin, ' - ', destination) as value"),
+            "name as value",
         ])
             ->whereHas('broker', function ($q) {
                 $q->where('id', auth()->user()->broker_id);
@@ -367,9 +368,16 @@ class LoadController extends Controller
             return response('You must attach a valid voucher', 400);
         }
 
+        $date = Carbon::now();
+
         $load = Load::find($loadId);
         $load->bol = $request->get('bol');
-        $load->dispatch_id = (DispatchSchedule::getDispatchInShift()) ? DispatchSchedule::getDispatchInShift()->id : null;
+
+        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+            ->where('time', $date->format("H").':00:00')->first();
+        if ($dispatch)
+            $load->dispatch_id = $dispatch->user_id;
+
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);

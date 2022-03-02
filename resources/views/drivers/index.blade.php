@@ -344,10 +344,22 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="row">
-                    <fieldset class="form-group col-6">
-                        {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
-                        {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
-                    </fieldset>
+                    <div class="col-10">
+                        <fieldset class="form-group">
+                            {!! Form::label('shipper', 'Customer', ['class' => 'col-form-label']) !!}
+                            {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
+                        </fieldset>
+                    </div>
+                    <div class="col-2">
+                        <div class="dropdown float-right">
+                            <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                                <a class="dropdown-item" href="/driver/downloadExcel" id="download"><i class="fas fa-file-excel"></i> Download active Drivers</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

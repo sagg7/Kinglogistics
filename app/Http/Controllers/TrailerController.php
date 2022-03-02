@@ -14,10 +14,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\CRUD\crudMessage;
 
 class TrailerController extends Controller
 {
-    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
+    use GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions, crudMessage;
 
     /**
      * @param array $data
@@ -192,8 +193,8 @@ class TrailerController extends Controller
 
         if ($trailer) {
             $message = '';
-            if ($trailer->rentals()->first())
-                $message .= "•" . $this->generateCrudMessage(4, 'Trailer', ['constraint' => 'rentals']) . "<br>";
+            //if ($trailer->rentals()->first())
+             //   $message .= "•" . $this->generateCrudMessage(4, 'Trailer') . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];
             else

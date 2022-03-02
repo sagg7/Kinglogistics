@@ -15,11 +15,11 @@ function filtersChange(tableCustomer){
             {
                 let shipper = res.shipperAvg[i];
                 let color = 'black';
-                
+
                 if(shipper.percentage < 100){
                     color="red";
                 }
-                if (shipper.avg > 0 && shipper.loadTime)
+                if (shipper.avg > 0 || shipper.loadTime > 0)
                     customerTbody.append(    `<tr><td>${shipper.name}</td>` +
                         `<td>${msToTime(shipper.avg*60*1000, false)}</td>` +
                         `<td>${msToTime(shipper.loadTime*60*1000, false)}</td>` +
