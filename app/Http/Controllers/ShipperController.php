@@ -224,7 +224,7 @@ class ShipperController extends Controller
             }
         }])
         ->withCount(['drivers' => function($q){
-            $q->where('status', 'active')
+            $q->where('status', '!=', 'inactive')
                 ->whereHas('truck');
         }]);
         if($shipper_id){

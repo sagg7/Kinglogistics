@@ -222,12 +222,13 @@
                             shipper: e.params.data.id,
                         });
                     tbLoadFinished.updateSearchQuery();
-                    filtersChange($('#costumerTable'));
+                    filtersChange($('#customerTable'));
                 }).on('select2:unselect', () => {
                     tbLoadFinished.searchQueryParams.shipper = null;
                     tbLoadFinished.updateSearchQuery();
                     tbLoadActive.searchQueryParams.shipper = null;
                     tbLoadActive.updateSearchQuery();
+                    filtersChange($('#customerTable'));
                 });
 
                 let tableProperties = (type) => {

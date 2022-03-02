@@ -506,8 +506,8 @@ class DriverController extends Controller
         $customSearch = [];
         if ($request->dispatch) {
             if ($request->count) {
-                $morningQuery = (clone $query)->where('turn_id', 1)->wherehas('truck');
-                $nightQuery = (clone $query)->where('turn_id', 2)->wherehas('truck');
+                $morningQuery = (clone $query)->where('turn_id', 1)->wherehas('truck')->whereNull('inactive');
+                $nightQuery = (clone $query)->where('turn_id', 2)->wherehas('truck')->whereNull('inactive');
                 return [
                     "morning" => [
                         "active" => $this->filterByType((clone $morningQuery), 'active', $request)->count(),
