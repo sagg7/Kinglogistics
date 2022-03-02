@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use DateTime;
+
 
 class UserController extends Controller
 {
@@ -441,30 +443,39 @@ class UserController extends Controller
 
         $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
         if($checkTime){
-            return ['You cannot check in if you already have an open session' => false];
+            return ['error' => true];
         }else {
         $checkInOut = new CheckInOut;
         $checkInOut->user_id = $user_id;
-        // $checkInOut->latitude_check_in = '32.4033303';
-        // $checkInOut->longitude_check_in = '-104.2120453';
-        $checkInOut->latitude_check_in = $request->lng;
-        $checkInOut->longitude_check_in = $request->lat;
+        $checkInOut->latitude_check_in = '33.4033303';
+        $checkInOut->longitude_check_in = '-104.2120453';
+        // $checkInOut->latitude_check_in = $request->lng;
+        // $checkInOut->longitude_check_in = $request->lat;
         $checkInOut->check_in = Carbon::now('America/Chicago');
         $checkInOut->save();
         return ['success' => true, 'data' => $checkInOut];}
     }
-    public function storeCheckOut($id, Request $request){
+    public function storeCheckOut($id, Request $request)
+    {
         $checkInOut = CheckInOut::find($id);
-          $now = Carbon::now('America/Chicago');  
-            $timeCheckIn = $checkInOut->check_in; 
-            // $checkInOut->latitude_check_out ='32.4033303';
-            // $checkInOut->longitude_check_out = '-104.2120453';
-            $checkInOut->latitude_check_out =$request->lat;
-            $checkInOut->longitude_check_out = $request->lng;
-            $checkInOut->check_out = $now;
-            $checkInOut->worked_hours = Carbon::parse($timeCheckIn)->diffInMinutes($now);
-            $checkInOut->save();
-            return ['success' => true, 'data' => $checkInOut];
+        $now = Carbon::now('America/Chicago');
+        $DateAndTime = date('Y-m-d H:i:s');
+        $DateAndTimeFormat = new  DateTime($DateAndTime);
+        $timeCheckIn = $checkInOut->check_in;
+        $timeCheckInFormat = new  DateTime($timeCheckIn);
+        // $checkInOut->latitude_check_out = '37.4033303';
+        // $checkInOut->longitude_check_out = '-104.2120453';
+        $checkInOut->latitude_check_out =$request->lat;
+        $checkInOut->longitude_check_out = $request->lng;
+        $checkInOut->check_out = $now;
+        $diffDate = date_diff($timeCheckInFormat, $DateAndTimeFormat);
+        $diffDateHours = ((float)$diffDate->format("%h")) * 60;
+        $diffDateMinutes = (float)$diffDate->format("%I");
+        $diffDateHoursTotal = $diffDateHours + $diffDateMinutes;
+        $checkInOut->worked_hours = $diffDateHoursTotal;
+
+        $checkInOut->save();
+        return ['success' => true, 'data' => $checkInOut];
     }
 
   
