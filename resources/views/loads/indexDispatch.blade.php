@@ -696,7 +696,7 @@
         <script src="{{ asset('js/sections/loads/dispatch/driverStatus.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/dispatch/DispatchReport.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/dispatch/dispatchReport.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection

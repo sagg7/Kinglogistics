@@ -41,9 +41,9 @@ function getDispatchReport() {
                 'dispatch_score':$("params.dispatch_score").val(),
                 'score_app_usage':$("params.score_app_usage").val(),
                  'well_status':$("params.well_status").val(),
-                 'description':$("params.description").val(),   
-            } ,  
-            
+                 'description':$("params.description").val(),
+            } ,
+
                 success: (res) => {
                     let showDispatchReport =  $("#showDispatchReport");
                     showDispatchReport.modal('show');
@@ -77,9 +77,9 @@ function getDispatchReport() {
                         `<div class="col-md-3">${res.loads_finalized}</div>` +
                         `</div><br>` +
                         `<div class="row">` +
-                        `<div class="col-md-3">Score App Usage</div>` +
+                        `<div class="col-md-3">App Usage Score</div>` +
                         `<div class="col-md-3">${res.score_app_usage}</div>` +
-                        `<div class="col-md-3">Calification Dispatch</div>` +
+                        `<div class="col-md-3">Dispatch Score</div>` +
                         `<div class="col-md-3">${res.dispatch_score}</div>` +
                         `</div><br>` +
                         `<div class="row">` +

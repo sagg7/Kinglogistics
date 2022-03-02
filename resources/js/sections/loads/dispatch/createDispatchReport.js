@@ -48,9 +48,9 @@ function fillFormDispatchReport() {
                 `<div class="col-md-3">${res.loads_finalized}</div>` +
                 `</div><br>` +
                 `<div class="row">` +
-                `<div class="col-md-3">Score App Usage</div>` +
+                `<div class="col-md-3">App Usage Score</div>` +
                 `<div class="col-md-3">${res.score_app_usage}</div>` +
-                `<div class="col-md-3">Calification Dispatch</div>` +
+                `<div class="col-md-3">Dispatch Score</div>` +
                 `<div class="col-md-3">${res.dispatch_score}</div>` +
                 `</div><br>` +
                 `<div for="situationDescription">Situation Description: </div>` +

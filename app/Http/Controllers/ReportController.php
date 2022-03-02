@@ -95,6 +95,7 @@ class ReportController extends Controller
             // Metric to get dispatch_score "Active drivers or truck active = 30%"
             'active_drivers' => $active_drivers,
             'inactive_drivers' => Driver::where('status','=','inactive')
+                            ->whereNull('inactive')
                             ->where('broker_id', session('broker'))->whereHas('truck')->count(),
             'loads_finalized' => $loads_finalized,
             //Metric to get loads to pending at the time end shift 30%

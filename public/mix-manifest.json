@@ -1,3 +1,4 @@
 {
-    "/js/sections/exports/rentals/inspection.min.js": "/js/sections/exports/rentals/inspection.min.js"
+    "/js/sections/loads/dispatch/createDispatchReport.min.js": "/js/sections/loads/dispatch/createDispatchReport.min.js",
+    "/js/sections/loads/dispatch/dispatchReport.min.js": "/js/sections/loads/dispatch/dispatchReport.min.js"
 }
