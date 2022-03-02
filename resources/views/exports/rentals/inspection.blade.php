@@ -187,12 +187,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($category['rental_items'] as $item)
-                            <tr>
-                            <!--<td>{{ $item["name"] }}</td>-->
-                                <td>{{ $item["pivot"]["option_value"] }}</td>
-                            </tr>
-                        @endforeach
+                        @isset($category['rental_items'])
+                            @foreach($category['rental_items'] as $item)
+                                <tr>
+                                <!--<td>{{ $item["name"] }}</td>-->
+                                    <td>{{ $item["pivot"]["option_value"] }}</td>
+                                </tr>
+                            @endforeach
+                        @endisset
                         </tbody>
                     </table>
                 </div>
