@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\DriverEnum;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
+use App\Exports\TemplateExport;
 use App\Mail\SendNotificationTemplate;
 use App\Models\AvailableDriver;
 use App\Models\BotAnswers;
@@ -16,6 +17,7 @@ use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Paperwork\PaperworkFilesFunctions;
 use App\Traits\Turn\DriverTurn;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -640,5 +642,49 @@ class DriverController extends Controller
 
         return ['success' => $driver];
 
+    }
+
+    public function downloadExcel(){
+        $query = Driver::select([
+            "drivers.id",
+            "drivers.name",
+            "drivers.zone_id",
+            "drivers.carrier_id",
+            "drivers.turn_id",
+            "drivers.status",
+            "drivers.inactive",
+            "drivers.inactive_observations",
+            "drivers.phone",
+            "drivers.broker_id",
+            "drivers.truck_id",
+        ])
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                }
+            })->orderBy("inactive", 'asc')
+            ->orderBy("name", 'asc')->get();
+
+        if (count($query) === 0)
+            return redirect()->back()->withErrors('There are no Users to generate the document');
+
+        $data = [];
+        foreach ($query as $driver) {
+            $data[] = [
+                'name' => $driver->name,
+                'truck' => $driver->truck ? $driver->truck->number : null,
+                'carrier' => $driver->carrier ? $driver->carrier->name : null,
+                'status' => $driver->status,
+                'inactive' => ($driver->inactive) ? "Yes" : "No",
+                'observations' => $driver->inactive_observations
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Name", "Truck", "Carrier", "Status", "Inactive", "Observations"],
+        ]))->download("Drivers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
