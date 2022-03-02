@@ -50,13 +50,15 @@ class Rental extends Model
 
     public function inspectionItems()
     {
-        return $this->belongsToMany('App\Models\InspectionItem', 'inspection_rental_delivery', 'rental_id', 'inspection_item_id')
-            ->withPivot(['option_value']);
+        return $this->belongsToMany(InspectionItem::class, 'inspection_rental_delivery', 'rental_id', 'inspection_item_id')
+            ->withPivot(['option_value'])
+            ->using(InspectionRentalDelivery::class);
     }
 
     public function inspectionItemsReturned()
     {
-        return $this->belongsToMany('App\Models\InspectionItem', 'inspection_rental_return', 'rental_id', 'inspection_item_id')
-            ->withPivot(['option_value']);
+        return $this->belongsToMany(InspectionItem::class, 'inspection_rental_return', 'rental_id', 'inspection_item_id')
+            ->withPivot(['option_value'])
+            ->using(InspectionRentalReturned::class);
     }
 }

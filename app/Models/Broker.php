@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Storage\S3Functions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Broker extends Model
@@ -37,5 +38,13 @@ class Broker extends Model
     {
         if ($value)
             return $this->getTemporaryFile($value);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function config(): HasOne
+    {
+        return $this->hasOne(BrokerConfig::class);
     }
 }

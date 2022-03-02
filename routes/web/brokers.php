@@ -13,5 +13,7 @@ Route::group(['middleware' => ['role:admin']], function () {
             ->name('company.equipment');
         Route::post('service', [BrokerController::class, 'service'])
             ->name('company.service');
+        Route::post('rentals', [BrokerController::class, 'rentals'])
+            ->name('company.rentals');
     });
 });

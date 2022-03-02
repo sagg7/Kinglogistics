@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
+use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 
@@ -269,6 +270,16 @@ class RentalController extends Controller
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
+    private function createEditInspectionParams()
+    {
+        return [
+            'coordsTemplates' => [
+                1 => ["text" => "Sandbox", "img_src" => asset('images/app/trailers/sandbox.png')],
+                2 => ["text" => "HiCrush", "img_src" => asset('images/app/trailers/sandbox.png')],
+            ],
+        ];
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -280,6 +291,9 @@ class RentalController extends Controller
         $rental = Rental::whereHas('broker', function ($q) {
             $q->where('id', session('broker'));
         })
+            ->with(['broker' => function ($q) {
+                $q->with('config:broker_id,rental_inspection_check_out_annex');
+            }])
             ->findOrFail($rental_id);
         $inspection_categories = InspectionCategory::select([
             'id',
@@ -294,18 +308,18 @@ class RentalController extends Controller
 
         $pictures = DB::table('rental_delivery_photos')
             ->where('rental_id', '=', $rental_id)->get();
-        $rental->drivers;
-        $rental->trailers;
         $inspectionItems = InspectionRentalDelivery::where('rental_id', $rental_id)->pluck( 'option_value','inspection_item_id')->toArray();
 
-        $params['title'] = 'Deliver';
-        $params['inspection_categories'] = $inspection_categories;
-        $params['rental'] = $rental;
-        $params['leased'] = $rental->leased;
-        $params['pictures'] = $pictures;
-        $params['inspection_items'] = $inspectionItems;
-        $params['action'] = 'inspection.store';
-        //dd($inspectionItems);
+        $params = [
+            'title' => 'Deliver',
+            'inspection_categories' => $inspection_categories,
+            'rental' => $rental,
+            'leased' => $rental->leased,
+            'pictures' => $pictures,
+            'inspection_items' => $inspectionItems,
+            'action' => 'inspection.store',
+            'type' => 'deliver',
+        ] + $this->createEditInspectionParams();
         return view('rentals.createInspection', $params);
 
     }
@@ -408,6 +422,9 @@ class RentalController extends Controller
         $rental = Rental::whereHas('broker', function ($q) {
             $q->where('id', session('broker'));
         })
+            ->with(['broker' => function ($q) {
+                $q->with('config:broker_id,rental_inspection_check_in_annex');
+            }])
             ->findOrFail($rental_id);
         $inspection_categories = InspectionCategory::select([
             'id',
@@ -426,22 +443,21 @@ class RentalController extends Controller
             $tempPics[$key]["url"] = $this->getTemporaryFile($picture->url);
             $tempPics[$key]["created_at"] = $picture->created_at;
         }
-
-        $rental->drivers;
-        $rental->trailers;
         $inspectionItems = InspectionRentalReturned::where('rental_id', $rental_id)->pluck( 'option_value','inspection_item_id')->toArray();// add flag to deliver trailer
         foreach ($inspectionItems as $key => $inspectionItem){
             if ($key == 41 || $key == 40)
                 $inspectionItems[$key] = $this->getTemporaryFile($inspectionItems[$key]);
         }
-        $params['title'] = 'Return - End Rental';
-        $params['inspection_categories'] = $inspection_categories;
-        $params['rental'] = $rental;
-        $params['leased'] = $rental->leased;
-        $params['pictures'] = $tempPics;
-        $params['inspection_items'] = $inspectionItems;
-        $params['action'] = 'rental.end';
-        //dd($pictures);
+        $params = [
+            'title' => 'Return - End Rental',
+            'inspection_categories' => $inspection_categories,
+            'rental' => $rental,
+            'leased' => $rental->leased,
+            'pictures' => $tempPics,
+            'inspection_items' => $inspectionItems,
+            'action' => 'rental.end',
+            'type' => 'return',
+        ]  + $this->createEditInspectionParams();
         return view('rentals.createInspection', $params);
 
     }
@@ -586,7 +602,6 @@ class RentalController extends Controller
     {
         $rentals = Rental::with([
             'carrier:id,name',
-            'carrier:id,name',
             'trailer:id,number',
         ])
             ->whereHas('broker', function ($q) {
@@ -631,5 +646,95 @@ class RentalController extends Controller
                 'G' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
             ],
         ]))->download("Rentals " . ucfirst($type) . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
+    private function generatePDF($idx, $returned = false)
+    {
+        $withRelations = [
+            'carrier:id,name',
+            'trailer:id,number',
+            'driver:id,name',
+            'inspectionItems',
+        ];
+        if ($returned) {
+            $withRelations[] = 'inspectionItemsReturned';
+            $withRelations['broker'] = function ($q) {
+                $q->with('config:broker_id,rental_inspection_check_out_annex');
+            };
+        } else {
+            $withRelations['broker'] = function ($q) {
+                $q->with('config:broker_id,rental_inspection_check_in_annex');
+            };
+        }
+        $rental = Rental::with($withRelations)
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+            ->findOrFail($idx);
+
+        $categories = InspectionCategory::orderBy('position')
+            ->get(['id', 'name', 'position', 'options'])
+            ->keyBy('id')
+            ->toArray();
+
+        $createEdit = $this->createEditInspectionParams();
+        $itemsDelivery = $rental->inspectionItems->toArray();
+        $itemsReturned = $rental->inspectionItemsReturned->toArray() ?? [];
+        $items = $returned ? $itemsReturned : $itemsDelivery;
+        foreach ($items as $item) {
+            if ($returned) {
+                $idx = array_search($item['id'], array_column($itemsDelivery, 'id'), true);
+                if ($idx !== false) {
+                    $original_value = $itemsDelivery[$idx]['pivot']['option_value'];
+                    $category_type = json_decode($categories[$item["inspection_category_id"]]['options'])->type;
+                    switch ($category_type) {
+                        case 'options':
+                            $original_value = $original_value === "0" ? null : $original_value;
+                            $value_changed = $original_value !== $item['pivot']['option_value'];
+                            break;
+                        case 'inputs':
+                            $original_value = json_decode($original_value);
+                            $current_value = json_decode($item['pivot']['option_value']);
+                            $value_changed = [];
+                            foreach ($original_value as $i => $original) {
+                                $value_changed[] = $original !== $current_value[$i];
+                            }
+                            break;
+                        default:
+                            $value_changed = false;
+                            break;
+                    }
+                    $item['pivot']['value_changed'] = $value_changed;
+                }
+            }
+            switch ($item["id"]) {
+                case 38:
+                    $car_type = array_column(json_decode($item["pivot"]["option_value"]), 'car_type')[0];
+                    $item["pivot"]['coords_template'] = $createEdit["coordsTemplates"][$car_type];
+                    break;
+                default:
+                    break;
+            }
+            $categories[$item["inspection_category_id"]]['rental_items'][] = $item;
+        }
+        $categories = array_values($categories);
+
+        $fmt = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
+        $rental->cost = numfmt_format_currency($fmt, $rental->cost, 'USD');
+        $rental->deposit = numfmt_format_currency($fmt, $rental->deposit, 'USD');
+
+        $companyLogo = asset('images/app/logos/logo.png');
+        $params = compact('companyLogo', 'rental', 'categories');
+        return view('exports.rentals.inspection', $params);
+    }
+
+    public function downloadInspectionDeliveryPDF($id)
+    {
+        return $this->generatePDF($id);
+    }
+
+    public function downloadInspectionReturnedPDF($id)
+    {
+        return $this->generatePDF($id, true);
     }
 }

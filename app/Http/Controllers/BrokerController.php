@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Broker;
+use App\Models\BrokerConfig;
 use App\Models\Equipment;
 use App\Models\Service;
 use App\Traits\QuillEditor\QuillFormatter;
@@ -23,7 +24,8 @@ class BrokerController extends Controller
      */
     public function profile()
     {
-        $company = Broker::find(session('broker'));
+        $company = Broker::with('config')
+            ->findOrFail(session('broker'));
         $equipment = Equipment::where('broker_id', session('broker'))->first();
         !$equipment ?: $equipment->message_json = $this->renderForJsonMessage($equipment->message_json);
         $service = Service::where('broker_id', session('broker'))->first();
@@ -103,6 +105,19 @@ class BrokerController extends Controller
 
             return $service;
         });
+        return ['success' => true];
+    }
+
+    public function rentals(Request $request)
+    {
+        $config = BrokerConfig::where('broker_id', session('broker'))->first();
+        if (!$config) {
+            $config = new BrokerConfig();
+            $config->broker_id = session('broker');
+        }
+        $config->rental_inspection_check_out_annex = $request->rental_inspection_check_out_annex;
+        $config->rental_inspection_check_in_annex = $request->rental_inspection_check_in_annex;
+        $config->save();
         return ['success' => true];
     }
 }

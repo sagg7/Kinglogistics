@@ -6,6 +6,7 @@
         <title>{{ $title ?? 'PDF' }}</title>
         <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
         <script src="{{ asset('js/bootstrap.js') }}"></script>
+        @if(!isset($advanced))
         <style>
             body {
                 font-family: sans-serif;
@@ -42,10 +43,17 @@
                 font-size: 18px;
             }
         </style>
+        @endif
+        @yield("head")
     </head>
     <body>
     <main>
-        {{ $slot }}
+        {{ $slot ?? $content }}
     </main>
     </body>
+    @isset($advanced)
+    <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
+    <script src="{{ asset("js/modules/masonry/masonry.pkgd.min.js") }}" type="application/javascript"></script>
+    @endisset
+    @yield("scripts")
 </html>

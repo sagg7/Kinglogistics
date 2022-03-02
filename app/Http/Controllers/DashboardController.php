@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Driver;
 use App\Jobs\ProcessPaymentsAndCollection;
+use App\Models\InspectionCategory;
 use App\Models\Load;
 use App\Models\ShipperInvoice;
 use App\Traits\Accounting\PaymentsAndCollection;
@@ -110,7 +111,20 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-       $invoices = ShipperInvoice::where('status', '=', 'pending')
+        $category = new InspectionCategory();
+        $category->name = "Gadgets";
+        $category->options = json_encode([
+            "type" => "options",
+            "options" =>[
+                "Good",
+                "Damaged",
+            ],
+            "default" => "Good",
+        ]);
+        $category->position = 1;
+        $category->editable = 1;
+        dd($category);
+       /*$invoices = ShipperInvoice::where('status', '=', 'pending')
             ->with('loads')->get();
         foreach ( $invoices as $invoice){
             $total = 0;
@@ -120,7 +134,7 @@ class DashboardController extends Controller
             echo $invoice->custom_id." - ".$invoice->total." - ".$total."<BR>";
             $invoice->total = $total;
             $invoice->save();
-        }
+        }*/
         //$this->carrierPayments();
         //ProcessPaymentsAndCollection::dispatch()->afterCommit();
         //$this->shipperInvoices();
