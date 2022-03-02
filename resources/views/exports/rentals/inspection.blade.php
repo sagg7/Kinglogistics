@@ -28,7 +28,7 @@
         </style>
     @endsection
     @section("scripts")
-        <script src="{{ asset('js/sections/exports/rentals/inspection.min.js') }}" defer></script>
+        <script src="{{ asset('js/sections/exports/rentals/inspection.min.js?1.0.0') }}" defer></script>
     @endsection
     <x-slot name="title">Rental Inspection</x-slot>
     <x-slot name="advanced"></x-slot>
@@ -187,12 +187,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($category['rental_items'] as $item)
-                            <tr>
-                            <!--<td>{{ $item["name"] }}</td>-->
-                                <td>{{ $item["pivot"]["option_value"] }}</td>
-                            </tr>
-                        @endforeach
+                        @isset($category['rental_items'])
+                            @foreach($category['rental_items'] as $item)
+                                <tr>
+                                <!--<td>{{ $item["name"] }}</td>-->
+                                    <td>{{ $item["pivot"]["option_value"] }}</td>
+                                </tr>
+                            @endforeach
+                        @endisset
                         </tbody>
                     </table>
                 </div>

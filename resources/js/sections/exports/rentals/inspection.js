@@ -60,7 +60,7 @@
         if (conditionFlag && imagesLoaded && !hasCalledPrint) {
             hasCalledPrint = true;
             window.print();
-            window.history.back();
+            window.location.href = '/rental/index';
         }
     }
     (() => {

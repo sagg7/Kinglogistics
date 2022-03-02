@@ -681,6 +681,9 @@ class RentalController extends Controller
         $itemsDelivery = $rental->inspectionItems->toArray();
         $itemsReturned = $rental->inspectionItemsReturned->toArray() ?? [];
         $items = $returned ? $itemsReturned : $itemsDelivery;
+        if (count($items) === 0) {
+            return redirect()->back()->withErrors('No data found to generate the PDF');
+        }
         foreach ($items as $item) {
             if ($returned) {
                 $idx = array_search($item['id'], array_column($itemsDelivery, 'id'), true);
