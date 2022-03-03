@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\LoadUpdate;
 use App\Exports\LoadsExport;
+use App\Exports\TemplateExport;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Excel;
+use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
 
 class LoadController extends Controller
 {
@@ -34,25 +36,25 @@ class LoadController extends Controller
     {
         return [
             'jobs' => [null => 'Select'] + Trip::whereHas('broker', function ($q) {
-                    $q->where('id', session('broker'));
-                })
-                    ->pluck('name', 'id')->toArray(),
+                $q->where('id', session('broker'));
+            })
+                ->pluck('name', 'id')->toArray(),
             'shippers' => [null => 'Select'] + Shipper::whereHas('broker', function ($q) {
-                    $q->where('id', session('broker'));
-                })
-                    ->pluck('name', 'id')->toArray(),
+                $q->where('id', session('broker'));
+            })
+                ->pluck('name', 'id')->toArray(),
             'available_drivers' => [null => 'Select'] + Driver::where(function ($q) {
-                    if (auth()->guard('web')->check()) {
-                        $q->whereHas('broker', function ($q) {
-                            $q->where('id', session('broker'));
-                        });
-                    } else if (auth()->guard('shipper')->check()) {
-                        $q->whereHas('shippers', function ($q) {
-                            $q->where('shipper_id', auth()->user()->id);
-                        });
-                    }
-                })
-                    ->pluck('name', 'id')->toArray(),
+                if (auth()->guard('web')->check()) {
+                    $q->whereHas('broker', function ($q) {
+                        $q->where('id', session('broker'));
+                    });
+                } else if (auth()->guard('shipper')->check()) {
+                    $q->whereHas('shippers', function ($q) {
+                        $q->where('shipper_id', auth()->user()->id);
+                    });
+                }
+            })
+                ->pluck('name', 'id')->toArray(),
         ];
     }
 
@@ -151,7 +153,7 @@ class LoadController extends Controller
             $data['load_log_id'] = $load_log->id;
             $control_number = (int)$request->control_number;
             for ($i = 0; $i < $request->load_number; $i++) {
-                if (isset($request->driver_id)){ //temporary
+                if (isset($request->driver_id)) { //temporary
                     $data['driver_id'] = $request->driver_id;
                     if ($data['notes'] === "finished") {
                         $data['status'] = 'finished';
@@ -359,14 +361,28 @@ class LoadController extends Controller
         return $array;
     }
 
+
+   
+
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function search(Request $request)
     {
-        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth()->subMonth();
-        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        if (!$request->start && $request->dateRange) {
+            $dates = explode(" - ", $request->dateRange);
+            $startA = explode("/", $dates[0]);
+            $endA = explode("/", $dates[1]);
+
+
+            $start = $startA ? Carbon::parse($startA[2] . "-" . $startA[0] . "-" . $startA[1]) : Carbon::now()->startOfMonth();
+            $end = $endA ? Carbon::parse($endA[2] . "-" . $endA[0] . "-" . $endA[1])->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        } else {
+            $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth()->subMonth();
+            $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        }
+
 
         $select = [
             "loads.id",
@@ -389,22 +405,22 @@ class LoadController extends Controller
             "loads.load_type_id",
         ];
         $query = Load::with([
-                'driver' => function ($q) {
-                    $q->with([
-                        'shift.chassisType',
-                        'carrier:id,name',
-                    ])
-                        ->select([
-                            'drivers.id',
-                            'drivers.name',
-                            'drivers.carrier_id',
-                        ]);
-                },
-                'trip:id,name',
-                'truck:id,number',
-                'shipper:id,name',
-                'load_type:id,name',
-            ])
+            'driver' => function ($q) {
+                $q->with([
+                    'shift.chassisType',
+                    'carrier:id,name',
+                ])->withTrashed()
+                    ->select([
+                        'drivers.id',
+                        'drivers.name',
+                        'drivers.carrier_id',
+                    ]);
+            },
+            'trip:id,name',
+            'truck:id,number',
+            'shipper:id,name',
+            'load_type:id,name',
+        ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
                     $q->whereHas('broker', function ($q) {
@@ -425,12 +441,11 @@ class LoadController extends Controller
                     $q->where('shipper_id', $request->shipper);
             });
         if ($request->type) {
-            if($request->type == 'active'){
-                $query->where('loads.status', '!=','finished');
+            if ($request->type == 'active') {
+                $query->where('loads.status', '!=', 'finished');
                 if (empty($request->sortModel))
                     $query->orderBy('accepted_timestamp', 'desc');
-            }
-            else {
+            } else {
                 $query->where('loads.status', 'finished');
                 if (empty($request->sortModel))
                     $query->orderBy('finished_timestamp', 'desc');
@@ -442,12 +457,11 @@ class LoadController extends Controller
 
         if (auth()->guard('web')->check() && $request->dispatch && auth()->user()->can('read-load-dispatch')) {
             $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp')
-                ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
+                ->whereBetween(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
             $select[] = 'customer_reference';
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
-
         } else {
             if (isset($request->searchable)) {
                 $array = $request->searchable;
@@ -493,14 +507,71 @@ class LoadController extends Controller
 
         if (strpos($request->search, '/')) {
             $date = explode('/', $request->search);
-            $request->search = $date[2].'-'.$date[0].'-'.$date[1];
+            $request->search = $date[2] . '-' . $date[0] . '-' . $date[1];
         }
         $query->select($select);
+
+        if ($request->download) {
+            $dquery = $this->multiTabSearchData($query, $request, 'getRelationArray');
+            if (count($dquery['rows']) === 0)
+                return redirect()->back()->withErrors('There are no loads to generate the document');
+            $data = [];
+            $now = Carbon::now();
+            foreach ($dquery['rows'] as $item) {
+                $data[] = [
+                    'accepted_timestamp' => $item->accepted_timestamp ? Carbon::createFromFormat('Y-m-d H:i:s', $item->accepted_timestamp)->format('m/d/Y H:i') : null,
+                    'finished_timestamp' => $item->finished_timestamp ? Carbon::createFromFormat('Y-m-d H:i:s', $item->finished_timestamp)->format('m/d/Y H:i') : null,
+                    'truck' => $item->truck ? $item->truck->number : null,
+                    'driver' => $item->driver->name,
+                    'carrier' => $item->driver->carrier->id,
+                    'control_number' => $item->control_number,
+                    'customer_reference' => $item->customer_reference,
+                    'bol' => $item->bol,
+                    'tons' => $item->tons,
+                    'mileage' => $item->mileage,
+                    'load_type' => $item->load_type->name,
+                    'trip' => $item->trip->name,
+                    'customer_po' => $item->customer_po,
+                    'shipper' => $item->shipper->name,
+                    'status' => ucfirst($item->status),
+                    'load_time' =>  $this->msToTime(($item->finished_timestamp ? Carbon::parse($item->accepted_timestamp)->diffInMinutes($item->finished_timestamp) : Carbon::parse($item->accepted_timestamp)->diffInMinutes($now))*60*1000, false),
+                ];
+            }
+            return (new TemplateExport([
+                "data" => $data,
+                "headers" => [
+                    "Accepted Timestamp", "Finished Timestamp", "Truck #", "Driver", "Carrier", "Control #", "C Reference", "BOL", "Tons", "Milage", "Load Type", "Job",  "PO",
+                    "Customer", "Status", "Load Time"
+                ],
+            ]))->download("Rentals - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+        }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }
 
-    public function replacePhoto(Request $request, $id, $type){
+    private function msToTime($duration, $showSeconds = true)
+    {
+        $seconds = floor(($duration / (1000)) % 60);
+        $minutes = floor(($duration / (1000 * 60)) % 60);
+        $hours = floor(($duration / (1000 * 60 * 60)) % 24);
+        $days = floor(($duration / (1000 * 60 * 60 * 24)));
+
+        $hours = ($hours < 10) ? "0$hours" : "$hours";
+        $minutes = ($minutes < 10) ? "0$minutes" : "$minutes";
+        $secs = "";
+        if ($showSeconds)
+            $secs = "$seconds s";
+        if ($days > 0)
+            return "$days d $hours h $minutes m $secs";
+        else if ($hours > 0)
+            return "$hours h $minutes m $secs";
+        else
+            return "$minutes m $secs";
+    }
+   
+
+    public function replacePhoto(Request $request, $id, $type)
+    {
 
         $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
             $q->whereHas('broker', function ($q) {
@@ -509,30 +580,30 @@ class LoadController extends Controller
         })
             ->where('load_id', $id)->first();
 
-        $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id",30);
+        $new_voucher = $this->uploadImage($request[json_decode($request->slim[0])->output->field], "loads/$load_status->id", 30);
         if ($type == "to_location") {
             $load_status->to_location_voucher = $new_voucher;
         } else {
             $load_status->finished_voucher = $new_voucher;
         }
 
-        if ($load_status->save()){
+        if ($load_status->save()) {
             return [
-                        "status"=>"false",
-                        "name"=>"uid_filename.jpg",
-                        "path"=>"path/uid_filename.jpg"
-                    ];
+                "status" => "false",
+                "name" => "uid_filename.jpg",
+                "path" => "path/uid_filename.jpg"
+            ];
         } else {
             return [
-                "status"=>"success",
-                "name"=>"uid_filename.jpg",
-                "path"=>"path/uid_filename.jpg"
+                "status" => "success",
+                "name" => "uid_filename.jpg",
+                "path" => "path/uid_filename.jpg"
             ];
         }
-
     }
 
-    function deleteDirectory($dir) {
+    function deleteDirectory($dir)
+    {
         if (!file_exists($dir)) {
             return true;
         }
@@ -549,13 +620,13 @@ class LoadController extends Controller
             if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
                 return false;
             }
-
         }
 
         return rmdir($dir);
     }
 
-    public function loadPhoto($id, $type){
+    public function loadPhoto($id, $type)
+    {
         $load_status = LoadStatus::whereHas('parentLoad', function ($q) {
             $q->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
@@ -570,57 +641,57 @@ class LoadController extends Controller
             $url = $this->getTemporaryFile("$load_status->to_location_voucher");
             $contents = file_get_contents($url);
             $name = substr($url, strrpos($url, '/') + 1);
-            Storage::put("public/loads/".$load_status->load_id."/to_location.jpg", $contents);
-            return asset("storage/loads/".$load_status->load_id."/to_location.jpg");
+            Storage::put("public/loads/" . $load_status->load_id . "/to_location.jpg", $contents);
+            return asset("storage/loads/" . $load_status->load_id . "/to_location.jpg");
         } else {
             $url = $this->getTemporaryFile("$load_status->finished_voucher");
             $contents = file_get_contents($url);
             $name = substr($url, strrpos($url, '/') + 1);
-            Storage::put("public/loads/".$load_status->load_id."/finished.jpg", $contents);
-            return asset("storage/loads/".$load_status->load_id."/finished.jpg");
+            Storage::put("public/loads/" . $load_status->load_id . "/finished.jpg", $contents);
+            return asset("storage/loads/" . $load_status->load_id . "/finished.jpg");
         }
     }
 
-    public function DownloadExcelReport(Request $request) {
-       // $request->endRow = 0;
-       // $request->startRow = 1000;
+    public function DownloadExcelReport(Request $request)
+    {
+        // $request->endRow = 0;
+        // $request->startRow = 1000;
         $dates = explode(" - ", $request->dateRange);
-        $startA = explode("/",$dates[0]);
-        $endA = explode("/",$dates[1]);
+        $startA = explode("/", $dates[0]);
+        $endA = explode("/", $dates[1]);
 
-        $request->merge(["start"=>$startA[2]."-".$startA[0]."-".$startA[1]]);
-        $request->merge(["end"=>$endA[2]."-".$endA[0]."-".$endA[1]]);
-        $request->merge(["endRow"=>1000]);
-        $request->merge(["startRow"=>0]);
+        $request->merge(["start" => $startA[2] . "-" . $startA[0] . "-" . $startA[1]]);
+        $request->merge(["end" => $endA[2] . "-" . $endA[0] . "-" . $endA[1]]);
+        $request->merge(["endRow" => 1000]);
+        $request->merge(["startRow" => 0]);
         //$result = $this->search($request);
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
         $result = Driver::select('name', 'id')
-           /* ->whereHas('trailer', function ($q) use ($request) {                      ///checar que todos tengan trailer
+            /* ->whereHas('trailer', function ($q) use ($request) {                      ///checar que todos tengan trailer
                         $q->whereHas('shippers', function ($q) use ($request) {
                             $q->where('id', $request->shipper);
                         });
                     })*/
             ->with('loadStatus', function ($q) use ($start, $end,  $request) {
-                    $q->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
-                    if (!empty($request->shipper)) //quitar cuando todos tengan trailer
-                        $q->where("shipper_id", "$request->shipper");
+                $q->whereBetween(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end]);
+                if (!empty($request->shipper)) //quitar cuando todos tengan trailer
+                    $q->where("shipper_id", "$request->shipper");
             })
             ->orderBy("name");
 
         return (new LoadsExport($result->get()))->download('Dispatch Report.xlsx');
-
-
     }
 
-    public function pictureReport(Request $request){
+    public function pictureReport(Request $request)
+    {
         $dates = explode(" - ", $request->dateRange);
-        $startA = explode("/",$dates[0]);
-        $endA = explode("/",$dates[1]);
+        $startA = explode("/", $dates[0]);
+        $endA = explode("/", $dates[1]);
 
 
-        $start = $startA ? Carbon::parse($startA[2]."-".$startA[0]."-".$startA[1]) : Carbon::now()->startOfMonth();
-        $end = $endA ? Carbon::parse($endA[2]."-".$endA[0]."-".$endA[1])->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+        $start = $startA ? Carbon::parse($startA[2] . "-" . $startA[0] . "-" . $startA[1]) : Carbon::now()->startOfMonth();
+        $end = $endA ? Carbon::parse($endA[2] . "-" . $endA[0] . "-" . $endA[1])->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
 
         $select = [
             "loads.id",
@@ -638,29 +709,29 @@ class LoadController extends Controller
             })
             ->with('trip:id,name')
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
-            ->whereBetween( DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
+            ->whereBetween(DB::raw('IF(finished_timestamp IS NULL,date,finished_timestamp)'), [$start, $end])
             //->whereNull('inspected')
             ->where(function ($q) use ($request) {
                 if ($request->shipper)
                     $q->where('shipper_id', $request->shipper);
             });
 
-            $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
-            $select[] = 'customer_reference';
-            $select[] = 'bol';
-            $select[] = 'accepted_timestamp';
-            $select[] = 'finished_timestamp';
-            $query->orderBy('finished_timestamp', 'desc');
+        $query->with('loadStatus:load_id,to_location_voucher,finished_voucher,accepted_timestamp,finished_timestamp');
+        $select[] = 'customer_reference';
+        $select[] = 'bol';
+        $select[] = 'accepted_timestamp';
+        $select[] = 'finished_timestamp';
+        $query->orderBy('finished_timestamp', 'desc');
 
         $photos = [];
         $loads = [];
-        foreach ($query->select($select)->get() as $key => $load){
+        foreach ($query->select($select)->get() as $key => $load) {
             $loads[] = [
-                'driverName'=> $load->driver->name,
-                'job'=> $load->trip->name,
-                'control_number'=> $load->control_number,
-                'customer_reference'=> $load->customer_reference,
-                'bol'=>$load->bol,
+                'driverName' => $load->driver->name,
+                'job' => $load->trip->name,
+                'control_number' => $load->control_number,
+                'customer_reference' => $load->customer_reference,
+                'bol' => $load->bol,
                 'finished' => (isset($load->loadStatus->finished_voucher)) ? $this->getTemporaryFile($load->loadStatus->finished_voucher) : "NO IMAGE",
                 'ticket' => (isset($load->loadStatus->to_location_voucher)) ? $this->getTemporaryFile($load->loadStatus->to_location_voucher) : "NO IMAGE",
                 'finished_timestamp' => $load->loadStatus->finished_timestamp,
@@ -682,7 +753,8 @@ class LoadController extends Controller
             return ['success' => false];
     }
 
-    public function getLoadNote($id){
+    public function getLoadNote($id)
+    {
         $load = Load::find($id);
         return $load->notes;
     }

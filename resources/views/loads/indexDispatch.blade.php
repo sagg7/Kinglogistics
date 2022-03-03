@@ -655,6 +655,18 @@
                 });*/
             }
 
+            function downloadLoads(type){
+                window.location = "{{url("load/search")}}?" + $.param({
+                    dateRange: dateRange.value,
+                    shipper: $("#shipper").val(),
+                    download: 1,
+                    dispatch: 1,
+                    type: type,
+                    startRow : 0,
+                    endRow: 1000,
+                });
+            }
+
             function openPicReport() {
                 window.location = "{{url("load/pictureReport")}}?" + $.param({
                     dateRange: dateRange.value,
@@ -846,9 +858,18 @@
 
     <div class="card">
         <div class="card-body">
+            <div class="dropdown float-right">
+                <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                    <a class="dropdown-item" id="completeAll" onclick="downloadLoads('active')"><i class="fas fa-file-excel"></i> Download Active Loads</a>
+                </div>
+            </div>
             <div class="card-content">
                 <h3>Active Loads</h3>
                 <hr>
+             
                 <div id="gridActive"></div>
             </div>
         </div>
@@ -856,8 +877,17 @@
 
     <div class="card">
         <div class="card-body">
+              <div class="dropdown float-right">
+                    <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                        <a class="dropdown-item" id="completeAll" onclick="downloadLoads('finished')"><i class="fas fa-file-excel"></i> Download Finished Loads</a>
+                    </div>
+                </div>
             <div class="card-content">
                 <h3>Finished Loads</h3>
+              
                 <hr>
                 <div id="gridFinished"></div>
             </div>
