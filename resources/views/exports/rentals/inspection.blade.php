@@ -1,5 +1,6 @@
 <x-pdf-layout>
     @section("head")
+        <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
         <style>
             body {
                 line-height: 1em;
@@ -79,7 +80,7 @@
             </table>
         </div>
     </div>
-    <div class="row m-0 masonry_grid">
+    <div class="row m-0 masonry_grid" style="font-size: 13px;">
         @foreach($categories as $i => $category)
             @php
                 $options = json_decode($category['options']);
@@ -91,8 +92,12 @@
                         <thead>
                         <tr>
                             <th>{{ $category['name'] }}</th>
-                            <th>Good</th>
-                            <th>Damaged</th>
+                            <th><i class="fas fa-thumbs-up"></i></th>
+                            <th><i class="fas fa-thumbs-down"></i></th>
+                            @if($returnedFlag)
+                                <th><i class="fas fa-thumbs-up"></i></th>
+                                <th><i class="fas fa-thumbs-down"></i></th>
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
@@ -101,11 +106,20 @@
                                 <td>{{ $item["name"] }}</td>
                                 @if($item["pivot"]["option_value"] === "1")
                                     <td></td>
-                                    <td class="text-center @if($item["pivot"]["value_changed"] ?? false){{ 'text-danger' }}@endif">✓</td>
+                                    <td class="text-center">✓</td>
                                 @else
-                                    <td class="text-center @if($item["pivot"]["value_changed"] ?? false){{ 'text-danger' }}@endif">✓</td>
+                                    <td class="text-center">✓</td>
                                     <td></td>
                                 @endif
+                                @isset($item["return_data"])
+                                    @if($item["return_data"]["option_value"] === "1")
+                                        <td></td>
+                                        <td class="text-center @if($item["return_data"]["value_changed"] ?? false){{ 'text-danger' }}@endif">✓</td>
+                                    @else
+                                        <td class="text-center @if($item["return_data"]["value_changed"] ?? false){{ 'text-danger' }}@endif">✓</td>
+                                        <td></td>
+                                    @endif
+                                @endisset
                             </tr>
                         @endforeach
                         </tbody>
@@ -121,6 +135,11 @@
                             @foreach($options->options as $item)
                                 <th>{{ $item }}</th>
                             @endforeach
+                            @if($returnedFlag)
+                                @foreach($options->options as $item)
+                                    <th>{{ $item }}</th>
+                                @endforeach
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
@@ -128,8 +147,13 @@
                             <tr>
                                 <td>{{ $item["name"] }}</td>
                                 @foreach(json_decode($item["pivot"]["option_value"]) as $i => $value)
-                                    <td class="@if($item["pivot"]["value_changed"][$i] ?? false){{ 'text-danger' }}@endif">{{ $value }}</td>
+                                    <td>{{ $value }}</td>
                                 @endforeach
+                                @isset($item["return_data"])
+                                    @foreach(json_decode($item["return_data"]["option_value"]) as $i => $value)
+                                        <td class="@if($item["return_data"]["value_changed"][$i] ?? false){{ 'text-danger' }}@endif">{{ $value }}</td>
+                                    @endforeach
+                                @endisset
                             </tr>
                         @endforeach
                         </tbody>
