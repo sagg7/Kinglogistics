@@ -79,7 +79,7 @@ class LoadController extends Controller
         $data['customer_po'] = ""; // Should be nullable in db
         $data['customer_reference'] = ""; // Should be nullable in db
 
-        $trip = Trip::find($request->trip_id)->first();
+        $trip = Trip::find($request->trip_id);
         // Trip related info
         $data['id'] = $trip->id;
         $data['origin'] = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
