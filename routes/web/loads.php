@@ -57,6 +57,8 @@ Route::prefix('load')->group(function () {
             ->name('load.addObservation');
         Route::post('transferJob/{id}', [LoadController::class, 'transferJob'])
             ->name('load.transferJob');
+        Route::post('finishLoad/{id}', [LoadController::class, 'finishLoad'])
+            ->name('load.finishLoad');
     });
 
     Route::group(['middleware' => ['permission:read-load|read-load-dispatch']], function () {

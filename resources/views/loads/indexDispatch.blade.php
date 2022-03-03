@@ -485,6 +485,14 @@
                         {
                             text: 'Add Observations', route: '#AddObservation', icon: 'far fa-folder-open', type: 'modal'
                         },
+                        {
+                            text: 'Finish load', route: "/load/finishLoad", icon: 'feather icon-check-square', type: 'confirm', conditional: 'status != "finished"', menuData: {title: 'Are you sure you want to end this load?'}
+                        },
+                            @if(auth()->user()->can(['delete-load-dispatch']))
+                        {
+                            route: '/load/delete', type: 'delete'
+                        },
+                            @endif
                         @endif
                     ];
                     const gridOptions = {

@@ -708,4 +708,48 @@ class LoadController extends Controller
         else
             return ['success' => false];
     }
+
+    public function finishLoad($id){
+        $load = Load::find($id);
+        $loadStatus = LoadStatus::where('load_id', $id)->first();
+
+        switch ($load->status){
+            case "unallocated":
+            case "requested":
+                return ['success' => false, 'message' => "you cannot finish a load without assigning a driver"];
+                break;
+            case "accepted":
+                $loadStatus->loading_timestamp = Carbon::now();
+                $loadStatus->to_location_timestamp = Carbon::now();
+                $loadStatus->arrived_timestamp = Carbon::now();
+                $loadStatus->unloading_timestamp = Carbon::now();
+                $loadStatus->finished_timestamp = Carbon::now();
+                break;
+            case "loading":
+                $loadStatus->to_location_timestamp = Carbon::now();
+                $loadStatus->arrived_timestamp = Carbon::now();
+                $loadStatus->unloading_timestamp = Carbon::now();
+                $loadStatus->finished_timestamp = Carbon::now();
+                break;
+            case "to_location":
+                $loadStatus->arrived_timestamp = Carbon::now();
+                $loadStatus->unloading_timestamp = Carbon::now();
+                $loadStatus->finished_timestamp = Carbon::now();
+                break;
+            case "arrived":
+                $loadStatus->unloading_timestamp = Carbon::now();
+                $loadStatus->finished_timestamp = Carbon::now();
+                break;
+            case "unloading":
+                $loadStatus->finished_timestamp = Carbon::now();
+                break;
+            case "finished":
+                return ['success' => false, 'message' => "you cannot finish a finished load"];
+                break;
+        }
+        $load->status = 'finished';
+        $load->save();
+        $loadStatus->save();
+        return ['success' => true, 'load' => $load];
+    }
 }
