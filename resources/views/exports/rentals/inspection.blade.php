@@ -92,11 +92,11 @@
                         <thead>
                         <tr>
                             <th>{{ $category['name'] }}</th>
-                            <th><i class="fas fa-thumbs-up"></i></th>
-                            <th><i class="fas fa-thumbs-down"></i></th>
+                            <th class="text-center"><i class="fas fa-thumbs-up"></i></th>
+                            <th class="text-center"><i class="fas fa-thumbs-down"></i></th>
                             @if($returnedFlag)
-                                <th><i class="fas fa-thumbs-up"></i></th>
-                                <th><i class="fas fa-thumbs-down"></i></th>
+                                <th class="text-center"><i class="fas fa-thumbs-up"></i></th>
+                                <th class="text-center"><i class="fas fa-thumbs-down"></i></th>
                             @endif
                         </tr>
                         </thead>
