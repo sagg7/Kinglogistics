@@ -648,7 +648,7 @@ class RentalController extends Controller
         ]))->download("Rentals " . ucfirst($type) . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 
-    private function generatePDF($idx, $returned = false)
+    private function generatePDF($idx, $returnedFlag = false)
     {
         $withRelations = [
             'carrier:id,name',
@@ -656,7 +656,7 @@ class RentalController extends Controller
             'driver:id,name',
             'inspectionItems',
         ];
-        if ($returned) {
+        if ($returnedFlag) {
             $withRelations[] = 'inspectionItemsReturned';
             $withRelations['broker'] = function ($q) {
                 $q->with('config:broker_id,rental_inspection_check_out_annex');
@@ -680,12 +680,12 @@ class RentalController extends Controller
         $createEdit = $this->createEditInspectionParams();
         $itemsDelivery = $rental->inspectionItems->toArray();
         $itemsReturned = $rental->inspectionItemsReturned->toArray() ?? [];
-        $items = $returned ? $itemsReturned : $itemsDelivery;
+        $items = $returnedFlag ? $itemsReturned : $itemsDelivery;
         if (count($items) === 0) {
             return redirect()->back()->withErrors('No data found to generate the PDF');
         }
         foreach ($items as $item) {
-            if ($returned) {
+            if ($returnedFlag) {
                 $idx = array_search($item['id'], array_column($itemsDelivery, 'id'), true);
                 if ($idx !== false) {
                     $original_value = $itemsDelivery[$idx]['pivot']['option_value'];
@@ -707,7 +707,8 @@ class RentalController extends Controller
                             $value_changed = false;
                             break;
                     }
-                    $item['pivot']['value_changed'] = $value_changed;
+                    $itemsDelivery[$idx]['pivot']['value_changed'] = $value_changed;
+                    $item['return_data'] = $itemsDelivery[$idx]['pivot'];
                 }
             }
             switch ($item["id"]) {
@@ -727,7 +728,7 @@ class RentalController extends Controller
         $rental->deposit = numfmt_format_currency($fmt, $rental->deposit, 'USD');
 
         $companyLogo = asset('images/app/logos/logo.png');
-        $params = compact('companyLogo', 'rental', 'categories');
+        $params = compact('companyLogo', 'rental', 'categories', 'returnedFlag');
         return view('exports.rentals.inspection', $params);
     }
 
