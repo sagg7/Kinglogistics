@@ -157,7 +157,7 @@
 
                 let msToTimeLet = (params) => {
                     if(params.value)
-                    var timeFormatted = msToTime(params.data.worked_hours*60*1000, false) ;
+                    var timeFormatted = msToTime(params.data.worked_hours*1000, false) ;
                     return timeFormatted;
                 }
 

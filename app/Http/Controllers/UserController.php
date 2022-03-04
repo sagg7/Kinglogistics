@@ -460,20 +460,22 @@ class UserController extends Controller
         $checkInOut = CheckInOut::find($id);
         $now = Carbon::now('America/Chicago');
         $DateAndTime = date('Y-m-d H:i:s');
-        $DateAndTimeFormat = new  DateTime($DateAndTime);
         $timeCheckIn = $checkInOut->check_in;
-        $timeCheckInFormat = new  DateTime($timeCheckIn);
+        // $DateAndTimeFormat = new  DateTime($DateAndTime);
+        // $timeCheckInFormat = new  DateTime($timeCheckIn);
         // $checkInOut->latitude_check_out = '37.4033303';
         // $checkInOut->longitude_check_out = '-104.2120453';
         $checkInOut->latitude_check_out =$request->lat;
         $checkInOut->longitude_check_out = $request->lng;
         $checkInOut->check_out = $now;
-        $diffDate = date_diff($timeCheckInFormat, $DateAndTimeFormat);
-        $diffDateHours = ((float)$diffDate->format("%h")) * 60;
-        $diffDateMinutes = (float)$diffDate->format("%I");
-        $diffDateHoursTotal = $diffDateHours + $diffDateMinutes;
+        // $diffDate = date_diff($timeCheckInFormat, $DateAndTimeFormat);
+        // $diffDateHours = ((float)$diffDate->format("%h")) * 60;
+        // $diffDateMinutes = (float)$diffDate->format("%I");
+        // $diffDateHoursTotal = $diffDateHours + $diffDateMinutes;
+        $timestamp = strtotime($DateAndTime);
+        $timestamp2 = strtotime($timeCheckIn);
+        $diffDateHoursTotal = $timestamp - $timestamp2;
         $checkInOut->worked_hours = $diffDateHoursTotal;
-
         $checkInOut->save();
         return ['success' => true, 'data' => $checkInOut];
     }
