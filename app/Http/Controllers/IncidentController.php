@@ -33,7 +33,8 @@ class IncidentController extends Controller
             'sanction' => ['required'],
             'date_submit' => ['required', 'date'],
             'location' => ['required', 'string', 'max:255'],
-            'description' => ['sometimes', 'required', 'string', 'max:1024'],
+            'supervisor' => ['required', 'string', 'max:255'],
+            'description' => ['sometimes', 'required', 'string', 'max:1535'],
             'excuse' => ['required', 'string', 'max:1024'],
         ]);
     }
@@ -109,9 +110,11 @@ class IncidentController extends Controller
             $incident->sanction = $request->sanction;
             $incident->date = Carbon::parse($request->date_submit);
             $incident->location = $request->location;
+            $incident->supervisor = $request->supervisor;
             $incident->description = trim($request->description);
             $incident->excuse = trim($request->excuse);
             $incident->refuse_sign = $request->refuse_sign ?? null;
+
             if (!$id)
                 $incident->save();
 
@@ -124,6 +127,8 @@ class IncidentController extends Controller
                 $incident->safety_signature = $this->uploadImage($request->safety_signature, "safety/incident/$incident->id/safety");
             if ($request->driver_signature)
                 $incident->driver_signature = $this->uploadImage($request->driver_signature, "safety/incident/$incident->id/driver");
+            if ($request->file_incident)
+                $incident->file_incident_url = $this->uploadFile($request->file_incident, "safety/incident/$incident->id/file_incident");
             $incident->save();
 
             return $incident;

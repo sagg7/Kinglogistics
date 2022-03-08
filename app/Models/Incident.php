@@ -16,6 +16,14 @@ class Incident extends Model
         'date' => 'date:m/d/Y',
     ];
 
+    protected $appends = ['incident_file_name'];
+
+
+    public function getIncidentFileNameAttribute()
+    {
+        $exploded = explode('/', $this->file_incident_url);
+        return explode('?', $exploded[count($exploded) - 1])[0];
+    }
     /**
      * @param $value
      * @return string

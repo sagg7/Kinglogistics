@@ -83,6 +83,33 @@
                     </span>
                     @enderror
                 </div>
+
+                <div class="form-group col-md-3">
+                    {!! Form::label('file_incident', "Add File", ['class' => 'col-form-label']) !!}
+                    <div class="file-group">
+                        <label for="file_incident" class="btn form-control btn-primary btn-block">
+                            <i class="fas fa-file"></i> <span class="file-name">Upload File</span>
+                            <input type="file" name="file_incident" id="file_incident" hidden>
+                        </label>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    @isset($incident->file_incident_url)
+                        {{-- <a class="d-block mt-2" href="{{ $incident->file_incident_url }}" target="_blank">Uploaded file: {{ $incident->incident_file_name }}</a> --}}
+                        <a href="{{ route('s3storage.temporaryUrl', ['url' =>  $incident->file_incident_url]) }}" target="_blank">{{ $incident->incident_file_name}}</a>
+                    @endisset
+                </div>
+                <div class="form-group col-md-3">
+                    {!! Form::label('supervisor', ucfirst(__('supervisor')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('supervisor', $incident->supervisor ?? null, ['class' => 'form-control' . ($errors->first('supervisor') ? ' is-invalid' : '')]) !!}
+                    @error('supervisor')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-6"></div>
                 @if(auth()->guard('web')->check())
                 <div class="form-group col-md-6">
                     {!! Form::label('description', ucfirst(__('description')), ['class' => 'col-form-label']) !!}

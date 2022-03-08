@@ -24,7 +24,7 @@
         @include('incidents.common.modals.deleteIncidentType')
     @endsection
 
-    {!! Form::open(['route' => 'incident.store', 'method' => 'post', 'class' => 'form form-vertical with-sig-pad']) !!}
+    {!! Form::open(['route' => 'incident.store', 'method' => 'post', 'class' => 'form form-vertical with-sig-pad', 'enctype' => 'multipart/form-data']) !!}
     @include('incidents.common.form')
     {!! Form::close() !!}
 </x-app-layout>
