@@ -99,6 +99,9 @@
             },
             success: (res) => {
                 initChart(res);
+                setTimeout(function (){
+                    getData();
+                }, 300000);
             }
         });
     };
