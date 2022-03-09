@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
-use App\Models\Load;
-use App\Models\Shipper;
-use App\Models\Trip;
-use App\Models\User;
-use App\Models\LoadStatus;
 use App\Models\dispatch_report;
 use App\Models\Driver;
+use App\Models\Expense;
+use App\Models\Income;
+use App\Models\Load;
+use App\Models\LoadStatus;
+use App\Models\Shipper;
+use App\Models\Trip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
-use function Clue\StreamFilter\fun;
 
 class ReportController extends Controller
 {
@@ -546,6 +545,102 @@ class ReportController extends Controller
         }
 
         return compact('driversData', 'carriersData');
+    }
+
+    public function utilityProjection()
+    {
+        return view('reports.utilityProjection');
+    }
+
+    public function utilityProjectionData(Request $request)
+    {
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfWeek();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfWeek()->endOfDay();
+
+        $loads = Load::join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+            ->with([
+                'driver' => function ($q) {
+                    $q->select('id', 'carrier_id')
+                        ->with('carrier:id,name');
+                }
+            ])
+            ->where('broker_id', session('broker'))
+            ->whereDate('finished_timestamp', '>=', $start)
+            ->whereDate('finished_timestamp', '<=', $end)
+            ->get([
+                'loads.id',
+                'loads.driver_id',
+                'loads.rate',
+                'loads.shipper_rate',
+                'loads.carrier_payment_id',
+                'loads.shipper_invoice_id',
+                'load_statuses.finished_timestamp',
+            ]);
+        $loadData = [
+            'paid_income' => 0,
+            'paid_expenses' => 0,
+            'pending_income' => 0,
+            'pending_expenses' => 0,
+            'load_count' => $loads->count(),
+            'carriers' => [],
+        ];
+        foreach ($loads as $load) {
+            if (!isset($loadData['carriers'][$load->driver->carrier_id])) {
+                $loadData['carriers'][$load->driver->carrier_id] = [
+                    'id' => $load->driver->carrier_id,
+                    'name' => $load->driver->carrier->name,
+                    'quantity' => 0,
+                    'income' => 0,
+                    'expenses' => 0,
+                ];
+            }
+            $loadData['carriers'][$load->driver->carrier_id]['quantity']++;
+            $loadData['carriers'][$load->driver->carrier_id]['income'] += (double)$load->shipper_rate;
+            $loadData['carriers'][$load->driver->carrier_id]['expenses'] += (double)$load->rate;
+
+            if ($load->shipper_invoice_id) {
+                $loadData['paid_income'] += (double)$load->shipper_rate;
+            } else {
+                $loadData['pending_income'] += (double)$load->shipper_rate;
+            }
+            if ($load->carrier_payment_id) {
+                $loadData['paid_expenses'] += (double)$load->rate;
+            } else {
+                $loadData['pending_expenses'] += (double)$load->rate;
+            }
+        }
+        $loadData['carriers'] = array_values($loadData['carriers']);
+
+        $income = Income::where('broker_id', session('broker'))
+            ->whereDate('date', '>=', $start)
+            ->whereDate('date', '<=', $end)
+            ->with([
+                'type:id,name',
+                'account:id,name',
+            ])
+            ->get([
+                'id',
+                'type_id',
+                'account_id',
+                'date',
+                'amount',
+            ]);
+
+        $expenses = Expense::where('broker_id', session('broker'))
+            ->whereDate('date', '>=', $start)
+            ->whereDate('date', '<=', $end)
+            ->with([
+                'type:id,name',
+                'account:id,name',
+            ])
+            ->get([
+                'id',
+                'account_id',
+                'date',
+                'amount',
+            ]);
+
+        return compact('loadData', 'income', 'expenses');
     }
 }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Income;
+use App\Models\IncomeAccount;
 use App\Models\IncomeType;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
@@ -23,6 +24,7 @@ class IncomeController extends Controller
     {
         return Validator::make($data, [
             'type' => ['required', 'exists:income_types,id'],
+            'account' => ['required', 'exists:income_accounts,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
         ]);
@@ -35,6 +37,10 @@ class IncomeController extends Controller
     {
         return [
             'types' => [null => ''] + IncomeType::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->pluck('name', 'id')->toArray(),
+            'accounts' => [null => ''] + IncomeAccount::whereHas('broker', function ($q) {
                     $q->where('id', session('broker'));
                 })
                     ->pluck('name', 'id')->toArray(),
@@ -59,6 +65,7 @@ class IncomeController extends Controller
         }
 
         $income->type_id = $request->type;
+        $income->account_id = $request->account;
         $income->amount = $request->amount;
         $income->description = $request->description;
         $income->date = Carbon::parse($request->date_submit);
@@ -172,6 +179,7 @@ class IncomeController extends Controller
     {
         switch ($item) {
             case 'type':
+            case 'account':
                 $array = [
                     'relation' => $item,
                     'column' => 'name',
@@ -194,14 +202,18 @@ class IncomeController extends Controller
         $query = Income::select([
             "incomes.id",
             "incomes.type_id",
+            "incomes.account_id",
             "incomes.amount",
-            "date",
+            "incomes.date",
 
         ])
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             })
-            ->with('type:id,name');
+            ->with([
+                'type:id,name',
+                'account:id,name',
+            ]);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
     }

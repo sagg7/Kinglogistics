@@ -8,7 +8,7 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbAG = null;
+            let tbAG = null;
             (() => {
                 const nameFormatter = (params) => {
                     if (params.value)
@@ -26,6 +26,7 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'type', valueFormatter: nameFormatter},
+                        {headerName: 'Account', field: 'account', valueFormatter: nameFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                     ],
                     menu: [

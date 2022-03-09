@@ -27,4 +27,13 @@ class Expense extends Model
     {
         return $this->belongsTo(ExpenseType::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function account(): BelongsTo
+    {
+            return $this->belongsTo(ExpenseAccount::class)
+            ->withTrashed();
+    }
 }

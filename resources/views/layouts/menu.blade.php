@@ -427,11 +427,14 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Daily Loads</span>
                         </a>
                     </li>
-                </ul>
-                <ul class="menu-content">
                     <li>
                         <a href="/report/activeTime">
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Active Time</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/report/utilityProjection">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Utility Projection</span>
                         </a>
                     </li>
                 </ul>

@@ -27,4 +27,13 @@ class Income extends Model
     {
         return $this->belongsTo(IncomeType::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(IncomeAccount::class)
+            ->withTrashed();
+    }
 }

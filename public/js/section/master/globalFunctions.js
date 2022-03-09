@@ -64,6 +64,7 @@ const select2Lang = {
     deleteHandler = (select, options, remove = true) => {
         select.html(options);
         select.find('option:selected').prop('selected', false);
+        console.log(select, options);
         if (remove)
             select.find('option:first').remove();
         select.prepend('<option selected disabled></option>');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExpenseAccountController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseTypeController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,21 @@ Route::prefix('expense')->group(function () {
         Route::group(['middleware' => ['permission:delete-expense']], function () {
             Route::post('delete/{id?}', [ExpenseTypeController::class, 'destroy'])
                 ->name('expenseType.delete');
+        });
+    });
+
+    Route::prefix('account')->group(function () {
+        Route::group(['middleware' => ['permission:read-expense']], function () {
+            Route::get('selection', [ExpenseAccountController::class, 'selection'])
+                ->name('expenseAccount.selection');
+        });
+        Route::group(['middleware' => ['permission:create-expense']], function () {
+            Route::post('store', [ExpenseAccountController::class, 'store'])
+                ->name('expenseAccount.store');
+        });
+        Route::group(['middleware' => ['permission:delete-expense']], function () {
+            Route::post('delete/{id?}', [ExpenseAccountController::class, 'destroy'])
+                ->name('expenseAccount.delete');
         });
     });
 });

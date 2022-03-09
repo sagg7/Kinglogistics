@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\IncomeAccountController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\IncomeTypeController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,21 @@ Route::prefix('income')->group(function () {
         Route::group(['middleware' => ['permission:delete-income']], function () {
             Route::post('delete/{id?}', [IncomeTypeController::class, 'destroy'])
                 ->name('incomeType.delete');
+        });
+    });
+
+    Route::prefix('account')->group(function () {
+        Route::group(['middleware' => ['permission:read-income']], function () {
+            Route::get('selection', [IncomeAccountController::class, 'selection'])
+                ->name('incomeAccount.selection');
+        });
+        Route::group(['middleware' => ['permission:create-income']], function () {
+            Route::post('store', [IncomeAccountController::class, 'store'])
+                ->name('incomeAccount.store');
+        });
+        Route::group(['middleware' => ['permission:delete-income']], function () {
+            Route::post('delete/{id?}', [IncomeAccountController::class, 'destroy'])
+                ->name('incomeAccount.delete');
         });
     });
 });

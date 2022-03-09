@@ -10,7 +10,7 @@
                 {!! Form::open(['route' => $route, 'method' => 'post', 'class' => 'form form-vertical optionHandler', 'data-handler-action' => 'delete', 'data-target-select' => '#' . $selectId]) !!}
 
                 <div class="form-group">
-                    <select id="delete_type" class="form-control" name="id"></select>
+                    <select id="{{ $deleteSelectId ?? 'delete_type' }}" class="form-control" name="id"></select>
                 </div>
 
                 <button type="submit" class="btn btn-block btn-danger">Delete</button>
