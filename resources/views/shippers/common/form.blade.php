@@ -72,6 +72,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('loads_per_invoice', ucwords(__('maximum quantity of loads per invoice')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('loads_per_invoice', $shipper->loads_per_invoice ?? null, ['class' => 'form-control' . ($errors->first('loads_per_invoice') ? ' is-invalid' : '')]) !!}
+                    @error('loads_per_invoice')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}
