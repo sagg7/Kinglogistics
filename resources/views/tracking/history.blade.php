@@ -7,23 +7,29 @@
         <script>
             const company = @json($company);
         </script>
-        <script src="{{ asset('js/sections/tracking/history.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/tracking/history.min.js?1.1.0') }}"></script>
     @endsection
 
     <div class="card">
         <div class="card-body">
             <div class="card-content">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <fieldset class="form-group">
                             <label for="dateRange">Select Load Dates</label>
                             <input type="text" id="dateRange" class="form-control">
                         </fieldset>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <fieldset class="form-group">
                             <label for="driver">Driver</label>
                             {!! Form::select('driver', [], null, ['class' => 'form-control']) !!}
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset class="form-group">
+                            <label for="driver">Load</label>
+                            {!! Form::select('load', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>
                 </div>

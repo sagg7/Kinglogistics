@@ -1,5 +1,3 @@
 {
-    "/js/sections/expenses/common.min.js": "/js/sections/expenses/common.min.js",
-    "/js/sections/incomes/common.min.js": "/js/sections/incomes/common.min.js",
-    "/js/sections/reports/utilityProjection.min.js": "/js/sections/reports/utilityProjection.min.js"
+    "/js/sections/tracking/history.min.js": "/js/sections/tracking/history.min.js"
 }

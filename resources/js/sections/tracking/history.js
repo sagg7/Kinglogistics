@@ -54,6 +54,13 @@
                         map,
                         animation: google.maps.Animation.DROP,
                     };
+                    // Setting a different starting pin to be able to visualize the first position
+                    if (i === 0) {
+                        markerObj.icon = {
+                            url: "/images/app/tracking/icons/start-pin.svg",
+                            scaledSize: new google.maps.Size(40, 40), // scaled size
+                        };
+                    }
                     const marker = new google.maps.Marker(markerObj);
                     const content = `<strong>Date:</strong> ${moment(info.date).format('MM/DD/YYYY HH:mm')}<br>` +
                         `<strong>Coords:</strong> ${lat}, ${lng}<br>` +
@@ -105,13 +112,16 @@
         });
         return marker;
     };
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 32.7096373, lng: -103.1525477 },
-        zoom: 10,
-        disableDefaultUI: true,
-        zoomControl: true,
-        fullscreenControl: true,
-    });
+    const initMapSetting = () => {
+        return new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 32.7096373, lng: -103.1525477 },
+            zoom: 10,
+            disableDefaultUI: true,
+            zoomControl: true,
+            fullscreenControl: true,
+        });
+    }
+    let map = initMapSetting();
     const bounds = new google.maps.LatLngBounds();
     if (company) {
         const info = (company.name ? `<p><strong>Company:</strong> ${company.name}</p>` : '') +
@@ -144,13 +154,35 @@
     }
     const dateRange = $('#dateRange');
     dateRange.daterangepicker({
+        singleDatePicker: true,
         format: 'YYYY/MM/DD',
-        startDate: moment().startOf('month'),
-        endDate: moment().endOf('month'),
     }, (start, end, label) => {
         getData(start, end);
     });
     const driverSel = $('[name=driver]');
+    const loadSel = $('[name=load]');
+    const hideMarkerAndPath = (item) => {
+        item.marker.setMap(null);
+        if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
+            item.poly.drivenPath.setMap(null);
+        }
+        if (item.polyMarkers.length > 0) {
+            item.polyMarkers.forEach(marker => {
+                marker.setMap(null);
+            });
+        }
+    }
+    const showMarkerAndPath = (item) => {
+        item.marker.setMap(map);
+        if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
+            item.poly.drivenPath.setMap(map);
+        }
+        if (item.polyMarkers.length > 0) {
+            item.polyMarkers.forEach(marker => {
+                marker.setMap(map);
+            });
+        }
+    }
     driverSel.select2({
         placeholder: 'Select',
         allowClear: true,
@@ -158,30 +190,47 @@
         const driver_id = Number(e.params.data.id);
         markersArray.forEach(item => {
             if (item.driver.id !== driver_id) {
-                item.marker.setMap(null);
-                if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
-                    item.poly.drivenPath.setMap(null);
-                }
+                hideMarkerAndPath(item);
             } else {
-                item.marker.setMap(map);
-                if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
-                    item.poly.drivenPath.setMap(map);
-                }
+                showMarkerAndPath(item);
             }
         });
     }).on('select2:unselect', () => {
         markersArray.forEach(item => {
-            item.marker.setMap(map);
-            if (item.poly.drivenPath && Object.keys(item.poly.drivenPath).length > 0) {
-                item.poly.drivenPath.setMap(map);
-            }
+            showMarkerAndPath(item);
         });
     });
-    let data = [];
-    const markersArray = [];
-    const setMapData = () => {
+    loadSel.select2({
+        placeholder: 'Select',
+        allowClear: true,
+    }).on('select2:select', (e) => {
+        const load_id = Number(e.params.data.id);
+        markersArray.forEach(item => {
+            if (item.load.id !== load_id) {
+                hideMarkerAndPath(item);
+            } else {
+                showMarkerAndPath(item);
+            }
+        });
+    }).on('select2:unselect', () => {
+        markersArray.forEach(item => {
+            showMarkerAndPath(item);
+        });
+    });
+    let markersArray = [];
+    const generatePastelColor = () => {
+        let R = Math.floor((Math.random() * 127) + 127);
+        let G = Math.floor((Math.random() * 127) + 127);
+        let B = Math.floor((Math.random() * 127) + 127);
+
+        let rgb = (R << 16) + (G << 8) + B;
+        return `#${rgb.toString(16)}`;
+    }
+    const setMapData = (data) => {
         driverSel.html('<option></option>').trigger('change');
+        loadSel.html('<option></option>').trigger('change');
         let drivers = [];
+        let loads = [];
         data.forEach((item) => {
             drivers.push({
                 id: item.id,
@@ -191,6 +240,8 @@
             const carrier = item.carrier;
             const loadPath = [];
             locations.forEach((location, i) => {
+                if (!loads.find(load => load.id === location.parent_load.id))
+                    loads.push(location.parent_load);
                 const position = {lat: Number(location.latitude), lng: Number(location.longitude)};
                 const foundPath = loadPath.find(obj => {
                     return obj.id === location.load_id;
@@ -226,9 +277,16 @@
                     drivenPath = new google.maps.Polyline({
                         path: pathData,
                         geodesic: true,
-                        strokeColor: "#FF0000",
+                        strokeColor: generatePastelColor(),
                         strokeOpacity: 1.0,
                         strokeWeight: 2,
+                        icons: [{
+                            icon: {
+                                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                            },
+                            repeat: '35px',
+                            offset: '100%'
+                        }],
                     });
                     drivenPath.setMap(map);
                 }
@@ -249,17 +307,20 @@
             driverSel.append(`<option value="${item.id}">${item.text}</option>`);
         });
         driverSel.trigger('change');
+        loads.forEach(item => {
+            loadSel.append(`<option value="${item.id}">Control #${item.control_number}</option>`);
+        });
+        loadSel.trigger('change');
         if (!bounds.isEmpty())
             map.fitBounds(bounds);
         else
             map.setZoom(6);
     }
     const getData = (start = dateRange.data().daterangepicker.startDate, end = dateRange.data().daterangepicker.endDate) => {
-        data = [];
-        markersArray.forEach(item => {
-            item.marker.setMap(null);
-        });
-        markersArray.length = 0;
+        if (markersArray.length > 0) {
+            map = initMapSetting();
+            markersArray = [];
+        }
         $.ajax({
             url: '/tracking/historyData',
             type: 'GET',
@@ -269,8 +330,7 @@
                 driver: $("[name='driver']").val(),
             },
             success: (res) => {
-                data = res;
-                setMapData();
+                setMapData(res);
             },
             error: () => {
                 throwErrorMsg();
