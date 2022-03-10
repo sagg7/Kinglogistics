@@ -142,6 +142,43 @@ class UserController extends Controller
         return view('users.edit', $params);
     }
 
+    public function rehirable($id)
+    {
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
+        $user->status = "rehirable";
+        if ($user->save()) {
+            return ['success' => true, 'user' => $user];
+        } else
+            return ['success' => false];
+    }
+    public function activate($id)
+    {
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
+        $user->status = "active";
+        if ($user->save()) {
+            return ['success' => true, 'user' => $user];
+        } else
+            return ['success' => false];
+    }
+    public function notRehirable($id)
+    {
+        $user = User::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
+        $user->status = "rehirable";
+        if ($user->save()) {
+            return ['success' => true, 'user' => $user];
+        } else
+            return ['success' => false];
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -243,7 +280,7 @@ class UserController extends Controller
         return $array;
     }
 
-        /**
+    /**
      * @param $item
      * @return array|string[]|null
      */
@@ -269,7 +306,7 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function search(Request $request, $type)
     {
         $query = User::select([
             "users.id",
@@ -280,6 +317,7 @@ class UserController extends Controller
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             })
+            ->where('status', $type)
             ->with('roles:name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
@@ -329,7 +367,7 @@ class UserController extends Controller
     private function getHoursRange(bool $decode = false): array
     {
         $range = [];
-        $timeRange = range(0, 47*1800, 3600);
+        $timeRange = range(0, 47 * 1800, 3600);
         date_default_timezone_set('UTC');
         foreach ($timeRange as $time) {
             //$time += (3600 * 6);
@@ -432,28 +470,31 @@ class UserController extends Controller
         });
     }
 
-    public function spotterCheckInOut(){
+    public function spotterCheckInOut()
+    {
         $user_id = auth()->user()->id;
-        $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
-        return view('users.checkInOut',compact('checkTime'));
+        $checkTime = CheckInOut::where('user_id', $user_id)->whereNull('check_out')->first();
+        return view('users.checkInOut', compact('checkTime'));
     }
 
-    public function storeCheckIn(Request $request){
+    public function storeCheckIn(Request $request)
+    {
         $user_id = auth()->user()->id;
 
-        $checkTime = CheckInOut::where('user_id',$user_id)->whereNull('check_out')->first();
-        if($checkTime){
+        $checkTime = CheckInOut::where('user_id', $user_id)->whereNull('check_out')->first();
+        if ($checkTime) {
             return ['error' => true];
-        }else {
-        $checkInOut = new CheckInOut;
-        $checkInOut->user_id = $user_id;
-        $checkInOut->latitude_check_in = '33.4033303';
-        $checkInOut->longitude_check_in = '-104.2120453';
-        // $checkInOut->latitude_check_in = $request->lng;
-        // $checkInOut->longitude_check_in = $request->lat;
-        $checkInOut->check_in = Carbon::now('America/Chicago');
-        $checkInOut->save();
-        return ['success' => true, 'data' => $checkInOut];}
+        } else {
+            $checkInOut = new CheckInOut;
+            $checkInOut->user_id = $user_id;
+            $checkInOut->latitude_check_in = '33.4033303';
+            $checkInOut->longitude_check_in = '-104.2120453';
+            // $checkInOut->latitude_check_in = $request->lng;
+            // $checkInOut->longitude_check_in = $request->lat;
+            $checkInOut->check_in = Carbon::now('America/Chicago');
+            $checkInOut->save();
+            return ['success' => true, 'data' => $checkInOut];
+        }
     }
     public function storeCheckOut($id, Request $request)
     {
@@ -465,7 +506,7 @@ class UserController extends Controller
         // $timeCheckInFormat = new  DateTime($timeCheckIn);
         // $checkInOut->latitude_check_out = '37.4033303';
         // $checkInOut->longitude_check_out = '-104.2120453';
-        $checkInOut->latitude_check_out =$request->lat;
+        $checkInOut->latitude_check_out = $request->lat;
         $checkInOut->longitude_check_out = $request->lng;
         $checkInOut->check_out = $now;
         // $diffDate = date_diff($timeCheckInFormat, $DateAndTimeFormat);
@@ -480,7 +521,7 @@ class UserController extends Controller
         return ['success' => true, 'data' => $checkInOut];
     }
 
-  
+
     public function searchCheckInOut(Request $request)
     {
         $query = CheckInOut::select([
@@ -499,7 +540,6 @@ class UserController extends Controller
             })*/
             ->with('user:id,name');
 
-        return $this->multiTabSearchData($query, $request,'getRelationCheckInArray');
+        return $this->multiTabSearchData($query, $request, 'getRelationCheckInArray');
     }
-
 }
