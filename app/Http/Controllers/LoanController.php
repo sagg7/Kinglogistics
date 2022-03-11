@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Loan;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+
 class LoanController extends Controller
 {
-    use GetSimpleSearchData;
+    use GetSimpleSearchData, FileUpload;
 
     /**
      * @param array $data
@@ -53,7 +55,9 @@ class LoanController extends Controller
         $loan->description = $request->description;
         $loan->date = $request->date;
         $loan->save();
-
+        if ($request->file_loan)
+        $loan->file_loan_url = $this->uploadFile($request->file_loan, "safety/loan/$loan->id/file_loan");
+        $loan->save();
         return $loan;
     }
 

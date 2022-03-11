@@ -15,6 +15,14 @@ class Loan extends Model
         'date' => 'date:m/d/Y',
     ];
 
+    protected $appends = ['loan_file_name'];
+
+
+    public function getLoanFileNameAttribute()
+    {
+        $exploded = explode('/', $this->file_loan_url);
+        return explode('?', $exploded[count($exploded) - 1])[0];
+    }
     /**
      * @return BelongsTo
      */

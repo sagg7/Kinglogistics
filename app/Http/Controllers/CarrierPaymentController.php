@@ -395,4 +395,13 @@ class CarrierPaymentController extends Controller
     {
         return (new CarrierPaymentExport($id))->download();
     }
+
+    public function pending($id){
+        $carrierPayment = CarrierPayment::findOrFail($id);
+        $carrierPayment->status = "pending";
+        if ($carrierPayment->save()) {
+            return ['success' => true, 'user' => $carrierPayment];
+        } else
+            return ['success' => false];
+    }
 }

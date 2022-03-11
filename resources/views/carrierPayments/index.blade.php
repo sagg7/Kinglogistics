@@ -96,6 +96,7 @@
                                     menu: [
                                         {text: 'PDF', route: '/carrier/payment/downloadPDF', icon: 'fas fa-file-pdf'},
                                         {text: 'XLSX', route: '/carrier/payment/downloadXLSX', icon: 'far fa-file-excel'},
+                                        {text: 'Return To Pending', route: '/carrier/payment/pending', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm', menuData: {title: 'Return To Pending?'}}
                                     ],
                                     container: 'completedPaymentsGrid',
                                     url: '/carrier/payment/search/completed',

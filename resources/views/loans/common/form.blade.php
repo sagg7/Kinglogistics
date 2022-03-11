@@ -43,7 +43,7 @@
                         </div>
                     </fieldset>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     {!! Form::label('installments', ucfirst(__('installments')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('installments', $loan->installments ?? null, ['class' => 'form-control' . ($errors->first('installments') ? ' is-invalid' : '')]) !!}
                     @error('installments')
@@ -52,7 +52,7 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <fieldset>
                         {!! Form::label('date', ucfirst(__('date')), ['class' => 'col-form-label']) !!}
                         <div class="input-group">
@@ -68,6 +68,25 @@
                         </div>
                     </fieldset>
                 </div>
+
+                <div class="form-group col-md-4">
+                            <fieldset>
+                            {!! Form::label('file_loan', "Add File", ['class' => 'col-form-label']) !!}
+                            <div class="file-group">
+                                <label for="file_loan" class="btn form-control btn-primary btn-block">
+                                    <i class="fas fa-file"></i> <span class="file-name">Upload File</span>
+                                    <input type="file" name="file_loan" id="file_loan" hidden>
+                                </label>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-danger remove-file d-none"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            @isset($loan->file_loan_url)
+                                <a href="{{ route('s3storage.temporaryUrl', ['url' =>  $loan->file_loan_url]) }}" target="_blank">{{ $loan->loan_file_name}}</a>
+                            @endisset
+                            </fieldset>
+                </div>
+                    
                 <div class="form-group col-md-12">
                     {!! Form::label('description', ucfirst(__('description')), ['class' => 'col-form-label']) !!}
                     {!! Form::textarea('description', $loan->description ?? null, ['class' => 'form-control' . ($errors->first('description') ? ' is-invalid' : ''), 'rows' => 5, 'maxlength' => 512]) !!}

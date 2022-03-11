@@ -6,7 +6,7 @@
         <script src="{{ asset('js/sections/loans/common.min.js') }}"></script>
     @endsection
 
-    {!! Form::open(['route' => 'loan.store', 'method' => 'post', 'class' => 'form form-vertical']) !!}
+    {!! Form::open(['route' => 'loan.store', 'method' => 'post', 'class' => 'form form-vertical','enctype' => 'multipart/form-data']) !!}
     @include('loans.common.form')
     {!! Form::close() !!}
 </x-app-layout>

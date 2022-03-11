@@ -51,6 +51,8 @@ Route::prefix('carrier')->group(function () {
                 ->name('carrierPayment.downloadXLSX');
             Route::get('downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
                 ->name('carrierPayment.downloadPaymentPDF');
+            Route::post('pending/{id}', [CarrierPaymentController::class, 'pending'])
+                ->name('carrierPayment.pending');
         });
         Route::group(['middleware' => ['permission:update-carrier']], function () {
             Route::get('edit/{id}', [CarrierPaymentController::class, 'edit'])
