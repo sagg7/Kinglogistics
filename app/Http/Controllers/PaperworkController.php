@@ -44,7 +44,7 @@ class PaperworkController extends Controller
     {
         return [
             "mode" => ['Simple', 'Advanced'],
-            "types" => [null => '', 'carrier' => 'Carriers', 'driver' => 'Drivers', 'trailer' => 'Trailers', 'truck' => 'Trucks'],
+            "types" => [null => '', 'carrier' => 'Carriers', 'driver' => 'Drivers', 'trailer' => 'Trailers', 'truck' => 'Trucks', 'staff' => 'Staff'],
             "categories" => [null => 'Initial', 'orientation' => 'Orientation'],
         ];
     }
@@ -770,6 +770,8 @@ class PaperworkController extends Controller
                     return redirect()->route('trailer.edit', $related_id);
                 case 'truck':
                     return redirect()->route('truck.edit', $related_id);
+                case 'staff':
+                    return redirect()->route('user.index');
                 default:
                     return redirect()->route("$paperwork->type.index");
             }

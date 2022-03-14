@@ -17,7 +17,7 @@ class CreatePaperworkTable extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedTinyInteger('required')->nullable();
-            $table->enum('type', ['carrier', 'driver', 'truck', 'trailer']);
+            $table->enum('type', ['carrier', 'driver', 'truck', 'trailer', 'staff']);
             $table->text('template')->nullable();
             $table->timestamps();
             $table->softDeletes();
