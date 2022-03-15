@@ -23,8 +23,8 @@
             {headerName: "Account", field: "account"},
             {headerName: "Type", field: "type"},
             {headerName: "Quantity", field: "quantity"},
-            {headerName: "Income", field: "income", valueFormatter: currencyFormatter},
-            {headerName: "Expenses", field: "expenses", valueFormatter: currencyFormatter},
+            {headerName: "Revenue", field: "income", valueFormatter: currencyFormatter},
+            {headerName: "COGS", field: "expenses", valueFormatter: currencyFormatter},
         ],
         rowData,
         gridOptions: {
@@ -39,16 +39,6 @@
             chart: {
                 height: 350,
                 type: 'bar',
-            },
-            title: {
-                text: 'Utility'
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    endingShape: 'flat',
-                    columnWidth: '55%',
-                },
             },
             dataLabels: {
                 enabled: true,
@@ -73,9 +63,41 @@
             barChart.render();
         }
     }
+    const pieIncome = {
+        chart: null,
+        id: "pieIncome",
+    };
+    const pieExpense = {
+        chart: null,
+        id: "pieExpenses",
+    };
+    const initPieChart = (chartData, options) => {
+        const _options = _.merge({
+            chart: {
+                type: 'pie',
+                height: options.series.length > 0 ? 280 : 0,
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return numeral(val).format('$0,0.00');
+                    }
+                },
+            },
+        }, options);
+        if (chartData.chart) {
+            chartData.chart.updateOptions(_options);
+        } else {
+            chartData.chart = new ApexCharts(
+                document.querySelector(`#${chartData.id}`),
+                _options
+            );
+            chartData.chart.render();
+        }
+    }
     const getData = (start = dateRange.data().daterangepicker.startDate, end = dateRange.data().daterangepicker.endDate) => {
         $.ajax({
-            url: '/report/utilityProjectionData',
+            url: '/report/profitAndLossData',
             type: 'GET',
             data: {
                 start: start.format('YYYY/MM/DD'),
@@ -93,9 +115,23 @@
                     });
                 });
                 let incomeSum = 0;
+                let incomeData = [];
+                let incomeLabels = [];
+                let incomeUndefined = 0;
                 res.income.forEach(item => {
                     const amount = Number(item.amount);
                     incomeSum += amount;
+                    if (item.type) {
+                        const indexOf = incomeLabels.indexOf(item.type.name);
+                        if (indexOf === -1) {
+                            incomeData.push(amount);
+                            incomeLabels.push(item.type.name);
+                        } else {
+                            incomeData[indexOf] += amount;
+                        }
+                    } else {
+                        incomeUndefined += amount;
+                    }
                     rowData.push({
                         account: item.account ? item.account.name : null,
                         type: item.type ? item.type.name : null,
@@ -104,10 +140,28 @@
                         expenses: 0,
                     });
                 });
+                if (incomeUndefined > 0) {
+                    incomeLabels.push('undefined');
+                    incomeData.push(incomeUndefined);
+                }
                 let expenseSum = 0;
+                let expenseData = [];
+                let expenseLabels = [];
+                let expenseUndefined = 0;
                 res.expenses.forEach(item => {
                     const amount = Number(item.amount);
                     expenseSum += amount;
+                    if (item.type) {
+                        const indexOf = expenseLabels.indexOf(item.type.name);
+                        if (indexOf === -1) {
+                            expenseData.push(Number(amount.toFixed(2)));
+                            expenseLabels.push(item.type.name);
+                        } else {
+                            expenseData[indexOf] = Number((expenseData[indexOf] + amount).toFixed(2));
+                        }
+                    } else {
+                        expenseUndefined += amount;
+                    }
                     rowData.push({
                         account: item.account ? item.account.name : null,
                         type: item.type ? item.type.name : null,
@@ -116,21 +170,27 @@
                         expenses: item.amount,
                     });
                 });
-                const incomeTotalSum = incomeSum + res.loadData.paid_income + res.loadData.pending_income;
-                const expenseTotalSum = expenseSum + res.loadData.paid_expenses + res.loadData.pending_expenses;
-                const utility = incomeTotalSum - expenseTotalSum;
+                if (expenseUndefined > 0) {
+                    expenseLabels.push('undefined');
+                    expenseData.push(expenseUndefined);
+                }
+                const incomeTotalSum = Number((incomeSum + res.loadData.paid_income + res.loadData.pending_income).toFixed(2));
+                const expenseTotalSum = Number((expenseSum + res.loadData.paid_expenses + res.loadData.pending_expenses).toFixed(2));
+                const utility = Number((incomeTotalSum - expenseTotalSum).toFixed(2));
+                incomeSum = Number((incomeSum).toFixed(2))
+                expenseSum = Number((expenseSum).toFixed(2));
                 let series = [
                     {
-                        name: 'Income',
-                        data: [res.loadData.paid_income, incomeSum, incomeTotalSum],
+                        name: 'Revenue',
+                        data: [Number(res.loadData.paid_income.toFixed(2)), incomeSum, incomeTotalSum],
                     },
                     {
-                        name: 'Expenses',
-                        data: [-res.loadData.paid_expenses, -expenseSum, -expenseTotalSum],
+                        name: 'COGS',
+                        data: [Number(-res.loadData.paid_expenses.toFixed(2)), -expenseSum, -expenseTotalSum],
                     },
                     {
-                        name: 'Utility',
-                        data: [res.loadData.paid_income - res.loadData.paid_expenses, incomeSum - expenseSum, utility],
+                        name: 'Gross Profit',
+                        data: [Number((res.loadData.paid_income - res.loadData.paid_expenses).toFixed(2)), Number((incomeSum - expenseSum).toFixed(2)), utility],
                     },
                 ];
                 let xaxis = {
@@ -139,9 +199,9 @@
                     ]
                 };
                 if (!end.isBefore(moment().startOf('week'))) {
-                    series[0].data.splice(1, 0, res.loadData.pending_income); // Push to position 1 the pending income data
-                    series[1].data.splice(1, 0, -res.loadData.pending_expenses); // Push to position 1 the pending expenses data
-                    series[2].data.splice(1, 0, res.loadData.pending_income - res.loadData.pending_expenses); // Push to position 1 the pending calculated utility
+                    series[0].data.splice(1, 0, Number((res.loadData.pending_income).toFixed(2))); // Push to position 1 the pending income data
+                    series[1].data.splice(1, 0, Number((-res.loadData.pending_expenses).toFixed(2))); // Push to position 1 the pending expenses data
+                    series[2].data.splice(1, 0, Number((res.loadData.pending_income - res.loadData.pending_expenses).toFixed(2))); // Push to position 1 the pending calculated utility
                     xaxis.categories.splice(1, 0, ['Pending Loads']); // Push to position 1 the pending section title
                 }
                 const options = {
@@ -154,9 +214,29 @@
                                 return numeral(val).format('$0,0.00');
                             }
                         },
-                    }
+                    },
+                    title: {
+                        text: 'Gross Profit'
+                    },
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                position: 'top', // top, center, bottom
+                            },
+                        }
+                    },
                 };
                 initBarChart(options);
+                initPieChart(pieIncome, {
+                    series: incomeData,
+                    labels: incomeLabels,
+                    title: {text:'Income'},
+                });
+                initPieChart(pieExpense, {
+                    series: expenseData,
+                    labels: expenseLabels,
+                    title: {text:'Expenses'},
+                });
                 dataTable.rowData = rowData;
                 dataTable.gridOptions.api.setRowData(rowData);
                 dataTable.gridOptions.api.setPinnedBottomRowData(setTotalsRow());

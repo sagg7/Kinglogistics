@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="crumb_section">Reports</x-slot>
-    <x-slot name="crumb_subsection">Utility Projection</x-slot>
+    <x-slot name="crumb_subsection">Profit and Loss</x-slot>
 
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -8,7 +8,7 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
-        <script src="{{ asset('js/sections/reports/utilityProjection.min.js') }}"></script>
+        <script src="{{ asset('js/sections/reports/profitAndLoss.min.js?1.0.0') }}"></script>
     @endsection
 
     <div class="card">
@@ -27,10 +27,10 @@
                     <div class="col-12">
                         <div id="barChart"></div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-md-6 col-12">
                         <div id="pieIncome"></div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-md-6 col-12">
                         <div id="pieExpenses"></div>
                     </div>
                 </div>
