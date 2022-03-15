@@ -11,12 +11,16 @@ Route::prefix('income')->group(function () {
             ->name('income.index');
         Route::get('search', [IncomeController::class, 'search'])
             ->name('income.search');
+        Route::get('downloadXLS', [IncomeController::class, 'downloadXLS'])
+            ->name('income.downloadXLS');
     });
     Route::group(['middleware' => ['permission:create-income']], function () {
         Route::get('create', [IncomeController::class, 'create'])
             ->name('income.create');
         Route::post('store', [IncomeController::class, 'store'])
             ->name('income.store');
+        Route::post('uploadIncomeExcel', [IncomeController::class, 'uploadIncomeExcel'])
+            ->name('income.uploadIncomeExcel');
     });
     Route::group(['middleware' => ['permission:update-income']], function () {
         Route::get('edit/{id}', [IncomeController::class, 'edit'])

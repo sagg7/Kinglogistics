@@ -15,7 +15,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
                                 @foreach($menu as $anchor)
-                                    <a href="{{ $anchor['url'] }}" class="dropdown-item" @isset($anchor['attributes']) @foreach($anchor['attributes'] as $name => $attribute){{ "$name=\"$attribute\"" }}@endforeach @endisset><i class="{{ $anchor['icon'] ?? '' }}"></i> {{ $anchor['text'] }}</a>
+                                    <a href="{{ $anchor['url'] }}" class="dropdown-item" @isset($anchor['attributes']) @foreach($anchor['attributes'] as $name => $attribute){{ "$name=$attribute " }}@endforeach @endisset><i class="{{ $anchor['icon'] ?? '' }}"></i> {{ $anchor['text'] }}</a>
                                 @endforeach
                             </div>
                         </div>

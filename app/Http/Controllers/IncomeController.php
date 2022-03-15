@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Exports\TemplateExport;
 use App\Models\Income;
 use App\Models\IncomeAccount;
 use App\Models\IncomeType;
@@ -10,6 +10,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use App\Exports\IncomeErrorsExport;
+use App\Imports\IncomeImport;
+use App\Jobs\ProcessDeleteFileDelayed;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IncomeController extends Controller
 {
@@ -27,6 +32,7 @@ class IncomeController extends Controller
             'account' => ['required', 'exists:income_accounts,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string', 'max:512'],
+            'note' => ['string', 'max:512'],
         ]);
     }
 
@@ -216,5 +222,60 @@ class IncomeController extends Controller
             ]);
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    public function downloadXLS(Request $request)
+    {
+        $income = Income::with([
+            'type:id,name',
+            'account:id,name',
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+            ->get();
+
+        if (count($income) === 0)
+            return redirect()->back()->withErrors('There are no income to generate the document');
+        $data = [];
+        foreach ($income as $incomes) {
+            $data[] = [
+                        'date' => $incomes->date ? Carbon::createFromFormat('Y-m-d H:i:s', $incomes->date)->format('m/d/Y H:i') : null,
+                        'type' => $incomes->type->name,
+                        'account' => $incomes->account ? $incomes->account->name : null,
+                        'amount' => $incomes->amount,
+                        'description' => $incomes->description ? $incomes->description: null,
+                        'note'=> $incomes->note ? $incomes->note: null
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Date", "Type", "Account", "Amount", "Description", "Note"],
+            "formats" => [
+                'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Income" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
+    
+    public function uploadIncomeExcel(Request $request)
+    {
+        $import = new IncomeImport;
+        Excel::import($import, $request->fileExcel);
+        $data = $import->data;
+
+        $result = ['success' => true];
+
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Income Excel Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new IncomeErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset($path);
+        }
+
+        return $result;
     }
 }

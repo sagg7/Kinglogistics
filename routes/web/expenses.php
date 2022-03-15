@@ -11,6 +11,8 @@ Route::prefix('expense')->group(function () {
             ->name('expense.index');
         Route::get('search', [ExpenseController::class, 'search'])
             ->name('expense.search');
+        Route::get('downloadXLS', [ExpenseController::class, 'downloadXLS'])
+            ->name('expense.downloadXLS');
     });
     Route::group(['middleware' => ['permission:create-expense']], function () {
         Route::get('create', [ExpenseController::class, 'create'])

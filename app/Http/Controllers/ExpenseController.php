@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Exports\TemplateExport;
 use App\Models\Expense;
 use App\Models\ExpenseAccount;
 use App\Models\ExpenseType;
@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ExpenseController extends Controller
 {
@@ -215,6 +216,41 @@ class ExpenseController extends Controller
                 'account:id,name',
             ]);
 
+
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
+    }
+
+    public function downloadXLS(Request $request)
+    {
+        $expense = Expense::with([
+            'type:id,name',
+            'account:id,name',
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+            ->get();
+
+        if (count($expense) === 0)
+            return redirect()->back()->withErrors('There are no rentals to generate the document');
+        $data = [];
+        foreach ($expense as $expenses) {
+            $data[] = [
+                         'date' => $expenses->date ? Carbon::createFromFormat('Y-m-d H:i:s', $expenses->date)->format('m/d/Y H:i') : null,
+                        'type' => $expenses->type->name,
+                        'account' => $expenses->account->name ? $expenses->account->name : null,
+                        'amount' => $expenses->amount,
+                        'description' => $expenses->description ? $expenses->description: null,
+                        'note'=> $expenses->note ? $expenses->note: null
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Date", "Type", "Account", "Amount", "Description", "Note"],
+            "formats" => [
+                'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Expense " . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }

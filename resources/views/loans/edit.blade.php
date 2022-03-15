@@ -14,7 +14,7 @@
         </script>
     @endsection
 
-    {!! Form::open(['route' => ['loan.update', $loan->id], 'method' => 'post', 'class' => 'form form-vertical']) !!}
+    {!! Form::open(['route' => ['loan.update', $loan->id], 'method' => 'post', 'class' => 'form form-vertical','enctype' => 'multipart/form-data']) !!}
     @include('loans.common.form')
     {!! Form::close() !!}
 </x-app-layout>

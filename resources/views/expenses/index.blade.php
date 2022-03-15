@@ -41,9 +41,12 @@
                     url: '/expense/search',
                     tableRef: 'tbAG',
                 });
+
+              
             })();
         </script>
     @endsection
 
-    @component('components.aggrid-index', auth()->user()->can(['create-expense']) ? ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense']] : [])@endcomponent
+    @component('components.aggrid-index', auth()->user()->can(['create-expense']) ? ['create_btn' => ['url' => '/expense/create', 'text' => 'Create Expense'], 'menu' => [['url'=>'/expense/downloadXLS','icon'=>'fas fa-file-excel', 'text' => 'Download Expense']]] : [])@endcomponent
+
 </x-app-layout>
