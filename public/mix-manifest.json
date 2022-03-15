@@ -1,3 +1,4 @@
 {
-    "/js/sections/tracking/history.min.js": "/js/sections/tracking/history.min.js"
+    "/js/sections/reports/activeTime.min.js": "/js/sections/reports/activeTime.min.js",
+    "/js/sections/reports/profitAndLoss.min.js": "/js/sections/reports/profitAndLoss.min.js"
 }

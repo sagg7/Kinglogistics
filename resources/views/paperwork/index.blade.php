@@ -8,16 +8,17 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
-            var tbCarriers = null,
-                tbDrivers = null,
-                tbTrucks = null,
-                tbTrailers = null;
+            let tbCarrier = null,
+                tbDriver = null,
+                tbTruck = null,
+                tbTrailer = null,
+                tbStaff = null;
             (() => {
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
                     tableProperties = (type) => {
                         const typeFormatter = (params) => {
-                            return  params.value ? `${params.value.replace(/^\w/, (c) => c.toUpperCase())}s` : '';
+                            return  params.value ? `${params.value.replace(/^\w/, (c) => c.toUpperCase())}` : '';
                         };
                         const checkFormatter = (params) => {
                             return  params.value ? 'Yes' : 'No';
@@ -38,7 +39,7 @@
                                 @endif
                             ],
                             container: `grid${tableName}`,
-                            url: `/paperwork/search/${type.slice(0, -1)}`,
+                            url: `/paperwork/search/${type}`,
                             tableRef: `tb${tableName}`,
                         };
                     },
@@ -69,27 +70,33 @@
                     <div class="col-lg col-md col-xs-12 col-sm-12 pl-0 pr-0 pills-menu-col">
                         <ul class="nav nav-pills flex-column mt-md-0 mt-1">
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75 active" id="account-pill-general" data-toggle="pill" href="#pane-carriers" aria-expanded="true">
+                                <a class="nav-link d-flex py-75 active" id="account-pill-general" data-toggle="pill" href="#pane-carrier" aria-expanded="true">
                                     <i class="fas fa-dolly-flatbed mr-50 font-medium-3"></i>
                                     Carriers
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" id="account-pill-password" data-toggle="pill" href="#pane-drivers" aria-expanded="false">
+                                <a class="nav-link d-flex py-75" id="account-pill-password" data-toggle="pill" href="#pane-driver" aria-expanded="false">
                                     <i class="fas fa-id-card mr-50 font-medium-3"></i>
                                     Drivers
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" id="account-pill-info" data-toggle="pill" href="#pane-trucks" aria-expanded="false">
+                                <a class="nav-link d-flex py-75" id="account-pill-info" data-toggle="pill" href="#pane-truck" aria-expanded="false">
                                     <i class="fas fa-truck mr-50 font-medium-3"></i>
                                     Trucks
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex py-75" id="account-pill-social" data-toggle="pill" href="#pane-trailers" aria-expanded="false">
+                                <a class="nav-link d-flex py-75" id="account-pill-social" data-toggle="pill" href="#pane-trailer" aria-expanded="false">
                                     <i class="fas fa-trailer mr-50 font-medium-3"></i>
                                     Trailers
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex py-75" id="account-pill-social" data-toggle="pill" href="#pane-staff" aria-expanded="false">
+                                    <i class="fas fa-users mr-50 font-medium-3"></i>
+                                    Staff
                                 </a>
                             </li>
                         </ul>
@@ -97,17 +104,20 @@
 
                     <div class="col-lg col-md col-xs-12 col-sm-12">
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="pane-carriers" aria-labelledby="pane-carriers" aria-expanded="true">
-                                <div id="gridCarriers"></div>
+                            <div role="tabpanel" class="tab-pane active" id="pane-carrier" aria-labelledby="pane-carrier" aria-expanded="true">
+                                <div id="gridCarrier"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="pane-drivers" aria-labelledby="pane-drivers" aria-expanded="true">
-                                <div id="gridDrivers"></div>
+                            <div role="tabpanel" class="tab-pane" id="pane-driver" aria-labelledby="pane-driver" aria-expanded="true">
+                                <div id="gridDriver"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="pane-trucks" aria-labelledby="pane-trucks" aria-expanded="true">
-                                <div id="gridTrucks"></div>
+                            <div role="tabpanel" class="tab-pane" id="pane-truck" aria-labelledby="pane-truck" aria-expanded="true">
+                                <div id="gridTruck"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="pane-trailers" aria-labelledby="pane-trailers" aria-expanded="true">
-                                <div id="gridTrailers"></div>
+                            <div role="tabpanel" class="tab-pane" id="pane-trailer" aria-labelledby="pane-trailer" aria-expanded="true">
+                                <div id="gridTrailer"></div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="pane-staff" aria-labelledby="pane-staff" aria-expanded="true">
+                                <div id="gridStaff"></div>
                             </div>
                         </div>
                     </div>

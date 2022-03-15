@@ -480,6 +480,11 @@ class ReportController extends Controller
                         ]);
                 }
             ])
+            ->where(function ($q) use ($request) {
+                if ($request->carrier) {
+                    $q->where('carriers.id', $request->carrier);
+                }
+            })
             ->get();
 
         $rangeEnd = $end->isAfter($now) ? $now : $end;
@@ -547,12 +552,12 @@ class ReportController extends Controller
         return compact('driversData', 'carriersData');
     }
 
-    public function utilityProjection()
+    public function profitAndLoss()
     {
-        return view('reports.utilityProjection');
+        return view('reports.profitAndLoss');
     }
 
-    public function utilityProjectionData(Request $request)
+    public function profitAndLossData(Request $request)
     {
         $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfWeek();
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfWeek()->endOfDay();
@@ -635,6 +640,7 @@ class ReportController extends Controller
             ])
             ->get([
                 'id',
+                'type_id',
                 'account_id',
                 'date',
                 'amount',

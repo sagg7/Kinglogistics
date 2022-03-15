@@ -3,6 +3,7 @@
     let carriersChart = null;
     let rowData = [];
     const dateRange = $('#dateRange');
+    const carrierSel = $('[name=carrier]');
     const hourFormatter = (params) => {
         if (params.value)
             return `${params.value}h`;
@@ -28,9 +29,8 @@
         },
         autoHeight: true,
     });
-    const initDriversChart = (series) => {
-        const options = {
-            series,
+    const initDriversChart = (options) => {
+        const _options = _.merge({
             chart: {
                 height: 350,
                 type: 'bar',
@@ -38,20 +38,8 @@
             title: {
                 text: 'Drivers Active Time'
             },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    endingShape: 'flat',
-                    columnWidth: '55%',
-                },
-            },
             dataLabels: {
                 enabled: true,
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
             },
             legend: {
                 offsetY: -10
@@ -64,10 +52,6 @@
                     text: 'Active time',
                 },
             }],
-            fill: {
-                opacity: 1
-
-            },
             tooltip: {
                 y: {
                     formatter: function (val) {
@@ -75,13 +59,13 @@
                     }
                 }
             }
-        }
+        }, options);
         if (driversChart) {
-            driversChart.updateOptions(options);
+            driversChart.updateOptions(_options);
         } else {
             driversChart = new ApexCharts(
                 document.querySelector("#driversChart"),
-                options
+                _options
             );
             driversChart.render();
         }
@@ -131,10 +115,12 @@
             data: {
                 start: start.format('YYYY/MM/DD'),
                 end: end.format('YYYY/MM/DD'),
+                carrier: carrierSel.val(),
             },
             success: (res) => {
                 rowData = [];
-                let driverSeries = [];
+                let driverData = [];
+                let driverNames = [];
                 res.driversData.forEach(item => {
                     const carrier = res.carriersData.find(obj => obj.id === item.carrier_id);
                     rowData.push({
@@ -146,10 +132,8 @@
                         inactive_time: item.inactive_time.toFixed(2),
                         loaded_time: item.loaded_time.toFixed(2),
                     });
-                    driverSeries.push({
-                        name: item.name,
-                        data: [item.active_time.toFixed(2)],
-                    });
+                    driverData.push(item.active_time.toFixed(2));
+                    driverNames.push(item.name)
                 });
                 let carrierLabels = [];
                 const carriersActiveTime = [];
@@ -159,7 +143,7 @@
                     carriersActiveTime.push(item.active_time.toFixed(2));
                     carriersActiveTrucks.push(item.trucks);
                 });
-                const carrierSeries= [{
+                const carrierSeries = [{
                     name: 'Active time',
                     data: carriersActiveTime,
                     type: 'bar',
@@ -168,7 +152,15 @@
                     data: carriersActiveTrucks,
                     type: 'line',
                 }];
-                initDriversChart(driverSeries);
+                initDriversChart({
+                    series: [{
+                        name: 'Active Time',
+                        data: driverData,
+                    }],
+                    xaxis: {
+                        categories: driverNames,
+                    }
+                });
                 initCarriersChart(carrierSeries, carrierLabels);
                 driversTable.rowData = rowData;
                 driversTable.gridOptions.api.setRowData(rowData);
@@ -182,6 +174,24 @@
         endDate: moment().endOf('week'),
     }, (start, end, label) => {
         getData(start, end);
+    });
+    carrierSel.select2({
+        ajax: {
+            url: '/carrier/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    }).on('select2:select', () => {
+        getData();
+    }).on('select2:unselect', () => {
+        getData();
     });
     getData();
 })()

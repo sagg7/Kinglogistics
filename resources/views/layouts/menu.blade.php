@@ -433,8 +433,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/report/utilityProjection">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Utility Projection</span>
+                        <a href="/report/profitAndLoss">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Profit and Loss</span>
                         </a>
                     </li>
                 </ul>

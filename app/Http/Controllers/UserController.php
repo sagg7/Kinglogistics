@@ -10,17 +10,16 @@ use App\Traits\EloquentQueryBuilder\agFilter;
 use App\Traits\EloquentQueryBuilder\EloquentFiltering;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
+use App\Traits\Paperwork\PaperworkFilesFunctions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use DateTime;
-
 
 class UserController extends Controller
 {
-    use agFilter, EloquentFiltering, GetSelectionData, GetSimpleSearchData;
+    use agFilter, EloquentFiltering, GetSelectionData, GetSimpleSearchData, PaperworkFilesFunctions;
     /**
      * @param array $data
      * @param int|null $id
@@ -41,7 +40,7 @@ class UserController extends Controller
     {
         return [
             'roles' => [null => 'Select'] + Role::orderBy('name')->pluck('name', 'id')->toArray(),
-        ];
+        ] + $this->getPaperworkByType("staff");
     }
 
     /**
@@ -138,7 +137,10 @@ class UserController extends Controller
         })
             ->findOrFail($id);
         $user->role = $user->getRoleId();
-        $params = compact('user') + $this->createEditParams();
+        $createEdit = $this->createEditParams();
+        $paperworkUploads = $this->getFilesPaperwork($createEdit['filesUploads'], $user->id);
+        $paperworkTemplates = $this->getTemplatesPaperwork($createEdit['filesTemplates'], $user->id);
+        $params = compact('user', 'paperworkUploads', 'paperworkTemplates') + $createEdit;
         return view('users.edit', $params);
     }
 

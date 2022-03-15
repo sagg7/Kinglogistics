@@ -2,7 +2,6 @@
     <x-slot name="crumb_section">Carrier</x-slot>
     <x-slot name="crumb_subsection">Edit</x-slot>
 
-
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
     @endsection
@@ -10,7 +9,7 @@
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script defer>
-            var tbEquipment = null;
+            let tbEquipment = null;
             (() => {
                 const capitalizeNameFormatter = (params) => {
                     if (params.value)
@@ -61,7 +60,7 @@
              aria-expanded="true">
             @include('common.paperwork.filesTemplates', ['related_id' => $carrier->id])
             <hr>
-            {!! Form::open(['route' => ['paperwork.storeFiles'], 'method' => 'post', 'class' => 'form form-vertical']) !!}
+            {!! Form::open(['route' => ['paperwork.storeFiles'], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data']) !!}
             @include('common.paperwork.filesUploads', ['related_id' => $carrier->id, 'type' => 'carrier'])
             {!! Form::close() !!}
         </div>

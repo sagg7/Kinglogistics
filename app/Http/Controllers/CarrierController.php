@@ -3,15 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CarrierEnum;
-use App\Enums\DriverEnum;
 use App\Enums\RoleSlugs;
 use App\Mail\SendNotificationTemplate;
 use App\Models\Carrier;
 use App\Models\CarrierEquipment;
-use App\Models\Driver;
-use App\Models\Incident;
 use App\Models\Load;
-use App\Models\Rental;
 use App\Models\User;
 use App\Rules\EmailArray;
 use App\Traits\CRUD\crudMessage;
