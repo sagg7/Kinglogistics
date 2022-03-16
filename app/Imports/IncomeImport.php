@@ -46,22 +46,24 @@ class IncomeImport implements ToArray
         $now = Carbon::now();
         foreach ($array as $idx => $row) {
            foreach($accounts as $account){
-               if($row[13]==$account->name){
+               if($row[2]==$account->name){
                 $account_id = $account->id ;
+                break 1;
                }
            }
            foreach($types as $type){
-               if($row[3]==$type->name){
+               if($row[1]==$type->name){
                 $type_id = $type->id;
+                break 1;
                }
            }
                     $toSubmit = [
                         "type_id" => $type_id,
-                        "date"=> $row[5],
+                        "date"=> $row[0],
                         "account_id" => $account_id,
-                        "amount" => $row[17],
-                        "description" => $row[11],
-                        "note" => $row[9],
+                        "amount" => $row[3],
+                        "description" => $row[4],
+                        "note" => $row[5],
                     ];
                     $valErrors = $this->validator($toSubmit)->errors()->all();
                 
