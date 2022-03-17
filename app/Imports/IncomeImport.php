@@ -76,10 +76,13 @@ class IncomeImport implements ToArray
                     "amount" => $row[3],
                     "description" => $row[4],
                     "note" => $row[5],
-                    "user_id"=>  auth()->user()->id
+                    "user_id"=>  auth()->user()->id,                       
+                    "created_at" => $now,
+                    "updated_at" => $now,
+                    "broker_id" => session('broker')
                 ];
                 $valErrors = $this->validator($toSubmit)->errors()->all();
-    
+             
                 if (count($valErrors) > 0) {
                     $errorString = "";
                     foreach ($valErrors as $error) {
@@ -91,7 +94,7 @@ class IncomeImport implements ToArray
                 }
             }
         }
-        
+
         $result = [
             'data' => $formatted,
             'errors' => null,

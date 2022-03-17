@@ -15,6 +15,7 @@ use App\Exports\IncomeErrorsExport;
 use App\Imports\IncomeImport;
 use App\Jobs\ProcessDeleteFileDelayed;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\File;
 
 class IncomeController extends Controller
 {
@@ -281,13 +282,13 @@ class IncomeController extends Controller
 
         if ($data['errors']) {
             $directory = "temp/xls/" . md5(Carbon::now());
-            $path = $directory . "/Income Excel Errors.xlsx";
+            $path = $directory . "/Income_Excel_Errors.xlsx";
             $publicPath = "public/" . $path;
             (new IncomeErrorsExport($data['errors']))->store($publicPath);
             ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
             $result['errors_file'] = asset($path);
         }
-
+        
         return $result;
     }
 }
