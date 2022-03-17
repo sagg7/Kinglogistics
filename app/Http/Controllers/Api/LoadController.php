@@ -282,9 +282,14 @@ class LoadController extends Controller
 
     public function loading(Request $request)
     {
+
+        $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
+
         $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::LOADING);
 
-        // Do required stuff for "Loading" event
+        $load->customer_po = $request->get('customer_po');
+        $load->update();
 
         return response([
             'status' => 'ok',
@@ -294,23 +299,6 @@ class LoadController extends Controller
     }
 
     public function toLocation(Request $request)
-    {
-        $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
-
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
-
-        $load->customer_po = $request->get('customer_po');
-        $load->update();
-
-        return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::TO_LOCATION,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
-    }
-
-    public function arrived(Request $request)
     {
         $receipt = $request->get('receipt');
         $loadId = $request->get('load_id');
@@ -325,7 +313,7 @@ class LoadController extends Controller
         $load->tons = floatval($request->get('weight')) / 2000;
         $load->update();
 
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::TO_LOCATION);
 
         $voucher = $this->uploadImage(
             $receipt,
@@ -337,6 +325,19 @@ class LoadController extends Controller
         $loadStatus->to_location_voucher = $voucher;
         $loadStatus->update();
 
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::TO_LOCATION,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
+    }
+
+    public function arrived(Request $request)
+    {
+        $loadId = $request->get('load_id');
+
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
+        $loadStatus->update();
 
         return response([
             'status' => 'ok',
@@ -348,7 +349,6 @@ class LoadController extends Controller
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
-        //$load = Load::find($loadId);
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
 
         return response([
