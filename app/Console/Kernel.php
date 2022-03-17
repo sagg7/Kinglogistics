@@ -165,6 +165,8 @@ class Kernel extends ConsoleKernel
         //})->daily()->at('18:15');
 
         $schedule->call(function () {
+            Storage::deleteDirectory('temp');
+            Storage::deleteDirectory('public/temp');
             $drivers = Driver::whereHas('shift', function ($q) {
                 $q->where('created_at', '<', Carbon::parse('-24 hours'));
             })
