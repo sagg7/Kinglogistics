@@ -110,6 +110,15 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+                    <div class="dropdown float-right">
+                        <button class="btn mb-1 pr-0 waves-effect waves-light" type="button" id="report-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
+                            <a class="dropdown-item" id="downloadTmpXLS" href="/income/downloadTmpXLS"><i class="fas fa-file-excel"></i> Download Excel Template</a>
+                        </div>
+                    </div>
+                    <BR>
                     <div class="modal-body">
                         {!! Form::open(['route' => ['income.uploadIncomeExcel'], 'method' => 'post', 'class' => 'form form-vertical', 'enctype' => 'multipart/form-data', 'id' => 'uploadIncome']) !!}
                         <div class="file-group" style="margin-bottom: 20px">

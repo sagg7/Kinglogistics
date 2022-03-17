@@ -258,13 +258,25 @@ class IncomeController extends Controller
         ]))->download("Income" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 
+    public function downloadTmpXLS()
+    {  
+        $data = [];
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Date", "Type", "Account", "Amount", "Description", "Note"],
+            "formats" => [
+                'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Income" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
     
     public function uploadIncomeExcel(Request $request)
     {
         $import = new IncomeImport;
         Excel::import($import, $request->fileExcel);
         $data = $import->data;
-
+       
         $result = ['success' => true];
 
         if ($data['errors']) {

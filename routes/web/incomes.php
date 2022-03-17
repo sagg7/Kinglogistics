@@ -13,6 +13,8 @@ Route::prefix('income')->group(function () {
             ->name('income.search');
         Route::get('downloadXLS', [IncomeController::class, 'downloadXLS'])
             ->name('income.downloadXLS');
+        Route::get('downloadTmpXLS', [IncomeController::class, 'downloadTmpXLS'])
+            ->name('income.downloadTmpXLS');
     });
     Route::group(['middleware' => ['permission:create-income']], function () {
         Route::get('create', [IncomeController::class, 'create'])
