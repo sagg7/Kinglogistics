@@ -285,7 +285,7 @@ class ChargeController extends Controller
             $publicPath = "public/" . $path;
             (new DieselErrorsExport($data['errors']))->store($publicPath);
             ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
-            $result['errors_file'] = asset($path);
+            $result['errors_file'] = asset("storage/" . $path);
         }
 
         return $result;

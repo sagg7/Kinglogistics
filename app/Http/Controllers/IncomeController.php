@@ -260,7 +260,7 @@ class IncomeController extends Controller
     }
 
     public function downloadTmpXLS()
-    {  
+    {
         $data = [];
         return (new TemplateExport([
             "data" => $data,
@@ -271,13 +271,13 @@ class IncomeController extends Controller
         ]))->download("Income" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 
-    
+
     public function uploadIncomeExcel(Request $request)
     {
         $import = new IncomeImport;
         Excel::import($import, $request->fileExcel);
         $data = $import->data;
-       
+
         $result = ['success' => true];
 
         if ($data['errors']) {
@@ -286,9 +286,9 @@ class IncomeController extends Controller
             $publicPath = "public/" . $path;
             (new IncomeErrorsExport($data['errors']))->store($publicPath);
             ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
-            $result['errors_file'] = asset($path);
+            $result['errors_file'] = asset("storage/" . $path);
         }
-        
+
         return $result;
     }
 }
