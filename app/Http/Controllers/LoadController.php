@@ -151,7 +151,35 @@ class LoadController extends Controller
             $load_log->type = auth()->guard('shipper')->check() ? 'shipper' : 'user';
             $load_log->save();
             $data['load_log_id'] = $load_log->id;
-            $control_number = (int)$request->control_number;
+            $control_number = $request->control_number;
+            $rest = substr($control_number, -1);
+            $rest2 = substr($control_number, -2,1);
+            $rest3 = substr($control_number, -3,1);
+            $patron = '/([0-9])+$/';
+
+                  
+             if(preg_match($patron,$rest)) {
+                if(preg_match($patron,$rest2)){
+                    if(preg_match($patron,$rest3)){
+                        $control_number_int =  substr($control_number, -3);
+                        $control_number_str = substr($control_number, 0, -3);
+                        
+                    }else{
+                        $control_number_int= substr($control_number, -2);
+                        $control_number_str = substr($control_number, 0, -2); 
+                     }
+                }else{
+                   $control_number_int= $rest;
+                   $control_number_str = substr($control_number, 0, -1); 
+               
+                }
+             } else {
+                $control_number_str = $control_number; 
+                $control_number_int = 0;
+               
+             } 
+
+                 
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)) { //temporary
                     $data['driver_id'] = $request->driver_id;
@@ -166,15 +194,16 @@ class LoadController extends Controller
                     // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
                     $data['driver_id'] ? $data['status'] = 'accepted' : $data['status'] = 'unallocated';
                 }
-                $data['control_number'] = $control_number;
+                $data['control_number'] = $control_number_str.$control_number_int;
 
                 $data['broker_id'] = session('broker');
                 $load = $this->storeUpdate($data);
 
-                $control_number++;
+                $control_number_int++;
 
                 event(new LoadUpdate($load));
             }
+          
         });
 
         if ($request->ajax()) {

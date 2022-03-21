@@ -33,7 +33,7 @@ trait GenerateLoads
             'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['nullable', 'exists:drivers,id'],
             'date' => ['required', 'date'],
-            'control_number' => ['required', 'numeric'],
+            'control_number' => ['required', 'string', 'max:255'],
             'origin' => ['required', 'string', 'max:255'],
             'origin_coords' => ['required', 'string', 'max:255'],
             'destination' => ['required', 'string', 'max:255'],
