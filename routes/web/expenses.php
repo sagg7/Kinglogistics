@@ -13,6 +13,8 @@ Route::prefix('expense')->group(function () {
             ->name('expense.search');
         Route::get('downloadXLS', [ExpenseController::class, 'downloadXLS'])
             ->name('expense.downloadXLS');
+        Route::get('downloadTmpXLS', [ExpenseController::class, 'downloadTmpXLS'])
+            ->name('expense.downloadTmpXLS');
     });
     Route::group(['middleware' => ['permission:create-expense']], function () {
         Route::get('create', [ExpenseController::class, 'create'])
@@ -25,6 +27,8 @@ Route::prefix('expense')->group(function () {
             ->name('expense.edit');
         Route::post('update/{id}', [ExpenseController::class, 'update'])
             ->name('expense.update');
+        Route::post('uploadExpenseExcel', [ExpenseController::class, 'uploadExpenseExcel'])
+            ->name('expense.uploadExpenseExcel');
     });
     Route::group(['middleware' => ['permission:delete-expense']], function () {
         Route::post('delete/{id}', [ExpenseController::class, 'destroy'])

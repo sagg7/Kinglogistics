@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessDeleteFileDelayed;
+use App\Exports\ExpenseErrorsExport;
+use App\Imports\ExpenseImport;
+
 
 class ExpenseController extends Controller
 {
@@ -252,5 +257,37 @@ class ExpenseController extends Controller
                 'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
             ],
         ]))->download("Expense " . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
+    public function downloadTmpXLS()
+    {
+        $data = [];
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Date", "Type", "Account", "Amount", "Description", "Note"],
+            "formats" => [
+                'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Expense" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
+    public function uploadExpenseExcel(Request $request)
+    {
+        $import = new ExpenseImport;
+        Excel::import($import, $request->fileExcel);
+        $data = $import->data;
+
+        $result = ['success' => true];
+
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Expense_Excel_Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new ExpenseErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset("storage/" . $path);
+        }
+
+        return $result;
     }
 }
