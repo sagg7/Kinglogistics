@@ -21,6 +21,10 @@ Route::prefix('report')->group(function () {
             ->name('report.getDispatchReport');
         Route::get('showDispatchReportById/{id}', [ReportController::class, 'showDispatchReportById'])
             ->name('report.showDispatchReportById');
+        Route::get('customerLoads', [ReportController::class, 'customerLoads'])
+            ->name('report.customerLoads');
+        Route::get('customerLoadsData', [ReportController::class, 'customerLoadsData'])
+            ->name('report.customerLoadsData');
     });
 
     Route::group(['middleware' => ['permission:update-load-dispatch']], function () {

@@ -437,6 +437,11 @@
                             <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Profit and Loss</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/report/customerLoads">
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Customer Loads</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endif
