@@ -157,29 +157,29 @@ class LoadController extends Controller
             $rest3 = substr($control_number, -3,1);
             $patron = '/([0-9])+$/';
 
-                  
+
              if(preg_match($patron,$rest)) {
                 if(preg_match($patron,$rest2)){
                     if(preg_match($patron,$rest3)){
                         $control_number_int =  substr($control_number, -3);
                         $control_number_str = substr($control_number, 0, -3);
-                        
+
                     }else{
                         $control_number_int= substr($control_number, -2);
-                        $control_number_str = substr($control_number, 0, -2); 
+                        $control_number_str = substr($control_number, 0, -2);
                      }
                 }else{
                    $control_number_int= $rest;
-                   $control_number_str = substr($control_number, 0, -1); 
-               
+                   $control_number_str = substr($control_number, 0, -1);
+
                 }
              } else {
-                $control_number_str = $control_number; 
+                $control_number_str = $control_number;
                 $control_number_int = 0;
-               
-             } 
 
-                 
+             }
+
+
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)) { //temporary
                     $data['driver_id'] = $request->driver_id;
@@ -203,7 +203,7 @@ class LoadController extends Controller
 
                 event(new LoadUpdate($load));
             }
-          
+
         });
 
         if ($request->ajax()) {
@@ -391,7 +391,7 @@ class LoadController extends Controller
     }
 
 
-   
+
 
     /**
      * @param Request $request
@@ -597,7 +597,7 @@ class LoadController extends Controller
         else
             return "$minutes m $secs";
     }
-   
+
 
     public function replacePhoto(Request $request, $id, $type)
     {

@@ -1,5 +1,5 @@
 <div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable {{ $modalClass ?? 'modal-lg' }}" role="document">
         <div class="modal-content" style="max-height: calc(100vh - 3.5rem);">
             <div class="modal-header">
                 <h5 class="modal-title">{{ $title ?? null }}</h5>
@@ -24,7 +24,6 @@
                 <button type="button" class="btn btn-primary btn-block mr-1 mb-1 waves-effect waves-light" data-dismiss="modal">Close</button>
             @endisset
             </div>
-
         </div>
     </div>
 </div>
