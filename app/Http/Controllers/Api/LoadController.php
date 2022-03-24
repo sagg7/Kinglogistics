@@ -11,15 +11,10 @@ use App\Http\Resources\Drivers\LoadStatusResource;
 use App\Http\Resources\Helpers\KeyValueResource;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
-use App\Models\AvailableDriver;
 use App\Models\BotAnswers;
-use App\Models\Broker;
 use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\Load;
-use App\Models\LoadLog;
-use App\Models\LoadStatus;
-use App\Models\RejectedLoad;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Load\ManageLoadProcessTrait;
 use App\Models\Trip;
@@ -282,9 +277,15 @@ class LoadController extends Controller
 
     public function loading(Request $request)
     {
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::LOADING);
+        $loadId = $request->get('load_id');
+        $load = Load::find($loadId);
+
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::LOADING);
 
         // Do required stuff for "Loading" event
+
+        $load->customer_po = $request->get('customer_po');
+        $load->update();
 
         return response([
             'status' => 'ok',
@@ -294,23 +295,6 @@ class LoadController extends Controller
     }
 
     public function toLocation(Request $request)
-    {
-        $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
-
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::TO_LOCATION);
-
-        $load->customer_po = $request->get('customer_po');
-        $load->update();
-
-        return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::TO_LOCATION,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
-    }
-
-    public function arrived(Request $request)
     {
         $receipt = $request->get('receipt');
         $loadId = $request->get('load_id');
@@ -322,10 +306,10 @@ class LoadController extends Controller
         $load->customer_reference = $request->get('sand_ticket');
         $load->weight = $request->get('weight');
         $load->silo_number = $request->get('silo_number');
-        $load->tons = floatval($request->get('weight')) / 2000;
+        $load->tons = (float)$request->get('weight') / 2000;
         $load->update();
 
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::TO_LOCATION);
 
         $voucher = $this->uploadImage(
             $receipt,
@@ -337,6 +321,18 @@ class LoadController extends Controller
         $loadStatus->to_location_voucher = $voucher;
         $loadStatus->update();
 
+        return response([
+            'status' => 'ok',
+            'load_status' => LoadStatusEnum::TO_LOCATION,
+            'load_status_details' => new LoadStatusResource($loadStatus)
+        ]);
+    }
+
+    public function arrived(Request $request)
+    {
+        $loadId = $request->get('load_id');
+
+        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
 
         return response([
             'status' => 'ok',
