@@ -10,9 +10,9 @@ use Carbon\Carbon;
 trait ManageLoadProcessTrait {
 
     // Move this method to a Trait: Useful for Load creation scenarios...
-    private function switchLoadStatus($loadId, string $status): LoadStatus
+    private function switchLoadStatus($load, string $status): LoadStatus
     {
-        $load = Load::find($loadId);
+        //$load = Load::find($loadId);
 
         if (empty($load)) {
             abort(404, 'The requested load has not been found');
