@@ -156,7 +156,7 @@ class ShiftController extends Controller
             $load->update();
 
             // Update load status
-            $this->switchLoadStatus($load->id, $assignedStatus);
+            $this->switchLoadStatus($load, $assignedStatus);
 
             // Notify to the driver of assignment
             $driver->notify(new LoadAssignment($driver, $load));

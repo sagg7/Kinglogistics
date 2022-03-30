@@ -92,7 +92,7 @@ class LoadController extends Controller
         $data['broker_id'] = $driver->broker_id ?? Driver::find($driver->id)->broker_id;
 
         $load = $this->storeUpdate($data);
-        $this->switchLoadStatus($load->id, $loadStatus);
+        $this->switchLoadStatus($load, $loadStatus);
 
         $driver->status = 'active';
         $driver->save();
@@ -192,25 +192,33 @@ class LoadController extends Controller
     public function accept(Request $request)
     {
         $driver = auth()->user();
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::ACCEPTED);
 
-        $load = Load::find($request->get('load_id'));
-        $shift = $driver->shift;
+        $load = Load::findOrFail($request->get('load_id'));
+        if ($load->status === LoadStatusEnum::REQUESTED || $load->status === LoadStatusEnum::UNALLOCATED) {
 
-        if (empty($shift))
-            throw new ShiftNotActiveException();
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ACCEPTED);
 
-        // Assign the box details to load coming from shift
-        $load->box_status_init = $shift->box_status;
-        $load->box_type_id_init = $shift->box_type_id;
-        $load->box_number_init = $shift->box_number;
-        $load->update();
+            $shift = $driver->shift;
+
+            if (empty($shift))
+                throw new ShiftNotActiveException();
+
+            // Assign the box details to load coming from shift
+            $load->box_status_init = $shift->box_status;
+            $load->box_type_id_init = $shift->box_type_id;
+            $load->box_number_init = $shift->box_number;
+            $load->update();
+
+            return response([
+                'status' => 'ok',
+                'load_status' => LoadStatusEnum::ACCEPTED,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
 
         return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::ACCEPTED,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function reject(Request $request)
@@ -235,7 +243,7 @@ class LoadController extends Controller
         $load->driver_id = null;
         $load->update();
 
-        $this->switchLoadStatus($loadId, LoadStatusEnum::UNALLOCATED);
+        $this->switchLoadStatus($load, LoadStatusEnum::UNALLOCATED);
 
         $maxLoadRejections = AppConfig::where('key', AppConfigEnum::MAX_LOAD_REJECTIONS)->first();
 
@@ -284,18 +292,24 @@ class LoadController extends Controller
     {
 
         $loadId = $request->get('load_id');
-        $load = Load::find($loadId);
+        $load = Load::findOrFail($loadId);
 
-        $loadStatus = $this->switchLoadStatus($request->get('load_id'), LoadStatusEnum::LOADING);
+        if ($load->status === LoadStatusEnum::ACCEPTED) {
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::LOADING);
 
-        $load->customer_po = $request->get('customer_po');
-        $load->update();
+            $load->customer_po = $request->get('customer_po');
+            $load->update();
+
+            return response([
+                'status' => 'ok',
+                'load_status' => LoadStatusEnum::LOADING,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
 
         return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::LOADING,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function toLocation(Request $request)
@@ -306,56 +320,74 @@ class LoadController extends Controller
             return response('You must attach a valid voucher', 400);
         }
 
-        $load = Load::find($loadId);
-        $load->customer_reference = $request->get('sand_ticket');
-        $load->weight = $request->get('weight');
-        $load->silo_number = $request->get('silo_number');
-        $load->tons = floatval($request->get('weight')) / 2000;
-        $load->update();
+        $load = Load::findOrFail($loadId);
+        if ($load->status === LoadStatusEnum::LOADING) {
+            $load->customer_reference = $request->get('sand_ticket');
+            $load->weight = $request->get('weight');
+            $load->silo_number = $request->get('silo_number');
+            $load->tons = (float)$request->get('weight') / 2000;
+            $load->update();
 
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::TO_LOCATION);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION);
 
-        $voucher = $this->uploadImage(
-            $receipt,
-            'loads/' . $loadStatus->id,
-            50,
-            'jpg',
-        );
+            $voucher = $this->uploadImage(
+                $receipt,
+                'loads/' . $loadStatus->id,
+                50,
+                'jpg',
+            );
 
-        $loadStatus->to_location_voucher = $voucher;
-        $loadStatus->update();
+            $loadStatus->to_location_voucher = $voucher;
+            $loadStatus->update();
+
+            return response([
+                'status' => 'ok',
+                'load_status' => LoadStatusEnum::TO_LOCATION,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
 
         return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::TO_LOCATION,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function arrived(Request $request)
     {
         $loadId = $request->get('load_id');
+        $load = Load::findOrFail($loadId);
+        if ($load->status === LoadStatusEnum::TO_LOCATION) {
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ARRIVED);
 
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::ARRIVED);
-        $loadStatus->update();
+            return response([
+                'status' => 'ok',
+                'load_status' => LoadStatusEnum::ARRIVED,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
 
         return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::ARRIVED,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function unloading(Request $request)
     {
         $loadId = $request->get('load_id');
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::UNLOADING);
+        $load = Load::findOrFail($loadId);
+        if ($load->status === LoadStatusEnum::ARRIVED) {
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::UNLOADING);
+
+            return response([
+                'status' => 'ok',
+                'load_status' => LoadStatusEnum::UNLOADING,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
 
         return response([
-            'status' => 'ok',
-            'load_status' => LoadStatusEnum::UNLOADING,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function finished(Request $request)
@@ -368,45 +400,52 @@ class LoadController extends Controller
             return response('You must attach a valid voucher', 400);
         }
 
-        $date = Carbon::now();
+        $load = Load::findOrFail($loadId);
+        if ($load->status === LoadStatusEnum::UNLOADING) {
 
-        $load = Load::find($loadId);
-        $load->bol = $request->get('bol');
+            $date = Carbon::now();
+            $load->bol = $request->get('bol');
 
-        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
-            ->where('time', $date->format("H").':00:00')->first();
-        if ($dispatch)
-            $load->dispatch_id = $dispatch->user_id;
+            $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+                ->where('time', $date->format("H").':00:00')->first();
+            if ($dispatch)
+                $load->dispatch_id = $dispatch->user_id;
 
-        $load->update();
+            $load->update();
 
-        $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::FINISHED);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED);
 
-        $voucher = $this->uploadImage(
-            $receipt,
-            'loads/' . $loadStatus->id,
-            50,
-            'jpg',
-        );
-        $loadStatus->finished_voucher = $voucher;
-        $loadStatus->update();
+            $voucher = $this->uploadImage(
+                $receipt,
+                'loads/' . $loadStatus->id,
+                50,
+                'jpg',
+            );
+            $loadStatus->finished_voucher = $voucher;
+            $loadStatus->update();
 
-        $this->endShift($driver);
+            $this->endShift($driver);
 
-        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
-        $canActivate = 1; //Temporal not checking shift
-        //if (Broker::find(1)->active_shifts){
-        //    $canActivate = $driver->canActiveShift();
-        //} else {
-        //    $canActivate = 1;
-        //}
-        // Check if driver can accept more loads and attach to response
+            BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
+
+            $canActivate = 1; //Temporal not checking shift
+            //if (Broker::find(1)->active_shifts){
+            //    $canActivate = $driver->canActiveShift();
+            //} else {
+            //    $canActivate = 1;
+            //}
+            // Check if driver can accept more loads and attach to response
+            return response([
+                'status' => 'ok',
+                'can_keep_shift' => true,
+                'load_status' => LoadStatusEnum::FINISHED,
+                'load_status_details' => new LoadStatusResource($loadStatus)
+            ]);
+        }
+
         return response([
-            'status' => 'ok',
-            'can_keep_shift' => true,
-            'load_status' => LoadStatusEnum::FINISHED,
-            'load_status_details' => new LoadStatusResource($loadStatus)
-        ]);
+            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+        ], 400);
     }
 
     public function updateEndBox(Request $request)

@@ -242,7 +242,6 @@ class ReportController extends Controller
         $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
         $count2 = [];
 
-        // TODO: FORMAT DATA TO SHOW FOR PERIOD FILTER, RIGHT NOW THE DATES ARE KINDA WEIRD ON THE GRAPH AND GOTTA SHOW NEW READABLE FORMATS
         switch ($request->period) {
             default:
             case 'day':
@@ -647,6 +646,166 @@ class ReportController extends Controller
             ]);
 
         return compact('loadData', 'income', 'expenses');
+    }
+
+    public function customerLoads()
+    {
+        return view('reports.customerLoads.report');
+    }
+
+    public function customerLoadsData(Request $request)
+    {
+        $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth();
+        $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
+
+        $shippers = Shipper::select('id', 'name')
+            ->with([
+                'loads' => function ($q) use ($start, $end, $request) {
+                    if ($request->carrier) {
+                        $q->where(function ($q) use ($request) {
+                            $q->whereHas('driver', function ($q) use ($request) {
+                                $q->where('drivers.carrier_id', $request->carrier);
+                            });
+                        });
+                    }
+                    $q->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
+                        ->select([
+                            'loads.id', 'loads.shipper_id', 'loads.driver_id', 'loads.truck_id', 'loads.trip_id',
+                            'loads.control_number', 'loads.bol', 'loads.customer_reference',
+                            'load_statuses.finished_timestamp',
+                        ])
+                        ->whereDate('finished_timestamp', '>=', $start)
+                        ->whereDate('finished_timestamp', '<=', $end)
+                        ->with([
+                            'trip:id,name',
+                            'driver' => function ($q) use ($request) {
+                                $q->select('id', 'carrier_id', 'name', 'carrier_id', 'phone')
+                                    ->withTrashed()
+                                    ->with('carrier', function ($q) use ($request) {
+                                        $q->select('id', 'name', 'phone')
+                                            ->withTrashed();
+                                    });
+
+                                if ($request->carrier) {
+                                    $q->where('drivers.carrier_id', $request->carrier);
+                                }
+                            },
+                            'truck:id,number',
+                            'shipper:id,name',
+                        ]);
+                },
+            ])
+            ->where('broker_id', session('broker'))
+            ->where(function ($q) use ($request) {
+                if ($request->shipper) {
+                    $q->where('shippers.id', $request->shipper);
+                }
+            })
+            ->get();
+
+        $loadData = [];
+        $usedDrivers = [];
+        foreach ($shippers as $shipper) {
+            foreach ($shipper->loads as $load) {
+                if (!in_array($load->driver_id, $usedDrivers)) {
+                    $usedDrivers[] = $load->driver_id;
+                }
+                $loadIdx = $shipper->id . "_" . $load->driver_id . "_" . $load->truck_id;
+                if (!isset($loadData[$loadIdx])) {
+                    $loadData[$loadIdx] = [
+                        'driver_id' => $load->driver_id,
+                        'driver' => $load->driver->name,
+                        'driver_phone' => $load->driver->phone,
+                        'truck_id' => $load->truck_id,
+                        'truck' => $load->truck->number ?? null,
+                        'carrier_id' => $load->driver->carrier->id,
+                        'carrier' => $load->driver->carrier->name,
+                        'carrier_phone' => $load->driver->carrier->phone,
+                        'shipper_id' => $shipper->id,
+                        'shipper' => $shipper->name,
+                        'loads' => 1,
+                        'load_data' => [[
+                            'date' => $load->finished_timestamp,
+                            'control' => $load->control_number,
+                            'reference' => $load->customer_reference,
+                            'bol' => $load->bol,
+                            'job' => $load->trip->name ?? null,
+                        ]],
+                    ];
+                } else {
+                    $loadData[$loadIdx]['loads']++;
+                    $loadData[$loadIdx]['load_data'][] = [
+                        'date' => $load->finished_timestamp,
+                        'control' => $load->control_number,
+                        'reference' => $load->customer_reference,
+                        'bol' => $load->bol,
+                        'job' => $load->trip->name ?? null,
+                    ];
+                }
+            }
+        }
+
+        $carriers = Carrier::where('broker_id', session('broker'))
+            ->whereHas('drivers', function ($q) use ($usedDrivers) {
+                $q->whereNotIn('drivers.id', $usedDrivers);
+            })
+            ->with([
+                'drivers' => function ($q) use ($usedDrivers, $request) {
+                    $q->select([
+                        'drivers.id', 'drivers.carrier_id', 'drivers.name', 'drivers.phone', 'drivers.truck_id'
+                    ])
+                        ->whereNotIn('drivers.id', $usedDrivers)
+                        ->with([
+                            'truck:id,driver_id,number',
+                            'shippers:id,name',
+                        ]);
+
+                    if ($request->shipper) {
+                        $q->whereHas('shippers', function ($q) use ($request) {
+                            $q->where('id', $request->shipper);
+                        });
+                    }
+                },
+            ])
+            ->where(function ($q) use ($request) {
+                if ($request->carrier) {
+                    $q->where('carriers.id', $request->carrier);
+                }
+                if ($request->shipper) {
+                    $q->whereHas('drivers', function ($q) use ($request) {
+                        $q->whereHas('shippers', function ($q) use ($request) {
+                            $q->where('id', $request->shipper);
+                        });
+                    });
+                }
+            })
+            ->get([
+                'carriers.id',
+                'carriers.name',
+                'carriers.phone',
+            ])
+            ->keyBy('id');
+
+        $inactiveData = [];
+        foreach ($carriers as $carrier) {
+            foreach ($carrier->drivers as $driver) {
+                $inactiveData[] = [
+                    'driver_id' => $driver->id,
+                    'driver' => $driver->name,
+                    'truck_id' => $driver->truck_id,
+                    'truck' => $driver->truck->number ?? null,
+                    'carrier_id' => $carrier->id,
+                    'carrier' => $carrier->name,
+                    'shippers' => $driver->shippers->toArray(),
+                    'loads' => 0,
+                ];
+            }
+        }
+
+        return [
+            'active_data' => array_values($loadData),
+            'inactive_data' => array_values($inactiveData),
+        ];
     }
 }
 
