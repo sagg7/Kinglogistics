@@ -356,9 +356,8 @@ class LoadController extends Controller
     {
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
-        if ($load->statur === LoadStatusEnum::TO_LOCATION) {
+        if ($load->status === LoadStatusEnum::TO_LOCATION) {
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ARRIVED);
-            $loadStatus->update();
 
             return response([
                 'status' => 'ok',
@@ -376,7 +375,7 @@ class LoadController extends Controller
     {
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
-        if ($load->statur === LoadStatusEnum::ARRIVED) {
+        if ($load->status === LoadStatusEnum::ARRIVED) {
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::UNLOADING);
 
             return response([

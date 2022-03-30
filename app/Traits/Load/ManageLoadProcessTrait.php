@@ -6,6 +6,7 @@ use App\Events\LoadUpdate;
 use App\Models\Load;
 use App\Models\LoadStatus;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 trait ManageLoadProcessTrait {
 
@@ -18,25 +19,27 @@ trait ManageLoadProcessTrait {
             abort(404, 'The requested load has not been found');
         }
 
-        $load->status = $status;
-        $load->save();
+        return DB::transaction(function () use ($load, $status) {
+            $load->status = $status;
+            $load->save();
 
-        $loadStatus = $load->loadStatus;
+            $loadStatus = $load->load('loadStatus')->loadStatus;
 
-        // If this load does not have a load status entry, create one and assign the incoming status
-        if (empty($loadStatus)) {
-            $loadStatus = LoadStatus::create([
-                'load_id' => $load->id
-            ]);
-        }
+            // If this load does not have a load status entry, create one and assign the incoming status
+            if (empty($loadStatus)) {
+                $loadStatus = LoadStatus::create([
+                    'load_id' => $load->id
+                ]);
+            }
 
-        // Update load statuses table
-        $loadStatus[$status . '_timestamp'] = Carbon::now();
-        $loadStatus->update();
+            // Update load statuses table
+            $loadStatus[$status . '_timestamp'] = Carbon::now();
+            $loadStatus->update();
 
-        event(new LoadUpdate($load));
+            event(new LoadUpdate($load));
 
-        return $loadStatus;
+            return $loadStatus;
+        });
     }
 
 }
