@@ -11,7 +11,7 @@
                     .val({{ $rental->carrier_id }})
                     .trigger('change');
                 $("#driver_id")
-                    .html(`<option value="{{ $rental->driver_id }}">{{ $rental->driver->name }}</option>`)
+                    .html(`<option value="{{ $rental->driver_id }}">{{ $rental->driver ? $rental->driver->name : null }}</option>`)
                     .val({{ $rental->driver_id }})
                     .prop('disabled', false)
                     .trigger('change');
