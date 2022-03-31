@@ -1026,83 +1026,154 @@ class LoadController extends Controller
         ]))->download("Loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 
-    // private function validator(Load $load, int $id = null)
-    // {
-    //     return Validator::make($load, [
-    //         'load_number' => ['sometimes', 'numeric', 'min:1', 'max:999'],
-    //         'shipper_id' => ['sometimes', 'exists:shippers,id'],
-    //         'trip_id' => ['required', 'exists:trips,id'],
-    //         'load_type_id' => ['required', 'exists:load_types,id'],
-    //         'driver_id' => ['nullable', 'exists:drivers,id'],
-    //         'date' => ['required', 'date'],
-    //         'control_number' => ['required', 'string', 'max:255'],
-    //         'origin' => ['required', 'string', 'max:255'],
-    //         'origin_coords' => ['required', 'string', 'max:255'],
-    //         'destination' => ['required', 'string', 'max:255'],
-    //         'destination_coords' => ['required', 'string', 'max:255'],
-    //         'customer_name' => ['required', 'string', 'max:255'],
-    //         'customer_po' => ['nullable', 'string', 'max:255'],
-    //         'customer_reference' => ['nullable', 'string', 'max:255'],
-    //         'tons' => ['nullable', 'string', 'max:255'],
-    //         // 'silo_number' => ['nullable', 'string', 'max:255'],
-    //         // 'container' => ['nullable', 'string', 'max:255'],
-    //         'weight' => ['nullable', 'numeric'],
-    //         'mileage' => ['nullable', 'numeric'],
-    //         'status' => ['sometimes', 'required'],
-    //     ], [
-    //         'origin_coords.required' => 'The origin map location is required',
-    //         'destination_coords.required' => 'The destination map location is required',
-    //     ], [
-    //         'shipper_id' => 'customer',
-    //         'trip_id' => 'trip',
-    //         'load_type_id' => 'load type',
-    //         'driver_id' => 'driver',
-    //     ]);
-    // }
+    private function validator(array $data)
+    {
+        return Validator::make($data, [
+            'shipper_id' => ['required', 'exists:shippers,id'],
+            'trip_id' => ['required', 'exists:trips,id'],
+            'truck_id' => ['nullable', 'exists:trucks,id'],
+            'load_type_id' => ['required', 'exists:load_types,id'],
+            'driver_id' => ['nullable', 'exists:drivers,id'],
+            'date' => ['required', 'date'],
+            'control_number' => ['required'],
+            'origin' => ['required', 'string', 'max:255'],
+            'origin_coords' => ['required', 'string', 'max:255'],
+            'destination' => ['required', 'string', 'max:255'],
+            'destination_coords' => ['required', 'string', 'max:255'],
+            'customer_name' => ['required', 'string', 'max:255'],
+            // 'customer_po' => ['nullable', 'string', 'max:255'],
+            'customer_reference' => ['nullable', 'string', 'max:255'],
+            'tons' => ['nullable', 'string', 'max:255'],
+            'weight' => ['nullable', 'numeric'],
+            // 'bol' => ['nullable', 'string', 'max:255'],
+            'mileage' => ['nullable', 'numeric'],
+            'status' => ['required'],
+            'box_type_id_init' => ['nullable', 'numeric'],
+            'box_type_id_end' => ['nullable', 'numeric'],
+            'unallocated_timestamp' => ['nullable', 'date'],
+            'requested_timestamp' => ['nullable', 'date'],
+            'accepted_timestamp' => ['nullable', 'date'],
+            'loading_timestamp' => ['nullable', 'date'],
+            'to_location_timestamp' => ['nullable', 'date'],
+            'arrived_timestamp' => ['nullable', 'date'],
+            'unloading_timestamp' => ['nullable', 'date'],
+            'finished_timestamp' => ['nullable', 'date'],
+        ], [
+            'origin_coords.required' => 'The origin map location is required',
+            'destination_coords.required' => 'The destination map location is required',
+        ]);
+    }
 
     public function createLoadsExternal(Request $request){
+        $formatted = [];
+        $errors = [];
+        $headers = [];
+        $data = null;
+
         $loadsExt = json_decode($request->array);
         $loadExtArry = get_object_vars($loadsExt[0]);
         $arrayobj = count($loadsExt);
-        if ($arrayobj === 0)
-           return redirect()->back()->withErrors('There are no loads to generate the document');
+        if ($arrayobj === 0){
+            return redirect()->back()->withErrors('There are no loads to generate the document');   
+                        }
 
-           foreach ($loadExtArry as $key => $row) {
+             foreach ($loadExtArry as $key => $row) {
             if($row[1]){$truck = Truck::where('number','LIKE','%'.$row[1].'%')->first();}
             if($row[2]){$driver = Driver::where('name','LIKE','%'.$row[2].'%')->first(); }
             // LoadType and Trip can't be null
             if($row[9]){$loadType = LoadType::where('name','LIKE','%'.$row[9].'%')->first(); }
             if($row[10]){$trip = Trip::where('name','LIKE','%'.$row[10].'%')->first(); }
+
+                    
+
+                $toValidate = [
+                    'control_number'=> $row[0],
+                    'shipper_id' => intval($request->shipper),
+                    'broker_id' => session('broker'),
+                    'date' => Carbon::parse($row[18]),
+                    'truck_id' => $row[1] ? $truck['id']  : null,
+                    'driver_id' => $row[2] ? $driver['id'] : null,
+                    'customer_reference' => $row[4] ? $row[4]: null,
+                    'bol' => $row[5] ? $row[5] : null,
+                    'weight' => $row[6] ? $row[6] : null,
+                    'tons'  >= $row[7] ? $row[7]: null,
+                    'mileage' => $row[8] ?  $row[8] : null,
+                    'load_type_id' =>  $loadType['id'],
+                    'trip_id' => $trip['id'],
+                    'customer_po' => $row[11],
+                    'customer_name' => $row[12],
+                    'status' => $row[13],
+                    'destination' => $trip['destination'],
+                    'destination_coords' => $trip['destination_coords'],
+                    'origin' => $trip['origin'],
+                    'origin_coords' => $trip['origin_coords'],
+                    'box_type_id_init' => $row[14] ? $row[14] :null,
+                    'box_type_id_end' => $row[15] ? $row[15] :null,
+                    'unallocated_timestamp' =>$row[16] ? $row[16]: null,
+                    'requested_timestamp' => $row[17] ? $row[17] : null,
+                    'accepted_timestamp' => $row[18] ? $row[18]: null,
+                    'loading_timestamp' => $row[19] ? $row[19]: null,
+                    'to_location_timestamp' => $row[20] ? $row[20]: null,
+                    'arrived_timestamp' => $row[21]  ? $row[21]: null,
+                    'unloading_timestamp' => $row[22] ? $row[22]: null,
+                    'finished_timestamp' =>$row[23]  ? $row[23]: null,
+                ];
+                // $this->validator($toValidate)->validate();
+                $valErrors = $this->validator($toValidate)->errors()->all();
+             
+
+                if (count($valErrors) > 0) {
+                    $errorString = "";
+                    foreach ($valErrors as $error) {
+                        $errorString .= "$error\n";
+                    }
+                    $errors[] = array_merge($row, [$errorString]);
+                } else {
+                    $formatted[] = $toValidate;
+                }
+
+                $result = [
+                    'data' => $formatted,
+                    'errors' => null,
+                ];
+        
+                if (count($errors) > 0) {
+                    $result['errors'] = array_merge($headers, $errors);
+                }
+        
+                $data = $result;
+               
+
+                if (!$data['errors']) {
                 $load_logs = new LoadLog();
                 $load_logs->user_id = 1;
                 $load_logs->quantity = 1;
                 $load_logs->type = 'user';
                 $load_logs->save();
                 $load = new Load();
-                $load->control_number = $row[0];
-                $load->shipper_id = intval($request->shipper);
+                $load->control_number =  $toValidate['control_number'];
+                $load->shipper_id = $toValidate['shipper_id'];
                 $load->broker_id = session('broker');
                 $load->load_log_id = $load_logs->id;
-                $load->date = Carbon::parse($row[18]);
-                $load->truck_id = $row[1] ? $truck['id']  : null;
-                $load->driver_id = $row[2] ? $driver['id'] : null;
-                // $load->carrier_id = $driver['carrier_id'] ? $driver['carrier_id'] : null;
-                $load->customer_reference = $row[4] ? $row[4]: null;
+                $load->date = $toValidate['date'];
+                $load->truck_id = $row[1] ? $toValidate['truck_id']  : null;
+                $load->driver_id = $row[2] ?  $toValidate['driver_id']  : null;
+                $load->customer_reference = $row[4] ? $toValidate['customer_reference']: null;
                 $load->bol = $row[5] ? $row[5] : null;
-                $load->weight = $row[6] ? $row[6] : null;
-                $load->tons  = $row[7] ? $row[7]: null;
-                $load->mileage = $row[8] ?  $row[8] : null;
-                $load->load_type_id =  $loadType['id'];
-                $load->trip_id = $trip['id'];
-                $load->customer_po = $row[11];
-                $load->customer_name = $row[12];
-                $load->status = $row[13];
-                $load->destination = $trip['destination'];
-                $load->destination_coords = $trip['destination_coords'];
-                $load->origin = $trip['origin'];
-                $load->origin_coords = $trip['origin_coords'];
-                $load->box_type_id_init = $row[14] ? $row[14] :null;
-                $load->box_type_id_end = $row[15] ? $row[15] :null;
+                $load->weight = $row[6] ? $toValidate['weight'] : null;
+                $load->tons  = $row[7] ? $toValidate['tons']: null;
+                $load->mileage = $row[8] ?  $toValidate['mileage'] : null;
+                $load->load_type_id =  $toValidate['load_type_id'];
+                $load->trip_id = $toValidate['trip_id'];
+                $load->customer_po = $toValidate['customer_po'];
+                $load->customer_name = $toValidate['customer_name'];
+                $load->status = $toValidate['status'];
+                $load->destination = $toValidate['destination'];
+                $load->destination_coords = $toValidate['destination_coords'];
+                $load->origin = $toValidate['origin'];
+                $load->origin_coords = $toValidate['origin_coords'];
+                $load->box_type_id_init = $row[14] ? $toValidate['box_type_id_init'] :null;
+                $load->box_type_id_end = $row[15] ? $toValidate['box_type_id_end'] :null;
                 $load->save();
                 $loadStatus = new LoadStatus();
                 $loadStatus->load_id = $load->id;
@@ -1115,14 +1186,21 @@ class LoadController extends Controller
                 $loadStatus->unloading_timestamp = $row[22] ? $row[22]: null;
                 $loadStatus->finished_timestamp =$row[23]  ? $row[23]: null;
                 $loadStatus->save();
-                // $this->validator($load)->validate();
-                // $request->validate([
-                //     '$row[0]' => 'required|numeric',
-
-                // ]);
+            }
+              
         }
-
-        return ['success' => true, 'load' => $load, 'loadStatus' => $loadStatus, 'loadLogs' =>  $load_logs];
+        $result = ['success' => true];
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Loads_Excel_Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new CompareLoadsErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset("storage/" . $path);
+            // dd($result['errors_file']);
+        }
+        
+        return $result;
 
     }
 }

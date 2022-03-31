@@ -677,11 +677,9 @@
                         contentType: false,
                         processData: false,
                         success: (res) => {
-
                             if (res.success) {
-                                // console.log(res.dataFile);
                                 if (res.errors_file) {
-                                    //location.href = res.errors_file;
+                                    location.href = res.errors_file;
                                 }
                                 uploadModal.modal('hide');
                                 matched = res.dataFile.columnsMatched;
@@ -748,11 +746,30 @@
             function createLoadsExternalFunc(externalInput) {
                 if(externalCount > 400){
                     throwErrorMsg("Error: You can not upload more than 400 loads.")
-                }else{window.location = "/load/createLoadsExternal/external?"+ $.param({
-                    array: JSON.stringify( externalInput ),
-                    shipper: $("#shipper").val(),
-                });}
+                }else{
+                    $.ajax({
+                        url: '/load/createLoadsExternal/external',
+                        type: 'GET',
+                        data: {
+                            array: JSON.stringify( externalInput ),
+                            shipper: $("#shipper").val(),
+                        },
+                        success: (res) => {
+                            if (res.success) {
+                                throwErrorMsg("Load Generated Successfully", {"title": "Success!", "type": "success"});
+                                $('#resultsCompareLoadsModal').modal('hide');
+                                if (res.errors_file) {
+                                    location.href = res.errors_file;
+                                }
+                            } else
+                                throwErrorMsg();
 
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    });
+                }
             }
 
             function transferJobModal(id){
