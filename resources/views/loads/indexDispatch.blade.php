@@ -13,6 +13,7 @@
         @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoadStatus", "title" => "Load Status"])
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
+        @include("common.modals.uploadXlsModal", ["id" => "compareLoadsModal", "title" => "Compare Loads","route"=>"load.uploadCompareLoadExcel","idForm"=>"uploadLoadForm"])
         @include("common.modals.genericAjaxLoading", ["id" => "AddObservation", "title" => "Load Observation", "content" =>
         Form::label('description', ucfirst(__('description')), ['class' => 'col-form-label']).
         Form::textarea('description', null, ['class' => 'form-control', 'rows' => 5, 'maxlength' => 512]),
@@ -28,6 +29,7 @@
         @include("loads.common.modals.createLoad")
         @include("loads.common.modals.viewOrigins")
         @include("loads.common.modals.viewDestinations")
+        @include("loads.common.modals.resultsCompareLoadsModal")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
@@ -43,6 +45,12 @@
             let tbLoadFinished = null;
             let now = null;
             let loadId = null;
+            let matched = null;
+            let internal = null;
+            let external = null;
+            let externalCount = 0;
+            let internalCount = 0;
+            let matchedCount = 0;
             (() => {
                 let reference = {};
                 let control = {};
@@ -619,12 +627,141 @@
                     });
                     $("#transferJob").modal("hide");
                 });
+
+
+                $('#compareLoads').click(function (e) {
+                    if(!$("#shipper").val()){ 
+                        throwErrorMsg("You have to select a Customer");                        
+                    } else {
+                        $('#compareLoadsModal').modal('show');
+                    }
+                });
+
+
+                //this area belong of option of menu to uploadXLS
+                const uploadModal = $('#compareLoadsModal');
+                const xlsInput = $('#fileExcel');
+                xlsInput.change((e) => {
+                    const target = e.currentTarget,
+                        inp = $(target),
+                        icon = inp.closest('label'),
+                        form = inp.closest('form'),
+                        btn = form.find('button[type=submit]'),
+                        file = target.files[0];
+                    if (file) {
+                        icon.removeClass('bg-warning').addClass('bg-success');
+                        btn.removeClass('btn-warning').addClass('btn-success')
+                        .text(`Upload: ${file.name}`)
+                        .prop('disabled', false);
+                    } else {
+                        icon.removeClass('bg-success').addClass('bg-warning');
+                        btn.removeClass('btn-success').addClass('btn-warning')
+                        .text('Upload')
+                        .prop('disabled', true);
+                    }
+                });
+                
+                const resultsCompareLoadsModal = $('#resultsCompareLoadsModal');
+                $('#uploadLoadForm').submit((e) => {
+                    e.preventDefault();
+                    let dateRange = $('#dateRange');
+                    let shipper = $("#shipper").val();
+                    const form = $(e.currentTarget),
+                        url = form.attr('action');
+                    let formData = new FormData(form[0]);
+                    formData.append('dateRange', dateRange.val());
+                    formData.append('shipper', $("#shipper").val());
+                    $.ajax({
+                        url,
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (res) => {
+
+                            if (res.success) {
+                                // console.log(res.dataFile);
+                                if (res.errors_file) {
+                                    //location.href = res.errors_file;
+                                }
+                                uploadModal.modal('hide');
+                                matched = res.dataFile.columnsMatched;
+                                external = res.dataFile.external;
+                                idInternal = res.dataFile.idLoadsInternal;
+                                matchedCount = matched.length;
+                                externalCount = Object.keys(external).length;
+                                internalCount = Object.keys(idInternal).length;
+                                $('#matchedColumn').html(matchedCount);
+                                $('#internalColumn').html(internalCount);
+                                $('#externalColumn').html(externalCount);
+                               
+                                    resultsCompareLoadsModal.modal('show');
+                                    let externalUrl = 'array=' + JSON.stringify(external);
+                               
+                                $('#buttonDownloadExternal').attr("onclick","downloadExternal("+externalUrl+")");
+                                $('#buttonDownloadInternal').attr("onclick","downloadInternal(["+idInternal+"])");
+                                $('#createLoadsFromExternal').attr("onclick","createLoadsExternalFunc(["+externalUrl+"])");
+                              
+                               
+                            } else
+                                throwErrorMsg();
+
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    }).always(() => {
+                        $('.ajax-loader').parent().prop('disabled',false).html('Upload');
+                    });
+                });
+
+              
             })();
+           
+
+            function downloadInternal(internalInput) {
+                if(internalCount > 1000){
+                    throwErrorMsg("Error: You can not download more than 1000 loads.")
+                }else{ window.location = "/load/downloadXLSInternal/internal?" + $.param({
+                    array: JSON.stringify( internalInput )
+                });}
+               
+                /*$.ajax({
+                    url: '/load/downloadXLSInternal/internal',
+                    type: 'POST',
+                    data: {
+                        array: JSON.stringify( internalInput )
+                    },
+                    success: (res) => {
+                        
+                    }
+                });*/
+            }
+
+            function downloadExternal(externalInput) {
+                if(externalCount > 400){
+                    throwErrorMsg("Error: You can not upload more than 400 loads.")
+                }else{window.location = "/load/downloadXLSExternal/external?"+ $.param({
+                    array: JSON.stringify( externalInput )
+                });}
+
+            }
+            function createLoadsExternalFunc(externalInput) {
+                if(externalCount > 400){
+                    throwErrorMsg("Error: You can not upload more than 400 loads.")
+                }else{window.location = "/load/createLoadsExternal/external?"+ $.param({
+                    array: JSON.stringify( externalInput ),
+                    shipper: $("#shipper").val(),
+                });}
+
+            }
 
             function transferJobModal(id){
                 loadId = id;
                 $("#transferJob").modal("show");
             }
+
+            
 
             function downloadDispatch() {
                 window.location = "{{url("load/DownloadExcelReport")}}?" + $.param({
@@ -674,6 +811,7 @@
                 });
             }
 
+
             function addTime() {
                 $(".update").each(function (index) {
                     let time = parseFloat($(this).attr('time')) + 1000;
@@ -708,6 +846,8 @@
                 else
                     return minutes + " m " + secs;
             }
+           
+
             const guard = 'web';
         </script>
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
@@ -848,6 +988,7 @@
                                 <a class="dropdown-item" id="genDisReport" onclick="fillFormDispatchReport()"><i class="fas fa-edit"></i> Generate Dispatch Report</a>
                                 <a class="dropdown-item" id="completeAll" onclick="downloadDispatch()"><i class="fas fa-file-excel"></i> Download Dispatch Report</a>
                                 <a class="dropdown-item" id="openPicReport" onclick="openPicReport()"><i class="fas fa-file-image"></i> Picture Report</a>
+                                <a class="dropdown-item" id="compareLoads"><i class="fas fa-file-upload"></i>Compare Loads</a>
                             </div>
                         </div>
                     </fieldset>
@@ -869,7 +1010,7 @@
             <div class="card-content">
                 <h3>Active Loads</h3>
                 <hr>
-             
+
                 <div id="gridActive"></div>
             </div>
         </div>
@@ -887,7 +1028,7 @@
                 </div>
             <div class="card-content">
                 <h3>Finished Loads</h3>
-              
+
                 <hr>
                 <div id="gridFinished"></div>
             </div>
