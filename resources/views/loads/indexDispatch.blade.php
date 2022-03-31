@@ -38,7 +38,6 @@
     @endsection
     @section("scripts")
         <script src="{{ asset('js/modules/slim/slim.kickstart.min.js') }}"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         @include("layouts.ag-grid.js")
         <script defer>
             let tbLoadActive = null;
@@ -630,8 +629,8 @@
 
 
                 $('#compareLoads').click(function (e) {
-                    if(!$("#shipper").val()){ 
-                        throwErrorMsg("You have to select a Customer");                        
+                    if(!$("#shipper").val()){
+                        throwErrorMsg("You have to select a Customer");
                     } else {
                         $('#compareLoadsModal').modal('show');
                     }
@@ -660,7 +659,7 @@
                         .prop('disabled', true);
                     }
                 });
-                
+
                 const resultsCompareLoadsModal = $('#resultsCompareLoadsModal');
                 $('#uploadLoadForm').submit((e) => {
                     e.preventDefault();
@@ -694,15 +693,15 @@
                                 $('#matchedColumn').html(matchedCount);
                                 $('#internalColumn').html(internalCount);
                                 $('#externalColumn').html(externalCount);
-                               
+
                                     resultsCompareLoadsModal.modal('show');
                                     let externalUrl = 'array=' + JSON.stringify(external);
-                               
+
                                 $('#buttonDownloadExternal').attr("onclick","downloadExternal("+externalUrl+")");
                                 $('#buttonDownloadInternal').attr("onclick","downloadInternal(["+idInternal+"])");
                                 $('#createLoadsFromExternal').attr("onclick","createLoadsExternalFunc(["+externalUrl+"])");
-                              
-                               
+
+
                             } else
                                 throwErrorMsg();
 
@@ -715,9 +714,9 @@
                     });
                 });
 
-              
+
             })();
-           
+
 
             function downloadInternal(internalInput) {
                 if(internalCount > 1000){
@@ -725,7 +724,7 @@
                 }else{ window.location = "/load/downloadXLSInternal/internal?" + $.param({
                     array: JSON.stringify( internalInput )
                 });}
-               
+
                 /*$.ajax({
                     url: '/load/downloadXLSInternal/internal',
                     type: 'POST',
@@ -733,7 +732,7 @@
                         array: JSON.stringify( internalInput )
                     },
                     success: (res) => {
-                        
+
                     }
                 });*/
             }
@@ -761,7 +760,7 @@
                 $("#transferJob").modal("show");
             }
 
-            
+
 
             function downloadDispatch() {
                 window.location = "{{url("load/DownloadExcelReport")}}?" + $.param({
@@ -846,7 +845,7 @@
                 else
                     return minutes + " m " + secs;
             }
-           
+
 
             const guard = 'web';
         </script>
