@@ -7,7 +7,7 @@
 
     @section('scripts')
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-        <script src="{{ asset('js/common/filesUploads.min.js') }}"></script>
+        <script src="{{ asset('js/common/filesUploads.min.js?1.0.1') }}"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key={{ env("GOOGLE_MAPS_API") }}&libraries=places"></script>
         <script>
             const equipment = @json($equipment->message_json ?? null);

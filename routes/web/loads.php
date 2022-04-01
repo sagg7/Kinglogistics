@@ -9,12 +9,23 @@ Route::prefix('load')->group(function () {
             ->name('load.index');
         Route::get('show/{id}', [LoadController::class, 'show'])
             ->name('load.show');
+        Route::get('downloadXLSInternal/{internal}', [LoadController::class, 'downloadXLSInternal'])
+            ->name('load.downloadXLSInternal');
+        Route::get('downloadXLSExternal/{external}', [LoadController::class, 'downloadXLSExternal'])
+            ->name('load.downloadXLSExternal');
+        Route::get('downloadTmpXLS', [LoadController::class, 'downloadTmpXLS'])
+            ->name('load.downloadTmpXLS');
+        Route::get('createLoadsExternal/{external}', [LoadController::class, 'createLoadsExternal'])
+            ->name('load.createLoadsExternal');
     });
     Route::group(['middleware' => ['permission:create-load']], function () {
         Route::get('create', [LoadController::class, 'create'])
             ->name('load.create');
         Route::post('store', [LoadController::class, 'store'])
             ->name('load.store');
+        Route::post('uploadCompareLoadExcel', [LoadController::class, 'uploadCompareLoadExcel'])
+            ->name('load.uploadCompareLoadExcel');
+
     });
     Route::group(['middleware' => ['permission:update-load']], function () {
         Route::get('edit/{id}', [LoadController::class, 'edit'])
