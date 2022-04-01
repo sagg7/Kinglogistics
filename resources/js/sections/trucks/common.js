@@ -8,13 +8,16 @@
         ajax: {
             url: '/trailer/selection',
             data: (params) => {
+                console.log(carrier);
                 return {
                     search: params.term,
                     page: params.page || 1,
                     take: 15,
+                    carrier: carrier.val(),
                 };
             },
-        }
+        },
+        carrier: carrier.val(),
     });
     driver.select2({
         placeholder: 'Select',
