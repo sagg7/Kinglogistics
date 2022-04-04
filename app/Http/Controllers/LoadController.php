@@ -1026,7 +1026,7 @@ class LoadController extends Controller
         ]))->download("Loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 
-    private function validator(array $data)
+    private function validator2(array $data)
     {
         return Validator::make($data, [
             'shipper_id' => ['required', 'exists:shippers,id'],
@@ -1096,17 +1096,17 @@ class LoadController extends Controller
                     'customer_reference' => $row[4] ? $row[4]: null,
                     'bol' => $row[5] ? $row[5] : null,
                     'weight' => $row[6] ? $row[6] : null,
-                    'tons'  >= $row[7] ? $row[7]: null,
+                    'tons'  => $row[7] ? $row[7]: null,
                     'mileage' => $row[8] ?  $row[8] : null,
-                    'load_type_id' =>  $loadType['id'],
-                    'trip_id' => $trip['id'],
+                    'load_type_id' =>  $row[9] ? $loadType['id']: null,
+                    'trip_id' => $row[10] ? $trip['id'] : null,
                     'customer_po' => $row[11],
                     'customer_name' => $row[12],
                     'status' => $row[13],
-                    'destination' => $trip['destination'],
-                    'destination_coords' => $trip['destination_coords'],
-                    'origin' => $trip['origin'],
-                    'origin_coords' => $trip['origin_coords'],
+                    'destination' =>  $row[10] ? $trip['destination']: null,
+                    'destination_coords' =>  $row[10] ? $trip['destination_coords']: null,
+                    'origin' =>  $row[10] ? $trip['origin']: null,
+                    'origin_coords' =>  $row[10] ? $trip['origin_coords']: null,
                     'box_type_id_init' => $row[14] ? $row[14] :null,
                     'box_type_id_end' => $row[15] ? $row[15] :null,
                     'unallocated_timestamp' =>$row[16] ? $row[16]: null,
@@ -1119,7 +1119,7 @@ class LoadController extends Controller
                     'finished_timestamp' =>$row[23]  ? $row[23]: null,
                 ];
                 // $this->validator($toValidate)->validate();
-                $valErrors = $this->validator($toValidate)->errors()->all();
+                $valErrors = $this->validator2($toValidate)->errors()->all();
              
 
                 if (count($valErrors) > 0) {
@@ -1197,7 +1197,8 @@ class LoadController extends Controller
             (new CompareLoadsErrorsExport($data['errors']))->store($publicPath);
             ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
             $result['errors_file'] = asset("storage/" . $path);
-            // dd($result['errors_file']);
+            $resultVar =  $result['errors_file'];
+            $result = ['success' => false ,$resultVar];
         }
         
         return $result;

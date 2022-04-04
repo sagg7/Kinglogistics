@@ -39,15 +39,7 @@ class CompareLoadsImport implements ToArray
         ]);
     }
 
-    private function transformDate($value, $format = 'Y-m-d')
-    {
-        try {
-            return \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
-        } catch (\ErrorException $e) {
-            return \Carbon\Carbon::createFromFormat($format, $value);
-        }
-    }
-
+ 
     /**
      * @param array $array
      */
@@ -73,14 +65,16 @@ class CompareLoadsImport implements ToArray
         $now = Carbon::now();
         $count = 0;
         $count2 = 0;
-
+        // dd($loads);
         foreach ($array as $key => $row) {
             //this is to remove the first row of xls uploaded Header
             if ($firtsLabel == true) {
                 $firtsLabel = false;
                 unset($array[$key]);
             }
+        
             foreach ($loads as $keyLoad => $load) {
+            
                 if (strval($row[0]) == $load->control_number) {
                     $columnMatch[] = $row;
                     unset($array[$key]);
