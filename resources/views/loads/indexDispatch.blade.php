@@ -763,7 +763,9 @@
                                 }
                             } else
                                 throwErrorMsg();
-
+                                if (res[0]) {
+                                    location.href = res[0];
+                                }
                         },
                         error: () => {
                             throwErrorMsg();
