@@ -192,13 +192,13 @@ class LoadController extends Controller
                     if ($data['notes'] === "finished") {
                         $data['status'] = 'finished';
                     } else {
-                        $data['status'] = 'accepted';
+                        $data['status'] = 'requested';
                     }
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
                     // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
-                    $data['driver_id'] ? $data['status'] = 'accepted' : $data['status'] = 'unallocated';
+                    $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
                 }
                 $data['control_number'] = $control_number_str . $control_number_int;
 
