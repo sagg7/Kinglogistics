@@ -46,7 +46,21 @@ class Rental extends Model
     {
         return $this->belongsTo(Trailer::class)->withTrashed();
     }
+    
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class)->withTrashed();
+    }  
 
+    public function deliveryUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'delivery_user_id', 'id')->withTrashed();
+    }  
+    
+    public function returnedUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_user_id', 'id')->withTrashed();
+    }
 
     public function inspectionItems()
     {

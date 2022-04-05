@@ -165,7 +165,7 @@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>{{ $category['name'] }}</th>
+                            <th>{{ $category['name'] }} @if($category['name'] == 'Inspector signature') {{($returnedFlag ? ($rental->returnedUser ? " - ".$rental->returnedUser->name : "") : ($rental->deliveryUser ? " - ".$rental->deliveryUser->name : "") )}} @elseif($category['name'] == 'Carrier signature') {{ $rental->carrier ? " - ".$rental->carrier->owner : ""}} @endif </th>
                         </tr>
                         </thead>
                         <tbody>
