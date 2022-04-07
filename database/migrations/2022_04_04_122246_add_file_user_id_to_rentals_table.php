@@ -17,7 +17,6 @@ class AddFileUserIdToRentalsTable extends Migration
             $table->unsignedBigInteger('user_id')->after('charge_date');
             $table->unsignedBigInteger('delivery_user_id')->after('user_id')->nullable();
             $table->unsignedBigInteger('returned_user_id')->after('delivery_user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
@@ -29,7 +28,6 @@ class AddFileUserIdToRentalsTable extends Migration
     public function down()
     {
         Schema::table('rentals', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
             $table->dropColumn('delivery_user_id');
             $table->dropColumn('returned_user_id');
