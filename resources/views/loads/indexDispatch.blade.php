@@ -959,8 +959,8 @@
                             <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>AVG waiting per load</th>
-                                <th>AVG aoad time</th>
+                                <th>AVG Waiting Per Load</th>
+                                <th>AVG Load Time</th>
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>
