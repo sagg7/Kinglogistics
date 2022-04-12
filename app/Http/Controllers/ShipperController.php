@@ -84,6 +84,7 @@ class ShipperController extends Controller
         $shipper->invoice_email = $request->invoice_email;
         $shipper->trucks_required = $request->trucks_required;
         $shipper->loads_per_invoice = $request->loads_per_invoice;
+        $shipper->type_rate = $request->type_rate;
         if ($request->password)
             $shipper->password = Hash::make($request->password);
         if ($request->payment_days)

@@ -81,6 +81,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('type_rate', ucfirst(__('type rate')), ['class' => 'col-form-label']) !!}
+                    {!! Form::select('type_rate', ['mileage' =>'mileage', 'mileage-tons'=> 'mileage-tons'], $shipper->type_rate ?? null, ['class' => 'form-control select2' . ($errors->first('type_rate') ? ' is-invalid' : '')]) !!}
+                    @error('type_rate')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

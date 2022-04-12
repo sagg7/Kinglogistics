@@ -14,6 +14,7 @@ use App\Models\LoadStatus;
 use App\Models\Shipper;
 use App\Models\Trip;
 use App\Models\Truck;
+use App\Models\Rate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
@@ -293,7 +294,16 @@ class LoadController extends Controller
             $q->where('id', session('broker'));
         })
             ->findOrFail($id);
+        $trip = Trip::with([
+            'shipper:id,type_rate',
+            'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
+
         $load->fill($request->all());
+
+        if($trip->shipper->type_rate == 'mileage-tons'){
+            $load->rate = $trip->rate->carrier_rate * $load->tons;
+            $load->shipper_rate =  $trip->rate->shipper_rate * $load->tons;
+        }
         return $load->update();
     }
 

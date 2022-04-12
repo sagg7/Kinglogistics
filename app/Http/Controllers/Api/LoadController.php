@@ -24,6 +24,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\Accounting\PaymentsAndCollection;
+use App\Models\Shipper;
+use App\Models\Rate;
 
 
 class LoadController extends Controller
@@ -306,7 +308,15 @@ class LoadController extends Controller
         $load->customer_reference = $request->get('sand_ticket');
         $load->weight = $request->get('weight');
         $load->silo_number = $request->get('silo_number');
+        $trip = Trip::with([
+            'shipper:id,type_rate',
+            'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
         $load->tons = (float)$request->get('weight') / 2000;
+        if($trip->shipper->type_rate == 'mileage-tons'){
+            $load->rate = $trip->rate->carrier_rate * $load->tons;
+            $load->shipper_rate =  $trip->rate->shipper_rate * $load->tons;
+        }
+        
         $load->update();
 
         $loadStatus = $this->switchLoadStatus($loadId, LoadStatusEnum::TO_LOCATION);
