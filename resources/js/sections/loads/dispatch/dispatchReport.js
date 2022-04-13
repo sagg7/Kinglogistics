@@ -40,8 +40,8 @@ function getDispatchReport() {
                 'worked_time':$("params.worked_time").val(),
                 'dispatch_score':$("params.dispatch_score").val(),
                 'score_app_usage':$("params.score_app_usage").val(),
-                 'well_status':$("params.well_status").val(),
-                 'description':$("params.description").val(),
+                'well_status':$("params.well_status").val(),
+                'description':$("params.description").val(),
             } ,
 
                 success: (res) => {
@@ -84,9 +84,9 @@ function getDispatchReport() {
                         `</div><br>` +
                         `<div class="row">` +
                         `<div class="col-md-3">Well Status</div>` +
-                        `<div class="col-md-3">${res.well_status}</div>` +
+                        `<div class="col-md-9">${res.well_status}</div>` +
                         `<div class="col-md-3">Description</div>` +
-                        `<div class="col-md-3">${res.description}</div>` +
+                        `<div class="col-md-9">${res.description}</div>` +
                         `</div><br>`
                     )
 
