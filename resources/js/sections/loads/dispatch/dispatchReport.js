@@ -83,15 +83,12 @@ function getDispatchReport() {
                         `<div class="col-md-3">${res.dispatch_score}</div>` +
                         `</div><br>` +
                         `<div class="row">` +
-                        `<div class="col-md-3">Well Status</div>` +
-                        `<div class="col-md-9">${res.well_status}</div>` +
-                        `<div class="col-md-3">Description</div>` +
-                        `<div class="col-md-9">${res.description}</div>` +
+                        `<div class="col-md-3"><p>Well Status:</p></div>` +
+                        `<div class="col-md-12"><p>${res.well_status}</p></div>` +
+                        `<div class="col-md-3"><p>Description:</p></div>` +
+                        `<div class="col-md-12"><p>${res.description}</p></div>` +
                         `</div><br>`
                     )
-
-
-
                 },
                 error: () => {
                     throwErrorMsg();
