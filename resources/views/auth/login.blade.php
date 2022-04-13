@@ -1,66 +1,71 @@
 <x-guest-layout>
     @section('scripts')
-        <script defer>
+        <script>
             (() => {
-                let form = document.getElementsByTagName('form')[0];
-                form.addEventListener("submit", () => {
-                    let input = document.createElement("input");
-                    input.setAttribute("type", "hidden");
-                    input.setAttribute("name", "timezone");
-                    input.setAttribute("value", `${moment.tz.guess()}`);
-                    form.appendChild(input);
+                const form = $('form');
+                form.submit((e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form[0]);
+                    formData.append('timezone', moment.tz.guess());
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (res) => {
+                            if (res.success) {
+                                window.location = res.route;
+                            }
+                        },
+                        error: (res) => {
+                            let errors = `<ul class="text-left">`;
+                            Object.values(res.responseJSON.errors).forEach((error) => {
+                                errors += `<li>${error}</li>`;
+                            });
+                            errors += `</ul>`;
+                            throwErrorMsg(errors);
+                        }
+                    });
                 });
             })();
         </script>
     @endsection
+    <form method="POST" action="{{ route('login') }}">
+    @csrf
 
-    <x-auth-card>
+        <h1 class="main-title mb-1">WELCOME</h1>
+        <h5 class="mt-0 mb-5">Please fill in the following fields:</h5>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
+        <!-- Email Address -->
+        <div class="form-group">
+            {!! Form::email('email', null, ['class' => 'form-control' . ($errors->first('type') ? ' is-invalid' : ''), 'placeholder' => 'Email']) !!}
+            <span class="input-focus-after"></span>
+        </div>
 
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+        <!-- Password -->
+        <div class="form-group">
+            {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Password']) !!}
+            <span class="input-focus-after"></span>
+        </div>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <!-- Email Address -->
-            <div>
-                <x-label for="email" :value="__('Email')" />
-
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <x-label for="password" :value="__('Password')" />
-
-                <x-input id="password" class="block mt-1 w-full"
-                                type="password"
-                                name="password"
-                                required autocomplete="current-password" />
-            </div>
-
-            <!-- Remember Me -->
-            <div class="block mt-4">
+        <div class="row mt-4 mb-4">
+            <div class="col">
+                <!-- Remember Me -->
                 <label for="remember_me" class="inline-flex items-center">
-                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                    {!! Form::checkbox('remember', null, false, ['class' => 'form-check-input', 'id' => 'remember']) !!}
+                    {!! Form::label('remember', 'Remember me',['class' => 'form-check-label']) !!}
                 </label>
             </div>
-
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
+            <div class="col text-end">
+                @if(Route::has('password.request'))
+                    <a class="link-secondary" href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif
-
-                <x-button class="ml-3">
-                    {{ __('Log in') }}
-                </x-button>
             </div>
-        </form>
-    </x-auth-card>
+        </div>
+
+        {!! Form::submit('LOG IN', ['class' => 'btn btn-primary ps-5 pe-5 pt-3 pb-3']) !!}
+    </form>
 </x-guest-layout>

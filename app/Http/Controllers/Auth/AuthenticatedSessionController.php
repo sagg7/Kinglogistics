@@ -45,6 +45,10 @@ class AuthenticatedSessionController extends Controller
     {
         $this->attemptLogin($request);
 
+        if ($request->ajax()) {
+            return ['success' => true, 'route' => RouteServiceProvider::HOME];
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

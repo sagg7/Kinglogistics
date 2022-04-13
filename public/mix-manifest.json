@@ -1,3 +1,4 @@
 {
-    "/js/sections/loads/dispatch/dispatchReport.min.js": "/js/sections/loads/dispatch/dispatchReport.min.js"
+    "/js/guest/app.min.js": "/js/guest/app.min.js",
+    "/css/guest/app.min.css": "/css/guest/app.min.css"
 }

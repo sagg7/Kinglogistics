@@ -1,106 +1,164 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
-        <link rel="icon" href="{{ asset('images/app/logos/icon.png') }}" type="image/x-icon">
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ asset('images/app/logos/icon.png') }}" type="image/x-icon">
 
-        <!-- Fonts -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
-        <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('css/guest/app.css') }}">
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('css/guest/app.min.css') }}">
+    <link rel="stylesheet" href="{{ asset("app-assets/vendors/css/extensions/sweetalert2.min.css") }}">
+    <link rel="stylesheet" href="{{ asset("app-assets/vendors/css/extensions/sweetalert2.min.css") }}">
+    <style>
+        @font-face {
+            font-family: SquareOneBold;
+            src: url("/css/guest/fonts/SquareOneBold.otf");
+        }
 
-        <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
-        <style>
-            body {
-                background: url("/images/guest/backgrounds/guest-bg.jpg") no-repeat center center;
-                background-size: cover;
+        body {
+            color: #919191;
+        }
+
+        main > .row {
+            height: 100vh;
+        }
+
+        .main-title {
+            font-size: 6em;
+            font-family: SquareOneBold;
+            color: #53abdf;
+        }
+
+        input[type=email], input[type=password] {
+            border-radius: 0;
+            border-width: 2px;
+            border-color: #dbdbdb;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            position: relative;
+        }
+
+        input[type=email]:focus, input[type=password]:focus {
+            border-color: #dbdbdb;
+            box-shadow: none;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .input-focus-after {
+            position: absolute;
+            z-index: 1;
+            left: 2px;
+            top: 2px;
+            height: calc(100% - 4px);
+            background-color: #3da2dc;
+            transition: all 200ms ease-in;
+            opacity: 0;
+        }
+
+        input[type=email]:focus + .input-focus-after, input[type=password]:focus + .input-focus-after {
+            width: 4px;
+            opacity: 1;
+        }
+
+        input[type=submit] {
+            background-image: linear-gradient(to right, #3da2dc, #3d6cdc);
+            border-radius: 0;
+            border: 0;
+        }
+
+        #right-logo {
+            max-width: 295px;
+            position: absolute;
+        }
+
+        #right-logo > img:nth-of-type(2) {
+            display: none;
+        }
+
+        #bg-image {
+            position: fixed;
+            left: 0;
+            top: 0;
+            margin-left: calc(50% - 60px);
+            z-index: -1;
+            height: 100%;
+        }
+
+        @media (max-width: 1200px) {
+            .main-title {
+                font-size: 5em;
             }
-            .right-divider-deco {
-                position: fixed;
-                top: 0;
-                right: 6vw;
-                height: 100%;
-                border-right: 2px solid #263136;
-                transition: all 300ms ease;
+        }
+
+        @media (max-width: 992px) {
+            .main-title {
+                font-size: 5em;
             }
-            .right-divider-deco:after{
-                content: "=";
-                position: absolute;
-                right: calc(-3vw - 4px);
-                color: white;
-                top: 50%;
-                transform: translate(50%, -50%);
-                font-size: 80px;
-                font-family: serif;
-                font-weight: bold;
+
+            main > .row > div:nth-of-type(2) {
+                display: none;
             }
-            .divider-thick-deco {
-                position: absolute;
-                right: -3px;
-                width: 6px;
-                background-color: white;
-            }
-            .divider-top-deco {
-                top: 3vw;
-                height: 8vw;
-            }
-            .divider-bottom-deco {
-                bottom: 3vw;
-                height: 6px;
-            }
-            footer {
-                width: 100%;
-                position: fixed;
-                bottom: 0;
-                margin-bottom: 10vh;
-                display: block;
-            }
-            footer .container {
-                padding: 0 50px;
-            }
-            .triangle-deco {
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                border-top: 5vw solid transparent;
-                border-bottom: 5vw solid transparent;
-                border-left: 5vw solid white;
-                z-index: -1;
-                transition: all 300ms ease;
-            }
-            #footer-images div[class^=flex]:nth-child(2) img {
+
+            #bg-image {
+                left: auto;
+                right: 0;
+                height: 110%;
                 margin-left: auto;
             }
-        </style>
-    </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+
+            #right-logo > img:nth-of-type(1) {
+                display: none;
+            }
+            #right-logo > img:nth-of-type(2) {
+                display: block;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .main-title {
+                font-size: 5em;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <div id="right-logo" class="mt-5">
+        <img class="img-fluid" src="{{ asset('/images/allstar/logo.png') }}" alt="ALLSTAR">
+        <img class="img-fluid" src="{{ asset('/images/allstar/logo3.png') }}" alt="ALLSTAR">
+    </div>
+    <div class="row align-items-center">
+        <div class="col-lg-4 col-md-12 col-12">
             {{ $slot }}
         </div>
-        <div class="right-divider-deco hidden sm:block">
-            <div class="divider-thick-deco divider-top-deco"></div>
-            <div class="divider-thick-deco divider-bottom-deco"></div>
+        <div class="offset-lg-2 col-lg-6 col-md-0">
+            <img class="img-fluid" src="{{ asset('/images/allstar/logo2.png') }}" alt="ALLSTAR">
         </div>
-        <footer>
-            <div class="triangle-deco"></div>
-            <div class="container mx-auto">
-                <div class="flex" id="footer-images">
-                    <div class="flex-1">
-                        <img src="/images/guest/logos/improving.png" alt="We are always improving for you." class="">
-                    </div>
-                    <div class="flex-1">
-                        <img src="/images/app/logos/logo-light.png" alt="King Logistic Oil LLC">
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </body>
-    @yield('scripts')
+    </div>
+    <img id="bg-image" src="{{ asset('/images/guest/backgrounds/allstar.png') }}" alt="Background">
+</main>
+<!-- Scripts -->
+<script src="{{ asset('/js/guest/jquery-3.6.0.min.js') }}" type="application/javascript"></script>
+<script src="{{ asset('/js/guest/app.min.js') }}" type="application/javascript"></script>
+<script src="{{ asset('/app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
+<script src="{{ asset('/app-assets/js/scripts/extensions/sweet-alerts.min.js') }}"></script>
+<script src="{{ asset('/js/section/master/globalFunctions.js') }}" type="application/javascript"></script>
+<script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+</script>
+@yield("scripts")
+</body>
 </html>
