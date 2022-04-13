@@ -173,7 +173,8 @@ trait GenerateLoads
     private function notifyToDriver($driverId, $load)
     {
         $driver = Driver::find($driverId);
-
+        $driver->status = 'active';
+        $driver->save();
         $driver->notify(new LoadAssignment($driver, $load));
     }
 }
