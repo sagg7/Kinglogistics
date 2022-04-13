@@ -68,6 +68,6 @@ class DriverLocationUpdateForKing implements ShouldBroadcastNow
     public function broadcastOn()
     {
         // Only users authenticated as admins can join this channel
-        return new PrivateChannel('driver-location-king' . $this->broker->id);
+        return new PrivateChannel('driver-location-king.' . $this->broker->id);
     }
 }
