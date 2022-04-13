@@ -121,17 +121,17 @@ class CarrierController extends Controller
      * @throws ValidationException
      */
     public function store(Request $request)
-    {
+    {   
         $this->validator($request->all())->validate();
 
-        DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
             $carrier = $this->storeUpdate($request);
             $request->merge(['id' => $carrier->id]);
             $request->merge(['status' => 'prospect']);
             $this->setStatus($request);
+            return ['success' => true, 'data' => $carrier];
         });
 
-        return redirect()->route('carrier.index');
     }
 
     public function getCarrierData(int $id)

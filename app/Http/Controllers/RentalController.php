@@ -91,7 +91,6 @@ class RentalController extends Controller
                 $rental->broker_id = session('broker');
                 $rental->status = 'uninspected';
             }
-
             $rental->trailer_id = $request->trailer_id;
             $rental->carrier_id = $request->carrier_id;
             $rental->driver_id = $request->driver_id;
@@ -100,6 +99,7 @@ class RentalController extends Controller
             $rental->deposit = $request->deposit;
             $rental->deposit_is_paid = $request->is_paid ?? null;
             $rental->period = $request->period;
+            $rental->user_id = auth()->user()->id;
             $rental->save();
 
             if ($rental->status !== 'finished') {
@@ -333,6 +333,7 @@ class RentalController extends Controller
         $rental->inspectionItems()->sync($inspection_items);
         $rental->delivered_at = Carbon::now();
         $rental->status = 'delivered';
+        $rental->delivery_user_id = auth()->user()->id;
         $rental->save();
         $jsonData = [
             'id' => $rental->id,
@@ -479,10 +480,11 @@ class RentalController extends Controller
         $rental->inspectionItemsReturned()->sync($inspection_items);
         $rental->finished_at = Carbon::now();
         $rental->status = 'finished';
+        $rental->returned_user_id = auth()->user()->id;
         $rental->save();
         $rental->trailer->status = TrailerEnum::AVAILABLE;
         $rental->trailer->save();
-
+        
         return response()->json([
             'msg' => 'Rental terminated correctly',
             'success' => true
@@ -651,27 +653,29 @@ class RentalController extends Controller
     private function generatePDF($idx, $returnedFlag = false)
     {
         $withRelations = [
-            'carrier:id,name',
+            'carrier:id,name,owner',
             'trailer:id,number',
             'driver:id,name',
             'inspectionItems',
+            'user:id,name',
         ];
         if ($returnedFlag) {
             $withRelations[] = 'inspectionItemsReturned';
             $withRelations['broker'] = function ($q) {
                 $q->with('config:broker_id,rental_inspection_check_out_annex');
             };
+            $withRelations[] = 'returnedUser:id,name';
         } else {
             $withRelations['broker'] = function ($q) {
                 $q->with('config:broker_id,rental_inspection_check_in_annex');
             };
+            $withRelations[] = 'deliveryUser:id,name';
         }
         $rental = Rental::with($withRelations)
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             })
             ->findOrFail($idx);
-
         $categories = InspectionCategory::orderBy('position')
             ->get(['id', 'name', 'position', 'options'])
             ->keyBy('id')
@@ -711,10 +715,12 @@ class RentalController extends Controller
                     $item['return_data'] = $itemsDelivery[$idx]['pivot'];
                 }
             }
+            
             switch ($item["id"]) {
                 case 38:
                     $car_type = array_column(json_decode($item["pivot"]["option_value"]), 'car_type')[0];
                     $item["pivot"]['coords_template'] = $createEdit["coordsTemplates"][$car_type];
+                    
                     break;
                 default:
                     break;
@@ -726,7 +732,6 @@ class RentalController extends Controller
         $fmt = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
         $rental->cost = numfmt_format_currency($fmt, $rental->cost, 'USD');
         $rental->deposit = numfmt_format_currency($fmt, $rental->deposit, 'USD');
-
         $companyLogo = asset('images/app/logos/logo.png');
         $params = compact('companyLogo', 'rental', 'categories', 'returnedFlag');
         return view('exports.rentals.inspection', $params);

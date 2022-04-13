@@ -145,7 +145,10 @@ class TruckController extends Controller
 
         $this->storeUpdate($request);
 
-        return redirect()->route('truck.index');
+        if ($request->ajax())
+            return ['success' => true, 'data' => $request->all()];
+        else
+            return redirect()->route('truck.index');
     }
 
     /**

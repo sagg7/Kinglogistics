@@ -27,21 +27,24 @@ class TrailerController extends Controller
      */
     private function validator(array $data, int $id = null)
     {
-        return Validator::make($data, [
-            'trailer_type_id' => ['required', 'exists:trailer_types,id'],
-            'chassis_type_id' => ['required', 'exists:chassis_types,id'],
-            'shipper_id' => ['nullable', 'exists:shippers,id'],
-            'number' => ['required', 'string', 'max:255', "unique:trailers,number,$id,id"],
-            'plate' => ['nullable', 'string', 'max:255'],
-            'vin' => ['nullable', 'string', 'max:255'],
-            'shippers' => ['nullable', 'array', 'exists:shippers,id'],
-            //'status' => ['required'],
-        ],
-        [],
-        [
-            'trailer_type_id' => 'trailer type',
-            'chassis_type_id' => 'chassis type',
-        ]);
+        return Validator::make(
+            $data,
+            [
+                'trailer_type_id' => ['required', 'exists:trailer_types,id'],
+                'chassis_type_id' => ['required', 'exists:chassis_types,id'],
+                'shipper_id' => ['nullable', 'exists:shippers,id'],
+                'number' => ['required', 'string', 'max:255', "unique:trailers,number,$id,id"],
+                'plate' => ['nullable', 'string', 'max:255'],
+                'vin' => ['nullable', 'string', 'max:255'],
+                'shippers' => ['nullable', 'array', 'exists:shippers,id'],
+                //'status' => ['required'],
+            ],
+            [],
+            [
+                'trailer_type_id' => 'trailer type',
+                'chassis_type_id' => 'chassis type',
+            ]
+        );
     }
 
     /**
@@ -50,13 +53,13 @@ class TrailerController extends Controller
     private function createEditParams(): array
     {
         return [
-                'trailer_types' => [null => ''] + TrailerType::whereHas('broker', function ($q) {
-                        $q->where('id', session('broker'));
-                    })
-                        ->pluck('name', 'id')->toArray(),
-                'chassis_types' => [null => ''] + ChassisType::pluck('name', 'id')->toArray(),
-                'statuses' => [null => ''] + [TrailerEnum::AVAILABLE => 'Available', TrailerEnum::RENTED => 'Rented', TrailerEnum::OUT_OF_SERVICE => 'Ouf of service'],
-            ] + $this->getPaperworkByType("trailer");
+            'trailer_types' => [null => ''] + TrailerType::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->pluck('name', 'id')->toArray(),
+            'chassis_types' => [null => ''] + ChassisType::pluck('name', 'id')->toArray(),
+            'statuses' => [null => ''] + [TrailerEnum::AVAILABLE => 'Available', TrailerEnum::RENTED => 'Rented', TrailerEnum::OUT_OF_SERVICE => 'Ouf of service'],
+        ] + $this->getPaperworkByType("trailer");
     }
 
     /**
@@ -194,7 +197,7 @@ class TrailerController extends Controller
         if ($trailer) {
             $message = '';
             //if ($trailer->rentals()->first())
-             //   $message .= "•" . $this->generateCrudMessage(4, 'Trailer') . "<br>";
+            //   $message .= "•" . $this->generateCrudMessage(4, 'Trailer') . "<br>";
             if ($message)
                 return ['success' => false, 'msg' => $message];
             else
@@ -209,6 +212,7 @@ class TrailerController extends Controller
      */
     public function selection(Request $request): array
     {
+
         $query = Trailer::select([
             'id',
             'number as text',
@@ -228,6 +232,10 @@ class TrailerController extends Controller
                     $q->where('status', TrailerEnum::AVAILABLE);
             })
             ->whereNull("inactive");
+        if ($request->carrier)
+            $query->whereHas('rentals', function ($q) use ($request) {
+                $q->where("carrier_id", $request->carrier);
+            });
 
         return $this->selectionData($query, $request->take, $request->page);
     }
@@ -314,7 +322,7 @@ class TrailerController extends Controller
             'chassis_type:id,name',
             'rentals' => function ($q) {
                 $q->where('status', '!=', 'finished')
-                ->with(['carrier:id,name','driver:id,name']);
+                    ->with(['carrier:id,name', 'driver:id,name']);
             }
         ])
             ->whereHas('broker', function ($q) {

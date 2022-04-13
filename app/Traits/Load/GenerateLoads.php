@@ -8,6 +8,7 @@ use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadStatus;
 use App\Models\Trip;
+use App\Models\Shipper;
 use App\Notifications\LoadAssignment;
 use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
@@ -79,7 +80,9 @@ trait GenerateLoads
                 $load = new Load();
                 $load->broker_id = $data['broker_id'];
             }
-
+            if($trip->shipper_id){
+                $shipper = Shipper::find($trip->shipper_id);
+            }
             $load->shipper_id = $trip->shipper_id;
             $load->load_type_id = $data["load_type_id"];
             if (isset($data['driver_id'])) {
@@ -109,12 +112,16 @@ trait GenerateLoads
                 // If all corresponding data to get the rate is set, then get the rate
                 if (isset($data["mileage"]) && $data["shipper_id"] && $zone_id) {
                     $rate = $this->getRate($data["mileage"], $data["shipper_id"], $zone_id)["rate"];
-                    $load->rate = $rate->carrier_rate ?? null;
-                    $load->shipper_rate = $rate->shipper_rate ?? null;
+                    if($shipper->type_rate == "mileage-tons" && $load->tons != null){
+                        $load->rate = $rate->carrier_rate * $load->tons ?? null;
+                        $load->shipper_rate = $rate->shipper_rate * $load->tons ?? null;
+                    }else{
+                        $load->rate = $rate->carrier_rate ?? null;
+                        $load->shipper_rate = $rate->shipper_rate  ?? null;
+                    }
                 }
             }
             $load->notes = $data["notes"] ?? null;
-
             if (isset($data['status']))
                 $load->status = $data["status"];
             $load->save();
@@ -141,7 +148,7 @@ trait GenerateLoads
 
                 $loadStatus->save();
             }
-
+          
             /**
              * As the ID's in data property are Strings, we must reload the load to automatically convert the ids to valid int types
              * This small fix were added to avoid type issues in the mobile app.
@@ -159,7 +166,7 @@ trait GenerateLoads
                 if (!empty($availableDriver))
                     $availableDriver->delete();
             }
-
+            
             return $load;
         });
     }

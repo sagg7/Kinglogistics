@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\LoadUpdate;
 use App\Exports\LoadsExport;
+use App\Models\LoadType;
 use App\Exports\TemplateExport;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
@@ -12,6 +13,8 @@ use App\Models\LoadLog;
 use App\Models\LoadStatus;
 use App\Models\Shipper;
 use App\Models\Trip;
+use App\Models\Truck;
+use App\Models\Rate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
@@ -22,8 +25,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
+use App\Jobs\ProcessDeleteFileDelayed;
+use App\Exports\CompareLoadsErrorsExport;
+use App\Imports\CompareLoadsImport;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use \Foo\Bar;
+use Illuminate\Support\Facades\Validator;
+
 
 class LoadController extends Controller
 {
@@ -153,48 +163,45 @@ class LoadController extends Controller
             $data['load_log_id'] = $load_log->id;
             $control_number = $request->control_number;
             $rest = substr($control_number, -1);
-            $rest2 = substr($control_number, -2,1);
-            $rest3 = substr($control_number, -3,1);
+            $rest2 = substr($control_number, -2, 1);
+            $rest3 = substr($control_number, -3, 1);
             $patron = '/([0-9])+$/';
 
-                  
-             if(preg_match($patron,$rest)) {
-                if(preg_match($patron,$rest2)){
-                    if(preg_match($patron,$rest3)){
+
+            if (preg_match($patron, $rest)) {
+                if (preg_match($patron, $rest2)) {
+                    if (preg_match($patron, $rest3)) {
                         $control_number_int =  substr($control_number, -3);
                         $control_number_str = substr($control_number, 0, -3);
-                        
-                    }else{
-                        $control_number_int= substr($control_number, -2);
-                        $control_number_str = substr($control_number, 0, -2); 
-                     }
-                }else{
-                   $control_number_int= $rest;
-                   $control_number_str = substr($control_number, 0, -1); 
-               
+                    } else {
+                        $control_number_int = substr($control_number, -2);
+                        $control_number_str = substr($control_number, 0, -2);
+                    }
+                } else {
+                    $control_number_int = $rest;
+                    $control_number_str = substr($control_number, 0, -1);
                 }
-             } else {
-                $control_number_str = $control_number; 
+            } else {
+                $control_number_str = $control_number;
                 $control_number_int = 0;
-               
-             } 
+            }
 
-                 
+
             for ($i = 0; $i < $request->load_number; $i++) {
                 if (isset($request->driver_id)) { //temporary
                     $data['driver_id'] = $request->driver_id;
                     if ($data['notes'] === "finished") {
                         $data['status'] = 'finished';
                     } else {
-                        $data['status'] = 'accepted';
+                        $data['status'] = 'requested';
                     }
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
                     // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
-                    $data['driver_id'] ? $data['status'] = 'accepted' : $data['status'] = 'unallocated';
+                    $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
                 }
-                $data['control_number'] = $control_number_str.$control_number_int;
+                $data['control_number'] = $control_number_str . $control_number_int;
 
                 $data['broker_id'] = session('broker');
                 $load = $this->storeUpdate($data);
@@ -203,7 +210,6 @@ class LoadController extends Controller
 
                 event(new LoadUpdate($load));
             }
-          
         });
 
         if ($request->ajax()) {
@@ -288,7 +294,16 @@ class LoadController extends Controller
             $q->where('id', session('broker'));
         })
             ->findOrFail($id);
+        $trip = Trip::with([
+            'shipper:id,type_rate',
+            'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
+
         $load->fill($request->all());
+
+        if($trip->shipper->type_rate == 'mileage-tons'){
+            $load->rate = $trip->rate->carrier_rate * $load->tons;
+            $load->shipper_rate =  $trip->rate->shipper_rate * $load->tons;
+        }
         return $load->update();
     }
 
@@ -391,7 +406,7 @@ class LoadController extends Controller
     }
 
 
-   
+
 
     /**
      * @param Request $request
@@ -563,7 +578,7 @@ class LoadController extends Controller
                     'customer_po' => $item->customer_po,
                     'shipper' => $item->shipper->name,
                     'status' => ucfirst($item->status),
-                    'load_time' =>  $this->msToTime(($item->finished_timestamp ? Carbon::parse($item->accepted_timestamp)->diffInMinutes($item->finished_timestamp) : Carbon::parse($item->accepted_timestamp)->diffInMinutes($now))*60*1000, false),
+                    'load_time' =>  $this->msToTime(($item->finished_timestamp ? Carbon::parse($item->accepted_timestamp)->diffInMinutes($item->finished_timestamp) : Carbon::parse($item->accepted_timestamp)->diffInMinutes($now)) * 60 * 1000, false),
                 ];
             }
             return (new TemplateExport([
@@ -572,7 +587,7 @@ class LoadController extends Controller
                     "Accepted Timestamp", "Finished Timestamp", "Truck #", "Driver", "Carrier", "Control #", "C Reference", "BOL", "Tons", "Milage", "Load Type", "Job",  "PO",
                     "Customer", "Status", "Load Time"
                 ],
-            ]))->download("Rentals - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+            ]))->download("Loads - " . Carbon::now()->format('m-d-Y') . ".xlsx");
         }
 
         return $this->multiTabSearchData($query, $request, 'getRelationArray');
@@ -597,7 +612,7 @@ class LoadController extends Controller
         else
             return "$minutes m $secs";
     }
-   
+
 
     public function replacePhoto(Request $request, $id, $type)
     {
@@ -810,11 +825,12 @@ class LoadController extends Controller
             return ['success' => false];
     }
 
-    public function finishLoad($id){
+    public function finishLoad($id)
+    {
         $load = Load::find($id);
         $loadStatus = LoadStatus::where('load_id', $id)->first();
 
-        switch ($load->status){
+        switch ($load->status) {
             case "unallocated":
             case "requested":
                 return ['success' => false, 'message' => "you cannot finish a load without assigning a driver"];
@@ -852,5 +868,350 @@ class LoadController extends Controller
         $load->save();
         $loadStatus->save();
         return ['success' => true, 'load' => $load];
+    }
+
+    public function uploadCompareLoadExcel(Request $request)
+    {
+
+        $import = new CompareLoadsImport($request->dateRange, $request->shipper);
+        Excel::import($import, $request->fileExcel);
+        $data = $import->data;
+
+        $result = ['success' => true, 'dataFile' => $data];
+
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Compare_Loads_Excel_Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new CompareLoadsErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset("storage/" . $path);
+        }
+
+        return $result;
+    }
+
+    public function downloadXLSInternal(Request $request)
+    {
+//dd(explode(",",str_replace(["[","]"], ["",""], $request->array)));
+        $loadsIds = json_decode($request->array);
+
+        $load = Load::with([
+            'driver' => function ($q) {
+                $q->with([
+                    'carrier:id,name',
+                ])
+                    ->select([
+                        'drivers.id',
+                        'drivers.name',
+                        'drivers.carrier_id',
+                    ]);
+            },
+            'truck:id,number',
+            'shipper:id,name',
+            'load_type:id,name',
+            'trip:id,name',
+            'loadStatus'
+        ])
+            ->whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+            ->whereIn('id', $loadsIds)
+            ->get();
+
+
+            $arrayLoad = array();
+
+            foreach ($loadsIds  as $key => $arrays) {
+                foreach ($load as $keyLoad => $loads) {
+                    if ($arrays == $loads->id) {
+                        $arrayLoad[] = $loads;
+                        break 1;
+                    }
+                }
+            }
+
+            if (count($arrayLoad) === 0)
+                return redirect()->back()->withErrors('There are no loads to generate the document');
+        $data = [];
+        foreach ($arrayLoad as $load) {
+            $data[] = [
+                'control_number' => $load->control_number,
+                'truck_number' => $load->truck ? $load->truck->number  : null,
+                'driver_name' => $load->driver ? $load->driver->name : null,
+                'carrier' => $load->driver ? $load->driver->carrier->name : null,
+                'customer_reference' => $load->customer_reference ? $load->customer_reference : null,
+                'bol' => $load->bol ? $load->bol : null,
+                'weight' => $load->weight ? $load->weight : null,
+                'tons'  => $load->tons ? $load->tons: null,
+                'mileage' => $load->mileage ?  $load->mileage : null,
+                'load_type' =>  $load->load_type->name,
+                'job' => $load->trip ? $load->trip->name :null,
+                'PO' => $load->customer_po,
+                'customer_name' => $load->customer_name,
+                'status' => $load->status,
+                'box_type_id_init' => $load->box_type_id_init ? $load->box_type_id_init :null,
+                'box_type_id_end' => $load->box_type_id_end ? $load->box_type_id_end :null,
+                'unallocated_timestamp' => $load->loadStatus ? $load->loadStatus->unallocated_timestamp: null,
+                'requested_timestamp' => $load->loadStatus ? $load->loadStatus->requested_timestamp: null,
+                'accepted_timestamp' => $load->loadStatus ? $load->loadStatus->accepted_timestamp: null,
+                'loading_timestamp' => $load->loadStatus ? $load->loadStatus->loading_timestamp: null,
+                'to_location_timestamp' => $load->loadStatus ? $load->loadStatus->to_location_timestamp: null,
+                'arrived_timestamp' => $load->loadStatus  ? $load->loadStatus->arrived_timestamp: null,
+                'unloading_timestamp' => $load->loadStatus  ? $load->loadStatus->unloading_timestamp: null,
+                'finished_timestamp' => $load->loadStatus  ? $load->loadStatus->finished_timestamp: null,
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+        "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp", "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
+            "formats" => [
+                // 'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("Internal loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+
+        return $request;
+    }
+
+
+    public function downloadXLSExternal(Request $request)
+    {
+        $loads = json_decode($request->array);
+        $arrayobj = count(get_object_vars($loads));
+        if ($arrayobj === 0)
+           return redirect()->back()->withErrors('There are no loads to generate the document');
+        $data = [];
+        foreach ($loads as $key => $row) {
+            $data[] = [
+                'control_number' => $row[0],
+                'truck_number' => $row[1] ? $row[1]  : null,
+                'driver_name' => $row[2] ? $row[2] : null,
+                'carrier' => $row[3] ? $row[3] : null,
+                'customer_reference' => $row[4] ? $row[4]: null,
+                'bol' => $row[5] ? $row[5] : null,
+                'weight' => $row[6] ? $row[6] : null,
+                'tons'  => $row[7] ? $row[7]: null,
+                'mileage' => $row[8] ?  $row[8] : null,
+                'load_type' =>  $row[9],
+                'job' => $row[10] ? $row[10] :null,
+                'PO' => $row[11],
+                'customer_name' => $row[12],
+                'status' => $row[13],
+                'box_type_id_init' => $row[14] ? $row[14] :null,
+                'box_type_id_end' => $row[15] ? $row[15] :null,
+                'unallocated_timestamp' =>$row[16] ? $row[16]: null,
+                'requested_timestamp' => $row[17] ? $row[17] : null,
+                'accepted_timestamp' => $row[18] ? $row[18]: null,
+                'loading_timestamp' => $row[19] ? $row[19]: null,
+                'to_location_timestamp' => $row[20] ? $row[20]: null,
+                'arrived_timestamp' => $row[21]  ? $row[21]: null,
+                'unloading_timestamp' => $row[22] ? $row[22]: null,
+                'finished_timestamp' =>$row[23]  ? $row[23]: null,
+            ];
+        }
+
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+             "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp", "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
+            "formats" => [
+                // 'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
+            ],
+        ]))->download("External loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+
+
+        return $request;
+    }
+
+    public function downloadTmpXLS()
+    {
+        $data = [];
+        return (new TemplateExport([
+            "data" => $data,
+            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+             "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp",
+            "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
+        ]))->download("Loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");
+    }
+
+    private function validator2(array $data)
+    {
+        return Validator::make($data, [
+            'shipper_id' => ['required', 'exists:shippers,id'],
+            'trip_id' => ['required', 'exists:trips,id'],
+            'truck_id' => ['nullable', 'exists:trucks,id'],
+            'load_type_id' => ['required', 'exists:load_types,id'],
+            'driver_id' => ['nullable', 'exists:drivers,id'],
+            'date' => ['required', 'date'],
+            'control_number' => ['required'],
+            'origin' => ['required', 'string', 'max:255'],
+            'origin_coords' => ['required', 'string', 'max:255'],
+            'destination' => ['required', 'string', 'max:255'],
+            'destination_coords' => ['required', 'string', 'max:255'],
+            'customer_name' => ['required', 'string', 'max:255'],
+            // 'customer_po' => ['nullable', 'string', 'max:255'],
+            'customer_reference' => ['nullable', 'string', 'max:255'],
+            'tons' => ['nullable', 'string', 'max:255'],
+            'weight' => ['nullable', 'numeric'],
+            // 'bol' => ['nullable', 'string', 'max:255'],
+            'mileage' => ['nullable', 'numeric'],
+            'status' => ['required'],
+            'box_type_id_init' => ['nullable', 'numeric'],
+            'box_type_id_end' => ['nullable', 'numeric'],
+            'unallocated_timestamp' => ['nullable', 'date'],
+            'requested_timestamp' => ['nullable', 'date'],
+            'accepted_timestamp' => ['nullable', 'date'],
+            'loading_timestamp' => ['nullable', 'date'],
+            'to_location_timestamp' => ['nullable', 'date'],
+            'arrived_timestamp' => ['nullable', 'date'],
+            'unloading_timestamp' => ['nullable', 'date'],
+            'finished_timestamp' => ['nullable', 'date'],
+        ], [
+            'origin_coords.required' => 'The origin map location is required',
+            'destination_coords.required' => 'The destination map location is required',
+        ]);
+    }
+
+    public function createLoadsExternal(Request $request){
+        $formatted = [];
+        $errors = [];
+        $headers = [];
+        $data = null;
+
+        $loadsExt = json_decode($request->array);
+        $loadExtArry = get_object_vars($loadsExt[0]);
+        $arrayobj = count($loadsExt);
+        if ($arrayobj === 0){
+            return redirect()->back()->withErrors('There are no loads to generate the document');   
+                        }
+
+             foreach ($loadExtArry as $key => $row) {
+            if($row[1]){$truck = Truck::where('number','LIKE','%'.$row[1].'%')->first();}
+            if($row[2]){$driver = Driver::where('name','LIKE','%'.$row[2].'%')->first(); }
+            // LoadType and Trip can't be null
+            if($row[9]){$loadType = LoadType::where('name','LIKE','%'.$row[9].'%')->first(); }
+            if($row[10]){$trip = Trip::where('name','LIKE','%'.$row[10].'%')->first(); }
+
+                    
+
+                $toValidate = [
+                    'control_number'=> $row[0],
+                    'shipper_id' => intval($request->shipper),
+                    'broker_id' => session('broker'),
+                    'date' => Carbon::parse($row[18]),
+                    'truck_id' => $row[1] ? $truck['id']  : null,
+                    'driver_id' => $row[2] ? $driver['id'] : null,
+                    'customer_reference' => $row[4] ? $row[4]: null,
+                    'bol' => $row[5] ? $row[5] : null,
+                    'weight' => $row[6] ? $row[6] : null,
+                    'tons'  => $row[7] ? $row[7]: null,
+                    'mileage' => $row[8] ?  $row[8] : null,
+                    'load_type_id' =>  $row[9] ? $loadType['id']: null,
+                    'trip_id' => $row[10] ? $trip['id'] : null,
+                    'customer_po' => $row[11],
+                    'customer_name' => $row[12],
+                    'status' => $row[13],
+                    'destination' =>  $row[10] ? $trip['destination']: null,
+                    'destination_coords' =>  $row[10] ? $trip['destination_coords']: null,
+                    'origin' =>  $row[10] ? $trip['origin']: null,
+                    'origin_coords' =>  $row[10] ? $trip['origin_coords']: null,
+                    'box_type_id_init' => $row[14] ? $row[14] :null,
+                    'box_type_id_end' => $row[15] ? $row[15] :null,
+                    'unallocated_timestamp' =>$row[16] ? $row[16]: null,
+                    'requested_timestamp' => $row[17] ? $row[17] : null,
+                    'accepted_timestamp' => $row[18] ? $row[18]: null,
+                    'loading_timestamp' => $row[19] ? $row[19]: null,
+                    'to_location_timestamp' => $row[20] ? $row[20]: null,
+                    'arrived_timestamp' => $row[21]  ? $row[21]: null,
+                    'unloading_timestamp' => $row[22] ? $row[22]: null,
+                    'finished_timestamp' =>$row[23]  ? $row[23]: null,
+                ];
+                // $this->validator($toValidate)->validate();
+                $valErrors = $this->validator2($toValidate)->errors()->all();
+             
+
+                if (count($valErrors) > 0) {
+                    $errorString = "";
+                    foreach ($valErrors as $error) {
+                        $errorString .= "$error\n";
+                    }
+                    $errors[] = array_merge($row, [$errorString]);
+                } else {
+                    $formatted[] = $toValidate;
+                }
+
+                $result = [
+                    'data' => $formatted,
+                    'errors' => null,
+                ];
+        
+                if (count($errors) > 0) {
+                    $result['errors'] = array_merge($headers, $errors);
+                }
+        
+                $data = $result;
+               
+
+                if (!$data['errors']) {
+                $load_logs = new LoadLog();
+                $load_logs->user_id = 1;
+                $load_logs->quantity = 1;
+                $load_logs->type = 'user';
+                $load_logs->save();
+                $load = new Load();
+                $load->control_number =  $toValidate['control_number'];
+                $load->shipper_id = $toValidate['shipper_id'];
+                $load->broker_id = session('broker');
+                $load->load_log_id = $load_logs->id;
+                $load->date = $toValidate['date'];
+                $load->truck_id = $row[1] ? $toValidate['truck_id']  : null;
+                $load->driver_id = $row[2] ?  $toValidate['driver_id']  : null;
+                $load->customer_reference = $row[4] ? $toValidate['customer_reference']: null;
+                $load->bol = $row[5] ? $row[5] : null;
+                $load->weight = $row[6] ? $toValidate['weight'] : null;
+                $load->tons  = $row[7] ? $toValidate['tons']: null;
+                $load->mileage = $row[8] ?  $toValidate['mileage'] : null;
+                $load->load_type_id =  $toValidate['load_type_id'];
+                $load->trip_id = $toValidate['trip_id'];
+                $load->customer_po = $toValidate['customer_po'];
+                $load->customer_name = $toValidate['customer_name'];
+                $load->status = $toValidate['status'];
+                $load->destination = $toValidate['destination'];
+                $load->destination_coords = $toValidate['destination_coords'];
+                $load->origin = $toValidate['origin'];
+                $load->origin_coords = $toValidate['origin_coords'];
+                $load->box_type_id_init = $row[14] ? $toValidate['box_type_id_init'] :null;
+                $load->box_type_id_end = $row[15] ? $toValidate['box_type_id_end'] :null;
+                $load->save();
+                $loadStatus = new LoadStatus();
+                $loadStatus->load_id = $load->id;
+                $loadStatus->unallocated_timestamp =$row[16] ? $row[16]: null;
+                $loadStatus->requested_timestamp = $row[17] ? $row[17] : null;
+                $loadStatus->accepted_timestamp = $row[18] ? $row[18]: null;
+                $loadStatus->loading_timestamp = $row[19] ? $row[19]: null;
+                $loadStatus->to_location_timestamp = $row[20] ? $row[20]: null;
+                $loadStatus->arrived_timestamp = $row[21]  ? $row[21]: null;
+                $loadStatus->unloading_timestamp = $row[22] ? $row[22]: null;
+                $loadStatus->finished_timestamp =$row[23]  ? $row[23]: null;
+                $loadStatus->save();
+            }
+              
+        }
+        $result = ['success' => true];
+        if ($data['errors']) {
+            $directory = "temp/xls/" . md5(Carbon::now());
+            $path = $directory . "/Loads_Excel_Errors.xlsx";
+            $publicPath = "public/" . $path;
+            (new CompareLoadsErrorsExport($data['errors']))->store($publicPath);
+            ProcessDeleteFileDelayed::dispatch($directory, true)->delay(now()->addMinutes(1));
+            $result['errors_file'] = asset("storage/" . $path);
+            $resultVar =  $result['errors_file'];
+            $result = ['success' => false ,$resultVar];
+        }
+        
+        return $result;
+
     }
 }
