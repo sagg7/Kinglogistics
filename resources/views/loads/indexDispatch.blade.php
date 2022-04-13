@@ -350,6 +350,7 @@
                     };
                     function LoadTimeRenderer() {}
                     LoadTimeRenderer.prototype.init = (params) => {
+                        console.log(params.data);
                         this.eGui = document.createElement('div');
                         if(!now)
                             now = new Date(params.now);
@@ -367,6 +368,9 @@
                         if(params.data.status !== "finished")
                             classU = "update"
                         this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
+                        new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user?params.data.user.name:''}`});
+                       
+
                     }
                     LoadTimeRenderer.prototype.getGui = () => {
                         return this.eGui;
