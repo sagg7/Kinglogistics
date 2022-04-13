@@ -110,7 +110,6 @@ class LoadController extends Controller
         $data = $request->all();
         $data['date'] = $request->date_submit;
 
-
         $shipper = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper_id;
         $data['shipper_id'] = $shipper;
 
@@ -447,6 +446,7 @@ class LoadController extends Controller
             "loads.notes",
             "loads.customer_po",
             "loads.load_type_id",
+            "loads.dispatch_id",
         ];
         $query = Load::with([
             'driver' => function ($q) {
@@ -464,6 +464,7 @@ class LoadController extends Controller
             'truck:id,number',
             'shipper:id,name',
             'load_type:id,name',
+            'user:id,name',
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -864,6 +865,7 @@ class LoadController extends Controller
                 return ['success' => false, 'message' => "you cannot finish a finished load"];
                 break;
         }
+        $load->dispatch_id = auth()->user()->id;
         $load->status = 'finished';
         $load->save();
         $loadStatus->save();

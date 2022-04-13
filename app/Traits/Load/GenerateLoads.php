@@ -156,16 +156,16 @@ trait GenerateLoads
             $load = Load::findOrFail($load->id);
             $load->notified_at = Carbon::now()->format('Y-m-d H:i:s');
 
-            if (isset($data["driver_id"]) and $load->notes != 'finished') {
-                // Send push notification message to Driver
-                $this->notifyToDriver($data["driver_id"], $load);
+            // if (isset($data["driver_id"]) and $load->notes != 'finished') {
+            //     // Send push notification message to Driver
+            //     $this->notifyToDriver($data["driver_id"], $load);
 
-                // Delete driver from the available driver's lists
-                $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
+            //     // Delete driver from the available driver's lists
+            //     $availableDriver = AvailableDriver::where('driver_id', $data["driver_id"])->first();
 
-                if (!empty($availableDriver))
-                    $availableDriver->delete();
-            }
+            //     if (!empty($availableDriver))
+            //         $availableDriver->delete();
+            // }
             
             return $load;
         });

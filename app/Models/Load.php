@@ -157,6 +157,10 @@ class Load extends Model
     {
         return $this->hasOne(BoxType::class, 'id', 'box_type_id_end');
     }
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'dispatch_id');
+    }
 
     public function getNotifiedAtProperty(): ?Carbon
     {
