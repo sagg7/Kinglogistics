@@ -25,7 +25,17 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/profile"><i class="fas fa-user"></i><span class="menu-title" data-i18n="User">Profile</span></a>
+                <a href="/profile"><i class="fas fa-user"></i><span class="menu-title">Profile</span></a>
+            </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title">Loads</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/load/road/index">
+                            <i class="far fa-circle"></i><span class="menu-item">Search</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
