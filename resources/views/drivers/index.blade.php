@@ -260,6 +260,12 @@
                     clearTablesParams(['shipper']);
                 });
             })();
+
+            function downloadExcel() {
+                window.location = "/driver/downloadExcel?" + $.param({
+                    shipper: $('#shipper').val()
+                });
+            }
         </script>
     @endsection
 
@@ -356,7 +362,7 @@
                                 <i class="fa fa-bars"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="report-menu" x-placement="bottom-end">
-                                <a class="dropdown-item" href="/driver/downloadExcel" id="download"><i class="fas fa-file-excel"></i> Download active Drivers</a>
+                                <a class="dropdown-item" href="#" onclick="downloadExcel()" id="download"><i class="fas fa-file-excel"></i> Download active Drivers</a>
                             </div>
                         </div>
                     </div>

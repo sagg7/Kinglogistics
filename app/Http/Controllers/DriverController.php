@@ -644,7 +644,7 @@ class DriverController extends Controller
 
     }
 
-    public function downloadExcel(){
+    public function downloadExcel(Request $request){
         $query = Driver::select([
             "drivers.id",
             "drivers.name",
@@ -659,12 +659,16 @@ class DriverController extends Controller
             "drivers.broker_id",
             "drivers.truck_id",
         ])
-            ->where(function ($q) {
+            ->where(function ($q) use ($request) {
                 if (auth()->guard('web')->check()) {
                     $q->whereHas('broker', function ($q) {
                         $q->where('id', session('broker'));
                     });
                 }
+                if ($request->shipper)
+                    $q->whereHas('shippers', function ($q) use ($request){
+                        $q->where('id', $request->shipper);
+                    });
             })->orderBy("inactive", 'asc')
             ->orderBy("name", 'asc')->get();
 
@@ -676,6 +680,7 @@ class DriverController extends Controller
             $data[] = [
                 'name' => $driver->name,
                 'truck' => $driver->truck ? $driver->truck->number : null,
+                'trailer' => $driver->truck ? $driver->truck->trailer ? $driver->truck->trailer->number : null : null,
                 'driverPhone' => $driver->phone,
                 'email' => $driver->email,
                 'carrier' => $driver->carrier ? $driver->carrier->name : null,
@@ -689,7 +694,7 @@ class DriverController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Driver name", "Truck", "Driver Phone", "Driver Email", "Carrier", "Carrier Phone", "Shift", "Status", "Inactive", "Observations"],
+            "headers" => ["Driver name", "Truck", "Trailer", "Driver Phone", "Driver Email", "Carrier", "Carrier Phone", "Shift", "Status", "Inactive", "Observations"],
         ]))->download("Drivers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
