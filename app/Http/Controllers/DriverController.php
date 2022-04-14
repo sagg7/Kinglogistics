@@ -112,7 +112,7 @@ class DriverController extends Controller
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
 
-        
+
                 $driver->shippers()->sync($request->shippers);
 
             if (!$id) {
@@ -648,6 +648,7 @@ class DriverController extends Controller
         $query = Driver::select([
             "drivers.id",
             "drivers.name",
+            "drivers.email",
             "drivers.zone_id",
             "drivers.carrier_id",
             "drivers.turn_id",
@@ -675,7 +676,11 @@ class DriverController extends Controller
             $data[] = [
                 'name' => $driver->name,
                 'truck' => $driver->truck ? $driver->truck->number : null,
+                'driverPhone' => $driver->phone,
+                'email' => $driver->email,
                 'carrier' => $driver->carrier ? $driver->carrier->name : null,
+                'carrierPhone' => $driver->carrier ? $driver->carrier->phone : null,
+                'shift' => $driver->turn->name,
                 'status' => $driver->status,
                 'inactive' => ($driver->inactive) ? "Yes" : "No",
                 'observations' => $driver->inactive_observations
@@ -684,7 +689,7 @@ class DriverController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Name", "Truck", "Carrier", "Status", "Inactive", "Observations"],
+            "headers" => ["Driver name", "Truck", "Driver Phone", "Driver Email", "Carrier", "Carrier Phone", "Shift", "Status", "Inactive", "Observations"],
         ]))->download("Drivers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }
