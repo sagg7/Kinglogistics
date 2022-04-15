@@ -232,10 +232,10 @@ class TrailerController extends Controller
                     $q->where('status', TrailerEnum::AVAILABLE);
             })
             ->whereNull("inactive");
-        if ($request->carrier)
+        /*if ($request->carrier)
             $query->whereHas('rentals', function ($q) use ($request) {
                 $q->where("carrier_id", $request->carrier);
-            });
+            });*/
 
         return $this->selectionData($query, $request->take, $request->page);
     }
