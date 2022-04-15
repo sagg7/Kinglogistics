@@ -41,6 +41,7 @@ Route::middleware(['auth:carrier','documentation'])->group(function () {
     require __DIR__.'/carriers/equipment.php';
     require __DIR__.'/web/s3storage.php';
     require __DIR__.'/common/documentation.php';
+    require __DIR__.'/carriers/loads.php';
 
     Route::get('carrier/payment/downloadPDF/{id}', [CarrierPaymentController::class, 'downloadPDF'])
         ->name('carrier.downloadPaymentPDF');

@@ -105,6 +105,14 @@ class Load extends Model
     }
 
     /**
+     * @return HasOne
+     */
+    public function road(): HasOne
+    {
+        return $this->hasOne(RoadLoad::class);
+    }
+
+    /**
      * Get all the load rejections
      *
      * @return HasMany
