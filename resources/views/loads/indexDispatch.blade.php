@@ -350,7 +350,6 @@
                     };
                     function LoadTimeRenderer() {}
                     LoadTimeRenderer.prototype.init = (params) => {
-                        console.log(params.data);
                         this.eGui = document.createElement('div');
                         if(!now)
                             now = new Date(params.now);
