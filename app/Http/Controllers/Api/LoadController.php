@@ -158,6 +158,14 @@ class LoadController extends Controller
             $load = new LoadResource($activeLoad);
         }
 
+        if (auth()->guard('shipper')->check()){
+            $load->type_creator = 'shipper';
+        }else if(auth()->guard('web')->check()){
+            $load->type_creator = 'user';
+        }else {
+            $load->type_driver = 'driver';
+        }
+        $load->creator_id  = auth()->user()->id;
         return response([
             'status' => 'ok',
             'message' => $message,

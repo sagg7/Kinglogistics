@@ -25,9 +25,7 @@ $('#formRoadLoads').submit(e => {
         error: () => {
             throwErrorMsg();
         }
-    }).always(() => {
-        removeAjaxLoaders();
-    });
+    })
 });
 
    const loadType = $('#load_type_id');

@@ -177,7 +177,10 @@ class Load extends Model
     {
         return $this->hasOne(User::class, 'id', 'dispatch_id');
     }
-
+    public function creator(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'creator_id');
+    }
     public function getNotifiedAtProperty(): ?Carbon
     {
         $loadId = $this->id;
