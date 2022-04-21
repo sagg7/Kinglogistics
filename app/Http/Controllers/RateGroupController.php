@@ -39,7 +39,7 @@ class RateGroupController extends Controller
                 ->findOrFail($id);
         else {
             $rateGroup = new RateGroup();
-            $rateGroup->broker = session('broker');
+            $rateGroup->broker_id = session('broker');
         }
 
         $rateGroup->name = $request->name;
