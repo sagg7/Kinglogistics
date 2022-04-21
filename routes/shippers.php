@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ShipperController;
+use App\Http\Controllers\Shippers\RoadLoadController;
 use App\Http\Controllers\Shippers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,7 @@ Route::middleware('auth:shipper')->group(function () {
     require __DIR__.'/shippers/reports.php';
     require __DIR__.'/shippers/incidents.php';
     require __DIR__.'/shippers/brokers.php';
+    require __DIR__.'/shippers/roadLoads.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.shippers.dashboard');

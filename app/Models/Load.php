@@ -99,6 +99,14 @@ class Load extends Model
         return $this->belongsTo(CarrierPayment::class);
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function road_loads(): BelongsTo
+    {
+        return $this->belongsTo(RoadLoad::class);
+    }
+
     public function loadStatus(): HasOne
     {
         return $this->hasOne(LoadStatus::class);
@@ -169,7 +177,10 @@ class Load extends Model
     {
         return $this->hasOne(User::class, 'id', 'dispatch_id');
     }
-
+    public function creator(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'creator_id');
+    }
     public function getNotifiedAtProperty(): ?Carbon
     {
         $loadId = $this->id;

@@ -112,8 +112,8 @@ class RoadLoadController extends Controller
             'weight',
         ])
             ->where('type', LoadTypeEnum::ROAD)
-            ->whereDate('date', '>=', $request->ship_date_start)
-                ->whereDate('date', '<=', $request->ship_date_end)
+            ->whereDate('date', '>=', str_replace("/","-",$request->ship_date_start))
+                ->whereDate('date', '<=', str_replace("/","-",$request->ship_date_end))
             ->where(function ($q) use ($request) {
                 if ($request->weight) {
                     $q->where('weight', '<=', $request->weight);
@@ -149,11 +149,11 @@ class RoadLoadController extends Controller
                         'mode:id,name',
                         'trailer_type:id,name',
                         'origin_city' => function ($q) {
-                            $q->select(['id', 'name'])
+                            $q->select(['id', 'name', 'state_id'])
                                 ->with('state:id,abbreviation');
                         },
                         'destination_city' => function ($q) {
-                            $q->select(['id', 'name'])
+                            $q->select(['id', 'name', 'state_id'])
                                 ->with('state:id,abbreviation');
                         },
                     ]);
