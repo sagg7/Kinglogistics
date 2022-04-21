@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\CitiesImport;
 use App\Models\Driver;
 use App\Jobs\ProcessPaymentsAndCollection;
 use App\Models\InspectionCategory;
@@ -11,6 +12,7 @@ use App\Traits\Accounting\PaymentsAndCollection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
@@ -111,19 +113,7 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-        $category = new InspectionCategory();
-        $category->name = "Gadgets";
-        $category->options = json_encode([
-            "type" => "options",
-            "options" =>[
-                "Good",
-                "Damaged",
-            ],
-            "default" => "Good",
-        ]);
-        $category->position = 1;
-        $category->editable = 1;
-        dd($category);
+        abort(404);
        /*$invoices = ShipperInvoice::where('status', '=', 'pending')
             ->with('loads')->get();
         foreach ( $invoices as $invoice){

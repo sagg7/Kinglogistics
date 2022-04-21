@@ -213,15 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         $(".modal-calendar").modal("hide");
                     }
 
-                },
-                error: (res) => {
-                    let errors = `<ul class="text-left">`;
-                    Object.values(res.responseJSON.errors).forEach((error) => {
-                        errors += `<li>${error}</li>`;
-                    });
-                    errors += `</ul>`;
-                    throwErrorMsg(errors, {timer: false});
-                },
+                },,
             });
         }
 

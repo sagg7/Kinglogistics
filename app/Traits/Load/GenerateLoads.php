@@ -80,9 +80,18 @@ trait GenerateLoads
                 $load = new Load();
                 $load->broker_id = $data['broker_id'];
             }
-            if($trip->shipper_id){
+            if ($trip->shipper_id) {
                 $shipper = Shipper::find($trip->shipper_id);
             }
+            if (auth()->guard('shipper')->check()){
+                $load->creator_type = 'shipper';
+            }else if(auth()->guard('web')->check()){
+                $load->creator_type = 'user';
+            }else {
+                $load->creator_type = 'driver';
+            }
+            $load->creator_id  = auth()->user()->id;
+
             $load->shipper_id = $trip->shipper_id;
             $load->load_type_id = $data["load_type_id"];
             if (isset($data['driver_id'])) {
@@ -112,10 +121,10 @@ trait GenerateLoads
                 // If all corresponding data to get the rate is set, then get the rate
                 if (isset($data["mileage"]) && $data["shipper_id"] && $zone_id) {
                     $rate = $this->getRate($data["mileage"], $data["shipper_id"], $zone_id)["rate"];
-                    if($shipper->type_rate == "mileage-tons" && $load->tons != null){
+                    if ($shipper->type_rate == "mileage-tons" && $load->tons != null) {
                         $load->rate = $rate->carrier_rate * $load->tons ?? null;
                         $load->shipper_rate = $rate->shipper_rate * $load->tons ?? null;
-                    }else{
+                    } else {
                         $load->rate = $rate->carrier_rate ?? null;
                         $load->shipper_rate = $rate->shipper_rate  ?? null;
                     }
@@ -125,12 +134,12 @@ trait GenerateLoads
             if (isset($data['status']))
                 $load->status = $data["status"];
             $load->save();
-            if (!$id){
+            if (!$id) {
                 $loadStatus = new LoadStatus();
                 $loadStatus->load_id = $load->id;
                 $loadStatus->unallocated_timestamp = Carbon::now();
                 $loadStatus->accepted_timestamp = Carbon::now();
-                if ($load->notes === 'finished'){
+                if ($load->notes === 'finished') {
                     $loadStatus->unallocated_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->requested_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->accepted_timestamp = Carbon::parse($data["date"]);
@@ -139,8 +148,8 @@ trait GenerateLoads
                     $loadStatus->arrived_timestamp = Carbon::parse($data["date"]);
                     $loadStatus->finished_timestamp = Carbon::parse($data["date"]);
                     $date = Carbon::now();
-                    $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
-                        ->where('time', $date->format("H").':00:00')->first();
+                    $dispatch = DispatchSchedule::where('day', $date->dayOfWeek - 1)
+                        ->where('time', $date->format("H") . ':00:00')->first();
                     if ($dispatch)
                         $load->dispatch_id = $dispatch->user_id;
                     $load->save();
@@ -148,7 +157,7 @@ trait GenerateLoads
 
                 $loadStatus->save();
             }
-          
+
             /**
              * As the ID's in data property are Strings, we must reload the load to automatically convert the ids to valid int types
              * This small fix were added to avoid type issues in the mobile app.
@@ -166,7 +175,7 @@ trait GenerateLoads
                 if (!empty($availableDriver))
                     $availableDriver->delete();
             }
-            
+
             return $load;
         });
     }
@@ -180,7 +189,8 @@ trait GenerateLoads
     private function notifyToDriver($driverId, $load)
     {
         $driver = Driver::find($driverId);
-
+        $driver->status = 'active';
+        $driver->save();
         $driver->notify(new LoadAssignment($driver, $load));
     }
 }

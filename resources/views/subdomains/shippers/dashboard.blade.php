@@ -1,4 +1,7 @@
 <x-app-layout>
+    @section('modals')
+        @include('subdomains.shippers.postLoadModal')
+    @endsection
 
     @section("scripts")
         <script>
@@ -63,6 +66,7 @@
         </script>
         <script src="{{ asset('js/sections/dashboard/loadSummary.min.js') }}"></script>
         <script src="{{ asset('js/sections/dashboard/common.min.js?1.0.13') }}"></script>
+        <script src="{{ asset('js/sections/dashboard/postLoad.js') }}"></script>
     @endsection
 
     @section('modals')
@@ -70,6 +74,20 @@
         @include("common.modals.genericAjaxLoading", ["id" => "viewLoad", "title" => "Load"])
     @endsection
     @include('dashboard.common.loadStatus')
+
+
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal"
+                            data-target="#postLoadModal" id="postLoadButton">Post load</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-12">

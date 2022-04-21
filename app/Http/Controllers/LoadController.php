@@ -110,7 +110,6 @@ class LoadController extends Controller
         $data = $request->all();
         $data['date'] = $request->date_submit;
 
-
         $shipper = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper_id;
         $data['shipper_id'] = $shipper;
 
@@ -193,13 +192,13 @@ class LoadController extends Controller
                     if ($data['notes'] === "finished") {
                         $data['status'] = 'finished';
                     } else {
-                        $data['status'] = 'requested';
+                        $data['status'] = 'accepted';
                     }
                 } else {
                     // Assign available drivers to load
                     $data['driver_id'] = $drivers[$i]->driver_id ?? null;
                     // If driver was assigned, set status as requested, else set status as unallocated to wait for driver
-                    $data['driver_id'] ? $data['status'] = 'requested' : $data['status'] = 'unallocated';
+                    $data['driver_id'] ? $data['status'] = 'accepted' : $data['status'] = 'unallocated';
                 }
                 $data['control_number'] = $control_number_str . $control_number_int;
 
@@ -447,6 +446,9 @@ class LoadController extends Controller
             "loads.notes",
             "loads.customer_po",
             "loads.load_type_id",
+            "loads.dispatch_id",
+            "loads.creator_id",
+            "loads.creator_type",
         ];
         $query = Load::with([
             'driver' => function ($q) {
@@ -464,6 +466,8 @@ class LoadController extends Controller
             'truck:id,number',
             'shipper:id,name',
             'load_type:id,name',
+            'user:id,name',
+            'creator:id,name',
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -864,6 +868,7 @@ class LoadController extends Controller
                 return ['success' => false, 'message' => "you cannot finish a finished load"];
                 break;
         }
+        $load->dispatch_id = auth()->user()->id;
         $load->status = 'finished';
         $load->save();
         $loadStatus->save();
@@ -1084,7 +1089,7 @@ class LoadController extends Controller
         $loadExtArry = get_object_vars($loadsExt[0]);
         $arrayobj = count($loadsExt);
         if ($arrayobj === 0){
-            return redirect()->back()->withErrors('There are no loads to generate the document');   
+            return redirect()->back()->withErrors('There are no loads to generate the document');
                         }
 
              foreach ($loadExtArry as $key => $row) {
@@ -1094,7 +1099,7 @@ class LoadController extends Controller
             if($row[9]){$loadType = LoadType::where('name','LIKE','%'.$row[9].'%')->first(); }
             if($row[10]){$trip = Trip::where('name','LIKE','%'.$row[10].'%')->first(); }
 
-                    
+
 
                 $toValidate = [
                     'control_number'=> $row[0],
@@ -1130,7 +1135,7 @@ class LoadController extends Controller
                 ];
                 // $this->validator($toValidate)->validate();
                 $valErrors = $this->validator2($toValidate)->errors()->all();
-             
+
 
                 if (count($valErrors) > 0) {
                     $errorString = "";
@@ -1146,13 +1151,13 @@ class LoadController extends Controller
                     'data' => $formatted,
                     'errors' => null,
                 ];
-        
+
                 if (count($errors) > 0) {
                     $result['errors'] = array_merge($headers, $errors);
                 }
-        
+
                 $data = $result;
-               
+
 
                 if (!$data['errors']) {
                 $load_logs = new LoadLog();
@@ -1197,7 +1202,7 @@ class LoadController extends Controller
                 $loadStatus->finished_timestamp =$row[23]  ? $row[23]: null;
                 $loadStatus->save();
             }
-              
+
         }
         $result = ['success' => true];
         if ($data['errors']) {
@@ -1210,7 +1215,7 @@ class LoadController extends Controller
             $resultVar =  $result['errors_file'];
             $result = ['success' => false ,$resultVar];
         }
-        
+
         return $result;
 
     }

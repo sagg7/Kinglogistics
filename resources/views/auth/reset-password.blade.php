@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-old-layout>
     <x-auth-card>
 
         <!-- Validation Errors -->
@@ -40,4 +40,4 @@
             </div>
         </form>
     </x-auth-card>
-</x-guest-layout>
+</x-guest-old-layout>

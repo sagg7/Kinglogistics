@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-old-layout>
     <x-auth-card>
 
         <div class="mb-4 text-sm text-gray-600">
@@ -31,4 +31,4 @@
             </form>
         </div>
     </x-auth-card>
-</x-guest-layout>
+</x-guest-old-layout>

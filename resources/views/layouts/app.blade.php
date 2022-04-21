@@ -29,7 +29,7 @@
         <link rel="stylesheet" href="{{ asset("app-assets/css/colors.css?1.0.1") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/components.min.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/themes/dark-layout.css") }}">
-        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css") }}">
+        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css?1.0.0") }}">
         <!-- END: Theme CSS-->
 
         <!-- BEGIN: Page CSS-->
@@ -47,11 +47,6 @@
         <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
         <link rel="stylesheet" href="{{ asset("css/app.css?1.0.1") }}">
         <style>
-            .main-menu {
-                background-image: url("{{ asset('images/app/logos/signature.png') }}")!important;
-                background-repeat: no-repeat!important;
-                background-position: bottom 5vh center!important;
-            }
             body.semi-dark-layout .main-menu-content .navigation-main,
             body.semi-dark-layout .main-menu-content .navigation-main .nav-item .menu-content,
             body.semi-dark-layout .main-menu-content .navigation-main .nav-item .menu-content li:not(.active) a {

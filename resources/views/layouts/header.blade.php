@@ -17,7 +17,7 @@
                     @endif
                     <ul class="nav navbar-nav">
                         <li class="nav-item d-none d-lg-block">
-                            <img src="{{ asset("images/app/logos/logo-dark-simple.png") }}" alt="King Logistic Oil" style="max-height: 40px;">
+                            <img src="{{ asset("images/allstar/logo-blue.png") }}" alt="King Logistic Oil" style="max-height: 40px;">
                         </li>
                     </ul>
                 </div>
