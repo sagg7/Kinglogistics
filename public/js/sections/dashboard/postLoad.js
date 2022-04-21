@@ -1,4 +1,5 @@
 (() => {
+
 })();
 
 $('#formRoadLoads').submit(e => {
@@ -15,11 +16,9 @@ $('#formRoadLoads').submit(e => {
         contentType: false,
         processData: false,
         success: (res) => {
-            // console.log(res.data.id);
             if (res.success){
             throwErrorMsg("Load Generated Successfully", {"title": "Success!", "type": "success"});
             $("#postLoadModal").modal('hide');
-            //  $("#optionToSelectTruck").modal('show');
             }
         },
         error: () => {
@@ -94,9 +93,6 @@ $('#formRoadLoads').submit(e => {
     
 
     const citiesOrigin = $('#citiesOrigin');
-    citiesOrigin.click(function(){
-        console.log(stateDestination.val());
-    })
     citiesOrigin.select2({
          placeholder: 'Select',
          ajax: {
@@ -214,46 +210,11 @@ $('#formRoadLoads').submit(e => {
     //   console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
     });
 
-    // driver.select2({
-    //     placeholder: 'Select',
-    //     ajax: {
-    //         url: '/driver/selection',
-    //         data: (params) => {
-    //             return {
-    //                 search: params.term,
-    //                 page: params.page || 1,
-    //                 take: 15,
-    //                 carrier: carrier.val(),
-    //                 noTruck: 1,
-    //             };
-    //         },
-    //     }
-    // });
-    // seller.select2({
-    //     placeholder: 'Select',
-    //     ajax: {
-    //         url: '/user/selection',
-    //         data: (params) => {
-    //             return {
-    //                 search: params.term,
-    //                 page: params.page || 1,
-    //                 take: 15,
-    //                 type: 'seller',
-    //             };
-    //         },
-    //     }
-    // });
-    // // carrier.select2({
-    // //     ajax: {
-    // //         url: '/carrier/selection',
-    // //         data: (params) => {
-    // //             return {
-    // //                 search: params.term,
-    // //                 page: params.page || 1,
-    // //                 take: 15,
-    // //             };
-    // //         },
-    // //     },
-    // //     placeholder: 'Select',
-    // //     allowClear: true,
-    // // });
+
+
+    statesOrigin.change(function() {
+        citiesOrigin.html(`<option value=""></option>`);
+    });
+    stateDestination.change(function() {
+        cityDestination.html(`<option value=""></option>`);
+      });

@@ -365,12 +365,13 @@
                             color = 'red'
                         let classU = "";
                         this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
-                        new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user?params.data.user.name:''}`});
-                        if(params.data.status == "finished"){
+                        
+                        if(params.data.status === 'finished'){
                             new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user?params.data.user.name:''}`});
                         }else if (params.data.status !== "finished") {
                             new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
                             classU = "update"
+                            console.log(params.data.creator);
                         }
                         
 

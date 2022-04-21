@@ -82,7 +82,7 @@
                 <div class="row">
                     <div class="col">
                         <button type="button" class="btn btn-primary btn-block" data-toggle="modal"
-                            data-target="#postLoadModal">Post load</button>
+                            data-target="#postLoadModal" id="postLoadButton">Post load</button>
                     </div>
                 </div>
             </div>

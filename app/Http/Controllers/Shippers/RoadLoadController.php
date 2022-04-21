@@ -11,6 +11,7 @@ use App\Models\LoadTrailerType;
 use App\Models\LoadMode;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Shipper;
 use App\Rules\EmailArray;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -95,8 +96,20 @@ class RoadLoadController extends Controller
         $load->notes = $request->notes;
         $load->shipper_id = auth()->user()->id;
         $load->date = Carbon::now()->format('Y-m-d');
+        if (auth()->guard('shipper')->check()){
+            $load->creator_type = 'shipper';
+        }else if(auth()->guard('web')->check()){
+            $load->creator_type = 'user';
+        }else {
+            $load->creator_type = 'driver';
+        }
         $load->creator_id = auth()->user()->id;
         $load->save();
+        
+        $shipper = Shipper::findOrFail($load->shipper_id);
+        $shipper->days_to_pay = $request->days_to_pay;
+        $shipper->save();
+
 
         $roadLoad->load_id = $load->id;
         $roadLoad->origin_city_id = $request->citiesOrigin;

@@ -84,11 +84,11 @@ trait GenerateLoads
                 $shipper = Shipper::find($trip->shipper_id);
             }
             if (auth()->guard('shipper')->check()){
-                $load->type_creator = 'shipper';
+                $load->creator_type = 'shipper';
             }else if(auth()->guard('web')->check()){
-                $load->type_creator = 'user';
+                $load->creator_type = 'user';
             }else {
-                $load->type_driver = 'driver';
+                $load->creator_type = 'driver';
             }
             $load->creator_id  = auth()->user()->id;
 

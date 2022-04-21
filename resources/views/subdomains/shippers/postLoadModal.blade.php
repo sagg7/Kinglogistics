@@ -279,17 +279,6 @@
                                 @enderror
                             </fieldset>
                         </div>
-                        {{-- <div class="row">
-                            
-                            <fieldset class="form-group col-md-6">
-                                {!! Form::label('deadhead_miles', ucwords(__('d/h miles')), ['class' => 'col-form-label']) !!}
-                                {!! Form::text('deadhead_miles', null, ['class' => 'form-control']) !!}
-                            </fieldset>
-                            <fieldset class="form-group col-md-6">
-                                {!! Form::label('control_number', ucwords(__('quick pay')), ['class' => 'col-form-label']) !!}
-                                {!! Form::text('control_number', null, ['class' => 'form-control']) !!}
-                            </fieldset>
-                        </div> --}}
                         <div class="row">
                             <fieldset class="form-group col-md-6">
                                 {!! Form::label('pay_rate', ucwords(__('Payrate')), ['class' => 'col-form-label']) !!}
@@ -312,6 +301,17 @@
                             </fieldset>
                         </div>
                         <div class="row">
+                            <fieldset class="form-group col-md-12">
+                                {!! Form::label('days_to_pay', ucwords(__('days until payment')), ['class' => 'col-form-label']) !!}
+                                {!! Form::text('days_to_pay', null, ['class' => 'form-control']) !!}
+                                @error('days_to_pay')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
+                                @enderror
+                            </fieldset>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-md-12">
                                 {!! Form::label('notes', ucfirst(__('description')), ['class' => 'col-form-label']) !!}
                                 {!! Form::textarea('notes', null, ['class' => 'form-control' . ($errors->first('notes') ? ' is-invalid' : ''), 'rows' => 5, 'maxlength' => 512]) !!}
@@ -322,16 +322,6 @@
                                 @enderror
                             </div>
                         </div>
-                        {{-- <div class="row">
-                            <h2 class="col-md-12 text-center">Additional Details</h2>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                {!! Form::label('sales', ucwords(__('Sales')), ['class' => 'col-form-label']) !!}
-                                {!! Form::select('sales', ['1' => '1', '2' => '2'], null, ['class' => 'form-control']) !!}
-                            </div>
-                        </div> --}}
-
                     </div>
                     <button type="submit" class="btn btn-block btn-success">Insert</button>
 
