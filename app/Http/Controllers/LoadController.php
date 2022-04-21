@@ -448,6 +448,7 @@ class LoadController extends Controller
             "loads.load_type_id",
             "loads.dispatch_id",
             "loads.creator_id",
+            "loads.creator_type",
         ];
         $query = Load::with([
             'driver' => function ($q) {
