@@ -344,18 +344,19 @@ class UserController extends Controller
         $now = Carbon::now();
         $timeString = $now->toTimeString();
         $query->where(function ($q) use ($timeString, $now) {
-            $q->whereTime('users.turn_end', '<', DB::raw('TIME(users.turn_start)'));
-            if ($now->hour >= 0 && $now->hour <= 12)
-                $q->whereTime('turn_end', '>', $timeString);
-            else
-                $q->whereTime('turn_start', '<=', $timeString);
-        })
-            ->orWhere(function ($q) use ($timeString) {
+            $q->where(function ($q) use ($timeString, $now) {
+                $q->whereTime('users.turn_end', '<', DB::raw('TIME(users.turn_start)'));
+                if ($now->hour >= 0 && $now->hour <= 12)
+                    $q->whereTime('turn_end', '>', $timeString);
+                else
+                    $q->whereTime('turn_start', '<=', $timeString);
+            })->orWhere(function ($q) use ($timeString) {
                 $q->whereTime('turn_end', '>', DB::raw('TIME(turn_start)'))
                     ->whereTime('turn_start', '<=', $timeString)
                     ->whereTime('turn_end', '>', $timeString);
             });
 
+        });
         if ($request->all)
             return $query->get();
 
