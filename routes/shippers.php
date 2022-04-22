@@ -32,7 +32,8 @@ Route::middleware('auth:shipper')->group(function () {
     require __DIR__.'/shippers/reports.php';
     require __DIR__.'/shippers/incidents.php';
     require __DIR__.'/shippers/brokers.php';
-    require __DIR__.'/shippers/roadLoads.php';
+    require __DIR__.'/common/roadLoad.php';
+    require __DIR__.'/common/cities.php';
 
     Route::get('/dashboard', function () {
         return view('subdomains.shippers.dashboard');

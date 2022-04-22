@@ -1,3 +1,4 @@
 {
-    "/js/sections/chat/bottomChat.min.js": "/js/sections/chat/bottomChat.min.js"
+    "/js/sections/loads/road/postLoad.min.js": "/js/sections/loads/road/postLoad.min.js",
+    "/js/sections/loads/road/searchBoard.min.js": "/js/sections/loads/road/searchBoard.min.js"
 }

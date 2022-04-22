@@ -1,5 +1,4 @@
-<div class="modal fade table-responsive" id="postLoadModal" tabindex="-1" role="dialog" aria-hidden="true"
-    style="max-height: calc(100vh - 4.5rem);">
+<div class="modal fade table-responsive" id="postLoadModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content ">
             <div class="modal-header">
@@ -13,119 +12,111 @@
                 {!! Form::open(['route' => 'roadLoads.store', 'method' => 'post', 'class' => 'form form-vertical optionHandler', 'data-handler-action' => 'create', 'id' => 'formRoadLoads']) !!}
 
                 <div class="row">
-                    <div class="form-group col-md-4">
-                        <div class="row">
-                            <h2 class="col-md-12 text-center">Origin</h2>
-                        </div>
+                    <div class="form-group col-lg-4">
+                        <h2 class="text-center">Origin</h2>
                         <div>
                             <div class="row">
                                 <div class="form-group col-md-6">
                                     {!! Form::label('statesOrigin', ucfirst(__('State')), ['class' => 'col-form-label']) !!}
                                     {!! Form::select('statesOrigin', [], null, ['class' => 'form-control' . ($errors->first('states') ? ' is-invalid' : '')]) !!}
                                     @error('statesOrigin')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </div>
-                                <div class=" form-group col-md-6">
+                                <div class="form-group col-md-6">
                                     {!! Form::label('citiesOrigin', ucfirst(__('city Origin')), ['class' => 'col-form-label']) !!}
                                     {!! Form::select('citiesOrigin', [], null, ['class' => 'form-control' . ($errors->first('citiesOrigin') ? ' is-invalid' : '')]) !!}
                                     @error('citiesOrigin')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </div>
                             </div>
                             <div class="row">
-                                <br>
                                 <fieldset class="form-group col-md-6">
                                     {!! Form::label('origin_early_pick_up_date', ucwords(__('Early Pick Up Date')), ['class' => 'col-form-label']) !!}
                                     {!! Form::text('origin_early_pick_up_date', null, ['class' => 'form-control']) !!}
                                     @error('origin_early_pick_up_date')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </fieldset>
                                 <fieldset class="form-group col-md-6">
                                     {!! Form::label('origin_late_pick_up_date', ucwords(__('Late Pick Up Date')), ['class' => 'col-form-label']) !!}
                                     {!! Form::text('origin_late_pick_up_date', null, ['class' => 'form-control']) !!}
                                     @error('origin_late_pick_up_date')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </fieldset>
                             </div>
-                            <div class="row">
-                                <h2 class="col-md-12 text-center">Destination</h2>
-                            </div>
+                            <h2 class="text-center">Destination</h2>
                             <div class="row">
                                 <div class="form-group col-md-6">
                                     {!! Form::label('stateDestination', ucfirst(__('State')), ['class' => 'col-form-label']) !!}
                                     {!! Form::select('stateDestination', [], null, ['class' => 'form-control' . ($errors->first('stateDestination') ? ' is-invalid' : '')]) !!}
                                     @error('stateDestination')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </div>
                                 <div class="form-group col-md-6">
                                     {!! Form::label('cityDestination', ucfirst(__('city')), ['class' => 'col-form-label']) !!}
                                     {!! Form::select('cityDestination', [], null, ['class' => 'form-control' . ($errors->first('cityDestination') ? ' is-invalid' : '')]) !!}
                                     @error('cityDestination')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </div>
                             </div>
                             <div class="row">
-                                <br>
                                 <fieldset class="form-group col-md-6">
                                     {!! Form::label('destination_early_pick_up_date', ucwords(__('Early Pick Up Date')), ['class' => 'col-form-label']) !!}
                                     {!! Form::text('destination_early_pick_up_date', null, ['class' => 'form-control']) !!}
                                     @error('destination_early_pick_up_date')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </fieldset>
                                 <fieldset class="form-group col-md-6">
                                     {!! Form::label('destination_late_pick_up_date', ucwords(__('Late Pick Up Date')), ['class' => 'col-form-label']) !!}
                                     {!! Form::text('destination_late_pick_up_date', null, ['class' => 'form-control']) !!}
                                     @error('destination_late_pick_up_date')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ ucfirst($message) }}</strong>
-                                        </span>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ ucfirst($message) }}</strong>
+                                    </span>
                                     @enderror
                                 </fieldset>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-4">
-                        <div class="row">
-                            <h2 class="col-md-12 text-center">Equipment & Load Details</h2>
-                        </div>
+                    <div class="form-group col-lg-4">
+                        <h2 class="text-center">Equipment & Load Details</h2>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 {!! Form::label('trailer_type_id', ucwords(__('Trailer type')), ['class' => 'col-form-label']) !!}
                                 {!! Form::select('trailer_type_id', [], null, ['class' => 'form-control']) !!}
                                 @error('trailer_type_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
                                 {!! Form::label('mode_id', ucfirst(__('Mode')), ['class' => 'col-form-label']) !!}
                                 {!! Form::select('mode_id', [], null, ['class' => 'form-control']) !!}
                                 @error('mode_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
@@ -134,18 +125,18 @@
                                 {!! Form::label('shipper_rate', ucwords(__('broker rate')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('shipper_rate', $shipper->loads_per_invoice ?? null, ['class' => 'form-control' . ($errors->first('shipper_rate') ? ' is-invalid' : '')]) !!}
                                 @error('shipper_rate')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
                                 {!! Form::label('rate', ucwords(__('carrier rate')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('rate', $shipper->loads_per_invoice ?? null, ['class' => 'form-control' . ($errors->first('rate') ? ' is-invalid' : '')]) !!}
                                 @error('rate')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
@@ -154,18 +145,18 @@
                                 {!! Form::label('weight', ucwords(__('weight')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('weight', null, ['class' => 'form-control']) !!}
                                 @error('weight')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                             <fieldset class="form-group col-md-6">
                                 {!! Form::label('tons', ucwords(__('tons')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('tons', null, ['class' => 'form-control']) !!}
                                 @error('tons')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                         </div>
@@ -174,18 +165,18 @@
                                 {!! Form::label('width', ucwords(__('width')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('width', null, ['class' => 'form-control']) !!}
                                 @error('width')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                             <fieldset class="form-group col-md-6">
                                 {!! Form::label('height', ucwords(__('height')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('height', null, ['class' => 'form-control']) !!}
                                 @error('height')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                         </div>
@@ -194,9 +185,9 @@
                                 {!! Form::label('length', ucwords(__('length')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('length', null, ['class' => 'form-control']) !!}
                                 @error('length')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                             {{-- <fieldset class="form-group col-md-6">
@@ -207,9 +198,9 @@
                                 {!! Form::label('pieces', ucwords(__('pieces')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('pieces', null, ['class' => 'form-control']) !!}
                                 @error('pieces')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                         </div>
@@ -218,9 +209,9 @@
                                 {!! Form::label('pallets', ucwords(__('pallets')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('pallets', null, ['class' => 'form-control']) !!}
                                 @error('pallets')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </fieldset>
                             <fieldset class="form-group col-md-6">
@@ -231,14 +222,12 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ ucfirst($message) }}</strong>
                                 </span>
-                            @enderror
+                                @enderror
                             </fieldset>
                         </div>
-
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-lg-4">
                         <div class="row">
-                            <br>
                             <fieldset class="form-group col-md-6">
                                 {!! Form::label('mileage', ucwords(__('distance')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('mileage', null, ['class' => 'form-control']) !!}
@@ -246,7 +235,7 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ ucfirst($message) }}</strong>
                                 </span>
-                            @enderror
+                                @enderror
                             </fieldset>
                             <fieldset class="form-group col-md-6">
                                 {!! Form::label('silo_number', ucwords(__('Silo number')), ['class' => 'col-form-label']) !!}
@@ -292,7 +281,7 @@
                             <fieldset class="form-group col-md-6">
                                 {{-- load_type_id --}}
                                 {!! Form::label('load_size', ucwords(__('load size')), ['class' => 'col-form-label']) !!}
-                                {!! Form::select('load_size', ['full' => 'full', 'partial' => 'partial'], null, ['class' => 'form-control']) !!}
+                                {!! Form::select('load_size', $load_sizes, null, ['class' => 'form-control']) !!}
                                 @error('load_size')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ ucfirst($message) }}</strong>
@@ -316,17 +305,15 @@
                                 {!! Form::label('notes', ucfirst(__('description')), ['class' => 'col-form-label']) !!}
                                 {!! Form::textarea('notes', null, ['class' => 'form-control' . ($errors->first('notes') ? ' is-invalid' : ''), 'rows' => 5, 'maxlength' => 512]) !!}
                                 @error('notes')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ ucfirst($message) }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ ucfirst($message) }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-block btn-success">Insert</button>
-
-
                 </div>
+                <button type="submit" class="btn btn-block btn-primary">Insert</button>
                 {!! Form::close() !!}
             </div>
         </div>
