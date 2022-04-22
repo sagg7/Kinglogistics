@@ -371,7 +371,7 @@
                         }else if (params.data.status !== "finished") {
                             if(params.data.creator_type == 'user'){
                                 new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
-                            }else if(params.data.creator_type == 'shipper'){
+                            }else if(params.data.creator_type == 'driver'){
                                 new bootstrap.Tooltip(this.eGui, {title: `Driver: ${params.data.driver?params.data.driver.name:''}`});
                             }
                             classU = "update"
