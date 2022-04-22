@@ -28,8 +28,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/modules/aggrid/common.js'], 'public/js/modules/aggrid/common.min.js')
     //.js('resources/js/app.js', 'public/js')
     // GUEST
-    .postCss('resources/css/guest.css', 'public/css/guest/app.min.css')
-    .js('resources/js/guest.js', 'public/js/guest/app.min.js')
+    //.postCss('resources/css/guest.css', 'public/css/guest/app.min.css')
+    //.js('resources/js/guest.js', 'public/js/guest/app.min.js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
@@ -79,5 +79,5 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
     //.scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
-    //.scripts(['resources/js/sections/chat/bottomChat.js'], 'public/js/sections/chat/bottomChat.min.js')
+    .scripts(['resources/js/sections/chat/bottomChat.js'], 'public/js/sections/chat/bottomChat.min.js')
     ;

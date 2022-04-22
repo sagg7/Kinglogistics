@@ -10,7 +10,8 @@ trait TrackingTrait
 {
     private function getTrackingData()
     {
-        $user_id = auth()->user()->id;
+        $user = auth()->user();
+        $user_id = $user->id;
 
         if (auth()->guard('carrier')->check()) {
             //$locationGroup = LocationGroup::where('carrier_id', $user_id)->first()->id ?? null;
@@ -21,7 +22,7 @@ trait TrackingTrait
             $channel = "driver-location-shipper." . $user_id;
             $event = "DriverLocationUpdateForShipper";
         } else {
-            $channel = "driver-location-king." . $user_id;
+            $channel = "driver-location-king." . $user->broker_id;
             $event = "DriverLocationUpdateForKing";
         }
 

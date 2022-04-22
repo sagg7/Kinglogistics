@@ -98,6 +98,7 @@
     <footer class="footer footer-static footer-light"></footer>
     <script>
         const userId = {{ auth()->user()->id }};
+        const brokerId = {{ auth()->user()->broker_id ?? 'null' }};
     </script>
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
@@ -125,7 +126,7 @@
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/laravel-echo/echo.js?1.0.0') }}"></script>
     @if(auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
-        <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.0") }}"></script>
+        <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.1") }}"></script>
     @endif
 
     <!-- BEGIN: Scripts JS-->
