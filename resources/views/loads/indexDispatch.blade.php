@@ -369,10 +369,14 @@
                         if(params.data.status === 'finished'){
                             new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user?params.data.user.name:''}`});
                         }else if (params.data.status !== "finished") {
-                            new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
+                            if(params.data.creator_type == 'user'){
+                                new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
+                            }else if(params.data.creator_type == 'driver'){
+                                new bootstrap.Tooltip(this.eGui, {title: `Driver: ${params.data.driver?params.data.driver.name:''}`});
+                            }
                             classU = "update"
-                            console.log(params.data.creator);
                         }
+
                         
 
                     }

@@ -218,3 +218,36 @@ $('#formRoadLoads').submit(e => {
     stateDestination.change(function() {
         cityDestination.html(`<option value=""></option>`);
       });
+
+      
+    $("#postLoadButton").click(function(){
+        $('#statesOrigin').html(`<option value=""></option>`);
+        $('#citiesOrigin').html(`<option value=""></option>`);
+        $('#stateDestination').html(`<option value=""></option>`);
+        $('#cityDestination').html(`<option value=""></option>`);
+        loadType.html(`<option value=""></option>`);
+        trailerType.html(`<option value=""></option>`);
+        loadMode.html(`<option value=""></option>`);
+        $('#origin_early_pick_up_date').val("");
+        $('#origin_late_pick_up_date').val("");
+        $('#destination_early_pick_up_date').val("");
+        $('#destination_late_pick_up_date').val("");
+        $('#shipper_rate').val("");
+        $('#rate').val("");
+        $('#weight').val("");
+        $('#tons').val("");
+        $('#width').val("");
+        $('#height').val("");
+        $('#length').val("");
+        $('#pieces').val("");
+        $('#pallets').val("");
+        $('#mileage').val("");
+        $('#silo_number').val("");
+        $('#customer_po').val("");
+        $('#control_number').val("");
+        $('#pay_rate').val("");
+        $('#load_size').val("");
+        $('#days_to_pay').val("");
+        $('#notes').val("");
+
+    })
