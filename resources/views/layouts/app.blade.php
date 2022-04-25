@@ -29,7 +29,7 @@
         <link rel="stylesheet" href="{{ asset("app-assets/css/colors.css?1.0.1") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/components.min.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/themes/dark-layout.css") }}">
-        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css?1.0.0") }}">
+        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css?1.0.1") }}">
         <!-- END: Theme CSS-->
 
         <!-- BEGIN: Page CSS-->
