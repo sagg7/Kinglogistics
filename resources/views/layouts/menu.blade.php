@@ -1,5 +1,6 @@
 <!-- BEGIN: Main Menu-->
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="figure-1"></div>
     <div class="navbar-header">
         <div class="row align-items-center">
             <div class="col pr-0">
