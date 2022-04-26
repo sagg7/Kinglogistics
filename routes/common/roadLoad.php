@@ -23,5 +23,11 @@ Route::prefix('load')->group(function () {
             ->name('roadLoads.selectionStates');
         Route::get('selectionCity', [RoadLoadController::class, 'selectionCity'])
             ->name('roadLoads.selectionCity');
+
+        // Dispatch routes
+        Route::prefix('dispatch')->group(function () {
+            Route::get('index', [RoadLoadController::class, 'indexDispatch'])
+                ->name('load.road.indexDispatch');
+        });
     });
 });

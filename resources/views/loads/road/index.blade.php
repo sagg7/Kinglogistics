@@ -30,7 +30,7 @@
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/road/postLoad.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/road/searchBoard.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/road/searchBoard.min.js?1.0.0') }}"></script>
     @endsection
 
     @if(auth()->guard('web')->check() || auth()->guard('shipper')->check())

@@ -302,7 +302,7 @@ class RoadLoadController extends Controller
                             },
                         ]);
                 },
-                'shipper:id,name,factoring',
+                'shipper:id,name,factoring,days_to_pay',
             ])
             ->orderBy('date');
 
@@ -326,5 +326,10 @@ class RoadLoadController extends Controller
         }
 
         return $query;
+    }
+
+    public function indexDispatch()
+    {
+        return view('loads.road.dispatch.index');
     }
 }

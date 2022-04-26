@@ -90,6 +90,31 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    <div class="row">
+                        <fieldset class="col-6">
+                            {!! Form::label('factoring', ucfirst(__('Approved for factoring')), ['class' => 'col-form-label']) !!}
+                            <div class="vs-checkbox-con vs-checkbox-primary">
+                                {{ Form::checkbox('factoring', 1, $shipper->factoring ?? null) }}
+                                <span class="vs-checkbox">
+                                    <span class="vs-checkbox--check">
+                                        <i class="vs-icon feather icon-check"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </fieldset>
+                        <div class="col-6">
+                            {!! Form::label('days_to_pay', ucfirst(__('Days to pay')), ['class' => 'col-form-label']) !!}
+                            <i class="fas fa-info-circle" data-toggle="popover" data-trigger="hover" data-content="Number of days that must elapse to proceed with the load payment "></i>
+                            {!! Form::text('days_to_pay', $shipper->days_to_pay ?? null, ['class' => 'form-control' . ($errors->first('trucks_required') ? ' is-invalid' : '')]) !!}
+                            @error('trucks_required')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ ucfirst($message) }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         {!! Form::button('Submit', ['class' => 'btn btn-primary btn-block', 'type' => 'submit']) !!}

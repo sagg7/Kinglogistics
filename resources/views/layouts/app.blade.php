@@ -135,6 +135,7 @@
             type="application/javascript"></script>
     <script src="{{ asset("app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js?1.0.0") }}"
             type="application/javascript"></script>
+    <script src="{{ asset("app-assets/js/scripts/popover/popover.js") }}" type="application/javascript"></script>
     <!-- END: Scripts JS-->
     @yield("scripts")
     <script>

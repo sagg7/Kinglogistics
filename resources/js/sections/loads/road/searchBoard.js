@@ -10,6 +10,15 @@
     const length = $('#length');
     const modal = $('#loadDetails');
 
+    function QuickPayRenderer() {}
+    QuickPayRenderer.prototype.init = (params) => {
+        this.eGui = document.createElement('div');
+        this.eGui.innerHTML = `<i class="far fa-check-circle ${params.value}"></i>`;
+    }
+    QuickPayRenderer.prototype.getGui = () => {
+        return this.eGui;
+    }
+
     const currencyFormatter = (value) => {
         // If not a number, return value unchanged
         if (isNaN(value))
@@ -44,7 +53,7 @@
                 field: 'rate_mile'
             },
             {headerTooltip: 'Ship Date', headerName: 'Ship Date', field: 'date'},
-            {headerTooltip: 'Quick Pay', headerName: 'Quick Pay', field: 'quick_pay'},
+            {headerTooltip: 'Quick Pay', headerName: 'Quick Pay', field: 'quick_pay', cellRenderer: QuickPayRenderer},
             {headerTooltip: 'Company', headerName: 'Company', field: 'shipper'},
         ],
         rowData: [],
@@ -103,6 +112,14 @@
             success: (res) => {
                 let rowData = [];
                 res.forEach(item => {
+                    let colorClass;
+                    if (item.shipper.factoring) {
+                        colorClass = 'text-success';
+                    } else if (Number(item.shipper.days_to_pay) <= 15) {
+                        colorClass = 'text-warning';
+                    } else {
+                        colorClass = 'text-danger';
+                    }
                     rowData.push({
                         age: item.age,
                         deadhead_miles: item.road.deadhead_miles, // TODO: Calculate deadhead
@@ -119,8 +136,7 @@
                         rate_mile: currencyFormatter(item.rate_mile),
                         date: item.date,
                         shipper: item.shipper.name,
-                        // TODO: ADD THIS DATA
-                        quick_pay: null,
+                        quick_pay: colorClass,
                         shipper_phone: item.shipper ? item.shipper.phone : null,
                     });
                 });

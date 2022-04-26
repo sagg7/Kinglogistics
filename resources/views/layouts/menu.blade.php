@@ -362,6 +362,11 @@
                             <i class="far fa-circle"></i><span class="menu-item">View</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="/load/road/dispatch/index">
+                            <i class="far fa-circle"></i><span class="menu-item">View Dispatch</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endif
