@@ -13,6 +13,8 @@ Route::prefix('paperwork')->group(function () {
             ->name('paperwork.showTemplate');
         Route::get('pdf/{id}/{related_id}', [PaperworkController::class, 'pdf'])
             ->name('paperwork.pdf');
+        // Route::get('NotificationPaperworkAlert', [PaperworkController::class, 'NotificationPaperworkAlert'])
+        //     ->name('paperwork.NotificationPaperworkAlert');
     });
     Route::group(['middleware' => ['permission:create-paperwork']], function () {
         Route::get('create', [PaperworkController::class, 'create'])
