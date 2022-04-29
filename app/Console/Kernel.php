@@ -219,6 +219,7 @@ class Kernel extends ConsoleKernel
             $this->calculateRanking();
         })->weekly()->mondays()->at('00:01');
 
+        // Notifications of days of expiration paperwork
         $schedule->call(function () {
             $days30 = Carbon::now()->addDays(30);
             $days15 = Carbon::now()->addDays(15);
@@ -251,7 +252,7 @@ class Kernel extends ConsoleKernel
                 $data['day'] = 0;            
                 $this->NotificationPaperworkAlert($data);
             }
-        })->daily()->at('15:15');
+        })->daily()->at('14:01');
     }
 
     /**

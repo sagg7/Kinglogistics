@@ -22,7 +22,9 @@ trait PaperworkSendEmailAlert
         // $paperworkName = $paperwork->name;
         // $days = 30;
         // $element = 'carrier';
+        
         $paperwork = Paperwork::find($data['paperwork_id']);
+        $paperworkName = $paperwork->name;
         $days = $data['day'];
         $element = $paperwork->type;
         if($element == 'carrier'){
@@ -71,6 +73,18 @@ trait PaperworkSendEmailAlert
             $trailer = Trailer::find($data['related_id']);
             $broker_id = $trailer->broker_id;
             $users = User::where('broker_id', $broker_id)
+            ->wherehas('roles',function($q){
+                $q->where('name','Seller');
+            })->get();
+            foreach($users as $user){
+             $userName = $user->name;
+             $email = $user->email;
+             $params = compact('paperworkName','days','element','userName','email');
+             Mail::to('ecorral@kinglogisticoil.com')->send(new SendNotificationPaperwork($params));
+            }
+        }
+        else if($element == 'staff'){
+            $users = User::where('broker_id',session('broker'))
             ->wherehas('roles',function($q){
                 $q->where('name','Seller');
             })->get();
