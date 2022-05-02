@@ -35,6 +35,9 @@
                                         icon: 'far fa-folder-open',
                                         type: 'modal'
                                     },
+                                    @if (auth()->user()->can(['read-carrier']))
+                                        {text: 'View', route: '#viewCarriers', icon: 'far fa-eye', type: 'modal'},
+                                    @endif
                                     @if (auth()->user()->can(['update-carrier']))
                                         {text: 'Edit', route: '/carrier/edit', icon: 'feather icon-edit'},
                                     @endif
@@ -118,9 +121,6 @@
                                     @if (auth()->user()->can(['delete-carrier']))
                                         {route: '/carrier/delete', type: 'delete'},
                                     @endif
-                                    @if (auth()->user()->can(['read-carrier']))
-                                        {text: 'View', route: '#viewCarriers', icon: 'far fa-eye', type: 'modal'},
-                                    @endif
                                 ];
                                 gridOptions = {
                                     components: {
@@ -201,44 +201,38 @@
                     success: (res) => {
                         // console.log(res.data);
                         content.empty();
-                        content.append(        
-                        `<div class="form-group">` +
-                        `<div class="row">` +
-                        `<div class="col-md-3">Name:</div>` +
-                        ` <div class="col-md-3">${res.data.name}</div>` +
-                        `<div class="col-md-3">Email:</div>` +
-                        `<div class="col-md-3">${res.data.email}</div>` +
-                        `</div><br>` +
-                        // `<div class="row">` +
-                        // `<div class="col-md-3">Password:</div>` +
-                        // `<div class="col-md-3">${res.hours}</div>` +
-                        // `<div class="col-md-3">Password Confirmation:</div>` +
-                        // `<div class="col-md-3">${res.active_loads}</div>` +
-                        // `</div><br>` +
-                        `<div class="row">` +
-                        `<div class="col-md-3">Phone:</div>` +
-                        `<div class="col-md-3">${res.data.phone}</div>` +
-                        `<div class="col-md-3">Address:</div>` +
-                        `<div class="col-md-3">${res.data.address}</div>` +
-                        `</div><br>` +
-                        `<div class="row">` +
-                        `<div class="col-md-3">City:</div>` +
-                        `<div class="col-md-3">${res.data.city}</div>` +
-                        `<div class="col-md-3">State:</div>` +
-                        `<div class="col-md-3">${res.data.state}</div>` +
-                        `</div><br>` +
-                        `<div class="row">` +
-                        `<div class="col-md-3">Zip code</div>` +
-                        `<div class="col-md-3">${res.data.zip_code}</div>` +
-                        `<div class="col-md-3">Owner Name</div>` +
-                        `<div class="col-md-3">${res.data.owner}</div>` +
-                        `</div><br>` +
-                        `<div class="row">` +
-                        `<div class="col-md-3"><p>Invoice Email:</p></div>` +
-                        `<div class="col-md-3"><p>${res.data.invoice_email ?? null}</p></div>` +
-                        `<div class="col-md-3"><p>Status:</p></div>` +
-                        `<div class="col-md-3"><p>${res.data.status ?? null}</p></div>` +
-                        `</div><br>`);
+                        content.append(
+                            `<div class="form-group">` +
+                            `<div class="row">` +
+                            `<div class="col-md-3">Name:</div>` +
+                            ` <div class="col-md-3">${res.data.name}</div>` +
+                            `<div class="col-md-3">Email:</div>` +
+                            `<div class="col-md-3">${res.data.email}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-3">Phone:</div>` +
+                            `<div class="col-md-3">${res.data.phone}</div>` +
+                            `<div class="col-md-3">Address:</div>` +
+                            `<div class="col-md-3">${res.data.address}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-3">City:</div>` +
+                            `<div class="col-md-3">${res.data.city}</div>` +
+                            `<div class="col-md-3">State:</div>` +
+                            `<div class="col-md-3">${res.data.state}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-3">Zip code</div>` +
+                            `<div class="col-md-3">${res.data.zip_code}</div>` +
+                            `<div class="col-md-3">Owner Name</div>` +
+                            `<div class="col-md-3">${res.data.owner}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-3"><p>Invoice Email:</p></div>` +
+                            `<div class="col-md-3"><p>${res.data.invoice_email ?? null}</p></div>` +
+                            `<div class="col-md-3"><p>Status:</p></div>` +
+                            `<div class="col-md-3"><p>${res.data.status ?? null}</p></div>` +
+                            `</div><br>`);
 
                     },
                     error: () => {
