@@ -310,25 +310,25 @@
                             `<div class="col-md-2">Turn:</div>` +
                             `<div class="col-md-4">${res.data.turn ? res.data.turn.name : 'N/A'}</div>` +
                             `<div class="col-md-2">Zone:</div>` +
-                            `<div class="col-md-4">${res.data.zone.name}</div>` +
+                            `<div class="col-md-4">${res.data.zone.name ? res.data.zone.name: : 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-2">Truck:</div>` +
                             `<div class="col-md-4">${res.data.truck ? res.data.truck.number : 'N/A'}</div>` +
                             `<div class="col-md-2">Name:</div>` +
-                            `<div class="col-md-4">${res.data.name}</div>` +
+                            `<div class="col-md-4">${res.data.name ? res.data.name : 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-2">Email:</div>` +
-                            `<div class="col-md-4">${res.data.email}</div>` +
+                            `<div class="col-md-4">${res.data.email ? res.data.email : 'N/A' }</div>` +
                             `<div class="col-md-2">Phone:</div>` +
-                            `<div class="col-md-4">${res.data.phone}</div>` +
+                            `<div class="col-md-4">${res.data.phone ? res.data.phone : 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-2"><p>Address:</p></div>` +
-                            `<div class="col-md-4"><p>${res.data.address}</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.address ? res.data.address : 'N/A' }</p></div>` +
                             `<div class="col-md-2"><p>Language:</p></div>` +
-                            `<div class="col-md-4"><p>${res.data.language}</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.language ? res.data.language : 'N/A' }</p></div>` +
                             `</div><br>`+
                             `<div class="row">` +
                             `<div class="col-md-2"><p>Status:</p></div>` +

@@ -207,31 +207,31 @@
                             `<div class="col-md-3">Name:</div>` +
                             ` <div class="col-md-3">${res.data.name}</div>` +
                             `<div class="col-md-3">Email:</div>` +
-                            `<div class="col-md-3">${res.data.email}</div>` +
+                            `<div class="col-md-3">${res.data.email ? res.data.email : 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-3">Phone:</div>` +
-                            `<div class="col-md-3">${res.data.phone}</div>` +
+                            `<div class="col-md-3">${res.data.phone ? res.data.phone: 'N/A'}</div>` +
                             `<div class="col-md-3">Address:</div>` +
-                            `<div class="col-md-3">${res.data.address}</div>` +
+                            `<div class="col-md-3">${res.data.address ? res.data.address: 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-3">City:</div>` +
-                            `<div class="col-md-3">${res.data.city}</div>` +
+                            `<div class="col-md-3">${res.data.city ? res.data.city: 'N/A'}</div>` +
                             `<div class="col-md-3">State:</div>` +
-                            `<div class="col-md-3">${res.data.state}</div>` +
+                            `<div class="col-md-3">${res.data.state ? res.data.state: 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-3">Zip code</div>` +
-                            `<div class="col-md-3">${res.data.zip_code}</div>` +
+                            `<div class="col-md-3">${res.data.zip_code ? res.data.zip_code: 'N/A'}</div>` +
                             `<div class="col-md-3">Owner Name</div>` +
-                            `<div class="col-md-3">${res.data.owner}</div>` +
+                            `<div class="col-md-3">${res.data.owner ? res.data.owner: 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-3"><p>Invoice Email:</p></div>` +
-                            `<div class="col-md-3"><p>${res.data.invoice_email ?? null}</p></div>` +
+                            `<div class="col-md-3"><p>${res.data.invoice_email ? res.data.invoice_email : 'N/A' }</p></div>` +
                             `<div class="col-md-3"><p>Status:</p></div>` +
-                            `<div class="col-md-3"><p>${res.data.status ?? null}</p></div>` +
+                            `<div class="col-md-3"><p>${res.data.status ? res.data.status : 'N/A' }</p></div>` +
                             `</div><br>`);
 
                     },
