@@ -252,7 +252,7 @@ class Kernel extends ConsoleKernel
                 $data['day'] = 0;            
                 $this->NotificationPaperworkAlert($data);
             }
-        })->daily()->at('14:01');
+        })->daily()->at('15:00');
     }
 
     /**
