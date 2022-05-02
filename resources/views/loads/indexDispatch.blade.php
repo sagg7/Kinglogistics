@@ -365,15 +365,16 @@
                             color = 'red'
                         let classU = "";
                         this.eGui.innerHTML = `<span class = "${classU}" time = "${nowT - created}" style="color: ${color}">${msToTime(nowT - created)}</span>`;
-                        
+
                         if(params.data.status === 'finished'){
                             new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user?params.data.user.name:''}`});
                         }else if (params.data.status !== "finished") {
-                            if(params.data.creator_type == 'user'){
-                                new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
-                            }else if(params.data.creator_type == 'driver'){
-                                new bootstrap.Tooltip(this.eGui, {title: `Driver: ${params.data.driver?params.data.driver.name:''}`});
-                            }
+                            // if(params.data.creator_type == 'user'){
+                            //     new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.creator?params.data.creator.name:''}`});
+                            // }else if(params.data.creator_type == 'driver'){
+                            //     new bootstrap.Tooltip(this.eGui, {title: `Driver: ${params.data.driver?params.data.driver.name:''}`});
+                            // }
+                            new bootstrap.Tooltip(this.eGui, {title: `Dispatch: ${params.data.user_init?params.data.user_init.name:''}`});
                             classU = "update"
                         }
 
