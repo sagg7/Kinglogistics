@@ -91,6 +91,7 @@ trait GenerateLoads
                 $load->creator_type = 'driver';
             }
             $load->creator_id  = auth()->user()->id;
+            $load->dispatch_init =  auth()->user()->id;
 
             $load->shipper_id = $trip->shipper_id;
             $load->load_type_id = $data["load_type_id"];

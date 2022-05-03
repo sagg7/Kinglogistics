@@ -152,13 +152,17 @@ class CarrierController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(int $id)
+    public function show(Request $request,int $id)
     {
         $carrier = Carrier::whereHas('broker', function ($q) {
             $q->where('id', session('broker'));
         })
             ->findOrFail($id);
-        return view('carriers.show', compact('carrier'));
+            if ($request->ajax()){
+                return ['data' => $carrier];}
+                else{
+                    return view('carriers.show', compact('carrier'));
+                }
     }
 
     public function summaryData(int $id = null)

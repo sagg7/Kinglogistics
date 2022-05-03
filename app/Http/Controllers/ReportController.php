@@ -59,7 +59,7 @@ class ReportController extends Controller
         $max_load = dispatch_report::max('loads_finalized');
         $loads_finalized = Load::where('dispatch_id',$userId)
         ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
-        ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
+        ->whereBetween('load_statuses.finished_timestamp', [$start, $now])
          ->where('broker_id', session('broker'))->count();
 
          //total loads
@@ -151,7 +151,7 @@ class ReportController extends Controller
         $max_load = dispatch_report::max('loads_finalized');
         $loads_finalized = Load::where('dispatch_id',$userId)
         ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
-        ->whereBetween('load_statuses.finished_timestamp', [$now->subHours(12), $now])
+        ->whereBetween('load_statuses.finished_timestamp', [$start, $now])
          ->where('broker_id', session('broker'))->count();
 
          //total loads

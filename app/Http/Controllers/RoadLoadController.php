@@ -11,6 +11,7 @@ use App\Models\LoadType;
 use App\Models\RoadLoad;
 use App\Models\Shipper;
 use App\Models\State;
+use App\Models\DispatchSchedule;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
@@ -76,6 +77,7 @@ class RoadLoadController extends Controller
 
     public function storeUpdate(Request $request)
     {
+        $date = Carbon::now();
         $coordsOrigin = City::with('state:id,name')->findOrFail($request->citiesOrigin)->first();
         $coordsDestination = City::with('state:id,name')->findOrFail($request->cityDestination)->first();
         $roadLoad = new RoadLoad();
@@ -106,6 +108,10 @@ class RoadLoadController extends Controller
             $load->creator_type = 'driver';
         }
         $load->creator_id = auth()->user()->id;
+        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+                ->where('time', $date->format("H").':00:00')->first();
+        if ($dispatch)
+                $load->dispatch_init = $dispatch->user_id;
         $load->save();
 
         $shipper = Shipper::findOrFail($load->shipper_id);

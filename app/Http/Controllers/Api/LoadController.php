@@ -137,6 +137,7 @@ class LoadController extends Controller
     public function getActive(Request $request)
     {
         $driver = auth()->user();
+        $date = Carbon::now();
 
         $activeLoad = DB::table('loads')
             ->where('driver_id', $driver->id)
@@ -166,6 +167,11 @@ class LoadController extends Controller
             $load->creator_type = 'driver';
         }
         $load->creator_id  = auth()->user()->id;
+        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+                ->where('time', $date->format("H").':00:00')->first();
+        if ($dispatch)
+                $load->dispatch_init = $dispatch->user_id;
+
         return response([
             'status' => 'ok',
             'message' => $message,

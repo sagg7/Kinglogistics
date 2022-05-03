@@ -9,10 +9,12 @@ use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\DriverWorkedHour;
 use App\Models\Shift;
+use App\Models\PaperworkFile;
 use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Chat\MessagesTrait;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\Notifications\PushNotificationsTrait;
+use App\Traits\Paperwork\PaperworkSendEmailAlert;
 use App\Traits\Ranking\RankingTrait;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,7 +24,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
-    use PaymentsAndCollection, GetSelectionData, PushNotificationsTrait, MessagesTrait, RankingTrait;
+    use PaymentsAndCollection, GetSelectionData, PushNotificationsTrait, MessagesTrait, RankingTrait, PaperworkSendEmailAlert;
 
     /**
      * The Artisan commands provided by your application.
@@ -216,6 +218,41 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $this->calculateRanking();
         })->weekly()->mondays()->at('00:01');
+
+        // Notifications of days of expiration paperwork
+        $schedule->call(function () {
+            $days30 = Carbon::now()->addDays(30);
+            $days15 = Carbon::now()->addDays(15);
+            $days3 = Carbon::now()->addDays(3);
+            $days = Carbon::now();
+            
+            $query30 = PaperworkFile::whereDate('expiration_date', $days30)
+                ->get();
+            $query15 = PaperworkFile::whereDate('expiration_date', $days15)
+                ->get();
+            $query3 = PaperworkFile::whereDate('expiration_date', $days3)
+                ->get();
+            $query = PaperworkFile::whereDate('expiration_date', $days)
+                ->get();
+            
+            // dd($query, $query30,$query15,$query3);
+            foreach($query30 as $data){
+                $data['day'] = 30;
+                $this->NotificationPaperworkAlert($data);
+            }
+            foreach($query15 as $data){
+                $data['day'] = 15;           
+                $this->NotificationPaperworkAlert($data);    
+            }
+            foreach($query3 as $data){
+                $data['day'] = 3;           
+                $this->NotificationPaperworkAlert($data);
+            }
+            foreach ($query as  $data){
+                $data['day'] = 0;            
+                $this->NotificationPaperworkAlert($data);
+            }
+        })->daily()->at('15:00');
     }
 
     /**

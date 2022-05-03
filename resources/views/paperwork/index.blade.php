@@ -2,6 +2,7 @@
     <x-slot name="crumb_section">Paperwork</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
+    
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
     @endsection
@@ -121,7 +122,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

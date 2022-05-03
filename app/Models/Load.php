@@ -177,6 +177,10 @@ class Load extends Model
     {
         return $this->hasOne(User::class, 'id', 'dispatch_id');
     }
+    public function userInit(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'dispatch_init');
+    }
     public function creator(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'creator_id');
