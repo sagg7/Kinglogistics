@@ -44,7 +44,7 @@
         <!-- BEGIN: Custom CSS-->
         <!--<link rel="stylesheet" href="{{ asset("css/modules/daterangepicker/daterangepicker.css") }}">-->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-        <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
+        <link rel="stylesheet" href="{{ asset("css/fontawesome.css?6.1.1") }}">
         <link rel="stylesheet" href="{{ asset("css/app.css?1.0.1") }}">
         <style>
             body.semi-dark-layout .main-menu-content .navigation-main,
