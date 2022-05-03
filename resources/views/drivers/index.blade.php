@@ -310,7 +310,7 @@
                             `<div class="col-md-2">Turn:</div>` +
                             `<div class="col-md-4">${res.data.turn ? res.data.turn.name : 'N/A'}</div>` +
                             `<div class="col-md-2">Zone:</div>` +
-                            `<div class="col-md-4">${res.data.zone.name ? res.data.zone.name: : 'N/A'}</div>` +
+                            `<div class="col-md-4">${res.data.zone.name ? res.data.zone.name : 'N/A'}</div>` +
                             `</div><br>` +
                             `<div class="row">` +
                             `<div class="col-md-2">Truck:</div>` +
