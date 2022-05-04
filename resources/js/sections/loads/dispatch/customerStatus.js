@@ -22,12 +22,12 @@ function filtersChange(tableCustomer){
                         `<tr><td>${shipper.name}</td>` +
                         `<td>${msToTime(shipper.avg*60*1000, false)}</td>` +
                         `<td>${msToTime(shipper.loadTime*60*1000, false)}</td>` +
-                        `<td data-toggle="tooltip" data-html="true" title="${shipper.total_loads}/${shipper.total_trucks ?? "N/A"}">${Number(shipper.total_loads/shipper.total_trucks).toFixed(2)}</td>` +
+                        `<td data-toggle="tooltip" data-html="true" >${Number(shipper.total_loads/shipper.total_trucks).toFixed(2)}</td>` +
                         `<td data-toggle="tooltip" data-html="true" title="${shipper.active_drivers}/${shipper.trucks_required ?? "N/A"}" style="color: ${color}">${(shipper.percentage > 0) ? shipper.percentage+"%" : "N/A"}</td>` +
                         `</tr>` );
                 acumAvg += shipper.avg;
                 acumTAR += parseInt(shipper.percentage);
-                acumAVGLoadPerTruck += Number(shipper.total_loads/shipper.total_trucks).toFixed(2);
+                acumAVGLoadPerTruck += parseFloat(shipper.total_loads/shipper.total_trucks);
                 acumAVGLoadTime += shipper.loadTime;
                 count++;
                 }
