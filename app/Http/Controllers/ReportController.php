@@ -156,7 +156,7 @@ class ReportController extends Controller
 
          //total loads
          $total_loads =0;
-         if($loads_finalized!=0)
+         if($loads_finalized != 0 && $max_load != 0)
             $total_loads =$loads_finalized*100/$max_load;
 
         $active_loads = Load::where('status','!=','finished')
