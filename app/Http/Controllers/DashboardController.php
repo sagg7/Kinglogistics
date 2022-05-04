@@ -113,7 +113,9 @@ class DashboardController extends Controller
 
     public function testKernel()
     {
-        abort(404);
+        //Excel::import(new CitiesImport(), 'cities.xlsx');
+        //Excel::queueImport(new CitiesImport(), 'cities.xlsx')->onQueue('imports');
+        //abort(404);
        /*$invoices = ShipperInvoice::where('status', '=', 'pending')
             ->with('loads')->get();
         foreach ( $invoices as $invoice){

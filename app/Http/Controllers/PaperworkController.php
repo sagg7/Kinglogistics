@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendPaperworkCompletionNotification;
+use App\Mail\SendNotificationPaperwork;
 use App\Models\Broker;
+use App\Models\User;
 use App\Models\Carrier;
 use App\Models\Driver;
+use App\Models\Truck;
+use App\Models\Trailer;
 use App\Models\Paperwork;
 use App\Models\PaperworkFile;
 use App\Models\PaperworkImage;
@@ -853,7 +857,9 @@ class PaperworkController extends Controller
             22, // margin bottom
             3, // margin header
             0); // margin footer
-        $mpdf->WriteHTML($html);
+            $mpdf->WriteHTML($html);
         return $mpdf->Output();
     }
+
 }
+

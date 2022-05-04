@@ -5,6 +5,9 @@
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
     @endsection
+    @section('modals')
+        @include('drivers.common.modals.viewDriver')
+    @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script defer>
@@ -151,7 +154,18 @@
                                 @if(auth()->user()->can(['delete-driver']))
                                 {route: '/driver/delete', type: 'delete'},
                                 @endif
+                                @if (auth()->user()->can(['read-driver']))
+                                        {text: 'View', route: '#viewDriver', icon: 'far fa-eye', type: 'modal'},
+                                @endif
                             ];
+                            gridOptions = {
+                                    components: {
+                                        OptionModalFunc: (modalId, driverId) => {
+                                            if (modalId == "#viewDriver") 
+                                                viewDriverFunction(modalId, driverId);
+                                        }
+                                    },
+                                };
                         }
                         return {
                             columns: [
@@ -163,6 +177,7 @@
                                 {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],
                             menu,
+                            gridOptions,
                             container: `grid${tableName}`,
                             url: `/driver/search/${type}`,
                             tableRef: `tb${tableName}`,
@@ -260,6 +275,75 @@
                     clearTablesParams(['shipper']);
                 });
             })();
+
+            function viewDriverFunction(modalId, driverId) {
+                const modal = $(`${modalId}`),
+                content = modal.find('#viewDriverContent');
+                modal.modal('show');
+                let text = '';
+                let sum = 0;
+                $.ajax({
+                    type: 'GET',
+                    url: '/driver/show/' + driverId,
+                    success: (res) => {
+                        if(res.data.shippers){
+                        res.data.shippers.forEach(myFunction);
+                        function myFunction(item) {
+                            if(sum == 0){
+                                text +=  item.name;
+                            }else {
+                                text +=  item.name + ", " ;
+                            }
+                            sum++;
+                        }}else{text = 'N/A'}
+                        
+                        content.empty();
+                        content.append(
+                            `<div class="form-group">` +
+                            `<div class="row">` +
+                            `<div class="col-md-2">Carrier:</div>` +
+                            `<div class="col-md-4">${res.data.carrier.name}</div>` +
+                            `<div class="col-md-2">Shippers:</div>` +
+                            `<div class="col-md-4">${text}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-2">Turn:</div>` +
+                            `<div class="col-md-4">${res.data.turn ? res.data.turn.name : 'N/A'}</div>` +
+                            `<div class="col-md-2">Zone:</div>` +
+                            `<div class="col-md-4">${res.data.zone.name ? res.data.zone.name : 'N/A'}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-2">Truck:</div>` +
+                            `<div class="col-md-4">${res.data.truck ? res.data.truck.number : 'N/A'}</div>` +
+                            `<div class="col-md-2">Name:</div>` +
+                            `<div class="col-md-4">${res.data.name ? res.data.name : 'N/A'}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-2">Email:</div>` +
+                            `<div class="col-md-4">${res.data.email ? res.data.email : 'N/A' }</div>` +
+                            `<div class="col-md-2">Phone:</div>` +
+                            `<div class="col-md-4">${res.data.phone ? res.data.phone : 'N/A'}</div>` +
+                            `</div><br>` +
+                            `<div class="row">` +
+                            `<div class="col-md-2"><p>Address:</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.address ? res.data.address : 'N/A' }</p></div>` +
+                            `<div class="col-md-2"><p>Language:</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.language ? res.data.language : 'N/A' }</p></div>` +
+                            `</div><br>`+
+                            `<div class="row">` +
+                            `<div class="col-md-2"><p>Status:</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.status}</p></div>` +
+                            `<div class="col-md-2"><p>Inactive Observations:</p></div>` +
+                            `<div class="col-md-4"><p>${res.data.inactive_observations ? res.data.inactive_observations: 'N/A'}</p></div>` +
+                            `</div><br>`
+                            );
+
+                    },
+                    error: () => {
+                        throwErrorMsg();
+                    }
+                });
+            }
 
             function downloadExcel() {
                 window.location = "/driver/downloadExcel?" + $.param({

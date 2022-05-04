@@ -69,12 +69,16 @@ class ShipperController extends Controller
      */
     private function storeUpdate(Request $request, $id = null): Shipper
     {
-        if ($id)
+        if ($id) {
             $shipper = Shipper::whereHas('broker', function ($q) {
-                $q->where('id', session('broker'));
+                if (auth()->guard('shipper')->check()) {
+                    $q->where('id', auth()->user()->id);
+                } else {
+                    $q->where('id', session('broker'));
+                }
             })
                 ->findOrFail($id);
-        else {
+        } else {
             $shipper = new Shipper();
             $shipper->broker_id = session('broker');
         }
@@ -85,10 +89,14 @@ class ShipperController extends Controller
         $shipper->trucks_required = $request->trucks_required;
         $shipper->loads_per_invoice = $request->loads_per_invoice;
         $shipper->type_rate = $request->type_rate;
-        if ($request->password)
+        $shipper->factoring = $request->factoring;
+        $shipper->days_to_pay = $request->days_to_pay;
+        if ($request->password) {
             $shipper->password = Hash::make($request->password);
-        if ($request->payment_days)
+        }
+        if ($request->payment_days) {
             $shipper->payment_days = implode(',',$request->payment_days);
+        }
         $shipper->save();
 
         return $shipper;
@@ -151,10 +159,11 @@ class ShipperController extends Controller
 
         $this->storeUpdate($request, $id);
 
-        if ($profile)
+        if ($profile) {
             return redirect()->route('shipper.profile');
-        else
+        } else {
             return redirect()->route('shipper.index');
+        }
     }
 
     /**
@@ -218,7 +227,6 @@ class ShipperController extends Controller
         $end = Carbon::now();
         $shipper_id = $request->shipper_id;
 
-
         $shippersAccepted = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
             $q->whereBetween('accepted_timestamp', [$start, $end])
                 ->orderBy('accepted_timestamp', 'asc');
@@ -234,7 +242,7 @@ class ShipperController extends Controller
             $shippersAccepted->where('id',$shipper_id);
         }
 
-        $shippersfinished = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
+        $shippersFinished = Shipper::with(['loadStatus'=> function($q) use ($start,$end,$shipper_id){
             $q->whereBetween('finished_timestamp', [$start, $end])
                 ->orderBy('finished_timestamp', 'asc');
             if($shipper_id){
@@ -243,36 +251,35 @@ class ShipperController extends Controller
         }]);
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
-            $shippersfinished->where('id',$shipper_id);
+            $shippersFinished->where('id',$shipper_id);
         }
 
         $shippers = $shippersAccepted->get();
         $shipperAvg= [];
         foreach($shippers as $key => $shipper){
-
             $totalTime = 0;
             $date = $start;
             $count = 0;
 
-           foreach($shipper->loadStatus as $load){
+            foreach($shipper->loadStatus as $load){
                 if ($date != null){
                     $totalTime += Carbon::parse($load->accepted_timestamp)->diffInMinutes($date);
                 }
-               $date =$load->accepted_timestamp;
-               $count++;
-           }
+                $date =$load->accepted_timestamp;
+                $count++;
+            }
             $truck_required =$shipper->trucks_required;
             $active_drivers = $shipper->drivers_count;
             $truck_required_exist = 0;
-            if ($active_drivers > 0)
+            if ($active_drivers > 0) {
                 $truck_required_exist = $truck_required ? round($active_drivers * 100 / $truck_required) : 0;
+            }
 
             $shipperAvg[$shipper->id] = ['name'=>$shipper->name,'avg'=>round(($count != 0) ? $totalTime/$count : 0), 'trucks_required'=>$shipper->trucks_required, 'active_drivers' => $shipper->drivers_count, 'percentage' => $truck_required_exist];
         }
         $totalTime = 0;
         $totalCount = 0;
-        foreach ($shippersfinished->get() as $shipper) {
-
+        foreach ($shippersFinished->get() as $shipper) {
             $shipperTotalTime = 0;
             $date = null;
             $count = 0;
@@ -282,20 +289,14 @@ class ShipperController extends Controller
             }
             $totalTime += $shipperTotalTime;
             $totalCount += $count;
-            if($shipperAvg[$shipper->id])
+            if ($shipperAvg[$shipper->id]) {
                 $shipperAvg[$shipper->id] += ['loadTime'=>round(($count !== 0) ? $shipperTotalTime/$count : 0)];
+            }
         }
-        $params = [
+        return [
             'shipperAvg' => $shipperAvg,
             'LoadTimeAvg' => round(($totalCount !== 0) ? $totalTime/$totalCount : 0),
         ];
-        return $params;
-
     }
-
-
-
-
-
 }
 

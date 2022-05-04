@@ -436,7 +436,7 @@
             showPreview();
         }
     };
-    window.Echo.private(`chat.${userId}`)
+    window.Echo.private(`chat.${brokerId}`)
         .listen('NewChatMessage', e => {
             if (!openChat)
                 messageCounter.removeClass('d-none');

@@ -12,7 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix//.sass('resources/sass/app.scss', 'public/css')
-    /*.postCss('resources/css/fontawesome.css', 'public/css')*/
+    .postCss('resources/css/fontawesome.css', 'public/css')
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
         require('tailwindcss'),
@@ -28,8 +28,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/modules/aggrid/common.js'], 'public/js/modules/aggrid/common.min.js')
     //.js('resources/js/app.js', 'public/js')
     // GUEST
-    .postCss('resources/css/guest.css', 'public/css/guest/app.min.css')
-    .js('resources/js/guest.js', 'public/js/guest/app.min.js')
+    //.postCss('resources/css/guest.css', 'public/css/guest/app.min.css')
+    //.js('resources/js/guest.js', 'public/js/guest/app.min.js')
     // Common
     //.js('resources/js/common/typesModal.js', 'public/js/common/typesModal.min.js')
     //.js('resources/js/modules/laravel-echo/echo.js', 'public/js/modules/laravel-echo/echo.js')
@@ -50,6 +50,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loads/dispatch/createDispatchReport.js'], 'public/js/sections/loads/dispatch/createDispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/dispatchReport.js'], 'public/js/sections/loads/dispatch/dispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/originsAndDestinations.js'], 'public/js/sections/loads/dispatch/originsAndDestinations.min.js')
+    //.scripts(['resources/js/sections/loads/road/postLoad.js'], 'public/js/sections/loads/road/postLoad.min.js')
+    //.scripts(['resources/js/sections/loads/road/searchBoard.js'], 'public/js/sections/loads/road/searchBoard.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
     //.scripts(['resources/js/sections/incomes/common.js'], 'public/js/sections/incomes/common.min.js')

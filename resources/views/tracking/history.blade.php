@@ -7,7 +7,7 @@
         <script>
             const company = @json($company);
         </script>
-        <script src="{{ asset('js/sections/tracking/history.min.js?1.1.0') }}"></script>
+        <script src="{{ asset('js/sections/tracking/history.min.js?1.1.1') }}"></script>
     @endsection
 
     <div class="card">

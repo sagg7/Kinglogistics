@@ -10,14 +10,14 @@
                     </a>
                 </div>
             </div>
-            <!--<div class="col-auto">
+            <div class="col-auto d-xl-none">
                 <div class="nav-item nav-toggle">
                     <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse">
                         <i class="feather icon-x d-block d-xl-none font-medium-4 primary toggle-icon"></i>
                         <i class="toggle-icon feather icon-disc font-medium-4 d-none d-xl-block primary" data-ticon="icon-disc"></i>
                     </a>
                 </div>
-            </div>-->
+            </div>
         </div>
     </div>
     <div class="shadow-bottom"></div>
@@ -33,11 +33,11 @@
                 <a href="/profile"><i class="fas fa-user"></i><span class="menu-title">Profile</span></a>
             </li>
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-truck-loading"></i><span class="menu-title">Loads</span></a>
+                <a href="#"><i class="fas fa-clipboard-list"></i><span class="menu-title">Load Board</span></a>
                 <ul class="menu-content">
                     <li>
                         <a href="/load/road/index">
-                            <i class="far fa-circle"></i><span class="menu-item">Search</span>
+                            <i class="far fa-circle"></i><span class="menu-item">View</span>
                         </a>
                     </li>
                 </ul>

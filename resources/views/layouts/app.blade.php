@@ -29,7 +29,7 @@
         <link rel="stylesheet" href="{{ asset("app-assets/css/colors.css?1.0.1") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/components.min.css") }}">
         <link rel="stylesheet" href="{{ asset("app-assets/css/themes/dark-layout.css") }}">
-        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css?1.0.0") }}">
+        <link rel="stylesheet" href="{{ asset("app-assets/css/themes/semi-dark-layout.css?1.0.1") }}">
         <!-- END: Theme CSS-->
 
         <!-- BEGIN: Page CSS-->
@@ -44,7 +44,7 @@
         <!-- BEGIN: Custom CSS-->
         <!--<link rel="stylesheet" href="{{ asset("css/modules/daterangepicker/daterangepicker.css") }}">-->
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-        <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
+        <link rel="stylesheet" href="{{ asset("css/fontawesome.css?6.1.1") }}">
         <link rel="stylesheet" href="{{ asset("css/app.css?1.0.1") }}">
         <style>
             body.semi-dark-layout .main-menu-content .navigation-main,
@@ -98,6 +98,7 @@
     <footer class="footer footer-static footer-light"></footer>
     <script>
         const userId = {{ auth()->user()->id }};
+        const brokerId = {{ auth()->user()->broker_id ?? 'null' }};
     </script>
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>
@@ -125,7 +126,7 @@
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/laravel-echo/echo.js?1.0.0') }}"></script>
     @if(auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
-        <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.0") }}"></script>
+        <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.1") }}"></script>
     @endif
 
     <!-- BEGIN: Scripts JS-->
@@ -134,6 +135,7 @@
             type="application/javascript"></script>
     <script src="{{ asset("app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js?1.0.0") }}"
             type="application/javascript"></script>
+    <script src="{{ asset("app-assets/js/scripts/popover/popover.js") }}" type="application/javascript"></script>
     <!-- END: Scripts JS-->
     @yield("scripts")
     <script>

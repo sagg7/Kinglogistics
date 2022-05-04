@@ -447,6 +447,9 @@ class LoadController extends Controller
             "loads.customer_po",
             "loads.load_type_id",
             "loads.dispatch_id",
+            "loads.creator_id",
+            "loads.creator_type",
+            "loads.dispatch_init"
         ];
         $query = Load::with([
             'driver' => function ($q) {
@@ -465,6 +468,9 @@ class LoadController extends Controller
             'shipper:id,name',
             'load_type:id,name',
             'user:id,name',
+            'userInit:id,name',
+            'creator:id,name',
+
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {

@@ -52,6 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
         require __DIR__.'/web/brokers.php';
         require __DIR__.'/web/bonuses.php';
         require __DIR__.'/web/reports.php';
+        require __DIR__.'/common/roadLoad.php';
+        require __DIR__.'/common/cities.php';
 
         Route::get('/testMail', function () {
             Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());
