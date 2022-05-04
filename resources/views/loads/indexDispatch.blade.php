@@ -974,6 +974,7 @@
                                 <th>Name</th>
                                 <th>AVG Waiting Per Load</th>
                                 <th>AVG Load Time</th>
+                                <th>AVG Load Per Truck</th>
                                 <th>Truck Active Required</th>
                             </tr>
                             </thead>

@@ -78,7 +78,7 @@
                     {{-- @if(auth()->user()->hasRole('spotter')||auth()->user()->hasRole('admin')) --}}
                     <li>
                         <a href="/user/spotterCheckInOut">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Spotter Check In/out</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Check In/out</span>
                         </a>
                     </li>
                     {{-- @endif --}}
@@ -205,7 +205,7 @@
             @endif
             @if(auth()->user()->can(['create-truck', 'read-truck']))
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
+                <a href="#"><i class="fas fa-truck-moving"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
                 <ul class="menu-content">
                     @if(auth()->user()->can(['create-truck']))
                     <li>
