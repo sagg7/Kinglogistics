@@ -465,66 +465,66 @@
                 </ul>
             </li>
             @endif
-            <li class="navigation-header">
-                <span>Safety</span>
-            </li>
-            @if(auth()->user()->can(['create-incident', 'read-incident']))
+            {{-- start --}}
+
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
+                <a href="#"><i class="fa-solid fa-helmet-safety"></i><span class="menu-title"
+                        data-i18n="User">Safety</span></a>
                 <ul class="menu-content">
-                    @if(auth()->user()->can(['create-incident']))
-                    <li>
-                        <a href="/incident/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->can(['create-incident', 'read-incident']))
+                        <li class="has-sub">
+                            <a href="#"><i class="far fa-circle"></i><span class="menu-title"
+                                    data-i18n="User">Incident</span></a>
+                            <ul class="menu-content">
+                                @if (auth()->user()->can(['create-incident']))
+                                    <li class="pl-1">
+                                        <a href="/incident/create">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="List">Create</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if (auth()->user()->can(['read-incident']))
+                                    <li class="pl-1">
+                                        <a href="/incident/index">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="View">View</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
                     @endif
-                    @if(auth()->user()->can(['read-incident']))
-                    <li>
-                        <a href="/incident/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->can(['create-safety-messages', 'read-safety-messages']))
+                        <li class="has-sub">
+                            <a href="#"><i class="far fa-circle"></i><span class="menu-title"
+                                    data-i18n="User">Messages</span></a>
+                            <ul class="menu-content">
+                                @if (auth()->user()->can(['create-safety-messages']))
+                                    <li class="pl-1">
+                                        <a href="/safetyMessage/create">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="List">Create</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if (auth()->user()->can(['read-safety-messages']))
+                                    <li class="pl-1">
+                                        <a href="/safetyMessage/index">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="View">View</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
                     @endif
                 </ul>
             </li>
-            @endif
-            <!--<li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Incident Types</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/incidentType/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/incidentType/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>-->
-            @if(auth()->user()->can(['create-safety-messages', 'read-safety-messages']))
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-envelope-open-text"></i><span class="menu-title" data-i18n="User">Messages</span></a>
-                <ul class="menu-content">
-                    @if(auth()->user()->can(['create-safety-messages']))
-                    <li>
-                        <a href="/safetyMessage/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    @endif
-                    @if(auth()->user()->can(['read-safety-messages']))
-                    <li>
-                        <a href="/safetyMessage/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
+
+            {{-- end --}}
+
+            
         </ul>
     </div>
 </div>

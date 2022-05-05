@@ -12,6 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix//.sass('resources/sass/app.scss', 'public/css')
+// .postCss('public/app-assets/css/components.css', 'public/app-assets/css/components.min.css')
     // .postCss('resources/css/fontawesome.css', 'public/css')
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
@@ -46,7 +47,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/driverStatus.js'], 'public/js/sections/loads/dispatch/driverStatus.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/loadSummary.js'], 'public/js/sections/loads/dispatch/loadSummary.min.js')
-    .scripts(['resources/js/sections/loads/dispatch/customerStatus.js'], 'public/js/sections/loads/dispatch/customerStatus.min.js')
+    // .scripts(['resources/js/sections/loads/dispatch/customerStatus.js'], 'public/js/sections/loads/dispatch/customerStatus.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/createDispatchReport.js'], 'public/js/sections/loads/dispatch/createDispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/dispatchReport.js'], 'public/js/sections/loads/dispatch/dispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/originsAndDestinations.js'], 'public/js/sections/loads/dispatch/originsAndDestinations.min.js')
