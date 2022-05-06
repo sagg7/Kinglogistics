@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="crumb_section">Staff</x-slot>
-    <x-slot name="crumb_subsection">Spotter Check In/Out</x-slot>
+    <x-slot name="crumb_subsection">Check In/Out</x-slot>
     
     @section('modals')
         @include("common.modals.genericAjaxLoading", ["id" => "getCheckInModal", "title" => "Make Check In"])

@@ -23,7 +23,6 @@ function getDispatchReport() {
         $('.reports').click(function(){
 
             let id = $(this).attr("id");
-            console.log(id);
             let modal = $('#DispatchReportModal')
             //     form = modal.find("textarea").serialize();
             $.ajax({
@@ -84,9 +83,9 @@ function getDispatchReport() {
                         `</div><br>` +
                         `<div class="row">` +
                         `<div class="col-md-3"><p>Well Status:</p></div>` +
-                        `<div class="col-md-12"><p>${res.well_status}</p></div>` +
+                        `<div class="col-md-3"><p>${res.well_status}</p></div>` +
                         `<div class="col-md-3"><p>Description:</p></div>` +
-                        `<div class="col-md-12"><p>${res.description}</p></div>` +
+                        `<div class="col-md-3"><p>${res.description}</p></div>` +
                         `</div><br>`
                     )
                 },

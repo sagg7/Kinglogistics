@@ -12,11 +12,11 @@
             const content = @json($message->message_json);
             (() => {
                 $("#carrier_id")
-                    .html(`<option value="{{ $message->carrier_id }}">{{ $message->carrier->name }}</option>`)
+                    .html(`<option value="{{ $message->carrier_id }}">{{ $message->carrier ? $message->carrier->name : "N/A" }}</option>`)
                     .val({{ $message->carrier_id }})
                     .trigger('change');
                 $("#zone_id")
-                    .html(`<option value="{{ $message->zone_id }}">{{ $message->zone->name }}</option>`)
+                    .html(`<option value="{{ $message->zone_id }}">{{ $message->zone ? $message->zone->name : "N/A" }}</option>`)
                     .val({{ $message->zone_id }})
                     .trigger('change');
                 const drivers = @json($message->drivers);

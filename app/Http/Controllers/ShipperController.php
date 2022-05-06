@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ShipperController extends Controller
 {
@@ -227,6 +228,7 @@ class ShipperController extends Controller
     public function shipperStatus(Request $request)
     {
         $start = Carbon::now()->subHour(12);
+        $start2 = Carbon::now()->subHour(24);
         $end = Carbon::now();
         $shipper_id = $request->shipper_id;
 
@@ -241,6 +243,19 @@ class ShipperController extends Controller
             $q->where('status', '!=', 'inactive')
                 ->whereHas('truck');
         }]);
+
+        //DailyLoads is working with by 24hrs and in this query you get total loads and total trucks
+        $dailyLoads = Shipper::select([
+            'shippers.id',
+            DB::raw("(select count(loads.id) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null) as loads"),
+            DB::raw("(select count(DISTINCT (driver_id)) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null ) as trucks"),
+        ]);
+        
+        if($shipper_id){
+            $dailyLoads->where('shipper_id',$shipper_id);
+        }
+        $dailyLoads = $dailyLoads->get();
+
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
         }
@@ -252,6 +267,7 @@ class ShipperController extends Controller
                 $q->where('shipper_id',$shipper_id);
             }
         }]);
+        
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
             $shippersFinished->where('id',$shipper_id);
@@ -264,7 +280,7 @@ class ShipperController extends Controller
             $date = $start;
             $count = 0;
 
-            foreach($shipper->loadStatus as $load){
+        foreach($shipper->loadStatus as $load){
                 if ($date != null){
                     $totalTime += Carbon::parse($load->accepted_timestamp)->diffInMinutes($date);
                 }
@@ -294,6 +310,11 @@ class ShipperController extends Controller
             $totalCount += $count;
             if ($shipperAvg[$shipper->id]) {
                 $shipperAvg[$shipper->id] += ['loadTime'=>round(($count !== 0) ? $shipperTotalTime/$count : 0)];
+            }
+        }
+        foreach ($dailyLoads as $shipper) {
+            if ($shipperAvg[$shipper->id]) {
+                $shipperAvg[$shipper->id] += ['total_loads'=> $shipper->loads, 'total_trucks'=> $shipper->trucks];
             }
         }
         return [
