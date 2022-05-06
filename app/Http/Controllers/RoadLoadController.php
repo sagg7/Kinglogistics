@@ -9,9 +9,11 @@ use App\Models\LoadMode;
 use App\Models\LoadTrailerType;
 use App\Models\LoadType;
 use App\Models\RoadLoad;
+use App\Models\RoadLoadRequest;
 use App\Models\Shipper;
 use App\Models\State;
 use App\Models\DispatchSchedule;
+use App\Models\Truck;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use Carbon\Carbon;
@@ -211,6 +213,26 @@ class RoadLoadController extends Controller
     }
 
     /**
+     * @param $item
+     * @return array|string[]|null
+     */
+    private function getRelationArray($item): ?array
+    {
+        switch ($item) {
+            /*case 'relation':
+                $array = [
+                    //'relation' => $item,
+                    'column' => 'created_at',
+                ];
+                break;*/
+            default:
+                $array = null;
+        }
+
+        return $array;
+    }
+
+    /**
      * @param Request $request
      * @return array
      */
@@ -232,6 +254,12 @@ class RoadLoadController extends Controller
             );
         };
 
+        if (auth()->guard('carrier')->check()) {
+            $requestable_type = 'carrier';
+        } else {
+            $requestable_type = 'user';
+        }
+
         $query = Load::select([
             'id',
             'date',
@@ -240,8 +268,6 @@ class RoadLoadController extends Controller
             'weight',
         ])
             ->where('type', LoadTypeEnum::ROAD)
-            ->whereDate('date', '>=', Carbon::parse($request->ship_date_start))
-            ->whereDate('date', '<=', Carbon::parse($request->ship_date_end))
             ->where(function ($q) use ($request) {
                 if ($request->weight) {
                     $q->where('weight', '<=', $request->weight);
@@ -279,9 +305,15 @@ class RoadLoadController extends Controller
                             }
                         }
                     });
+
+                // This checks if the load has a request that has been accepted, if it has, it doesn't query the load
+                $q->whereDoesntHave('request', function ($q) {
+                    $q->where('status', 'accepted');
+                })
+                    ->whereDoesntHave('request'); // Or query the ones that do not have a request at all
             })
             ->with([
-                'road' => function ($q) {
+                'road' => function ($q) use ($requestable_type) {
                     $q->select([
                         'id',
                         'load_id',
@@ -306,9 +338,30 @@ class RoadLoadController extends Controller
                                 $q->select(['id', 'state_id', 'name'])
                                     ->with('state:id,abbreviation');
                             },
+                            'request' => function ($q) use ($requestable_type) {
+                                $filterRequestable = function ($q) {
+                                    // If a carrier is searching, filter via the id of the related requestable
+                                    if (auth()->guard('carrier')->check()) {
+                                        $q->where('id', auth()->user()->id);
+                                    } else {
+                                        // else if the broker is searching, filter via the requestable broker id
+                                        $q->where('broker_id', session('broker'));
+                                    }
+                                };
+                                $q->where('requestable_type', $requestable_type)
+                                    ->whereHas('requestable', function ($q) use ($filterRequestable) {
+                                        $filterRequestable($q);
+                                    })
+                                    ->with([
+                                        "requestable" => function ($q) use ($filterRequestable) {
+                                            $filterRequestable($q);
+                                            $q->select('id', 'broker_id');
+                                        }
+                                    ]);
+                            }
                         ]);
                 },
-                'shipper:id,name,factoring,days_to_pay',
+                'shipper:id,name,factoring,days_to_pay,phone',
             ])
             ->orderBy('date');
 
@@ -316,26 +369,144 @@ class RoadLoadController extends Controller
             $query->take(15);
         }
 
-        $query = $query->get();
-
-        $now = Carbon::now();
-        foreach ($query as $load) {
-            $load->age = Carbon::parse($load->road->created_at)->diff($now);
-            $start = $load->road->created_at;
-            $diffInSeconds = $start->diffInSeconds($now);
-            if ($diffInSeconds <= 86400) { // Checks if it's older than 24 hrs
-                $load->age = $start->diff($now)->format('%hh%im');
-            } else {
-                $load->age = $start->diffInHours($now) . 'd' . $start->diff($now)->format('%hh%im');
+        $calculateResultsData = function ($query) {
+            $now = Carbon::now();
+            foreach ($query as $load) {
+                $load->age = Carbon::parse($load->road->created_at)->diff($now);
+                $start = $load->road->created_at;
+                $diffInSeconds = $start->diffInSeconds($now);
+                if ($diffInSeconds <= 86400) { // Checks if it's older than 24 hrs
+                    $load->age = $start->diff($now)->format('%hh%im');
+                } else {
+                    $load->age = Carbon::parse($start)->diffInDays($now) . 'd' . $start->diff($now)->format('%hh%im');
+                }
+                $load->rate_mile = ($load->road->pay_rate && $load->mileage) ? ($load->road->pay_rate / $load->mileage) : 0;
             }
-            $load->rate_mile = ($load->road->pay_rate && $load->mileage) ? ($load->road->pay_rate / $load->mileage) : 0;
+        };
+
+        if ($request->dispatch) {
+            $array = $request->searchable;
+            $query->where(function ($q) use (&$array, $request) {
+                $statement = 'whereHas';
+                foreach ($array as $idx => $item) {
+                    switch ($item) {
+                        case 'age':
+                            $array[$idx] = 'created_at';
+                            break;
+                        case 'origin_city':
+                        case 'destination_city':
+                        case 'trailer_type':
+                            $q->$statement('road', function ($q) use ($item, $request) {
+                                $q->whereHas($item, function ($q) use ($request) {
+                                    $q->where('name', 'LIKE', "%$request->search%");
+                                });
+                            });
+                            $statement = 'orWhereHas';
+                            unset($array[$idx]);
+                            break;
+                        case 'origin_state':
+                        case 'destination_state':
+                            $q->orWhereHas('road', function ($q) use ($item, $request) {
+                                if ($item === 'origin_state') {
+                                    $relation = 'origin_city';
+                                } else {
+                                    $relation = 'destination_city';
+                                }
+                                $q->whereHas($relation, function ($q) use ($request) {
+                                    $q->whereHas('state', function ($q) use ($request) {
+                                        $q->where('name', 'LIKE', "%$request->search%")
+                                            ->orWhere('abbreviation', 'LIKE', "%$request->search%");
+                                    });
+                                });
+                            });
+                            unset($array[$idx]);
+                            break;
+                        case 'load_size':
+                        case 'length':
+                        case 'pay_rate':
+                            $q->orWhereHas('road', function ($q) use ($item, $request) {
+                                $q->where($item, 'LIKE', "%$request->search%");
+                            });
+                            unset($array[$idx]);
+                            break;
+                        case 'shipper':
+                            $q->orWhereHas($item, function ($q) use ($request) {
+                                $q->where('name', 'LIKE', "%$request->search%");
+                            });
+                            unset($array[$idx]);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            $request->searchable = $array;
+            $result = $this->multiTabSearchData($query, $request, null, 'orWhere');
+            $calculateResultsData($result['rows']);
+            return $result;
+        } else {
+            $query = $query->whereDate('date', '>=', Carbon::parse($request->ship_date_start))
+                ->whereDate('date', '<=', Carbon::parse($request->ship_date_end))
+                ->get();
+            $calculateResultsData($query);
         }
 
         return $query;
     }
 
+    public function request(Request $request)
+    {
+        if (auth()->guard('web')->check()) {
+            $carrier = Truck::with('carrier')->find($request->truck_id)->carrier;
+            $requestable_type = 'user';
+        } else if (auth()->guard('carrier')->check()) {
+            $carrier = auth()->user();
+            $requestable_type = 'carrier';
+        } else {
+            return abort(404);
+        }
+        $loadRequest = new RoadLoadRequest();
+        $loadRequest->road_load_id = $request->road_load_id;
+        $loadRequest->carrier_id = $carrier->id;
+        $loadRequest->truck_id = $request->truck_id;
+        $loadRequest->requestable_id = auth()->user()->id;
+        $loadRequest->requestable_type = $requestable_type;
+
+        return ['success' => $loadRequest->save()];
+    }
+
     public function indexDispatch()
     {
         return view('loads.road.dispatch.index');
+    }
+
+    public function getRequests(Request $request) {
+        return RoadLoadRequest::where('road_load_id', $request->road_load_id)
+            ->with([
+                'carrier:id,name',
+                'truck:id,number',
+            ])
+            ->get();
+    }
+
+    public function acceptRequest(Request $request) {
+        return DB::transaction(function () use ($request) {
+            $loadRequest = RoadLoadRequest::with([
+                'road.parentLoad',
+            ])
+                ->findOrFail($request->request_id);
+
+            RoadLoadRequest::where('road_load_id', $request->road_load_id)
+                ->where('id', '!=', $request->request_id)
+                ->update(['status' => 'rejected']);
+
+            $loadRequest->status = 'accepted';
+            $loadRequest->save();
+
+            $loadRequest->road->parentLoad->truck_id = $loadRequest->truck_id;
+            $loadRequest->road->parentLoad->save();
+
+            return ['success' => true];
+        });
     }
 }

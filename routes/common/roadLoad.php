@@ -9,6 +9,12 @@ Route::prefix('load')->group(function () {
             ->name('load.road.index');
         Route::get('search', [RoadLoadController::class, 'search'])
             ->name('load.road.search');
+        Route::post('request', [RoadLoadController::class, 'request'])
+            ->name('load.road.request');
+        Route::get('getRequests', [RoadLoadController::class, 'getRequests'])
+            ->name('load.road.getRequests');
+        Route::post('acceptRequest', [RoadLoadController::class, 'acceptRequest'])
+            ->name('load.road.acceptRequest');
 
         // Store modal routes
         Route::post('store', [RoadLoadController::class, 'store'])

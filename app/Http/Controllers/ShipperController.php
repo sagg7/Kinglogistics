@@ -36,8 +36,10 @@ class ShipperController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', "unique:shippers,email,$id,id"],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable','string','max:255'],
             'invoice_email' => ['nullable', new EmailArray, 'max:255'],
             'loads_per_invoice' => ['nullable','numeric'],
+            'days_to_pay' => ['nullable','numeric'],
         ]);
     }
 
@@ -85,6 +87,7 @@ class ShipperController extends Controller
 
         $shipper->name = $request->name;
         $shipper->email = $request->email;
+        $shipper->phone = $request->phone;
         $shipper->invoice_email = $request->invoice_email;
         $shipper->trucks_required = $request->trucks_required;
         $shipper->loads_per_invoice = $request->loads_per_invoice;

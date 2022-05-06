@@ -262,10 +262,14 @@ class TruckController extends Controller
             })
             ->whereNull("inactive");
 
-        if ($request->type === "drivers") {
-            $query->whereDoesntHave('driver');
+        switch ($request->type) {
+            case "drivers":
+                $query->whereDoesntHave('driver');
+                break;
+            case "hasCarrier":
+                $query->whereHas('carrier');
+                break;
         }
-
         return $this->selectionData($query, $request->take, $request->page);
     }
 

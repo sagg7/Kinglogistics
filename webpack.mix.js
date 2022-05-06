@@ -12,7 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix//.sass('resources/sass/app.scss', 'public/css')
-    .postCss('resources/css/fontawesome.css', 'public/css')
+    //.postCss('resources/css/fontawesome.css', 'public/css')
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
         require('tailwindcss'),
@@ -23,7 +23,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.sass('resources/css/bootstrap.scss', 'public/css/')
     // Modules
     //.scripts(['resources/js/modules/aggrid/dynamicFront.js'], 'public/js/modules/aggrid/dynamicFront.min.js')
-    //.scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
+    .scripts(['resources/js/modules/aggrid/backRequest.js'], 'public/js/modules/aggrid/backRequest.min.js')
     //.scripts(['resources/js/modules/aggrid/simpleTable.js'], 'public/js/modules/aggrid/simpleTable.min.js')
     //.scripts(['resources/js/modules/aggrid/common.js'], 'public/js/modules/aggrid/common.min.js')
     //.js('resources/js/app.js', 'public/js')
@@ -51,7 +51,8 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/loads/dispatch/dispatchReport.js'], 'public/js/sections/loads/dispatch/dispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/originsAndDestinations.js'], 'public/js/sections/loads/dispatch/originsAndDestinations.min.js')
     //.scripts(['resources/js/sections/loads/road/postLoad.js'], 'public/js/sections/loads/road/postLoad.min.js')
-    //.scripts(['resources/js/sections/loads/road/searchBoard.js'], 'public/js/sections/loads/road/searchBoard.min.js')
+    .scripts(['resources/js/sections/loads/road/searchBoard.js'], 'public/js/sections/loads/road/searchBoard.min.js')
+    .scripts(['resources/js/sections/loads/road/dispatch/index.js'], 'public/js/sections/loads/road/dispatch/index.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
     //.scripts(['resources/js/sections/incomes/common.js'], 'public/js/sections/incomes/common.min.js')

@@ -154,6 +154,7 @@ class DataSource {
         this.ajax = null;
         this.successCallback = data.successCallback;
         this.data = null;
+        this.formatResult = data.formatResult;
     }
 
     getRows(params)  {
@@ -176,8 +177,11 @@ class DataSource {
             },
             success: (res) => {
                 this.data = res;
+                if (this.formatResult) {
+                    this.data = this.formatResult(res);
+                }
                 // call the success callback
-                params.successCallback(res.rows, res.lastRow);
+                params.successCallback(this.data.rows, this.data.lastRow);
                 if (this.successCallback)
                     this.successCallback(res);
             },
@@ -197,6 +201,7 @@ class tableAG {
         this.columnDefs = [];
         this.renderSimple = typeof properties.renderSimple !== "undefined" ? properties.renderSimple : false;
         this.successCallback = typeof properties.successCallback !== "undefined" ? properties.successCallback : null;
+        this.formatDSResult = properties.formatDSResult ? properties.formatDSResult : null;
         this.menu = properties.menu ? properties.menu : [];
         this.constructColumns();
         this.page = 0;
@@ -214,7 +219,7 @@ class tableAG {
             colResizeDefault: "shift",
             animateRows: true,
             components: {
-                OptionsRenderer: OptionsRenderer,
+                OptionsRenderer,
                 OptionModalFunc: null,
                 tableRef: properties.tableRef,
             },
@@ -357,7 +362,7 @@ class tableAG {
     }*/
 
     updateSearchQuery(params = {}) {
-        let dsPar = {url: this.url, successCallback: this.successCallback};
+        let dsPar = {url: this.url, successCallback: this.successCallback, formatResult: this.formatDSResult};
         if (this.searchQueryParams)
             dsPar.params = _.merge(params, this.searchQueryParams)
         else
@@ -423,7 +428,7 @@ class tableAG {
                 this.gridOptions.columnApi.setColumnPinned(this.pinned, "left");
         });
 
-        let ds = new DataSource({url: this.url, successCallback: this.successCallback, params: this.searchQueryParams});
+        let ds = new DataSource({url: this.url, successCallback: this.successCallback, params: this.searchQueryParams, formatResult: this.formatDSResult});
         this.dataSource = ds;
         this.gridOptions.api.setServerSideDatasource(ds);
     }

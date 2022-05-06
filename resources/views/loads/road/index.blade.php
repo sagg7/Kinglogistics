@@ -9,12 +9,11 @@
                 padding-left: 5px;
                 padding-right: 5px;
             }
-
-            /*span.ag-header-icon.ag-header-cell-menu-button {
+            .ag-header-cell[col-id="status"] {
                 display: none;
-            }*/
+            }
             #dataTable, .aggrid .ag-header-cell-text {
-                font-size: .9rem !important;
+                font-size: 11px!important;
             }
         </style>
     @endsection
@@ -30,7 +29,10 @@
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script src="{{ asset('js/sections/loads/road/postLoad.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/road/searchBoard.min.js?1.0.0') }}"></script>
+        <script>
+            const boardType = 'makeRequest';
+        </script>
+        <script src="{{ asset('js/sections/loads/road/searchBoard.min.js?1.0.1') }}"></script>
     @endsection
 
     @if(auth()->guard('web')->check() || auth()->guard('shipper')->check())
