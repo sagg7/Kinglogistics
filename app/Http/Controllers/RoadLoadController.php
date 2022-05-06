@@ -79,65 +79,68 @@ class RoadLoadController extends Controller
 
     public function storeUpdate(Request $request)
     {
-        $date = Carbon::now();
-        $coordsOrigin = City::with('state:id,name')->findOrFail($request->citiesOrigin)->first();
-        $coordsDestination = City::with('state:id,name')->findOrFail($request->cityDestination)->first();
-        $roadLoad = new RoadLoad();
-        $load = new Load();
-        $load->broker_id = auth()->user()->broker_id;
-        $load->shipper_rate = $request->shipper_rate;
-        $load->rate = $request->rate;
-        $load->weight = $request->weight;
-        $load->tons = $request->tons;
-        $load->origin = $coordsOrigin->state->name . ', ' . $coordsOrigin->name;
-        $load->origin_coords = $coordsOrigin->latitude . ', -' . $coordsOrigin->longitude;
-        $load->destination = $coordsOrigin->state->name . ', ' . $coordsOrigin->name;
-        $load->destination_coords = $coordsDestination->latitude . ', -' . $coordsDestination->longitude;
-        $load->mileage = $request->mileage;
-        $load->silo_number = $request->silo_number;
-        $load->load_type_id = $request->load_type_id;
-        $load->type = 'road';
-        $load->customer_po = $request->customer_po;
-        $load->control_number = $request->control_number;
-        $load->notes = $request->notes;
-        $load->shipper_id = auth()->user()->id;
-        $load->date = Carbon::now()->format('Y-m-d');
-        if (auth()->guard('shipper')->check()) {
-            $load->creator_type = 'shipper';
-        } else if (auth()->guard('web')->check()) {
-            $load->creator_type = 'user';
-        } else {
-            $load->creator_type = 'driver';
-        }
-        $load->creator_id = auth()->user()->id;
-        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+        return DB::transaction(function () use ($request) {
+            $date = Carbon::now();
+            $coordsOrigin = City::with('state:id,name')->findOrFail($request->citiesOrigin)->first();
+            $coordsDestination = City::with('state:id,name')->findOrFail($request->cityDestination)->first();
+            $roadLoad = new RoadLoad();
+            $load = new Load();
+            $load->broker_id = auth()->user()->broker_id;
+            $load->shipper_rate = $request->shipper_rate;
+            $load->rate = $request->rate;
+            $load->weight = $request->weight;
+            $load->tons = $request->tons;
+            $load->origin = $coordsOrigin->state->name . ', ' . $coordsOrigin->name;
+            $load->origin_coords = $coordsOrigin->latitude . ', -' . $coordsOrigin->longitude;
+            $load->destination = $coordsOrigin->state->name . ', ' . $coordsOrigin->name;
+            $load->destination_coords = $coordsDestination->latitude . ', -' . $coordsDestination->longitude;
+            $load->mileage = $request->mileage;
+            $load->silo_number = $request->silo_number;
+            $load->load_type_id = $request->load_type_id;
+            $load->type = 'road';
+            $load->customer_po = $request->customer_po;
+            $load->control_number = $request->control_number;
+            $load->notes = $request->notes;
+            $load->shipper_id = auth()->guard('shipper')->check() ? auth()->user()->id : $request->shipper;
+            $load->date = Carbon::now()->format('Y-m-d');
+            if (auth()->guard('shipper')->check()) {
+                $load->creator_type = 'shipper';
+            } else if (auth()->guard('web')->check()) {
+                $load->creator_type = 'user';
+            } else {
+                $load->creator_type = 'driver';
+            }
+            $load->creator_id = auth()->user()->id;
+            $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
                 ->where('time', $date->format("H").':00:00')->first();
-        if ($dispatch)
+            if ($dispatch)
                 $load->dispatch_init = $dispatch->user_id;
-        $load->save();
+            $load->save();
 
-        $shipper = Shipper::findOrFail($load->shipper_id);
-        $shipper->days_to_pay = $request->days_to_pay;
-        $shipper->save();
+            // TODO: TALK ABOUT THIS IMPLEMENTATION, IT WAS DEFINED AS SET INTO THE SHIPPER PROFILE BEFOREHAND
+            /*$shipper = Shipper::findOrFail($load->shipper_id);
+            $shipper->days_to_pay = $request->days_to_pay;
+            $shipper->save();*/
 
+            $roadLoad->load_id = $load->id;
+            $roadLoad->origin_city_id = $request->citiesOrigin;
+            $roadLoad->destination_city_id = $request->cityDestination;
+            $roadLoad->origin_early_pick_up_date = Carbon::parse($request->origin_early_pick_up_date);
+            $roadLoad->origin_late_pick_up_date = Carbon::parse($request->origin_late_pick_up_date);
+            $roadLoad->destination_early_pick_up_date = Carbon::parse($request->destination_early_pick_up_date);
+            $roadLoad->destination_late_pick_up_date = Carbon::parse($request->destination_late_pick_up_date);
+            $roadLoad->trailer_type_id = $request->trailer_type_id;
+            $roadLoad->mode_id = $request->mode_id;
+            $roadLoad->width = $request->width;
+            $roadLoad->height = $request->height;
+            $roadLoad->length = $request->length;
+            $roadLoad->cube = $request->width * $request->height * $roadLoad->length;
+            $roadLoad->pay_rate = $request->pay_rate;
+            $roadLoad->load_size = $request->load_size;
+            $roadLoad->save();
 
-        $roadLoad->load_id = $load->id;
-        $roadLoad->origin_city_id = $request->citiesOrigin;
-        $roadLoad->destination_city_id = $request->cityDestination;
-        $roadLoad->origin_early_pick_up_date = Carbon::parse($request->origin_early_pick_up_date);
-        $roadLoad->origin_late_pick_up_date = Carbon::parse($request->origin_late_pick_up_date);
-        $roadLoad->destination_early_pick_up_date = Carbon::parse($request->destination_early_pick_up_date);
-        $roadLoad->destination_late_pick_up_date = Carbon::parse($request->destination_late_pick_up_date);
-        $roadLoad->trailer_type_id = $request->trailer_type_id;
-        $roadLoad->mode_id = $request->mode_id;
-        $roadLoad->width = $request->width;
-        $roadLoad->height = $request->height;
-        $roadLoad->length = $request->length;
-        $roadLoad->cube = $request->width * $request->height * $roadLoad->length;
-        $roadLoad->pay_rate = $request->pay_rate;
-        $roadLoad->load_size = $request->load_size;
-        $roadLoad->save();
-
+            return ['success' => true];
+        });
     }
 
     public function store(Request $request)

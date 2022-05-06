@@ -13,7 +13,7 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-4">
-                        {!! Form::label('shippers[]', ucfirst(__('shippers')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('shippers[]', ucfirst(__('customers')), ['class' => 'col-form-label']) !!}
                         {!! Form::select('shippers[]', [], $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : ''), 'multiple']) !!}
                         @error('shippers')
                         <span class="invalid-feedback" role="alert">

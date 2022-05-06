@@ -13,6 +13,20 @@
 
                 <div class="row">
                     <div class="form-group col-lg-4">
+                        @if(auth()->guard('web')->check())
+                            <h2 class="text-center">Customer</h2>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-12">
+                                    {!! Form::label('shipper', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
+                                    {!! Form::select('shipper', [], $driver->shippers ?? null, ['class' => 'form-control' . ($errors->first('shippers') ? ' is-invalid' : '')]) !!}
+                                    @error('shippers')
+                                    <span class="invalid-feedback" role="alert">
+                                            <strong>{{ ucfirst($message) }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endif
                         <h2 class="text-center">Origin</h2>
                         <div>
                             <div class="row">
@@ -289,7 +303,7 @@
                                 @enderror
                             </fieldset>
                         </div>
-                        <div class="row">
+                        <!--<div class="row">
                             <fieldset class="form-group col-md-12">
                                 {!! Form::label('days_to_pay', ucwords(__('days until payment')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('days_to_pay', null, ['class' => 'form-control']) !!}
@@ -299,7 +313,7 @@
                                 </span>
                                 @enderror
                             </fieldset>
-                        </div>
+                        </div>-->
                         <div class="row">
                             <div class="form-group col-md-12">
                                 {!! Form::label('notes', ucfirst(__('description')), ['class' => 'col-form-label']) !!}

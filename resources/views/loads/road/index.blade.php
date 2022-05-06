@@ -28,7 +28,7 @@
     @section("scripts")
         @include("layouts.ag-grid.js")
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
-        <script src="{{ asset('js/sections/loads/road/postLoad.min.js') }}"></script>
+        <script src="{{ asset('js/sections/loads/road/postLoad.min.js?1.0.0') }}"></script>
         <script>
             const boardType = 'makeRequest';
         </script>
