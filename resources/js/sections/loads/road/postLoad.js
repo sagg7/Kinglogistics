@@ -59,9 +59,15 @@
                     throwErrorMsg();
                 }
             },
-            error: () => {
-                throwErrorMsg();
-            }
+            error: (res) => {
+                console.log(res);
+                let errors = `<ul class="text-left">`;
+                Object.values(res.responseJSON.errors).forEach((error) => {
+                    errors += `<li>${error}</li>`;
+                });
+                errors += `</ul>`;
+                throwErrorMsg(errors, {timer: false});
+            },
         })
     });
 
