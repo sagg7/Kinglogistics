@@ -250,9 +250,9 @@ class ShipperController extends Controller
             DB::raw("(select count(loads.id) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null) as loads"),
             DB::raw("(select count(DISTINCT (driver_id)) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null ) as trucks"),
         ]);
-        
+
         if($shipper_id){
-            $dailyLoads->where('shipper_id',$shipper_id);
+            $dailyLoads->where('shippers.id',$shipper_id);
         }
         $dailyLoads = $dailyLoads->get();
 
@@ -267,7 +267,7 @@ class ShipperController extends Controller
                 $q->where('shipper_id',$shipper_id);
             }
         }]);
-        
+
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
             $shippersFinished->where('id',$shipper_id);
