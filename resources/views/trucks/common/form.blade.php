@@ -52,7 +52,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     {!! Form::label('vin', ucfirst(__('vin')), ['class' => 'col-form-label']) !!}
-                    {!! Form::text('vin', $truck->plate ?? null, ['class' => 'form-control' . ($errors->first('vin') ? ' is-invalid' : '')]) !!}
+                    {!! Form::text('vin', $truck->vin ?? null, ['class' => 'form-control' . ($errors->first('vin') ? ' is-invalid' : '')]) !!}
                     @error('vin')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ ucfirst($message) }}</strong>
