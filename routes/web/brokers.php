@@ -3,8 +3,8 @@
 use App\Http\Controllers\BrokerController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => ['role:admin']], function () {
-    Route::prefix('company')->group(function () {
+Route::prefix('company')->group(function () {
+    Route::group(['middleware' => ['role:admin']], function () {
         Route::get('profile', [BrokerController::class, 'profile'])
             ->name('company.profile');
         Route::post('update', [BrokerController::class, 'update'])

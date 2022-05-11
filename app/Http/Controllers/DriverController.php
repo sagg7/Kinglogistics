@@ -113,8 +113,7 @@ class DriverController extends Controller
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
 
-
-                $driver->shippers()->sync($request->shippers);
+            $driver->shippers()->sync($request->shippers);
 
             if (!$id) {
                 $host = explode(".", $request->getHost());

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\BrokerHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Carrier;
@@ -11,11 +12,18 @@ use App\Traits\Guard\GuardFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 
 class AuthenticatedSessionController extends Controller
 {
     use GuardFunctions;
+
+    protected $dHelper;
+
+    public function __construct()
+    {
+        $this->dHelper = new BrokerHelper();
+    }
+
     /**
      * Display the login view.
      *
@@ -33,13 +41,14 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         session(['timezone' => $request->timezone]);
+        session(['broker' => auth()->user()->broker_id]);
     }
 
     /**
      * Handle an incoming authentication request.
      *
      * @param  \App\Http\Requests\Auth\LoginRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return array|\Illuminate\Http\RedirectResponse
      */
     public function store(LoginRequest $request)
     {

@@ -36,14 +36,15 @@ class BrokerHelper
             if ($broker->disabled) {
                 return true;
             }
+
             // If it has no expiration date, always enabled
             if (!$broker->expiration_date) {
                 return false;
-            } else {
-                $today = Carbon::now()->startOfDay();
-                $expiration = Carbon::parse($broker->expiration_date);
-                return $today->greaterThan($expiration);
             }
+
+            $today = Carbon::now()->startOfDay();
+            $expiration = Carbon::parse($broker->expiration_date);
+            return $today->greaterThan($expiration);
         }
         return false;
     }
