@@ -32,15 +32,8 @@
             <li class="nav-item">
                 <a href="/profile"><i class="fas fa-user"></i><span class="menu-title">Profile</span></a>
             </li>
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-clipboard-list"></i><span class="menu-title">Load Board</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/load/road/index">
-                            <i class="far fa-circle"></i><span class="menu-item">View</span>
-                        </a>
-                    </li>
-                </ul>
+            <li class="nav-item">
+                <a href="/load/road/index"><i class="fas fa-clipboard-list"></i><span class="menu-item">Load Board</span></a>
             </li>
             <li class="nav-item has-sub">
                 <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>

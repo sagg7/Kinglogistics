@@ -10,7 +10,6 @@ use App\Models\LoadTrailerType;
 use App\Models\LoadType;
 use App\Models\RoadLoad;
 use App\Models\RoadLoadRequest;
-use App\Models\Shipper;
 use App\Models\State;
 use App\Models\DispatchSchedule;
 use App\Models\Truck;
@@ -39,6 +38,10 @@ class RoadLoadController extends Controller
             'weight' => [null => 'All', 40000 => 'Less than: 40,000', 30000 => 'Less than: 30,000', 20000 => 'Less than: 20,000', 10000 => 'Less than: 10,000'],
             'length' => [null => 'All', 40 => 'Less than: 40', 30 => 'Less than: 30', 20 => 'Less than: 20', 10 => 'Less than: 10'],
         ];
+
+        if (auth()->guard('shipper')->check()) {
+            return view('subdomains.shippers.load.road.index', $params);
+        }
 
         return view('loads.road.index', $params);
     }
@@ -275,6 +278,9 @@ class RoadLoadController extends Controller
                 if ($request->weight) {
                     $q->where('weight', '<=', $request->weight);
                 }
+                if (auth()->guard('shipper')->check()) {
+                    $q->where('shipper_id', auth()->user()->id);
+                }
             })
             ->whereHas('road', function ($q) use ($request, $distanceCalculationSelect) {
                 if ($request->load_size) {
@@ -309,11 +315,14 @@ class RoadLoadController extends Controller
                         }
                     });
 
-                // This checks if the load has a request that has been accepted, if it has, it doesn't query the load
-                $q->whereDoesntHave('request', function ($q) {
-                    $q->where('status', 'accepted');
-                })
-                    ->whereDoesntHave('request'); // Or query the ones that do not have a request at all
+
+                if (!auth()->guard('shipper')->check()) {
+                    // This checks if the load has a request that has been accepted, if it has, it doesn't query the load
+                    $q->whereDoesntHave('request', function ($q) {
+                        $q->where('status', 'accepted');
+                    })
+                        ->whereDoesntHave('request'); // Or query the ones that do not have a request at all
+                }
             })
             ->with([
                 'road' => function ($q) use ($requestable_type) {

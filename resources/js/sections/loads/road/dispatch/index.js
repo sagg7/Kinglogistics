@@ -104,37 +104,39 @@
         gridOptions: {
             undoRedoCellEditing: true,
             onRowClicked: (event) => {
-                modal.modal('show');
-                tbAG.gridOptions.api.deselectAll();
-                if (!selectedLoad || selectedLoad.road_load_id !== event.data.road_load_id) {
-                    selectedLoad = event.data;
-                    $.ajax({
-                        url: '/load/road/getRequests',
-                        type: 'GET',
-                        data: {
-                            road_load_id: selectedLoad.road_load_id,
-                        },
-                        success: (res) => {
-                            const rowData = [];
-                            res.forEach(item => {
-                                rowData.push({
-                                    id: item.id,
-                                    carrier: item.carrier.name,
-                                    truck: item.truck.number,
+                if (dispatch) {
+                    modal.modal('show');
+                    tbAG.gridOptions.api.deselectAll();
+                    if (!selectedLoad || selectedLoad.road_load_id !== event.data.road_load_id) {
+                        selectedLoad = event.data;
+                        $.ajax({
+                            url: '/load/road/getRequests',
+                            type: 'GET',
+                            data: {
+                                road_load_id: selectedLoad.road_load_id,
+                            },
+                            success: (res) => {
+                                const rowData = [];
+                                res.forEach(item => {
+                                    rowData.push({
+                                        id: item.id,
+                                        carrier: item.carrier.name,
+                                        truck: item.truck.number,
+                                    });
                                 });
-                            });
-                            requestsTable.rowData = rowData;
-                            requestsTable.gridOptions.api.setRowData(rowData);
-                            modal.find('.modal-spinner').addClass('d-none');
-                            modal.find('.content-body').removeClass('d-none');
-                        },
-                        error: () => {
-                            throwErrorMsg();
-                        }
-                    });
-                } else {
-                    modal.find('.modal-spinner').addClass('d-none');
-                    modal.find('.content-body').removeClass('d-none');
+                                requestsTable.rowData = rowData;
+                                requestsTable.gridOptions.api.setRowData(rowData);
+                                modal.find('.modal-spinner').addClass('d-none');
+                                modal.find('.content-body').removeClass('d-none');
+                            },
+                            error: () => {
+                                throwErrorMsg();
+                            }
+                        });
+                    } else {
+                        modal.find('.modal-spinner').addClass('d-none');
+                        modal.find('.content-body').removeClass('d-none');
+                    }
                 }
             },
         },

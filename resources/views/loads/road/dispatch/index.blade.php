@@ -29,6 +29,7 @@
         <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
         <script>
             var tbAG = null;
+            const dispatch = true;
         </script>
         <script src="{{ asset('js/sections/loads/road/dispatch/index.min.js?1.0.0') }}"></script>
     @endsection
