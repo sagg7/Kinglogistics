@@ -457,20 +457,22 @@ class ReportController extends Controller
 
         $average = [];
         $total = null;
-        foreach ($data as $key => $item) {
-            if ($key == 0) {
-                $average[] = $item;
-                $total = $item;
-            } elseif ($key > 30) {
-                $total += $item - $data [$key - 30];
-                $average[] = Round($total / 30);
-            } else {
-                $total += $item;
-                $average[] = Round($total / ($key + 1));
+        if (isset($data)) {
+            foreach ($data as $key => $item) {
+                if ($key == 0) {
+                    $average[] = $item;
+                    $total = $item;
+                } elseif ($key > 30) {
+                    $total += $item - $data [$key - 30];
+                    $average[] = Round($total / 30);
+                } else {
+                    $total += $item;
+                    $average[] = Round($total / ($key + 1));
+                }
             }
         }
 
-		 if (isset($average) && ($request->graph_type == 'total'))
+        if (isset($average) && ($request->graph_type == 'total'))
             $series[] = [
                 'data' => $average,
                 'name' => 'Average',
