@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
+use App\Models\Destination;
 use App\Models\dispatch_report;
 use App\Models\Driver;
 use App\Models\Expense;
@@ -311,6 +312,52 @@ class ReportController extends Controller
         };
         switch ($request->graph_type) {
             default:
+            case "destination":
+                $query = Destination::whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                })
+                    ->whereHas('trips', function ($q) use ($request, $filterLoads, $checkOnLoadsRelation) {
+                        $q->whereHas('loads', function ($q) use ($filterLoads) {
+                            $filterLoads($q);
+                        })
+                            ->where(function ($q) use ($request, $checkOnLoadsRelation) {
+                                if ($request->shipper) {
+                                    $q->where('shipper_id', $request->shipper);
+                                }
+                                $checkOnLoadsRelation($q);
+                            });
+                    })
+                    ->with([
+                        'trips' => function ($q) use ($request, $filterLoads, $checkOnLoadsRelation) {
+                            $q->select(['id', 'name', 'shipper_id', 'destination_id'])
+                                ->with([
+                                    'loads' => function ($q) use ($filterLoads) {
+                                        $filterLoads($q);
+                                    },
+                                ])
+                                ->where(function ($q) use ($request, $checkOnLoadsRelation) {
+                                    if ($request->shipper) {
+                                        $q->where('shipper_id', $request->shipper);
+                                    }
+                                    $checkOnLoadsRelation($q);
+                                })
+                                ->withTrashed();
+                        },
+                    ])
+                    ->get(['id', 'name']);
+                foreach ($query as $destination) {
+                    $count = [];
+                    foreach ($destination->trips as $trip) {
+                        foreach ($trip->loads as $load) {
+                            $storeData($load, $count);
+                        }
+                    }
+                    $series[] = [
+                        'name' => $destination->name,
+                        'data' => $count,
+                    ];
+                }
+            break;
             case "trips": // Format the data per trip
                 $query = Trip::whereHas('broker', function ($q) {
                     $q->where('id', session('broker'));
@@ -323,8 +370,9 @@ class ReportController extends Controller
                     ])
                     ->withTrashed()
                     ->where(function ($q) use ($request, $checkOnLoadsRelation) {
-                        if ($request->shipper)
+                        if ($request->shipper) {
                             $q->where('shipper_id', $request->shipper);
+                        }
                         $checkOnLoadsRelation($q);
                     })
                     ->get(['id', 'name', 'shipper_id']);
