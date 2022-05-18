@@ -229,7 +229,7 @@ class ShipperController extends Controller
         ->withCount(['drivers' => function($q){
             $q->where('status', '!=', 'inactive')
                 ->whereHas('truck');
-        }]);
+        }])->where('broker_id', session('broker'));
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
         }
@@ -240,7 +240,8 @@ class ShipperController extends Controller
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
             }
-        }]);
+        }])
+            ->where('broker_id', session('broker'));
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
             $shippersfinished->where('id',$shipper_id);
