@@ -13,7 +13,7 @@
                 </div>
                 <div class="content-body d-none">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <span id="route_string"></span>
                             <table class="table">
                                 <tbody>
@@ -68,7 +68,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <h5>Contact Information</h5>
                             <table class="table">
                                 <tbody>
@@ -82,7 +82,15 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <button type="button" class="btn btn-primary btn-block">Require</button>
+                            <div class="row align-items-end">
+                                <div class="form-group col-lg-6">
+                                    <label for="requestTruck">Truck for request</label>
+                                    <select id="requestTruck" name="request_truck" class="form-control"></select>
+                                </div>
+                                <div class="form-group col-lg-6">
+                                    <button type="button" class="btn btn-primary btn-block submit-ajax" id="requestLoad">Request</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

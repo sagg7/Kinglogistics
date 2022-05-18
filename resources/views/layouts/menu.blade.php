@@ -1,19 +1,24 @@
 <!-- BEGIN: Main Menu-->
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="figure-1"></div>
     <div class="navbar-header">
-        <ul class="nav navbar-nav flex-row">
-            <li class="nav-item mr-auto">
-                <a class="navbar-brand" href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500"/>
-                </a>
-            </li>
-            <li class="nav-item nav-toggle">
-                <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse">
-                    <i class="feather icon-x d-block d-xl-none font-medium-4 primary toggle-icon"></i>
-                    <i class="toggle-icon feather icon-disc font-medium-4 d-none d-xl-block primary" data-ticon="icon-disc"></i>
-                </a>
-            </li>
-        </ul>
+        <div class="row align-items-center">
+            <div class="col pr-0">
+                <div class="nav-item mr-auto">
+                    <a class="navbar-brand mt-1 mb-1" href="/">
+                        <x-application-logo/>
+                    </a>
+                </div>
+            </div>
+            <div class="col-auto d-xl-none">
+                <div class="nav-item nav-toggle">
+                    <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse">
+                        <i class="feather icon-x d-block d-xl-none font-medium-4 primary toggle-icon"></i>
+                        <i class="toggle-icon feather icon-disc font-medium-4 d-none d-xl-block primary" data-ticon="icon-disc"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
@@ -73,7 +78,7 @@
                     {{-- @if(auth()->user()->hasRole('spotter')||auth()->user()->hasRole('admin')) --}}
                     <li>
                         <a href="/user/spotterCheckInOut">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Spotter Check In/out</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Check In/out</span>
                         </a>
                     </li>
                     {{-- @endif --}}
@@ -200,7 +205,7 @@
             @endif
             @if(auth()->user()->can(['create-truck', 'read-truck']))
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-truck"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
+                <a href="#"><i class="fas fa-truck-moving"></i><span class="menu-title" data-i18n="User">Trucks</span></a>
                 <ul class="menu-content">
                     @if(auth()->user()->can(['create-truck']))
                     <li>
@@ -349,6 +354,21 @@
                     @endif
                 </ul>
             </li>
+            <li class="nav-item has-sub">
+                <a href="#"><i class="fas fa-clipboard-list"></i><span class="menu-title">Load Board</span></a>
+                <ul class="menu-content">
+                    <li>
+                        <a href="/load/road/index">
+                            <i class="far fa-circle"></i><span class="menu-item">View</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/load/road/dispatch/index">
+                            <i class="far fa-circle"></i><span class="menu-item">View Dispatch</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             @endif
             @if(auth()->user()->can(['create-job-opportunity', 'read-job-opportunity']))
             <li class="nav-item has-sub">
@@ -445,66 +465,66 @@
                 </ul>
             </li>
             @endif
-            <li class="navigation-header">
-                <span>Safety</span>
-            </li>
-            @if(auth()->user()->can(['create-incident', 'read-incident']))
+            {{-- start --}}
+
             <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-exclamation-circle"></i><span class="menu-title" data-i18n="User">Incident</span></a>
+                <a href="#"><i class="fa-solid fa-helmet-safety"></i><span class="menu-title"
+                        data-i18n="User">Safety</span></a>
                 <ul class="menu-content">
-                    @if(auth()->user()->can(['create-incident']))
-                    <li>
-                        <a href="/incident/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->can(['create-incident', 'read-incident']))
+                        <li class="has-sub">
+                            <a href="#"><i class="far fa-circle"></i><span class="menu-title"
+                                    data-i18n="User">Incident</span></a>
+                            <ul class="menu-content">
+                                @if (auth()->user()->can(['create-incident']))
+                                    <li class="pl-1">
+                                        <a href="/incident/create">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="List">Create</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if (auth()->user()->can(['read-incident']))
+                                    <li class="pl-1">
+                                        <a href="/incident/index">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="View">View</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
                     @endif
-                    @if(auth()->user()->can(['read-incident']))
-                    <li>
-                        <a href="/incident/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->can(['create-safety-messages', 'read-safety-messages']))
+                        <li class="has-sub">
+                            <a href="#"><i class="far fa-circle"></i><span class="menu-title"
+                                    data-i18n="User">Messages</span></a>
+                            <ul class="menu-content">
+                                @if (auth()->user()->can(['create-safety-messages']))
+                                    <li class="pl-1">
+                                        <a href="/safetyMessage/create">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="List">Create</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if (auth()->user()->can(['read-safety-messages']))
+                                    <li class="pl-1">
+                                        <a href="/safetyMessage/index">
+                                            <i class="fas fa-circle"></i><span class="menu-item"
+                                                data-i18n="View">View</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
                     @endif
                 </ul>
             </li>
-            @endif
-            <!--<li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-list-ol"></i><span class="menu-title" data-i18n="User">Incident Types</span></a>
-                <ul class="menu-content">
-                    <li>
-                        <a href="/incidentType/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/incidentType/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>-->
-            @if(auth()->user()->can(['create-safety-messages', 'read-safety-messages']))
-            <li class="nav-item has-sub">
-                <a href="#"><i class="fas fa-envelope-open-text"></i><span class="menu-title" data-i18n="User">Messages</span></a>
-                <ul class="menu-content">
-                    @if(auth()->user()->can(['create-safety-messages']))
-                    <li>
-                        <a href="/safetyMessage/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Create</span>
-                        </a>
-                    </li>
-                    @endif
-                    @if(auth()->user()->can(['read-safety-messages']))
-                    <li>
-                        <a href="/safetyMessage/index">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">View</span>
-                        </a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
+
+            {{-- end --}}
+
+            
         </ul>
     </div>
 </div>

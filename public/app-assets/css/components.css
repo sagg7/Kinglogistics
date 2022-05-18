@@ -709,7 +709,7 @@ body.fixed-footer footer.footer-dark {
 .main-menu.menu-border {
   border-right : 1px solid #E4E7ED;
 }
-.main-menu .shadow-bottom {
+/* .main-menu .shadow-bottom {
   display : none;
   position : absolute;
   z-index : 2;
@@ -721,7 +721,7 @@ body.fixed-footer footer.footer-dark {
           filter : blur(5px);
   background : -webkit-linear-gradient(#FFFFFF 41%, rgba(255, 255, 255, 0.11) 95%, rgba(255, 255, 255, 0));
   background :         linear-gradient(#FFFFFF 41%, rgba(255, 255, 255, 0.11) 95%, rgba(255, 255, 255, 0));
-}
+} */
 .main-menu.menu-native-scroll .main-menu-content {
   overflow-y : scroll;
 }

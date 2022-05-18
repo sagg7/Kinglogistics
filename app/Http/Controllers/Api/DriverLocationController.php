@@ -10,6 +10,7 @@ use App\Models\Load;
 use App\Models\LocationGroup;
 use App\Models\Driver;
 use App\Models\DriverLocation;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,31 +21,56 @@ class DriverLocationController extends Controller
     public function updateDriverLocation(Request $request)
     {
         $driver = auth()->user();
-        $loadId = $request->get('load_id');
 
-        $latitude = $request->get('latitude');
-        $longitude = $request->get('longitude');
+        $now = Carbon::now();
+        $data = $request->all();
+        $lastPosition = count($data) - 1;
+        $array = [];
+        $lastLocation = [];
 
-        $payload = [
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'status' => $request->get('status'),
-            'driver_id' => $driver->id,
-            'load_id' => $loadId,
-        ];
+        // This would handle the old way the location was received, with only one object for a single location
+        if ($request->latitude) {
+            $array = [
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'status' => $request->status,
+                'driver_id' => $driver->id,
+                'load_id' => $request->load_id,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
 
-        $driverLocation = new DriverLocation();
-        $driverLocation->fill($payload);
-        $driverLocation->save();
+            $lastLocation = $array + ['speed' => $request->speed ?? null];
+        } else {
+            // And this handles the new method, in which we receive an array of locations
+            foreach ($data as $i => $item) {
+                $payload = [
+                    'latitude' => $item['latitude'],
+                    'longitude' => $item['longitude'],
+                    'status' => $item['status'],
+                    'driver_id' => $driver->id,
+                    'load_id' => $item['load_id'],
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
 
-        $load = Load::find($loadId);
+                $array[] = $payload;
+
+                if ($i === $lastPosition) {
+                    $lastLocation = $payload + ['speed' => $item['speed']];
+                }
+            }
+        }
+        DriverLocation::insert($array);
+
+        $load = Load::find($lastLocation['load_id']);
 
         $coords = [
-            'latitude' => $latitude,
-            'longitude' => $longitude,
+            'latitude' => $lastLocation['latitude'],
+            'longitude' => $lastLocation['longitude'],
         ];
 
-        $speed = $request->get('speed');
+        $speed = $lastLocation['speed'];
 
         // TODO: CHECK THIS! Does driver could have more than one shipper????
         $shipper = empty($load) ? $driver->shippers->first() : $load->shipper;

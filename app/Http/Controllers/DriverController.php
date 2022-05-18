@@ -12,6 +12,7 @@ use App\Models\BotAnswers;
 use App\Models\Driver;
 use App\Models\Shift;
 use App\Models\Zone;
+use App\Models\Shipper;
 use App\Traits\Driver\DriverParams;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
@@ -112,8 +113,7 @@ class DriverController extends Controller
             $driver->inactive_observations = $request->inactive_observations;
             $driver->save();
 
-
-                $driver->shippers()->sync($request->shippers);
+            $driver->shippers()->sync($request->shippers);
 
             if (!$id) {
                 $host = explode(".", $request->getHost());
@@ -164,6 +164,23 @@ class DriverController extends Controller
         $this->storeUpdate($request);
 
         return redirect()->route('driver.index');
+    }
+
+
+    public function show(Request $request,int $id)
+    {
+        $driver = Driver::with(['carrier:id,name','shippers:id,name','zone:id,name','turn:id,name','truck:id,number'])
+        ->whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
+            // dd($driver);.
+
+            if ($request->ajax()){
+                return ['data' => $driver];}
+                else{
+                    return view('drivers.show', compact('driver'));
+                }
     }
 
     /**

@@ -8,8 +8,8 @@ body.semi-dark-layout .main-menu {
   background-color : #3da2dc;
 }
 body.semi-dark-layout .main-menu .shadow-bottom {
-  background : -webkit-linear-gradient(top, #0F1642 44%, rgba(15, 22, 66, 0.51) 73%, rgba(44, 48, 60, 0));
-  background :         linear-gradient(180deg, #0F1642 44%, rgba(15, 22, 66, 0.51) 73%, rgba(44, 48, 60, 0));
+  background : -webkit-linear-gradient(top, rgba(54,138,198,.7) 44%, #3d99db 73%, rgba(44, 48, 60, 0));
+  background :         linear-gradient(180deg, rgba(54,138,198,.7) 44%, #3d99db 73%, rgba(44, 48, 60, 0));
 }
 body.semi-dark-layout .main-menu:not(.expanded) .navigation .sidebar-group-active a {
   background-color : #368ac6;

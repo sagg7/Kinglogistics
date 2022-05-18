@@ -44,7 +44,7 @@
     <!-- BEGIN: Custom CSS-->
 <!--<link rel="stylesheet" href="{{ asset("css/modules/daterangepicker/daterangepicker.css") }}">-->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <link rel="stylesheet" href="{{ asset("css/fontawesome.css") }}">
+    <link rel="stylesheet" href="{{ asset("css/fontawesome.css?6.1.1") }}">
     <link rel="stylesheet" href="{{ asset("css/app.css?1.0.1") }}">
     <style>
         .main-menu {
@@ -66,7 +66,7 @@
     @yield("head")
 </head>
 <body class="horizontal-layout horizontal-menu 2-columns navbar-floating footer-static menu-expanded pace-done" data-menu="horizontal-menu" data-col="2-columns">
-@include('layouts.header')
+@include('layouts.headerSimple')
 @include('chat.modals.imagePreview')
 @yield('modals')
 <div class="app-content content">

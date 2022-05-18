@@ -1,3 +1,6 @@
 {
-    "/js/modules/aggrid/simpleTable.min.js": "/js/modules/aggrid/simpleTable.min.js"
+    "/js/modules/aggrid/backRequest.min.js": "/js/modules/aggrid/backRequest.min.js",
+    "/js/sections/loads/road/postLoad.min.js": "/js/sections/loads/road/postLoad.min.js",
+    "/js/sections/loads/road/searchBoard.min.js": "/js/sections/loads/road/searchBoard.min.js",
+    "/js/sections/loads/road/dispatch/index.min.js": "/js/sections/loads/road/dispatch/index.min.js"
 }

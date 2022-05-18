@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\BrokerController;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,8 @@ Route::get('/', function () {
     ->middleware('guest');
 
 Route::group(['middleware' => 'auth'], function () {
+    Route::get('expired', [BrokerController::class, 'expired'])
+        ->name('company.expired');
     Route::group(['middleware' => 'broker'], function () {
         require __DIR__.'/web/dashboard.php';
         require __DIR__.'/web/users.php';
@@ -52,11 +56,8 @@ Route::group(['middleware' => 'auth'], function () {
         require __DIR__.'/web/brokers.php';
         require __DIR__.'/web/bonuses.php';
         require __DIR__.'/web/reports.php';
-
-        Route::get('/testMail', function () {
-            Mail::to('pepe.lujan2@gmail.com')->send(new TestMail());
-        });
-
+        require __DIR__.'/common/roadLoad.php';
+        require __DIR__.'/common/cities.php';
     });
 });
 

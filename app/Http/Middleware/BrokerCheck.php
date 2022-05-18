@@ -17,12 +17,11 @@ class BrokerCheck
 
     public function handle(Request $request, Closure $next)
     {
-        // TODO: Handle expiration case
-        /*$expired = $this->helper->isExpired();
+        $expired = $this->helper->isExpired();
 
         if ($expired) {
-            // TODO: redirect to expiration view
-        }*/
+            return redirect()->route('company.expired');
+        }
 
         if (!session('broker')) {
             session(['broker' => auth()->user()->broker_id]);

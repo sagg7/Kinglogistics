@@ -3,36 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Events\LoadUpdate;
+use App\Exports\CompareLoadsErrorsExport;
 use App\Exports\LoadsExport;
-use App\Models\LoadType;
 use App\Exports\TemplateExport;
+use App\Imports\CompareLoadsImport;
+use App\Jobs\ProcessDeleteFileDelayed;
 use App\Models\AvailableDriver;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\LoadStatus;
+use App\Models\LoadType;
 use App\Models\Shipper;
 use App\Models\Trip;
 use App\Models\Truck;
-use App\Models\Rate;
 use App\Traits\EloquentQueryBuilder\GetSelectionData;
 use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
+use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
 use App\Traits\Turn\DriverTurn;
 use Carbon\Carbon;
+use Foo\Bar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Traits\Storage\FileUpload;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
-use App\Jobs\ProcessDeleteFileDelayed;
-use App\Exports\CompareLoadsErrorsExport;
-use App\Imports\CompareLoadsImport;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use \Foo\Bar;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class LoadController extends Controller
@@ -404,9 +401,6 @@ class LoadController extends Controller
         return $array;
     }
 
-
-
-
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -425,7 +419,6 @@ class LoadController extends Controller
             $start = $request->start ? Carbon::parse($request->start) : Carbon::now()->startOfMonth()->subMonth();
             $end = $request->end ? Carbon::parse($request->end)->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
         }
-
 
         $select = [
             "loads.id",
@@ -449,6 +442,7 @@ class LoadController extends Controller
             "loads.dispatch_id",
             "loads.creator_id",
             "loads.creator_type",
+            "loads.dispatch_init"
         ];
         $query = Load::with([
             'driver' => function ($q) {
@@ -467,7 +461,9 @@ class LoadController extends Controller
             'shipper:id,name',
             'load_type:id,name',
             'user:id,name',
+            'userInit:id,name',
             'creator:id,name',
+
         ])
             ->where(function ($q) {
                 if (auth()->guard('web')->check()) {
@@ -475,13 +471,25 @@ class LoadController extends Controller
                         $q->where('id', session('broker'));
                     });
                 }
-            })
-            ->where(function ($q) {
                 if (auth()->guard('shipper')->check()) {
                     $q->whereHas('shipper', function ($q) {
                         $q->where('shipper_id', auth()->user()->id);
                     });
                 }
+            })
+            ->where(function ($q) {
+                $q->where('type', 'oil_field') // Query all the loads with type oil_field
+                ->orWhere(function ($q) {
+                    // Or if it's type road
+                    $q->where('type', 'road')
+                        ->whereHas('road', function ($q) { // Check if it has a road relation
+                            // Finally this checks if the load has a request that has been accepted
+                            $q->whereHas('request', function ($q) {
+                                $q->where('status', 'accepted');
+                            });
+                        });
+                    // Thus, only querying the loads with accepted requests
+                });
             })
             ->join('load_statuses', 'load_statuses.load_id', '=', 'loads.id')
             ->where(function ($q) use ($request) {
@@ -491,12 +499,14 @@ class LoadController extends Controller
         if ($request->type) {
             if ($request->type == 'active') {
                 $query->where('loads.status', '!=', 'finished');
-                if (empty($request->sortModel))
+                if (empty($request->sortModel)) {
                     $query->orderBy('accepted_timestamp', 'desc');
+                }
             } else {
                 $query->where('loads.status', 'finished');
-                if (empty($request->sortModel))
+                if (empty($request->sortModel)) {
                     $query->orderBy('finished_timestamp', 'desc');
+                }
             }
         }
         if (!$request->sortModel) {
@@ -510,14 +520,12 @@ class LoadController extends Controller
             $select[] = 'bol';
             $select[] = 'accepted_timestamp';
             $select[] = 'finished_timestamp';
-        } else {
-            if (isset($request->searchable)) {
-                $array = $request->searchable;
-                $array[] = 'customer_reference';
-                $array[] = 'customer_po';
-                $array[] = 'bol';
-                $request->searchable = $array;
-            }
+        } else if (isset($request->searchable)) {
+            $array = $request->searchable;
+            $array[] = 'customer_reference';
+            $array[] = 'customer_po';
+            $array[] = 'bol';
+            $request->searchable = $array;
         }
 
         switch ($request->search) {
