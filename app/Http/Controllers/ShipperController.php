@@ -313,7 +313,7 @@ class ShipperController extends Controller
             }
         }
         foreach ($dailyLoads as $shipper) {
-            if ($shipperAvg[$shipper->id]) {
+            if (isset($shipperAvg[$shipper->id]) && $shipperAvg[$shipper->id]) {
                 $shipperAvg[$shipper->id] += ['total_loads'=> $shipper->loads, 'total_trucks'=> $shipper->trucks];
             }
         }
