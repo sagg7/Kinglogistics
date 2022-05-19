@@ -35,6 +35,7 @@ class TrailerController extends Controller
                 'shipper_id' => ['nullable', 'exists:shippers,id'],
                 'number' => ['required', 'string', 'max:255', "unique:trailers,number,$id,id"],
                 'plate' => ['nullable', 'string', 'max:255'],
+                'description' => ['nullable', 'string', 'max:255'],
                 'vin' => ['nullable', 'string', 'max:255'],
                 'shippers' => ['nullable', 'array', 'exists:shippers,id'],
                 //'status' => ['required'],
@@ -110,6 +111,7 @@ class TrailerController extends Controller
             $trailer->number = $request->number;
             $trailer->plate = $request->plate;
             $trailer->vin = $request->vin;
+            $trailer->description = $request->description;
             $trailer->inactive = $request->inactive ?? null;;
             $trailer->save();
 
@@ -273,6 +275,7 @@ class TrailerController extends Controller
             "trailers.plate",
             "trailers.vin",
             "trailers.status",
+            "trailers.description",
             "trailers.trailer_type_id",
         ])
             ->whereHas('broker', function ($q) {
@@ -338,6 +341,7 @@ class TrailerController extends Controller
         foreach ($trailers as $trailer) {
             $data[] = [
                 'number' => $trailer->number,
+                'description' => $trailer->description,
                 'carrier' => isset($trailer->rentals[0]) ? (isset($trailer->rentals[0]->carrier)) ? $trailer->rentals[0]->carrier->name : null : null,
                 'driver' => (isset($trailer->rentals[0]) && isset($trailer->rentals[0]->driver)) ? $trailer->rentals[0]->driver->name : null,
                 'trailer_type' => $trailer->trailer_type->name,
