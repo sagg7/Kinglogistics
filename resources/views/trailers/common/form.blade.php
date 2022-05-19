@@ -44,6 +44,15 @@
                     @enderror
                 </div>
                 <div class="form-group col-md-6">
+                    {!! Form::label('Description', ucfirst(__('description')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('description', $trailer->description ?? null, ['class' => 'form-control' . ($errors->first('plate') ? ' is-invalid' : '')]) !!}
+                    @error('description')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="form-group col-md-6">
                     {!! Form::label('plate', ucfirst(__('plate')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('plate', $trailer->plate ?? null, ['class' => 'form-control' . ($errors->first('plate') ? ' is-invalid' : '')]) !!}
                     @error('plate')
