@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDescriptionDateToTrailersTable extends Migration
+class AddBrokerToIncidentTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddDescriptionDateToTrailersTable extends Migration
      */
     public function up()
     {
-        Schema::table('trailers', function (Blueprint $table) {
-            $table->string('description')->nullable()->after('number');
+        Schema::table('incidents', function (Blueprint $table) {
+            $table->unsignedBigInteger('broker_id')->default(1)->after('user_id');
         });
     }
 
@@ -25,8 +25,8 @@ class AddDescriptionDateToTrailersTable extends Migration
      */
     public function down()
     {
-        Schema::table('trailers', function (Blueprint $table) {
-            $table->dropColumn('description');
+        Schema::table('incidents', function (Blueprint $table) {
+            $table->dropColumn('broker_id');
         });
     }
 }

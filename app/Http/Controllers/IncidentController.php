@@ -107,6 +107,7 @@ class IncidentController extends Controller
             $incident->driver_id = $request->driver_id;
             $incident->truck_id = $request->truck_id;
             $incident->trailer_id = $request->trailer_id;
+            $incident->broker_id = session('broker') ?? auth()->user()->broker_id;
             $incident->sanction = $request->sanction;
             $incident->date = Carbon::parse($request->date_submit);
             $incident->location = $request->location;
@@ -266,6 +267,9 @@ class IncidentController extends Controller
                 }
                 if (auth()->guard('carrier')->check())
                     $q->where('carrier_id', auth()->user()->id);
+            })
+            ->whereHas('broker', function ($q) {
+                $q->where('id', auth()->user()->broker_id);
             })
             ->with([
                 'incident_type:id,name',
