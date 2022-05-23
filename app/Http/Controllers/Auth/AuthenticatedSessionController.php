@@ -41,7 +41,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         session(['timezone' => $request->timezone]);
-        session(['broker' => auth()->user()->broker_id]);
     }
 
     /**
