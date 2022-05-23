@@ -12,7 +12,7 @@
         <script>
             const readOnly = true;
         </script>
-        <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.5') }}"></script>
     @endsection
 
     @include('loads.common.showForm')

@@ -5,6 +5,8 @@
         loadTypeShipper = $('#load_type_shipper'),
         shipperSel = $('#shipper_id'),
         tripSel = $('#trip_id'),
+        originSel = $('#origin_id'),
+        destinationSel = $('#destination_id'),
         customerName = $('#customer_name'),
         origin = $('#origin'),
         originCoords = $('[name=origin_coords]'),
@@ -58,12 +60,60 @@
                         destinationCoords.val(res.trip_destination ? res.trip_destination.coords : '').trigger('change');
                         customerName.val(res.customer_name);
                         mileage.val(res.mileage);
+                        if (res.trip_origin) {
+                            originSel.append(`<option value="${res.trip_origin.id}">${res.trip_origin.name}</option>`);
+                            originSel.val(res.trip_origin.id).prop('disabled', true);
+                        }
+                        if (res.trip_destination) {
+                            destinationSel.append(`<option value="${res.trip_destination.id}">${res.trip_destination.name}</option>`);
+                            destinationSel.val(res.trip_destination.id).prop('disabled', true);
+                        }
                     },
                     error: () => {
                         throwErrorMsg();
                     }
                 })
+            })
+            .on('select2:unselect', () => {
+                originSel.val('').prop('disabled', false).trigger('change');
+                destinationSel.val('').prop('disabled', false).trigger('change');
             });
+        originSel.select2({
+            ajax: {
+                url: '/trip/origin/selection',
+                data: (params) => {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        take: 15,
+                    };
+                },
+            },
+            placeholder: 'Select',
+            allowClear: true,
+        }).on('select2:select', (res) => {
+            const data = res.params.data;
+            origin.val(data.text);
+            originCoords.val(data.coords).trigger('change');
+        });
+        destinationSel.select2({
+            ajax: {
+                url: '/trip/destination/selection',
+                data: (params) => {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        take: 15,
+                    };
+                },
+            },
+            placeholder: 'Select',
+            allowClear: true,
+        }).on('select2:select', (res) => {
+            const data = res.params.data;
+            destination.val(data.text);
+            destinationCoords.val(data.coords).trigger('change');
+        });
         if (shipperSel.length > 0) {
             shipperSel.select2({
                 ajax: {
@@ -90,7 +140,7 @@
                     loadTypeSel.val('').prop('disabled', true).trigger('change');
                     tripSel.val('').prop('disabled', true).trigger('change');
                 });
-            if (!loadTypeSel.val())
+            if (!loadTypeSel.val() && !shipperSel.val())
                 loadTypeSel.prop('disabled', true).trigger('change');
         }
         date.set('select', dateInp.val(), {format: 'yyyy/mm/dd'});
@@ -101,6 +151,10 @@
         });
         if (shipperSel.length > 0 && !shipperSel.val())
             tripSel.prop('disabled', true).trigger('change');
+        if (tripSel.val()) {
+            originSel.prop('disabled', true);
+            destinationSel.prop('disabled', true);
+        }
         const createLoadModal = $('#createLoadModal');
         if (createLoadModal.length > 0) {
             createLoadModal.on('hidden.modal.bs', () => {

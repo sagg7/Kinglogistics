@@ -1,6 +1,6 @@
 <div class="row">
     @if(!isset($load))
-        <div class="form-group col-md-3">
+        <div class="form-group col-md col-sm-12">
             {!! Form::label('load_number', ucfirst(__('Number of loads')), ['class' => 'col-form-label']) !!}
             {!! Form::text('load_number', $load->load_number ?? null, ['class' => 'form-control' . ($errors->first('load_number') ? ' is-invalid' : '')]) !!}
             @error('load_number')
@@ -10,7 +10,7 @@
             @enderror
         </div>
     @endif
-    <div class="form-group col-md-3">
+    <div class="form-group col-md col-sm-12">
         {!! Form::label('driver', ucfirst(__('Driver')), ['class' => 'col-form-label']) !!}
         @if(isset($load->driver->name))
             {!! Form::text('driver_id', $load->driver->name ?? null, ['class' => 'form-control' . ($errors->first('driver_id') ? ' is-invalid' : ''), 'disabled']) !!}
@@ -23,26 +23,46 @@
         </span>
         @enderror
     </div>
-        @if(auth()->guard('web')->check())
-            <div class="form-group col-md-3">
-                {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
-                {!! Form::select('shipper_id', $shippers, $load->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
-                @error('shipper_id')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ ucfirst($message) }}</strong>
-                </span>
-                @enderror
-            </div>
-        @endif
-        <div class="form-group col-md-3">
-            {!! Form::label('trip_id', ucfirst(__('job')), ['class' => 'col-form-label']) !!}
-            {!! Form::select('trip_id', [], $load->trip_id ?? null, ['class' => 'form-control' . ($errors->first('trip_id') ? ' is-invalid' : '')]) !!}
-            @error('trip_id')
+    @if(auth()->guard('web')->check())
+        <div class="form-group col-md col-sm-12">
+            {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
+            {!! Form::select('shipper_id', isset($load->shipper) ? [$load->shipper->id => $load->shipper->name] : [], $load->shipper_id ?? null, ['class' => 'form-control' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}
+            @error('shipper_id')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ ucfirst($message) }}</strong>
             </span>
             @enderror
         </div>
+    @endif
+    <div class="form-group col-md col-sm-12">
+        {!! Form::label('trip_id', ucfirst(__('job')), ['class' => 'col-form-label']) !!}
+        {!! Form::select('trip_id', isset($load->trip) ? [$load->trip->id => $load->trip->name] : [], $load->trip_id ?? null, ['class' => 'form-control' . ($errors->first('trip_id') ? ' is-invalid' : '')]) !!}
+        @error('trip_id')
+        <span class="invalid-feedback" role="alert">
+                <strong>{{ ucfirst($message) }}</strong>
+            </span>
+        @enderror
+    </div>
+</div>
+<div class="row">
+    <div class="form-group col-md-6">
+        {!! Form::label('origin_id', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
+        {!! Form::select('origin_id', $origin ?? [], $load->trip->origin_id ?? $load->origin_id ?? null, ['class' => 'form-control' . ($errors->first('origin_id') ? ' is-invalid' : '')]) !!}
+        @error('origin_id')
+        <span class="invalid-feedback" role="alert">
+            <strong>{{ ucfirst($message) }}</strong>
+        </span>
+        @enderror
+    </div>
+    <div class="form-group col-md-6">
+        {!! Form::label('destination_id', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
+        {!! Form::select('destination_id', $destination ?? [], $load->trip->destination_id ?? $load->destination_id ?? null, ['class' => 'form-control' . ($errors->first('destination_id') ? ' is-invalid' : '')]) !!}
+        @error('destination_id')
+        <span class="invalid-feedback" role="alert">
+            <strong>{{ ucfirst($message) }}</strong>
+        </span>
+        @enderror
+    </div>
 </div>
 <hr>
 <div class="row">

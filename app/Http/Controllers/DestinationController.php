@@ -168,9 +168,16 @@ class DestinationController extends Controller
         $query = Destination::select([
             'id',
             'name AS text',
+            'coords',
         ])
             ->where("name", "LIKE", "%$request->search%")
-            ->where('broker_id', session('broker'));
+            ->where(function ($q) {
+                if (auth()->guard('web')->check()) {
+                    $q->where('broker_id', session('broker'));
+                } else if (auth()->guard('shipper')->check()) {
+                    $q->where('broker_id', auth()->user()->broker_id);
+                }
+            });
 
         return $this->selectionData($query, $request->take, $request->page);
     }
