@@ -62,11 +62,11 @@
                         mileage.val(res.mileage);
                         if (res.trip_origin) {
                             originSel.append(`<option value="${res.trip_origin.id}">${res.trip_origin.name}</option>`);
-                            originSel.val(res.trip_origin.id).prop('disabled', true);
+                            originSel.val(res.trip_origin.id).prop('disabled', true).trigger('change');
                         }
                         if (res.trip_destination) {
                             destinationSel.append(`<option value="${res.trip_destination.id}">${res.trip_destination.name}</option>`);
-                            destinationSel.val(res.trip_destination.id).prop('disabled', true);
+                            destinationSel.val(res.trip_destination.id).prop('disabled', true).trigger('change');
                         }
                     },
                     error: () => {
@@ -97,7 +97,9 @@
             originCoords.val(data.coords).trigger('change');
             tripSel.prop('disabled', true);
         }).on('select2:unselect', () => {
-            tripSel.prop('disabled', false);
+            if (!destinationSel.val()) {
+                tripSel.prop('disabled', false);
+            }
         });
         destinationSel.select2({
             ajax: {
@@ -118,7 +120,9 @@
             destinationCoords.val(data.coords).trigger('change');
             tripSel.prop('disabled', true);
         }).on('select2:unselect', () => {
-            tripSel.prop('disabled', false);
+            if (!originSel.val()) {
+                tripSel.prop('disabled', false);
+            }
         });
         if (shipperSel.length > 0) {
             shipperSel.select2({
