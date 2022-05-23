@@ -8,9 +8,9 @@
         originSel = $('#origin_id'),
         destinationSel = $('#destination_id'),
         customerName = $('#customer_name'),
-        origin = $('#origin'),
+        origin = $('[name=origin]'),
         originCoords = $('[name=origin_coords]'),
-        destination = $('#destination'),
+        destination = $('[name=destination]'),
         destinationCoords = $('[name=destination_coords]'),
         mileage = $('#mileage');
     const interactive = typeof readOnly === "undefined";
@@ -95,6 +95,9 @@
             const data = res.params.data;
             origin.val(data.text);
             originCoords.val(data.coords).trigger('change');
+            tripSel.prop('disabled', true);
+        }).on('select2:unselect', () => {
+            tripSel.prop('disabled', false);
         });
         destinationSel.select2({
             ajax: {
@@ -113,6 +116,9 @@
             const data = res.params.data;
             destination.val(data.text);
             destinationCoords.val(data.coords).trigger('change');
+            tripSel.prop('disabled', true);
+        }).on('select2:unselect', () => {
+            tripSel.prop('disabled', false);
         });
         if (shipperSel.length > 0) {
             shipperSel.select2({
@@ -149,7 +155,7 @@
                 select = $('#delete_type');
             deleteHandler(select,options);
         });
-        if (shipperSel.length > 0 && !shipperSel.val())
+        if (shipperSel.length > 0 && !shipperSel.val() || (originSel.val() || destinationSel.val()))
             tripSel.prop('disabled', true).trigger('change');
         if (tripSel.val()) {
             originSel.prop('disabled', true);

@@ -44,26 +44,6 @@
         @enderror
     </div>
 </div>
-<div class="row">
-    <div class="form-group col-md-6">
-        {!! Form::label('origin_id', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
-        {!! Form::select('origin_id', $origin ?? [], $load->trip->origin_id ?? $load->origin_id ?? null, ['class' => 'form-control' . ($errors->first('origin_id') ? ' is-invalid' : '')]) !!}
-        @error('origin_id')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ ucfirst($message) }}</strong>
-        </span>
-        @enderror
-    </div>
-    <div class="form-group col-md-6">
-        {!! Form::label('destination_id', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
-        {!! Form::select('destination_id', $destination ?? [], $load->trip->destination_id ?? $load->destination_id ?? null, ['class' => 'form-control' . ($errors->first('destination_id') ? ' is-invalid' : '')]) !!}
-        @error('destination_id')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ ucfirst($message) }}</strong>
-        </span>
-        @enderror
-    </div>
-</div>
 <hr>
 <div class="row">
     <div class="form-group col-md-3">
@@ -99,18 +79,24 @@
         @enderror
     </div>
     <div class="form-group col-md-3">
-        {!! Form::label('origin', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
+        {!! Form::label('origin_id', ucfirst(__('origin')), ['class' => 'col-form-label']) !!}
         <div class="input-group">
-            {!! Form::text('origin', $load->origin ?? null, ['class' => 'form-control' . ($errors->first('origin') ? ' is-invalid' : '')]) !!}
-            <div class="input-group-append">
-                <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addOrigin"><i class="fas fa-map-marker-alt"></i></button>
-            </div>
-            @error('origin')
+            {!! Form::select('origin_id', $origin ?? [], $load->trip->origin_id ?? $load->origin_id ?? null, ['class' => 'form-control' . ($errors->first('origin_id') ? ' is-invalid' : '')]) !!}
+            @error('origin_id')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ ucfirst($message) }}</strong>
             </span>
             @enderror
+            <div class="input-group-append">
+                <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addOrigin"><i class="fas fa-map-marker-alt"></i></button>
+            </div>
         </div>
+        {!! Form::hidden('origin', $load->origin ?? null, ['class' => 'form-control' . ($errors->first('origin') ? ' is-invalid' : ''), 'id' => 'origin']) !!}
+        @error('origin')
+        <span class="invalid-feedback" role="alert">
+            <strong>{{ ucfirst($message) }}</strong>
+        </span>
+        @enderror
         {!! Form::hidden('origin_coords', $load->origin_coords ?? null, ['class' => 'form-control' . ($errors->first('origin_coords') ? ' is-invalid' : '')]) !!}
         @error('origin_coords')
         <span class="invalid-feedback" role="alert">
@@ -119,18 +105,24 @@
         @enderror
     </div>
     <div class="form-group col-md-3">
-        {!! Form::label('destination', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
+        {!! Form::label('destination_id', ucfirst(__('destination')), ['class' => 'col-form-label']) !!}
         <div class="input-group">
-            {!! Form::text('destination', $load->destination ?? null, ['class' => 'form-control' . ($errors->first('destination') ? ' is-invalid' : '')]) !!}
-            <div class="input-group-append">
-                <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addDestination"><i class="fas fa-map-marker-alt"></i></button>
-            </div>
-            @error('destination')
+            {!! Form::select('destination_id', $destination ?? [], $load->trip->destination_id ?? $load->destination_id ?? null, ['class' => 'form-control' . ($errors->first('destination_id') ? ' is-invalid' : '')]) !!}
+            @error('destination_id')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ ucfirst($message) }}</strong>
             </span>
             @enderror
+            <div class="input-group-append">
+                <button class="btn btn-success pl-1 pr-1" type="button" data-toggle="modal" data-target="#addDestination"><i class="fas fa-map-marker-alt"></i></button>
+            </div>
         </div>
+        {!! Form::hidden('destination', $load->destination ?? null, ['class' => 'form-control' . ($errors->first('destination') ? ' is-invalid' : ''), 'id' => 'destination']) !!}
+        @error('destination')
+        <span class="invalid-feedback" role="alert">
+                <strong>{{ ucfirst($message) }}</strong>
+            </span>
+        @enderror
         {!! Form::hidden('destination_coords', $load->destination_coords ?? null, ['class' => 'form-control' . ($errors->first('destination_coords') ? ' is-invalid' : '')]) !!}
         @error('destination_coords')
         <span class="invalid-feedback" role="alert">
