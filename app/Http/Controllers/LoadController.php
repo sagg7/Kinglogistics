@@ -315,15 +315,19 @@ class LoadController extends Controller
             $q->where('id', session('broker'));
         })
             ->findOrFail($id);
-        $trip = Trip::with([
-            'shipper:id,type_rate',
-            'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
 
         $load->fill($request->all());
 
-        if($trip->shipper->type_rate == 'mileage-tons'){
-            $load->rate = $trip->rate->carrier_rate * $load->tons;
-            $load->shipper_rate =  $trip->rate->shipper_rate * $load->tons;
+        if ($request->tons) {
+            $trip = Trip::with([
+                'shipper:id,type_rate',
+                'rate:id,carrier_rate,shipper_rate'
+            ])
+                ->find($load->trip_id);
+            if ($trip && $trip->shipper->type_rate === 'mileage-tons') {
+                $load->rate = $trip->rate->carrier_rate * $load->tons;
+                $load->shipper_rate = $trip->rate->shipper_rate * $load->tons;
+            }
         }
         return $load->update();
     }

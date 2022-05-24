@@ -391,8 +391,10 @@
                     function JobRenderer() {}
                     JobRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
-                        this.eGui.innerHTML = `<a onclick="transferJobModal(${params.data.id})">${params.value.name}</a>`;
-                        new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                        if (params.value) {
+                            this.eGui.innerHTML = `<a onclick="transferJobModal(${params.data.id})">${params.value.name}</a>`;
+                            new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                        }
                     }
                     JobRenderer.prototype.getGui = () => {
                         return this.eGui;
