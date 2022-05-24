@@ -378,8 +378,6 @@
                             classU = "update"
                         }
 
-                        
-
                     }
                     LoadTimeRenderer.prototype.getGui = () => {
                         return this.eGui;
@@ -888,7 +886,7 @@
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/dispatchReport.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.5') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection
     <div class="card">

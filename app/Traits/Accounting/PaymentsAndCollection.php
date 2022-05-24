@@ -109,7 +109,7 @@ trait PaymentsAndCollection
     private function shipperInvoices($customDate)
     {
         DB::transaction(function () use ($customDate) {
-            $carbon_now = Carbon::now();
+            //$carbon_now = Carbon::now();
             $loads = Load::join('drivers', 'drivers.id', '=', 'driver_id')
                 ->whereNull('shipper_invoice_id')
                 ->whereHas('driver')
@@ -117,6 +117,7 @@ trait PaymentsAndCollection
                     // FILTER FOR PAYMENT DAYS CONFIG OF SHIPPER
                     //$q->whereRaw("FIND_IN_SET(".Carbon::now()->weekday().",payment_days)");
                 })
+                ->whereHas('trip')
                 ->whereHas('loadStatus', function ($q) use ($customDate, $carbon_now) {
                     $q->whereDate('finished_timestamp', '<=', $customDate);
                     //$q->whereDate('finished_timestamp', '<=', $carbon_now);

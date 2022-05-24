@@ -86,6 +86,24 @@ class Load extends Model
     /**
      * @return BelongsTo
      */
+    public function load_origin(): BelongsTo
+    {
+        return $this->belongsTo(Origin::class, 'origin_id')
+            ->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function load_destination(): BelongsTo
+    {
+        return $this->belongsTo(Destination::class, 'destination_id')
+            ->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo
+     */
     public function shipper_invoice(): BelongsTo
     {
         return $this->belongsTo(ShipperInvoice::class);

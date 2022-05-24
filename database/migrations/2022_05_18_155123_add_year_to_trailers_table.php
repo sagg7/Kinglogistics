@@ -14,7 +14,7 @@ class AddYearToTrailersTable extends Migration
     public function up()
     {
         Schema::table('trailers', function (Blueprint $table) {
-            $table->date('year')->nullable()->after('description');
+            $table->string('year')->nullable()->after('description');
         });
     }
 

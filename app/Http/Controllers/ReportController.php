@@ -534,6 +534,7 @@ class ReportController extends Controller
                     $q->where('carriers.id', $request->carrier);
                 }
             })
+            ->where('broker_id', session('broker'))
             ->get();
 
         $rangeEnd = $end->isAfter($now) ? $now : $end;

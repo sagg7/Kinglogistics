@@ -199,7 +199,7 @@ class LoadController extends Controller
                 }
                 $data['control_number'] = $control_number_str . $control_number_int;
 
-                $data['broker_id'] = session('broker');
+                $data['broker_id'] = session('broker') ?? auth()->user()->broker_id;
                 $load = $this->storeUpdate($data);
 
                 $control_number_int++;
@@ -250,9 +250,34 @@ class LoadController extends Controller
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             })
-            ->with('load_type:id,name', 'trip:id,name')
+            ->with([
+                'load_type:id,name',
+                'trip' => function ($q) {
+                    $q->select('id', 'name', 'origin_id', 'destination_id')
+                        ->with([
+                            'trip_origin:id,name',
+                            'trip_destination:id,name',
+                        ]);
+                },
+                'load_origin:id,name',
+                'load_destination:id,name',
+            ])
             ->find($id);
-        $params = compact('load') + $this->createEditParams();
+        if (isset($load->trip->trip_origin)) {
+            $origin = [$load->trip->origin_id => $load->trip->trip_origin->name];
+        } else if (isset($load->load_origin)) {
+            $origin = [$load->origin_id => $load->load_origin->name];
+        } else {
+            $origin = [];
+        }
+        if (isset($load->trip->trip_destination)) {
+            $destination = [$load->trip->destination_id => $load->trip->trip_destination->name];
+        } else if (isset($load->load_destination)) {
+            $destination = [$load->destination_id => $load->load_destination->name];
+        } else {
+            $destination = [];
+        }
+        $params = compact('load', 'origin', 'destination') + $this->createEditParams();
         return view('loads.edit', $params);
     }
 
