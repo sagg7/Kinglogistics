@@ -17,8 +17,8 @@
         loadMode.html(`<option value=""></option>`);
         $('#origin_early_pick_up_date').val("");
         $('#origin_late_pick_up_date').val("");
-        $('#destination_early_pick_up_date').val("");
-        $('#destination_late_pick_up_date').val("");
+        $('#destination_early_drop_off_date').val("");
+        $('#destination_late_drop_off_date').val("");
         $('#shipper_rate').val("");
         $('#rate').val("");
         $('#weight').val("");
@@ -183,7 +183,7 @@
     }, function(start, end, label) {
         //   console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
     });
-    $('#destination_early_pick_up_date').daterangepicker({
+    $('#destination_early_drop_off_date').daterangepicker({
         "singleDatePicker": true,
         "timePicker": true,
         "timePicker24Hour": true,
@@ -196,7 +196,7 @@
     }, function(start, end, label) {
         //   console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
     });
-    $('#destination_late_pick_up_date').daterangepicker({
+    $('#destination_late_drop_off_date').daterangepicker({
         "singleDatePicker": true,
         "timePicker": true,
         "timePicker24Hour": true,

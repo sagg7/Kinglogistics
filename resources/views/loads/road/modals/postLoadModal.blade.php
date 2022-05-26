@@ -78,18 +78,18 @@
                             </div>
                             <div class="row">
                                 <fieldset class="form-group col-md-6">
-                                    {!! Form::label('destination_early_pick_up_date', ucwords(__('Early Pick Up Date')), ['class' => 'col-form-label']) !!}
-                                    {!! Form::text('destination_early_pick_up_date', null, ['class' => 'form-control']) !!}
-                                    @error('destination_early_pick_up_date')
+                                    {!! Form::label('destination_early_drop_off_date', ucwords(__('Early Drop Off Date')), ['class' => 'col-form-label']) !!}
+                                    {!! Form::text('destination_early_drop_off_date', null, ['class' => 'form-control']) !!}
+                                    @error('destination_early_drop_off_date')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ ucfirst($message) }}</strong>
                                     </span>
                                     @enderror
                                 </fieldset>
                                 <fieldset class="form-group col-md-6">
-                                    {!! Form::label('destination_late_pick_up_date', ucwords(__('Late Pick Up Date')), ['class' => 'col-form-label']) !!}
-                                    {!! Form::text('destination_late_pick_up_date', null, ['class' => 'form-control']) !!}
-                                    @error('destination_late_pick_up_date')
+                                    {!! Form::label('destination_late_drop_off_date', ucwords(__('Late Drop Off Date')), ['class' => 'col-form-label']) !!}
+                                    {!! Form::text('destination_late_drop_off_date', null, ['class' => 'form-control']) !!}
+                                    @error('destination_late_drop_off_date')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ ucfirst($message) }}</strong>
                                     </span>

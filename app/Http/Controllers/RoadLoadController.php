@@ -50,8 +50,8 @@ class RoadLoadController extends Controller
             'origin_late_pick_up_date' => ['nullable', 'date'],
             'stateDestination' => ['required', 'numeric'],
             'cityDestination' => ['required', 'numeric'],
-            'destination_early_pick_up_date' => ['nullable', 'date'],
-            'destination_late_pick_up_date' => ['nullable', 'date'],
+            'destination_early_drop_off_date' => ['nullable', 'date'],
+            'destination_late_drop_off_date' => ['nullable', 'date'],
             'trailer_type_id' => ['required', 'numeric'],
             'mode_id' => ['nullable', 'numeric'],
             'shipper_rate' => ['nullable', 'numeric'],
@@ -124,8 +124,8 @@ class RoadLoadController extends Controller
         $roadLoad->destination_city_id = $request->cityDestination;
         $roadLoad->origin_early_pick_up_date = Carbon::parse($request->origin_early_pick_up_date);
         $roadLoad->origin_late_pick_up_date = Carbon::parse($request->origin_late_pick_up_date);
-        $roadLoad->destination_early_pick_up_date = Carbon::parse($request->destination_early_pick_up_date);
-        $roadLoad->destination_late_pick_up_date = Carbon::parse($request->destination_late_pick_up_date);
+        $roadLoad->destination_early_drop_off_date = Carbon::parse($request->destination_early_drop_off_date);
+        $roadLoad->destination_late_drop_off_date = Carbon::parse($request->destination_late_drop_off_date);
         $roadLoad->trailer_type_id = $request->trailer_type_id;
         $roadLoad->mode_id = $request->mode_id;
         $roadLoad->width = $request->width;
