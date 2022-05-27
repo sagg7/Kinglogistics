@@ -93,7 +93,7 @@ trait GenerateLoads
             $load->dispatch_init = auth()->user()->id;
             $load->shipper_id = auth()->guard('web')->check() ? $data["shipper_id"] : auth()->user()->id;
             $load->load_type_id = $data["load_type_id"];
-            $shipper = Shipper::find($load->shipper_id);
+            $shipper = Shipper::find(auth()->guard('web')->check() ? $data["shipper_id"] : auth()->user()->id);
             if (isset($data['driver_id'])) {
                 $load->driver_id = $data["driver_id"] ?? null;
                 $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
