@@ -12,8 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix//.sass('resources/sass/app.scss', 'public/css')
-// .postCss('public/app-assets/css/components.css', 'public/app-assets/css/components.min.css')
-    // .postCss('resources/css/fontawesome.css', 'public/css')
+    //.postCss('resources/css/fontawesome.css', 'public/css')
     /*.postCss('resources/css/app.css', 'public/css/guest', [
         require('postcss-import'),
         require('tailwindcss'),
@@ -42,17 +41,17 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/rentals/common.js'], 'public/js/sections/rentals/common.min.js')
     //.scripts(['resources/js/sections/trailers/common.js'], 'public/js/sections/trailers/common.min.js')
     //.scripts(['resources/js/sections/incidents/common.js'], 'public/js/sections/incidents/common.min.js')
-    //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
+    .scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/driverStatus.js'], 'public/js/sections/loads/dispatch/driverStatus.min.js')
-    //.scripts(['resources/js/sections/loads/common.js'], 'public/js/sections/loads/common.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/driverStatus.js'], 'public/js/sections/loads/dispatch/driverStatus.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/loadSummary.js'], 'public/js/sections/loads/dispatch/loadSummary.min.js')
-    // .scripts(['resources/js/sections/loads/dispatch/customerStatus.js'], 'public/js/sections/loads/dispatch/customerStatus.min.js')
+    //.scripts(['resources/js/sections/loads/dispatch/customerStatus.js'], 'public/js/sections/loads/dispatch/customerStatus.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/createDispatchReport.js'], 'public/js/sections/loads/dispatch/createDispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/dispatchReport.js'], 'public/js/sections/loads/dispatch/dispatchReport.min.js')
     //.scripts(['resources/js/sections/loads/dispatch/originsAndDestinations.js'], 'public/js/sections/loads/dispatch/originsAndDestinations.min.js')
     // .scripts(['resources/js/sections/loads/road/postLoad.js'], 'public/js/sections/loads/road/postLoad.min.js')
     //.scripts(['resources/js/sections/loads/road/searchBoard.js'], 'public/js/sections/loads/road/searchBoard.min.js')
+    //.scripts(['resources/js/sections/loads/road/dispatch/index.js'], 'public/js/sections/loads/road/dispatch/index.min.js')
     //.scripts(['resources/js/sections/paperwork/common.js'], 'public/js/sections/paperwork/common.min.js')
     //.scripts(['resources/js/sections/expenses/common.js'], 'public/js/sections/expenses/common.min.js')
     //.scripts(['resources/js/sections/incomes/common.js'], 'public/js/sections/incomes/common.min.js')

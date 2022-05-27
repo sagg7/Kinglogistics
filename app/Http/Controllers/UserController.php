@@ -253,7 +253,14 @@ class UserController extends Controller
             ->where(function ($q) use ($request) {
                 if ($request->type)
                     $q->whereHas('roles', function ($r) use ($request) {
-                        $r->where('slug', $request->type);
+                        $types = explode(",",$request->type);
+                        foreach ($types as $key => $type){
+                            if($key == 0){
+                                $r->where('slug', $type);
+                            } else {
+                                $r->orWhere('slug', $type);
+                            }
+                        }
                     });
             })
             ->with('roles');

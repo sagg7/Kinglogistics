@@ -10,6 +10,29 @@
     const length = $('#length');
     const modal = $('#loadDetails');
 
+    function StatusBarRenderer() {}
+    StatusBarRenderer.prototype.init = (params) => {
+        this.eGui = document.createElement('div');
+        let colorClass;
+        switch (params.value) {
+            default:
+                colorClass = 'bg-light';
+                break;
+            case 'requested':
+                colorClass = 'bg-warning';
+                break;
+            case 'accepted':
+                colorClass = 'bg-success';
+                break;
+            case 'rejected':
+                colorClass = 'bg-danger';
+                break;
+        }
+        this.eGui.innerHTML = `<div class="text-center ${colorClass} colors-container" style="width: 4px;">&nbsp;</div>`;
+    }
+    StatusBarRenderer.prototype.getGui = () => {
+        return this.eGui;
+    }
     function QuickPayRenderer() {}
     QuickPayRenderer.prototype.init = (params) => {
         this.eGui = document.createElement('div');
@@ -18,7 +41,6 @@
     QuickPayRenderer.prototype.getGui = () => {
         return this.eGui;
     }
-
     const currencyFormatter = (value) => {
         // If not a number, return value unchanged
         if (isNaN(value))
@@ -32,9 +54,11 @@
         else
             return '';
     };
+    let selectedLoad = null;
     const dataTable = new simpleTableAG({
         id: 'dataTable',
         columns: [
+            {headerName: '', field: 'status', filter: false, sortable: false, maxWidth: 14, cellRenderer: StatusBarRenderer},
             {headerTooltip: 'Age', headerName: 'Age', field: 'age'},
             {headerTooltip: 'Deadhead Miles', headerName: 'D/H Miles', field: 'deadhead_miles'},
             {headerTooltip: 'Trip Miles', headerName: 'Trip Miles', field: 'mileage'},
@@ -63,31 +87,37 @@
             },
             tooltipShowDelay: 500,
             onRowClicked: (event) => {
-                const data = event.data;
-                if (data.origin_city)
-                    $('#route_string').text(`${data.origin_city}, ${data.origin_state} » ${data.destination_city}, ${data.destination_state}`);
-                $('#load_details_age').text(data.age);
-                $('#load_details_mileage').text(data.mileage);
-                $('#load_details_trailer').text(data.trailer_type);
-                $('#load_details_size').text(data.load_size);
-                $('#load_details_length').text(data.length);
-                $('#load_details_weight').text(data.weight);
-                $('#load_details_width').text(data.width);
-                $('#load_details_height').text(data.height);
-                $('#load_details_payrate').text(data.pay_rate);
-                $('#load_details_date').text(data.date);
-                //$('#load_details_delivery').text(data.);
-                //$('#load_details_comments').text(data.);
-                $('#shipper_name').text(data.shipper);
-                $('#shipper_phone').text(data.shipper_phone);
+                modal.modal('show');
+                selectedLoad = event.data;
+                if (selectedLoad.origin_city)
+                    $('#route_string').text(`${selectedLoad.origin_city}, ${selectedLoad.origin_state} » ${selectedLoad.destination_city}, ${selectedLoad.destination_state}`);
+                $('#load_details_age').text(selectedLoad.age);
+                $('#load_details_mileage').text(selectedLoad.mileage);
+                $('#load_details_trailer').text(selectedLoad.trailer_type);
+                $('#load_details_size').text(selectedLoad.load_size);
+                $('#load_details_length').text(selectedLoad.length);
+                $('#load_details_weight').text(selectedLoad.weight);
+                $('#load_details_width').text(selectedLoad.width);
+                $('#load_details_height').text(selectedLoad.height);
+                $('#load_details_payrate').text(selectedLoad.pay_rate);
+                $('#load_details_date').text(selectedLoad.date);
+                //$('#load_details_delivery').text(selectedLoad.);
+                //$('#load_details_comments').text(selectedLoad.);
+                $('#shipper_name').text(selectedLoad.shipper);
+                $('#shipper_phone').text(selectedLoad.shipper_phone);
                 modal.find('.modal-spinner').addClass('d-none');
                 modal.find('.content-body').removeClass('d-none');
                 //const selectedRows = dataTable.gridOptions.api.getSelectedRows();
-                modal.modal('show');
                 dataTable.gridOptions.api.deselectAll();
             },
         },
         autoHeight: true,
+    });
+
+    modal.on('hidden.bs.modal', () => {
+        modal.find('.modal-spinner').removeClass('d-none');
+        modal.find('.content-body').addClass('d-none');
+        selectedLoad = null;
     });
 
     const getData = (first = false) => {
@@ -121,6 +151,8 @@
                         colorClass = 'text-danger';
                     }
                     rowData.push({
+                        status: item.road.request ? item.road.request.status : null,
+                        road_load_id: item.road.id,
                         age: item.age,
                         deadhead_miles: item.road.deadhead_miles, // TODO: Calculate deadhead
                         mileage: item.mileage,
@@ -234,4 +266,58 @@
     });
     // First auto search
     getData(true);
+
+    /* ---- REQUEST MODAL FORM FUNCTIONALITY ---- */
+    const requestTruck = $('#requestTruck');
+    requestTruck.select2({
+        ajax: {
+            url: '/truck/selection',
+            data: (params) => {
+                return {
+                    search: params.term,
+                    page: params.page || 1,
+                    take: 15,
+                    type: 'hasCarrier',
+                };
+            },
+        },
+        placeholder: 'Select',
+        allowClear: true,
+    });
+    const requestLoadBtn = $('#requestLoad');
+    requestLoadBtn.click(() => {
+        const truck_id = requestTruck.val();
+        if (!truck_id) {
+            throwErrorMsg('Select the truck you want to assign to this load to continue');
+        } else {
+            $.ajax({
+                url: '/load/road/request',
+                type: 'POST',
+                data: {
+                    road_load_id: selectedLoad.road_load_id,
+                    truck_id,
+                },
+                success: (res) => {
+                    if (res.success) {
+                        removeAjaxLoaders();
+                        modal.modal('hide');
+                        throwErrorMsg("Your request has been sent successfully", {"title": "Success!", "type": "success"});
+                        const idx = dataTable.rowData.find(obj => obj.road_load_id === selectedLoad.road_load_id);
+                        if (idx !== -1) {
+                            dataTable.rowData[idx].status = 'requested';
+                            dataTable.gridOptions.api.setRowData(dataTable.rowData);
+                        }
+                        modal.modal('hide');
+                    } else {
+                        throwErrorMsg();
+                    }
+                },
+                error: () => {
+                    throwErrorMsg();
+                }
+            }).always(() => {
+                removeAjaxLoaders();
+            });
+        }
+    });
 })();

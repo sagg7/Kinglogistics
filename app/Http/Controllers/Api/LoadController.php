@@ -345,9 +345,9 @@ class LoadController extends Controller
             $trip = Trip::with([
                 'shipper:id,type_rate',
                 'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
-            if($trip->shipper->type_rate == 'mileage-tons'){
+            if ($trip && $trip->shipper->type_rate === 'mileage-tons') {
                 $load->rate = $trip->rate->carrier_rate * $load->tons;
-                $load->shipper_rate =  $trip->rate->shipper_rate * $load->tons;
+                $load->shipper_rate = $trip->rate->shipper_rate * $load->tons;
             }
             $load->update();
 

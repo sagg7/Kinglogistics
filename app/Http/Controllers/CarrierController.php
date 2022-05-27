@@ -121,7 +121,7 @@ class CarrierController extends Controller
      * @throws ValidationException
      */
     public function store(Request $request)
-    {   
+    {
         $this->validator($request->all())->validate();
 
         return DB::transaction(function () use ($request) {

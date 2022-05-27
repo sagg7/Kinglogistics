@@ -17,7 +17,7 @@
                 <div class="card-header">
                     <fieldset class="form-group col-3">
                         <label for="dateRange">Graph type</label>
-                        {!! Form::select('graphType', ['trips' => 'Per trips', 'shippers' => 'Per customers', 'total' => 'Total'], null, ['class' => 'form-control', 'id' => 'graphType']) !!}
+                        {!! Form::select('graphType', ['destination' => 'Per destination','trips' => 'Per trips', 'shippers' => 'Per customers', 'total' => 'Total'], null, ['class' => 'form-control', 'id' => 'graphType']) !!}
                     </fieldset>
                     <fieldset class="form-group col-3">
                         <label for="dateRange">Select Dates</label>

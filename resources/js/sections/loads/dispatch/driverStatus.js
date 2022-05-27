@@ -30,7 +30,7 @@
                     `<td><a class="d-block" id="night_awaiting" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.awaiting}</a></td>` +
                     `<td><a class="d-block" id="night_loaded" href="${modalId}" data-toggle="modal" data-target="${modalId}">${res.night.loaded}</a></td></tr>`
                 );
-                $("#night_dispatch").html(`Nigth - ${res.night.active + res.night.inactive}`);
+                $("#night_dispatch").html(`Night - ${res.night.active + res.night.inactive}`);
 
             },
             error: () => {

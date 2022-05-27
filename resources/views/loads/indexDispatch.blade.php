@@ -378,8 +378,6 @@
                             classU = "update"
                         }
 
-                        
-
                     }
                     LoadTimeRenderer.prototype.getGui = () => {
                         return this.eGui;
@@ -393,8 +391,10 @@
                     function JobRenderer() {}
                     JobRenderer.prototype.init = (params) => {
                         this.eGui = document.createElement('div');
-                        this.eGui.innerHTML = `<a onclick="transferJobModal(${params.data.id})">${params.value.name}</a>`;
-                        new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                        if (params.value) {
+                            this.eGui.innerHTML = `<a onclick="transferJobModal(${params.data.id})">${params.value.name}</a>`;
+                            new bootstrap.Tooltip(this.eGui, {title: `Destination / Loader - ${Math.round(params.data.mileage)} miles`});
+                        }
                     }
                     JobRenderer.prototype.getGui = () => {
                         return this.eGui;
@@ -888,7 +888,7 @@
         <script src="{{ asset('js/sections/loads/dispatch/customerStatus.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/createDispatchReport.min.js') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/dispatchReport.min.js') }}"></script>
-        <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.5') }}"></script>
         <script src="{{ asset('js/sections/loads/dispatch/originsAndDestinations.min.js?1.0.0') }}"></script>
     @endsection
     <div class="card">

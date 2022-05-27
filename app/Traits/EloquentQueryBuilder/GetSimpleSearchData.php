@@ -92,7 +92,7 @@ trait GetSimpleSearchData
                     });
                 }
 
-            if ($request->searchable) {
+            if ($request->searchable && $request->search) {
                 $q->where(function ($q) use ($request, $relationships) {
                     $first = true;
                     foreach ($request->searchable as $i => $item) {

@@ -91,4 +91,12 @@ class Incident extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function broker()
+    {
+        return $this->belongsTo(Broker::class);
+    }
 }

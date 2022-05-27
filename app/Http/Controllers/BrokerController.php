@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\BrokerHelper;
 use App\Models\Broker;
 use App\Models\BrokerConfig;
 use App\Models\Equipment;
@@ -16,6 +17,13 @@ use Illuminate\Support\Facades\Validator;
 class BrokerController extends Controller
 {
     use FileUpload, QuillFormatter, QuillHtmlRendering;
+
+    protected $dHelper;
+
+    public function __construct()
+    {
+        $this->dHelper = new BrokerHelper();
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -119,5 +127,31 @@ class BrokerController extends Controller
         $config->rental_inspection_check_in_annex = $request->rental_inspection_check_in_annex;
         $config->save();
         return ['success' => true];
+    }
+
+    public function expired()
+    {
+        $expired = $this->dHelper->isExpired();
+
+        if ($expired) {
+            $viewContent = [
+                'title' => 'Your account is currently expired',
+                'text' => 'Make your payment or contact our support if you think this could be an error.',
+                'btns' => [
+                    [
+                        'href' => '/logout',
+                        'btn_text' => 'Logout'
+                    ],
+                    /*[
+                        'href' => '/stripe/payment',
+                        'btn_text' => 'Make payment',
+                    ]*/
+                ],
+            ];
+            $params = compact('viewContent');
+            return view('brokers.expired', $params);
+        }
+
+        return redirect('/');
     }
 }

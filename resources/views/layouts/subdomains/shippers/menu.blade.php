@@ -50,6 +50,9 @@
                 </ul>
             </li>
             <li class="nav-item">
+                <a href="/load/road/index"><i class="fas fa-clipboard-list"></i><span class="menu-item">Load Board</span></a>
+            </li>
+            <li class="nav-item">
                 <a href="/driver/index"><i class="fas fa-id-card"></i><span class="menu-item" data-i18n="List">Drivers</span></a>
             </li>
             <li class="nav-item has-sub">

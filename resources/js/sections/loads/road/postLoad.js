@@ -6,6 +6,7 @@
     const cityOrigin = $('#citiesOrigin');
     const stateDestination = $('#stateDestination');
     const cityDestination = $('#cityDestination');
+    const shipperSel = $('#shipper');
 
     const clearForm = () => {
         stateOrigin.html(`<option value=""></option>`);
@@ -54,11 +55,19 @@
                     throwErrorMsg("Load Generated Successfully", {"title": "Success!", "type": "success"});
                     $("#postLoadModal").modal('hide');
                     clearForm();
+                } else {
+                    throwErrorMsg();
                 }
             },
-            error: () => {
-                throwErrorMsg();
-            }
+            error: (res) => {
+                console.log(res);
+                let errors = `<ul class="text-left">`;
+                Object.values(res.responseJSON.errors).forEach((error) => {
+                    errors += `<li>${error}</li>`;
+                });
+                errors += `</ul>`;
+                throwErrorMsg(errors, {timer: false});
+            },
         })
     });
 
@@ -155,6 +164,22 @@
             },
         },
     });
+    if (shipperSel.length > 0) {
+        shipperSel.select2({
+            ajax: {
+                url: '/shipper/selection',
+                data: (params) => {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        take: 15,
+                    };
+                },
+            },
+            placeholder: 'Select',
+            allowClear: true,
+        });
+    }
 
     $('#origin_early_pick_up_date').daterangepicker({
         "singleDatePicker": true,

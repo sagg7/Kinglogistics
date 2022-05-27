@@ -25,7 +25,7 @@
                 @endif
             })();
         </script>
-        <script src="{{ asset('js/sections/loads/common.min.js?1.0.4') }}"></script>
+        <script src="{{ asset('js/sections/loads/common.min.js?1.0.5') }}"></script>
         <script src="{{ asset('js/sections/loads/coordsMaps.min.js') }}"></script>
         <script src="{{ asset('js/common/typesModal.min.js') }}"></script>
     @endsection

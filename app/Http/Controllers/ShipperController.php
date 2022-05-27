@@ -37,8 +37,10 @@ class ShipperController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', "unique:shippers,email,$id,id"],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable','string','max:255'],
             'invoice_email' => ['nullable', new EmailArray, 'max:255'],
             'loads_per_invoice' => ['nullable','numeric'],
+            'days_to_pay' => ['nullable','numeric'],
         ]);
     }
 
@@ -86,6 +88,7 @@ class ShipperController extends Controller
 
         $shipper->name = $request->name;
         $shipper->email = $request->email;
+        $shipper->phone = $request->phone;
         $shipper->invoice_email = $request->invoice_email;
         $shipper->trucks_required = $request->trucks_required;
         $shipper->loads_per_invoice = $request->loads_per_invoice;
@@ -239,7 +242,7 @@ class ShipperController extends Controller
         ->withCount(['drivers' => function($q){
             $q->where('status', '!=', 'inactive')
                 ->whereHas('truck');
-        }]);
+        }])->where('broker_id', session('broker'));
 
         //DailyLoads is working with by 24hrs and in this query you get total loads and total trucks
         $dailyLoads = Shipper::select([
@@ -247,9 +250,9 @@ class ShipperController extends Controller
             DB::raw("(select count(loads.id) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null) as loads"),
             DB::raw("(select count(DISTINCT (driver_id)) from loads join load_statuses on loads.id = load_id where finished_timestamp between '$start2' and '$end' and shipper_id = shippers.id and loads.deleted_at is null ) as trucks"),
         ]);
-        
+
         if($shipper_id){
-            $dailyLoads->where('shipper_id',$shipper_id);
+            $dailyLoads->where('shippers.id',$shipper_id);
         }
         $dailyLoads = $dailyLoads->get();
 
@@ -263,8 +266,8 @@ class ShipperController extends Controller
             if($shipper_id){
                 $q->where('shipper_id',$shipper_id);
             }
-        }]);
-        
+        }])
+            ->where('broker_id', session('broker'));
         if($shipper_id){
             $shippersAccepted->where('id',$shipper_id);
             $shippersFinished->where('id',$shipper_id);
@@ -310,7 +313,7 @@ class ShipperController extends Controller
             }
         }
         foreach ($dailyLoads as $shipper) {
-            if ($shipperAvg[$shipper->id]) {
+            if (isset($shipperAvg[$shipper->id]) && $shipperAvg[$shipper->id]) {
                 $shipperAvg[$shipper->id] += ['total_loads'=> $shipper->loads, 'total_trucks'=> $shipper->trucks];
             }
         }

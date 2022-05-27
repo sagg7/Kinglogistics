@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\OriginController;
 use App\Http\Controllers\TripController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +12,8 @@ Route::prefix('trip')->group(function () {
         ->name('trip.store');
     Route::get('selection', [TripController::class, 'selection'])
         ->name('trip.selection');
+    Route::get('getTrip', [TripController::class, 'getTrip'])
+        ->name('trip.getTrip');
     /*
     Route::get('index', [TripController::class, 'index'])
         ->name('trip.index');
@@ -25,4 +29,16 @@ Route::prefix('trip')->group(function () {
         ->name('trip.update');
     Route::post('delete/{id}', [TripController::class, 'destroy'])
         ->name('trip.delete');*/
+
+    // Origins
+    Route::prefix('origin')->group(function () {
+        Route::get('selection', [OriginController::class, 'selection'])
+            ->name('origin.selection');
+    });
+
+    // Destinations
+    Route::prefix('destination')->group(function () {
+        Route::get('selection', [DestinationController::class, 'selection'])
+            ->name('destination.selection');
+    });
 });

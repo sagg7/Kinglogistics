@@ -2,49 +2,36 @@
     <x-slot name="crumb_section">Load</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
+    @section('head')
+        <style>
+            .ag-theme-material .ag-header-cell, .ag-theme-material .ag-header-group-cell,
+            .ag-theme-material .ag-cell {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            .ag-header-cell[col-id="status"] {
+                display: none;
+            }
+            #dataTable, .aggrid .ag-header-cell-text {
+                font-size: 11px!important;
+            }
+        </style>
+    @endsection
+
     @section('modals')
-        @include("common.modals.genericAjaxLoading", ["id" => "view-photo", "title" => "Photo"])
+        @include("loads.road.modals.requestDetails")
     @endsection
     @section("vendorCSS")
         @include("layouts.ag-grid.css")
     @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
-        <script defer>
+        <script src="{{ asset('js/modules/aggrid/simpleTable.min.js?1.0.0') }}"></script>
+        <script>
             var tbAG = null;
-            (() => {
-                const nameFormatter = (params) => {
-                    if (params.value)
-                        return params.value.name;
-                    else
-                        return '';
-                };
-                tbAG = new tableAG({
-                    columns: [
-                        {headerName: 'Date', field: 'date'},
-                        {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
-                        {headerName: 'Control #', field: 'control_number'},
-                        {headerName: 'Origin', field: 'origin'},
-                        {headerName: 'Destination', field: 'destination'},
-                    ],
-                    menu: [
-                        {text: 'Show', route: '/load/show', icon: 'feather icon-eye'},
-                        @if(auth()->user()->can(['update-load']))
-                        {text: 'Edit', route: '/load/edit', icon: 'feather icon-edit'},
-                        @endif
-                        @if(auth()->user()->can(['delete-load']))
-                        {route: '/load/delete', type: 'delete'}
-                        @endif
-                    ],
-                    gridOptions: {
-                        undoRedoCellEditing: true,
-                    },
-                    container: 'myGrid',
-                    url: '/load/search',
-                    tableRef: 'tbAG',
-                });
-            })();
+            const dispatch = true;
         </script>
+        <script src="{{ asset('js/sections/loads/road/dispatch/index.min.js?1.0.0') }}"></script>
     @endsection
 
     <x-aggrid-index></x-aggrid-index>

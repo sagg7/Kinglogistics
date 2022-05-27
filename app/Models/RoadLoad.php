@@ -10,6 +10,11 @@ class RoadLoad extends Model
 {
     use HasFactory;
 
+    public function parentLoad(): BelongsTo
+    {
+        return $this->belongsTo(Load::class, 'load_id');
+    }
+
     /**
      * @return BelongsTo
      */
@@ -40,5 +45,10 @@ class RoadLoad extends Model
     public function destination_city(): BelongsTo
     {
         return $this->belongsTo(City::class, 'destination_city_id');
+    }
+
+    public function request()
+    {
+        return $this->hasOne(RoadLoadRequest::class);
     }
 }

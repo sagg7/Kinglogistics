@@ -102,14 +102,15 @@ class TruckController extends Controller
                 $truck = new Truck();
                 $truck->broker_id = session('broker');
             }
-
-            $trailer = Trailer::whereHas('truck')
+            /*$trailer = Trailer::whereHas('truck')
                 ->with('truck')
                 ->find($request->trailer_id);
+
             if ($trailer) {
                 $trailer->truck->trailer_id = null;
                 $trailer->truck->save();
-            }
+            }*/
+
             if (auth()->guard('carrier')->check())
                 $truck->carrier_id = auth()->user()->id;
             else
@@ -128,7 +129,6 @@ class TruckController extends Controller
             if ($request->seller_id)
                 $truck->seller_id = $request->seller_id;
             $truck->save();
-
             return $truck;
         });
     }
@@ -262,10 +262,14 @@ class TruckController extends Controller
             })
             ->whereNull("inactive");
 
-        if ($request->type === "drivers") {
-            $query->whereDoesntHave('driver');
+        switch ($request->type) {
+            case "drivers":
+                $query->whereDoesntHave('driver');
+                break;
+            case "hasCarrier":
+                $query->whereHas('carrier');
+                break;
         }
-
         return $this->selectionData($query, $request->take, $request->page);
     }
 

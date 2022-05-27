@@ -23,7 +23,7 @@
                     search: params.term,
                     page: params.page || 1,
                     take: 15,
-                    type: 'dispatch',
+                    type: 'dispatch,operations',
                 };
             },
         },

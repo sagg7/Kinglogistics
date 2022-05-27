@@ -13,6 +13,14 @@ class Destination extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * @return BelongsTo
+     */
+    public function broker(): BelongsTo
+    {
+        return $this->belongsTo(Broker::class);
+    }
+
+    /**
      * @return HasMany
      */
     public function trips(): HasMany

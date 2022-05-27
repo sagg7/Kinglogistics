@@ -30,7 +30,9 @@ trait GenerateLoads
         return Validator::make($data, [
             'load_number' => ['sometimes', 'numeric', 'min:1', 'max:999'],
             'shipper_id' => ['sometimes', 'exists:shippers,id'],
-            'trip_id' => ['required', 'exists:trips,id'],
+            'trip_id' => ['nullable', 'exists:trips,id'],
+            'origin_id' => ['nullable', 'exists:origins,id'],
+            'destination_id' => ['nullable', 'exists:destinations,id'],
             'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['nullable', 'exists:drivers,id'],
             'date' => ['required', 'date'],
@@ -67,8 +69,8 @@ trait GenerateLoads
     private function storeUpdate(array $data, int $id = null): Load
     {
         return DB::transaction(function () use ($data, $id) {
-            $trip = Trip::findOrFail($data['trip_id']);
-            if (isset($data['broker_id'])) {
+            $trip = isset($data['trip_id']) ? Trip::findOrFail($data['trip_id']) : null;
+            if (isset($trip->broker_id)) {
                 $data['broker_id'] = $trip->broker_id;
             }
             if ($id) {
@@ -80,27 +82,26 @@ trait GenerateLoads
                 $load = new Load();
                 $load->broker_id = $data['broker_id'];
             }
-            if ($trip->shipper_id) {
-                $shipper = Shipper::find($trip->shipper_id);
-            }
-            if (auth()->guard('shipper')->check()){
+            if (auth()->guard('shipper')->check()) {
                 $load->creator_type = 'shipper';
-            }else if(auth()->guard('web')->check()){
+            } else if (auth()->guard('web')->check()) {
                 $load->creator_type = 'user';
-            }else {
+            } else {
                 $load->creator_type = 'driver';
             }
-            $load->creator_id  = auth()->user()->id;
-            $load->dispatch_init =  auth()->user()->id;
-
-            $load->shipper_id = $trip->shipper_id;
+            $load->creator_id = auth()->user()->id;
+            $load->dispatch_init = auth()->user()->id;
+            $load->shipper_id = auth()->guard('web')->check() ? $data["shipper_id"] : auth()->user()->id;
             $load->load_type_id = $data["load_type_id"];
+            $shipper = Shipper::find($load->shipper_id);
             if (isset($data['driver_id'])) {
                 $load->driver_id = $data["driver_id"] ?? null;
                 $load->truck_id = isset($data["driver_id"]) ? Driver::with('truck')->find($data["driver_id"])->truck->id ?? null : null;
             }
             $load->load_log_id = $data["load_log_id"] ?? null;
             $load->trip_id = $data["trip_id"] ?? null;
+            $load->origin_id = $data["origin_id"] ?? null;
+            $load->destination_id = $data["destination_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
             $load->control_number = $data["control_number"];
             $load->origin = $data["origin"];
@@ -132,8 +133,9 @@ trait GenerateLoads
                 }
             }
             $load->notes = $data["notes"] ?? null;
-            if (isset($data['status']))
+            if (isset($data['status'])) {
                 $load->status = $data["status"];
+            }
             $load->save();
             if (!$id) {
                 $loadStatus = new LoadStatus();
