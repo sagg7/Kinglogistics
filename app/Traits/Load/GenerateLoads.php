@@ -91,7 +91,7 @@ trait GenerateLoads
             }
             $load->creator_id = auth()->user()->id;
             $load->dispatch_init = auth()->user()->id;
-            $load->shipper_id = auth()->guard('web')->check() ? $data["shipper_id"] : auth()->user()->shippers[0]->id;
+            $load->shipper_id = $data["shipper_id"] ?? auth()->user()->id;
             $load->load_type_id = $data["load_type_id"];
             $shipper = Shipper::find($load->shipper_id);
             if (isset($data['driver_id'])) {
