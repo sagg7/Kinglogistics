@@ -353,7 +353,7 @@ class TrailerController extends Controller
         }
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Number", "Carrier", "Driver", "Trailer Type", "Chassis Type", "Plate", "Vin"/*, "Status"*/],
+            "headers" => ["Number", session('renames') ? session('renames')->carrier : 'Carrier', "Driver", "Trailer Type", "Chassis Type", "Plate", "Vin"/*, "Status"*/],
         ]))->download("Trailers - " . Carbon::now()->format('m-d-Y') . ".xlsx");
     }
 }

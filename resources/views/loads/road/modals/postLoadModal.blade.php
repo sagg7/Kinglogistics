@@ -263,7 +263,7 @@
                         </div>
                         <div class="row">
                             <fieldset class="form-group col-md-6">
-                                {!! Form::label('customer_po', ucwords(__('customer PO')), ['class' => 'col-form-label']) !!}
+                                {!! Form::label('customer_po', ucwords(__(session('renames') ? session('renames')->po : 'Customer PO')), ['class' => 'col-form-label']) !!}
                                 {!! Form::text('customer_po', null, ['class' => 'form-control']) !!}
                                 @error('customer_po')
                                 <span class="invalid-feedback" role="alert">

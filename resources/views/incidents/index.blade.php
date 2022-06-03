@@ -26,7 +26,7 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'incident_type', valueFormatter: nameFormatter},
-                        @if(auth()->guard('web')->check()){headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},@endif
+                        @if(auth()->guard('web')->check()){headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: nameFormatter},@endif
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                         {headerName: 'Safety User', field: 'user', valueFormatter: nameFormatter},
                         {headerName: 'Sanction', field: 'sanction', valueFormatter: capitalizeNameFormatter},

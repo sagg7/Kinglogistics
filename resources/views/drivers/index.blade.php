@@ -161,7 +161,7 @@
                             gridOptions = {
                                     components: {
                                         OptionModalFunc: (modalId, driverId) => {
-                                            if (modalId == "#viewDriver") 
+                                            if (modalId == "#viewDriver")
                                                 viewDriverFunction(modalId, driverId);
                                         }
                                     },
@@ -172,7 +172,7 @@
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
                                 {headerName: 'Truck #', field: 'truck', valueFormatter: truckFormatter,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
-                                {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                                {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', cellRenderer: StatusTooltip},
                                 {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],
@@ -296,7 +296,7 @@
                             }
                             sum++;
                         }}else{text = 'N/A'}
-                        
+
                         content.empty();
                         content.append(
                             `<div class="form-group">` +

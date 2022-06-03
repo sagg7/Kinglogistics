@@ -94,7 +94,7 @@
                                     field: "driver",
                                 },
                                 {
-                                    headerName: "Control #",
+                                    headerName: "{{session('renames') ? session('renames')->control_number : 'Control #'}}",
                                     field: "control",
                                 },
                                 {
@@ -182,7 +182,7 @@
                 </div>
                 <div class="col-6">
                     <fieldset class="form-group">
-                        <label for="trips">Job</label>
+                        <label for="trips">{{session('renames') ? session('renames')->job : 'Job'}}</label>
                         {!! Form::select('trips', $trips, null, ['class' => 'form-control']) !!}
                     </fieldset>
                 </div>

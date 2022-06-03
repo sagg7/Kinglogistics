@@ -44,7 +44,7 @@
                     </li>
                     <li>
                         <a href="/trip/create">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Jobs</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">{{session('renames') ? session('renames')->job : 'Jobs'}}</span>
                         </a>
                     </li>
                 </ul>
@@ -83,7 +83,7 @@
                     </li>
                     <li>
                         <a href="/report/trips">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">Jobs</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="List">{{session('renames') ? session('renames')->job : 'Jobs'}}</span>
                         </a>
                     </li>
                     <li>

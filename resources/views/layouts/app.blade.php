@@ -99,6 +99,7 @@
     <script>
         const userId = {{ auth()->user()->id }};
         const brokerId = {{ auth()->user()->broker_id ?? 'null' }};
+        let session = JSON.parse('{!!session('renames')!!}');
     </script>
     <!-- BEGIN: Vendor JS-->
     <script src="{{ asset("app-assets/vendors/js/vendors.min.js") }}" type="application/javascript"></script>

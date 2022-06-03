@@ -308,7 +308,7 @@
         });
         driverSel.trigger('change');
         loads.forEach(item => {
-            loadSel.append(`<option value="${item.id}">Control #${item.control_number}</option>`);
+            loadSel.append(`<option value="${item.id}">${session['control_number'] ?? 'Control #'}${item.control_number}</option>`);
         });
         loadSel.trigger('change');
         if (!bounds.isEmpty())

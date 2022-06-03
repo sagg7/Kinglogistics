@@ -23,7 +23,7 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
-                        {headerName: 'Control #', field: 'control_number'},
+                        {headerName: ${session['control_number'] ?? 'Control #'}, field: 'control_number'},
                         {headerName: 'Origin', field: 'origin'},
                         {headerName: 'Destination', field: 'destination'},
                     ],

@@ -25,7 +25,7 @@
                 tbAG = new tableAG({
                     columns: [
                         {headerName: 'Date', field: 'date'},
-                        {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                        {headerName: '{{session('renames') ? session('renames')->carrier : 'Carrier'}}', field: 'carrier', valueFormatter: nameFormatter},
                         {headerName: 'Subtotal', field: 'gross_amount', valueFormatter: moneyFormatter},
                         {headerName: 'Reductions', field: 'reductions', valueFormatter: moneyFormatter},
                         {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},

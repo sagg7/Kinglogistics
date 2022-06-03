@@ -49,7 +49,7 @@ const showLoadModal = (data) => {
         '</tr>' +
         '<tr>' +
         '<th>Weight</th>' +
-        '<th>Tons</th>' +
+        `<th>${session['tons'] ?? 'Tons'}</th>` +
         '<th>Silo number</th>' +
         '<th>Mileage</th>' +
         '</tr>' +

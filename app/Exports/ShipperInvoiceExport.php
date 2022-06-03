@@ -179,7 +179,7 @@ class ShipperInvoiceExport implements FromArray, ShouldAutoSize, WithStyles, Wit
                 "WELL NAME",
                 "Sand Ticket #",
                 "Sandbox" . PHP_EOL . "Control",
-                "BOL",
+                session('renames') ? session('renames')->bol : 'BOL',
                 "MILES",
                 "RATE",
             ],

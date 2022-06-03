@@ -215,6 +215,7 @@
     ['name' => 'Equipment', 'pane' => 'pane-equipment'],
     ['name' => 'Services', 'pane' => 'pane-service'],
     ['name' => 'Rentals', 'pane' => 'pane-rentals'],
+    ['name' => 'Configurations', 'pane' => 'pane-config'],
     ]])
         <div role="tabpanel" class="tab-pane active" id="pane-info" aria-expanded="true">
             {!! Form::open(['route' => ['company.update', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical with-sig-pad', 'enctype' => 'multipart/form-data', 'id' => 'profileForm']) !!}
@@ -234,6 +235,11 @@
         <div role="tabpanel" class="tab-pane" id="pane-rentals" aria-expanded="false">
             {!! Form::open(['route' => ['company.rentals', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical', 'id' => 'rentalsForm']) !!}
             @include('brokers.common.rentals', ['title' => $service->title ?? null, 'id' => 'rentals'])
+            {!! Form::close() !!}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="pane-config" aria-expanded="false">
+            {!! Form::open(['route' => ['company.config', $company->id ?? 1], 'method' => 'post', 'class' => 'form form-vertical', 'id' => 'configForm']) !!}
+            @include('brokers.common.config', ['title' => $service->title ?? null, 'id' => 'config'])
             {!! Form::close() !!}
         </div>
     @endcomponent

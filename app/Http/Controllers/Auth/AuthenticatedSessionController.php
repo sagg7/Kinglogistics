@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate($guard ?: $this->getGuard());
 
         $request->session()->regenerate();
-
+        session(['renames' => Auth::user()->broker->renames]);
         session(['timezone' => $request->timezone]);
     }
 

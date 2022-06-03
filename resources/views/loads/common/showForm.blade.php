@@ -84,7 +84,7 @@
                     @enderror
                 </div>
                 <div class="form-group col-md-3">
-                    {!! Form::label('control_number', ucfirst(__('control number')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('control_number', ucfirst(__(session('renames') ? session('renames')->control_number : 'control number')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('control_number', $load->control_number ?? null, ['class' => 'form-control' . ($errors->first('control_number') ? ' is-invalid' : ''), 'readonly']) !!}
                     @error('control_number')
                     <span class="invalid-feedback" role="alert">

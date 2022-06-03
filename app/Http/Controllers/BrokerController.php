@@ -6,11 +6,13 @@ use App\Helpers\BrokerHelper;
 use App\Models\Broker;
 use App\Models\BrokerConfig;
 use App\Models\Equipment;
+use App\Models\Rename;
 use App\Models\Service;
 use App\Traits\QuillEditor\QuillFormatter;
 use App\Traits\QuillEditor\QuillHtmlRendering;
 use App\Traits\Storage\FileUpload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,11 +36,12 @@ class BrokerController extends Controller
     {
         $company = Broker::with('config')
             ->findOrFail(session('broker'));
+        $renames = Rename::where('broker_id', session('broker'))->first();
         $equipment = Equipment::where('broker_id', session('broker'))->first();
         !$equipment ?: $equipment->message_json = $this->renderForJsonMessage($equipment->message_json);
         $service = Service::where('broker_id', session('broker'))->first();
         !$service ?: $service->message_json = $this->renderForJsonMessage($service->message_json);
-        $params = compact('company', 'equipment', 'service');
+        $params = compact('company', 'equipment', 'service', 'renames');
         return view('brokers.profile', $params);
     }
 
@@ -127,6 +130,27 @@ class BrokerController extends Controller
         $config->rental_inspection_check_in_annex = $request->rental_inspection_check_in_annex;
         $config->save();
         return ['success' => true];
+    }
+
+    public function config(Request $request)
+    {
+        $config = Rename::where('broker_id', session('broker'))->first();
+        if (!$config) {
+            $config = new Rename();
+            $config->broker_id = session('broker');
+        }
+        $config->job = $request->job;
+        $config->control_number = $request->control_number;
+        $config->customer_reference = $request->customer_reference;
+        $config->bol = $request->bol;
+        $config->tons = $request->tons;
+        $config->po = $request->po;
+        $config->carrier = $request->carrier;
+        $config->save();
+
+        session(['renames' => Auth::user()->broker->renames]);
+
+        return redirect()->route('company.profile');
     }
 
     public function expired()

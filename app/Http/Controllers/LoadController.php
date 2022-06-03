@@ -26,6 +26,7 @@ use App\Traits\Turn\DriverTurn;
 use Carbon\Carbon;
 use Foo\Bar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -625,7 +626,7 @@ class LoadController extends Controller
             return (new TemplateExport([
                 "data" => $data,
                 "headers" => [
-                    "Accepted Timestamp", "Finished Timestamp", "Truck #", "Driver", "Carrier", "Control #", "C Reference", "BOL", "Tons", "Milage", "Load Type", "Job",  "PO",
+                    "Accepted Timestamp", "Finished Timestamp", "Truck #", "Driver", "Carrier", session('renames') ? session('renames')->control_number : 'Control #', session('renames') ? session('renames')->customer_reference : 'C Reference', session('renames') ? session('renames')->bol : 'BOL', session('renames') ? session('renames')->tons : 'Tons', "Milage", "Load Type", session('renames') ? session('renames')->job : 'Job',  session('renames') ? session('renames')->po : 'PO',
                     "Customer", "Status", "Load Time"
                 ],
             ]))->download("Loads - " . Carbon::now()->format('m-d-Y') . ".xlsx");
@@ -1007,7 +1008,7 @@ class LoadController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+            "headers" => [session('renames') ? session('renames')->control_number : 'Control #', "Truck #", "Driver", "Carrier", session('renames') ? session('renames')->customer_reference : 'C Reference', session('renames') ? session('renames')->bol : 'BOL', "Weight", session('renames') ? session('renames')->tons : 'Tons', "Milage", "Load Type", session('renames') ? session('renames')->job : 'Job', session('renames') ? session('renames')->po : 'PO', "Customer","Status",
         "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp", "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
             "formats" => [
                 // 'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
@@ -1056,7 +1057,7 @@ class LoadController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+            "headers" => [session('renames') ? session('renames')->control_number : 'Control #', "Truck #", "Driver", "Carrier", session('renames') ? session('renames')->customer_reference : 'C Reference', session('renames') ? session('renames')->bol : 'BOL', "Weight", session('renames') ? session('renames')->tons : 'Tons', "Milage", "Load Type", session('renames') ? session('renames')->job : 'Job', session('renames') ? session('renames')->po : 'PO', "Customer","Status",
              "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp", "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
             "formats" => [
                 // 'D' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
@@ -1072,7 +1073,7 @@ class LoadController extends Controller
         $data = [];
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Control #", "Truck #", "Driver", "Carrier", "C Reference", "BOL", "Weight", "Tons", "Milage", "Load Type", "Job", "PO", "Customer","Status",
+            "headers" => [session('renames') ? session('renames')->control_number : 'Control #', "Truck #", "Driver", "Carrier", session('renames') ? session('renames')->customer_reference : 'C Reference', session('renames') ? session('renames')->bol : 'BOL', "Weight", session('renames') ? session('renames')->tons : 'Tons', "Milage", "Load Type", session('renames') ? session('renames')->job : 'Job', session('renames') ? session('renames')->po : 'PO', "Customer","Status",
              "Box Id", "Box id end", "Unallocated Timestamp", "Requested Timestamp", "Accepted Timestamp", "Loading Timestamp","To location Timestamp",
             "Arrived Timestamp","Unloading Timestamp", "Finished Timestamp" ],
         ]))->download("Loads" . " - " . Carbon::now()->format('m-d-Y') . ".xlsx");

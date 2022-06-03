@@ -30,7 +30,7 @@
                 }
                 tbAG = new tableAG({
                     columns: [
-                        {headerName: 'Carrier', field: 'carrier', valueFormatter: carrierFormatter},
+                        {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: carrierFormatter},
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                         {headerName: 'Paid', field: 'paid_amount', valueFormatter: moneyFormatter},
                         {headerName: 'Installments', field: 'installments'},

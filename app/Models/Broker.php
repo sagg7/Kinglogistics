@@ -47,4 +47,12 @@ class Broker extends Model
     {
         return $this->hasOne(BrokerConfig::class);
     }
+
+    /**
+     * @return HasOne
+     */
+    public function renames(): HasOne
+    {
+        return $this->hasOne(Rename::class);
+    }
 }

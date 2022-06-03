@@ -77,8 +77,8 @@
                     {headerName: 'Chassis Nº', field: 'trailer', valueFormatter: trailerNumberFormatter},
                     {headerName: 'Driver', field: 'name'},
                     {headerName: 'Phone', field: 'phone'},
-                    {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
-                    {headerName: 'Carrier phone', field: 'carrier_phone', valueFormatter: carrierPhoneFormatter},
+                    {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: nameFormatter},
+                    {headerName: `${session['carrier'] ?? 'Carrier'} phone`, field: 'carrier_phone', valueFormatter: carrierPhoneFormatter},
                 ],
                 gridOptions: {
                     components: {

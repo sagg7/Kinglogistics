@@ -90,7 +90,7 @@
                             columns: [
                                 {headerName: 'Name', field: 'name', cellRenderer: TooltipRenderer,},
                                 {headerName: 'Zone', field: 'zone', valueFormatter: nameFormatter},
-                                {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                                {headerName: '{{session('renames') ? session('renames')->carrier : 'Carrier'}}', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Load Status', field: 'latest_load', valueFormatter: capitalizeStatus},
                                 {headerName: 'Status', field: 'status', cellRenderer: StatusRenderer},
                             ],

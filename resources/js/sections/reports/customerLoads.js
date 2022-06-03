@@ -15,8 +15,8 @@
         id: `totalLoads`,
         columns: [
             {headerName: "Finished at", field: "date"},
-            {headerName: "Control #", field: "control"},
-            {headerName: "C Reference ", field: "reference"},
+            {headerName: session['control_number'] ?? 'Control #', field: "control"},
+            {headerName: session ? session['customer_reference'] : 'C Reference', field: "reference"},
             {headerName: "Bol", field: "bol"},
             {headerName: "Job", field: "job"},
         ],

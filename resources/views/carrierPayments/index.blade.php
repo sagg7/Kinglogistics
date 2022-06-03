@@ -50,7 +50,7 @@
                 };
                 const paymentsColumns = [
                     {headerName: 'Date', field: 'date'},
-                    {headerName: 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
+                    {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: nameFormatter},
                     {headerName: 'Subtotal', field: 'gross_amount', valueFormatter: moneyFormatter},
                     {headerName: 'Reductions', field: 'reductions', valueFormatter: moneyFormatter},
                     {headerName: 'Total', field: 'total', valueFormatter: moneyFormatter},
@@ -107,7 +107,7 @@
                             if (!penChargesTable)
                                 penChargesTable = new tableAG({
                                     columns: [
-                                        {headerName: 'Carrier', field: 'name'},
+                                        {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'name'},
                                         {headerName: 'Amount', field: 'amount', filter:false, sortable: false, valueFormatter: expensesFormatter},
                                     ],
                                     menu: [

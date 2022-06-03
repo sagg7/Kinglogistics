@@ -15,5 +15,7 @@ Route::prefix('company')->group(function () {
             ->name('company.service');
         Route::post('rentals', [BrokerController::class, 'rentals'])
             ->name('company.rentals');
+        Route::post('config', [BrokerController::class, 'config'])
+            ->name('company.config');
     });
 });

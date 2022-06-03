@@ -324,7 +324,7 @@
                     @if(auth()->user()->can(['read-job']))
                     <li class="has-sub">
                         <a href="#">
-                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Jobs</span>
+                            <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">{{session('renames') ? session('renames')->job : 'Jobs'}}</span>
                         </a>
                         <ul class="menu-content">
                             <li class="pl-1">
@@ -524,7 +524,7 @@
 
             {{-- end --}}
 
-            
+
         </ul>
     </div>
 </div>

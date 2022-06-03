@@ -40,7 +40,7 @@
                         {!! Form::select('shipper', [], null, ['class' => 'form-control']) !!}
                     </fieldset>
                     <fieldset class="form-group col-xl-3 col-lg-4 col-md-4 col-12">
-                        {!! Form::label('carrier', 'Carrier') !!}
+                        {!! Form::label('carrier', session('renames') ? session('renames')->carrier : 'carrier') !!}
                         {!! Form::select('carrier', [], null, ['class' => 'form-control']) !!}
                     </fieldset>
                 </div>

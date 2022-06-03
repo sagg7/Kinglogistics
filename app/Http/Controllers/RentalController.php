@@ -484,7 +484,7 @@ class RentalController extends Controller
         $rental->save();
         $rental->trailer->status = TrailerEnum::AVAILABLE;
         $rental->trailer->save();
-        
+
         return response()->json([
             'msg' => 'Rental terminated correctly',
             'success' => true
@@ -642,7 +642,7 @@ class RentalController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Date", "Carrier", "Driver", "Trailer", "Period", "Cost", "Deposit", "Delivered At", "Finished At"],
+            "headers" => ["Date", session('renames') ? session('renames')->carrier : 'Carrier', "Driver", "Trailer", "Period", "Cost", "Deposit", "Delivered At", "Finished At"],
             "formats" => [
                 'F' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
                 'G' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
@@ -715,12 +715,12 @@ class RentalController extends Controller
                     $item['return_data'] = $itemsDelivery[$idx]['pivot'];
                 }
             }
-            
+
             switch ($item["id"]) {
                 case 38:
                     $car_type = array_column(json_decode($item["pivot"]["option_value"]), 'car_type')[0];
                     $item["pivot"]['coords_template'] = $createEdit["coordsTemplates"][$car_type];
-                    
+
                     break;
                 default:
                     break;

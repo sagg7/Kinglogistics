@@ -66,7 +66,7 @@
     const requestsTable = new simpleTableAG({
         id: 'requestsTable',
         columns: [
-            {headerName: 'Carrier', field: 'carrier'},
+            {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier'},
             {headerName: 'Truck', field: 'truck'},
             {headerName: 'Accept Request', field: 'id', cellRenderer: AcceptBtnRenderer},
         ],
