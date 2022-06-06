@@ -106,6 +106,7 @@ class CarrierController extends Controller
         $carrier->owner = $request->owner;
         $carrier->inactive = $request->inactive ?? null;
         $carrier->invoice_email = $request->invoice_email;
+        $carrier->contact_from = $request->contact_from;
         if ($request->password)
             $carrier->password = Hash::make($request->password);
         $carrier->save();
@@ -510,7 +511,9 @@ class CarrierController extends Controller
             "carriers.email",
             "carriers.phone",
             "carriers.status",
-        ])
+            "carriers.contact_from",
+            "carriers.seller_id",
+        ])->with('seller:id,name')
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             });

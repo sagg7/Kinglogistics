@@ -75,7 +75,7 @@ class CompareLoadsImport implements ToArray
         
             foreach ($loads as $keyLoad => $load) {
             
-                if (strval($row[0]) == $load->control_number) {
+                if (strval($row[0]) == $load->control_number || preg_replace("-", "", strval($row[5])) == preg_replace("-", "", $load->bol)) {
                     $columnMatch[] = $row;
                     unset($array[$key]);
                     unset($loads[$keyLoad]);

@@ -22,6 +22,15 @@
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         let menu;
                         let gridOptions = {};
+                        function contactFrom() {};
+                        contactFrom.prototype.init = (params) => {
+                        this.eGui = document.createElement('div');
+                        this.eGui.innerHTML = `<span>${params.data.name}</span>`;
+                        new bootstrap.Tooltip(this.eGui, {title: `Contact from: ${params.data.seller?params.data.seller.name +' - ':''}${params.data.contact_from?params.data.contact_from:''}`});
+                        }
+                        contactFrom.prototype.getGui = () => {
+                        return this.eGui;
+                        }
                         switch (type) {
                             default:
                                 menu = [{
@@ -154,7 +163,8 @@
                         return {
                             columns: [{
                                     headerName: 'Name',
-                                    field: 'name'
+                                    field: 'name',
+                                    cellRenderer: contactFrom
                                 },
                                 {
                                     headerName: 'Email',

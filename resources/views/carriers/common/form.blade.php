@@ -104,6 +104,15 @@
                     </span>
                     @enderror
                 </div>
+                <div class="form-group col-md-6">
+                    {!! Form::label('contact_from', ucfirst(__('How the carrier found out about us?')), ['class' => 'col-form-label']) !!}
+                    {!! Form::text('contact_from', $carrier->contact_from ?? null, ['class' => 'form-control' . ($errors->first('contact_from') ? ' is-invalid' : '') ]) !!}
+                    @error('contact_from')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ ucfirst($message) }}</strong>
+                    </span>
+                    @enderror
+                </div>
             </div>
             @if(auth()->guard('web')->check())
                 <hr>
