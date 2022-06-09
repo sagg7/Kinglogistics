@@ -36,7 +36,7 @@ trait GenerateLoads
             'load_type_id' => ['required', 'exists:load_types,id'],
             'driver_id' => ['nullable', 'exists:drivers,id'],
             'date' => ['required', 'date'],
-            'control_number' => ['required', 'string', 'max:255'],
+            'control_number' => ['nullable', 'string', 'max:255'],
             'origin' => ['required', 'string', 'max:255'],
             'origin_coords' => ['required', 'string', 'max:255'],
             'destination' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ trait GenerateLoads
             $load->origin_id = $data["origin_id"] ?? null;
             $load->destination_id = $data["destination_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
-            $load->control_number = $data["control_number"];
+            $load->control_number = $data["control_number"] ?? null;
             $load->origin = $data["origin"];
             $load->origin_coords = $data["origin_coords"];
             $load->destination = $data["destination"];
