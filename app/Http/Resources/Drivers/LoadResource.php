@@ -23,8 +23,10 @@ class LoadResource extends JsonResource
             "date" => $this->date,
             "control_number" => $this->control_number,
             "origin" => $this->origin,
+            "origin_id" => $this->origin_id,
             "origin_coords" => $this->origin_coords,
             "destination" => $this->destination,
+            "destination_id" => $this->destination_id,
             "destination_coords" => $this->destination_coords,
             "customer_name" => $this->customer_name,
             "customer_po" => $this->customer_po,
@@ -38,6 +40,7 @@ class LoadResource extends JsonResource
             "auto_assigned" => $this->auto_assigned,
             "notified_at" => $this->getNotifiedAtProperty(),
             "load_status" => new LoadStatusResource($this->loadStatus),
+            "shipper_name" => $this->shipper->name ?? null,
             "created_at" => $this->created_at,
         ];
     }

@@ -11,10 +11,12 @@ use App\Models\AppConfig;
 use App\Models\Broker;
 use App\Models\Load;
 use App\Models\Shift;
+use App\Models\Truck;
 use App\Notifications\LoadAssignment;
 use App\Traits\Load\ManageLoadProcessTrait;
 use App\Traits\Shift\ShiftTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ShiftController extends Controller
 {
@@ -107,21 +109,43 @@ class ShiftController extends Controller
             ], 400);
         }
 
-        BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
+        return DB::transaction(function () use ($request, $driver) {
+            BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
-        // Create a Shift instance just to retrieve the fillable fields
-        $shift = new Shift();
-        $payload = $request->all($shift->getFillable());
+            // Check if exists unallocated loads and auto assign to driver
+            $load = null;
+            //$load = $this->autoAssignUnallocatedLoad($driver);
+            $driver->status = 'active';
+            $driver->save();
 
-        // Check if exists unallocated loads and auto assign to driver
-        $load = null;
-//        $load = $this->autoAssignUnallocatedLoad($driver);
-        $driver->status = 'active';
-        $driver->save();
-        // Starts shift for this driver
-        $this->startShift($driver, $payload, $load);
+            // Create a Shift instance just to retrieve the fillable fields
+            $shift = new Shift();
 
-        return response(['status' => 'ok', 'assigned_load' => $load], 200);
+            if ($request->truck_id) {
+                $assignedTruck = $driver->load('truck')->truck;
+                if ($assignedTruck->id != $request->truck_id) {
+                    $assignedTruck->driver_id = null;
+                    $assignedTruck->save();
+
+                    $newTruck = Truck::find($request->truck_id);
+                    $newTruck->driver_id = $driver->id;
+                    $newTruck->trailer_id = $request->trailer_id;
+                    $newTruck->save();
+                }
+                $payload = [
+                    "turn_id" => $request->shift_data["turn_id"],
+                    "have_truck" => $request->shift_data["have_truck"],
+                    "have_chassis" => $request->shift_data["have_chassis"],
+                    "have_box" => false,
+                ];
+            } else {
+                $payload = $request->all($shift->getFillable());
+            }
+            // Starts shift for this driver
+            $this->startShift($driver, $payload, $load);
+
+            return response(['status' => 'ok', 'assigned_load' => $load], 200);
+        });
     }
 
     /**

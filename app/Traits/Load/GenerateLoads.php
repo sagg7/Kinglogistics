@@ -108,7 +108,7 @@ trait GenerateLoads
             $load->origin_coords = $data["origin_coords"];
             $load->destination = $data["destination"];
             $load->destination_coords = $data["destination_coords"];
-            $load->customer_name = $data["customer_name"];
+            $load->customer_name = $data["customer_name"] ?? null;
             $load->customer_po = $data["customer_po"];
             $load->customer_reference = $data["customer_reference"];
             $load->tons = $data["tons"] ?? null;

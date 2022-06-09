@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Helpers\KeyValueResource;
+use App\Models\Truck;
+use Illuminate\Http\Request;
+
+class TruckController extends Controller
+{
+    public function getActiveTruck()
+    {
+        $driver = auth()->user()->load([
+            'truck' => function ($q) {
+                $q->select('id', 'driver_id', 'trailer_id', 'number');
+            }
+        ]);
+
+        return $driver->truck;
+    }
+
+    public function getTrucks()
+    {
+        $trucks = Truck::select([
+            'id as key',
+            'number as value',
+        ])
+            ->where('broker_id', auth()->user()->broker_id)
+            ->get();
+
+        return response([
+            'status' => 'ok',
+            'message' => 'Found trucks',
+            'trucks' => KeyValueResource::collection($trucks),
+        ]);
+    }
+}

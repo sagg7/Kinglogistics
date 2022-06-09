@@ -2,12 +2,17 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\DriverLocationController;
 use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\OriginController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\ShipperController;
+use App\Http\Controllers\Api\TrailerController;
+use App\Http\Controllers\Api\TruckController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
@@ -68,6 +73,9 @@ Route::group([
         Route::post('update-end-box', [LoadController::class, 'updateEndBox']);
         Route::post('store-load', [LoadController::class, 'storeLoad']);
 
+        Route::get('get-load-types', [LoadController::class, 'getLoadTypes']);
+        Route::get('get-origins', [OriginController::class, 'getOrigins']);
+        Route::get('get-destinations', [DestinationController::class, 'getDestinations']);
 
     });
 
@@ -113,6 +121,13 @@ Route::group([
         Route::post('start', [ShiftController::class, 'start']);
         Route::post('end', [ShiftController::class, 'end']);
 
+        Route::get('get-active-truck', [TruckController::class, 'getActiveTruck']);
+        Route::get('get-trucks', [TruckController::class, 'getTrucks']);
+        Route::get('get-trailers', [TrailerController::class, 'getTrailers']);
+    });
+
+    Route::prefix('shipper')->group(function () {
+        Route::get('get-shippers', [ShipperController::class, 'getShippers']);
     });
 
 });

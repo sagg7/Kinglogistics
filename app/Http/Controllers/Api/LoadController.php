@@ -14,11 +14,14 @@ use App\Models\AppConfig;
 use App\Models\AvailableDriver;
 use App\Models\BotAnswers;
 use App\Models\Broker;
+use App\Models\Destination;
 use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadLog;
 use App\Models\LoadStatus;
+use App\Models\LoadType;
+use App\Models\Origin;
 use App\Models\RejectedLoad;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Load\ManageLoadProcessTrait;
@@ -58,54 +61,73 @@ class LoadController extends Controller
 
     public function storeLoad(Request $request)
     {
-        $driver = auth()->user();
+        return DB::transaction(function () use ($request) {
+            $driver = auth()->user();
 
-        if ($driver->hasActiveLoads()) {
+            if ($driver->hasActiveLoads()) {
+                return response([
+                    'status' => 'error',
+                    'message' => __('Finish your current load to create a new one.')
+                ], 403);
+            }
+
+            $data = $request->all();
+            $loadStatus = LoadStatusEnum::ACCEPTED;
+
+            // Required data to create a new Load...
+
+            $data['date'] = Carbon::now();
+            $data['driver_id'] = $driver->id;
+            $data['status'] = $loadStatus;
+            $data['load_type_id'] = 1; //need to change this to null in database;
+            $data['control_number'] = $request->control_number ?? null;
+            //$data['origin'] = null;
+            $data['customer_po'] = ""; // Should be nullable in db
+            $data['customer_reference'] = ""; // Should be nullable in db
+
+            if ($request->trip_id) {
+                $trip = Trip::find($request->trip_id);
+                // Trip related info
+                //$data['id'] = $trip->id;
+                $data['origin'] = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
+                $data['origin_coords'] = $trip->trip_origin ? $trip->trip_origin->coords : $trip->origin_coords;
+                $data['destination'] = $trip->trip_destination ? $trip->trip_destination->name : $trip->destination;
+                $data['destination_coords'] = $trip->trip_destination ? $trip->trip_destination->coords : $trip->destination_coords;
+                $data['customer_name'] = $trip->customer_name;
+                $data['mileage'] = $trip->mileage;
+                $data['shipper_id'] = $trip->shipper_id;
+            }
+            if ($request->shipper_id) {
+                $data['shipper_id'] = $request->shipper_id;
+            }
+            if ($request->origin_id) {
+                $origin = Origin::findOrFail($request->origin_id);
+                $data['origin_id'] = $origin->id;
+                $data['origin'] = $origin->name;
+                $data['origin_coords'] = $origin->coords;
+            }
+            if ($request->destination_id) {
+                $destination = Origin::findOrFail($request->destination_id);
+                $data['destination_id'] = $destination->id;
+                $data['destination'] = $destination->name;
+                $data['destination_coords'] = $destination->coords;
+            }
+            $data['broker_id'] = $driver->broker_id ?? Driver::find($driver->id)->broker_id;
+
+            $load = $this->storeUpdate($data);
+            $this->switchLoadStatus($load, $loadStatus);
+
+            $driver->status = 'active';
+            $driver->save();
+
+            BotAnswers::where('driver_id', $driver->id)->delete();
+
             return response([
-                'status' => 'error',
-                'message' => __('Finish your current load to create a new one.')
-            ], 403);
-        }
-
-        $data = $request->all();
-        $loadStatus = LoadStatusEnum::ACCEPTED;
-
-        // Required data to create a new Load...
-
-        $data['date'] = Carbon::now();
-        $data['driver_id'] = $driver->id;
-        $data['status'] = $loadStatus;
-        $data['load_type_id'] = 1; //need to change this to null in database;
-        $data['control_number'] = $request->control_number ?? "undefined";
-        //$data['origin'] = null;
-        $data['customer_po'] = ""; // Should be nullable in db
-        $data['customer_reference'] = ""; // Should be nullable in db
-
-        $trip = Trip::find($request->trip_id);
-        // Trip related info
-        $data['id'] = $trip->id;
-        $data['origin'] = $trip->trip_origin ? $trip->trip_origin->name : $trip->origin;
-        $data['origin_coords'] = $trip->trip_origin ? $trip->trip_origin->coords : $trip->origin_coords;
-        $data['destination'] = $trip->trip_destination ? $trip->trip_destination->name : $trip->destination;
-        $data['destination_coords'] = $trip->trip_destination ? $trip->trip_destination->coords : $trip->destination_coords;
-        $data['customer_name'] = $trip->customer_name;
-        $data['mileage'] = $trip->mileage;
-        $data['shipper_id'] = $trip->shipper_id;
-        $data['broker_id'] = $driver->broker_id ?? Driver::find($driver->id)->broker_id;
-
-        $load = $this->storeUpdate($data);
-        $this->switchLoadStatus($load, $loadStatus);
-
-        $driver->status = 'active';
-        $driver->save();
-
-        $botAnswers = BotAnswers::where('driver_id', $driver->id)->delete();
-
-        return response([
-            'status' => 'ok',
-            'message' => 'The load has been successfully created!',
-            'load' => $load
-        ]);
+                'status' => 'ok',
+                'message' => 'The load has been successfully created!',
+                'load' => $load
+            ]);
+        });
     }
 
     public function getTrips(Request $request)
@@ -139,9 +161,10 @@ class LoadController extends Controller
         $driver = auth()->user();
         $date = Carbon::now();
 
-        $activeLoad = DB::table('loads')
-            ->where('driver_id', $driver->id)
-            ->whereNull('deleted_at')
+        $activeLoad = Load::where('driver_id', $driver->id)
+            ->with('shipper')
+            //->whereNull('deleted_at')
+            ->withTrashed()
             ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
             ->first();
 
@@ -153,7 +176,7 @@ class LoadController extends Controller
              * Temporary fix, the previous query does return the load but in a stdObject instance,
              * we need to call the eloquent constructor to get a model instance for further methods
              */
-            $activeLoad = Load::find($activeLoad->id);
+            //$activeLoad = Load::find($activeLoad->id);
 
             $message = __('Active load found');
             $load = new LoadResource($activeLoad);
@@ -168,9 +191,9 @@ class LoadController extends Controller
         }
         $load->creator_id  = auth()->user()->id;
         $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
-                ->where('time', $date->format("H").':00:00')->first();
+            ->where('time', $date->format("H").':00:00')->first();
         if ($dispatch)
-                $load->dispatch_init = $dispatch->user_id;
+            $load->dispatch_init = $dispatch->user_id;
 
         return response([
             'status' => 'ok',
@@ -306,14 +329,18 @@ class LoadController extends Controller
 
     public function loading(Request $request)
     {
-
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
 
         if ($load->status === LoadStatusEnum::ACCEPTED) {
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::LOADING);
 
-            $load->customer_po = $request->get('customer_po');
+            if ($request->customer_po) {
+                $load->customer_po = $request->customer_po;
+            }
+            if ($request->control_number) {
+                $load->control_number = $request->control_number;
+            }
             $load->update();
 
             return response([
@@ -338,16 +365,37 @@ class LoadController extends Controller
 
         $load = Load::findOrFail($loadId);
         if ($load->status === LoadStatusEnum::LOADING) {
-            $load->customer_reference = $request->get('sand_ticket');
-            $load->weight = $request->get('weight');
-            $load->silo_number = $request->get('silo_number');
-            $load->tons = (float)$request->get('weight') / 2000;
-            $trip = Trip::with([
-                'shipper:id,type_rate',
-                'rate:id,carrier_rate,shipper_rate'])->find($load->trip_id);
-            if ($trip && $trip->shipper->type_rate === 'mileage-tons') {
-                $load->rate = $trip->rate->carrier_rate * $load->tons;
-                $load->shipper_rate = $trip->rate->shipper_rate * $load->tons;
+            if ($request->sand_ticket) {
+                $load->customer_reference = $request->sand_ticket;
+            }
+            if ($request->weight) {
+                $load->weight = $request->weight;
+                $load->tons = (float)$request->weight / 2000;
+                if ($load->trip_id) {
+                    $trip = Trip::with([
+                        'shipper:id,type_rate',
+                        'rate:id,carrier_rate,shipper_rate'
+                    ])->find($load->trip_id);
+                    if ($trip && $trip->shipper->type_rate === 'mileage-tons') {
+                        $load->rate = $trip->rate->carrier_rate * $load->tons;
+                        $load->shipper_rate = $trip->rate->shipper_rate * $load->tons;
+                    }
+                }
+            }
+            if ($request->silo_number) {
+                $load->silo_number = $request->silo_number;
+            }
+            if ($request->origin_id) {
+                $origin = Origin::find($request->origin_id);
+                $load->origin_id = $request->origin_id;
+                $load->origin = $origin->name;
+                $load->origin_coords = $origin->coords;
+            }
+            if ($request->tons) {
+                $load->tons = $request->tons;
+            }
+            if ($request->load_type_id) {
+                $load->load_type_id = $request->load_type_id;
             }
             $load->update();
 
@@ -365,6 +413,7 @@ class LoadController extends Controller
 
             return response([
                 'status' => 'ok',
+                'load' => $load,
                 'load_status' => LoadStatusEnum::TO_LOCATION,
                 'load_status_details' => new LoadStatusResource($loadStatus)
             ]);
@@ -382,8 +431,17 @@ class LoadController extends Controller
         if ($load->status === LoadStatusEnum::TO_LOCATION) {
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ARRIVED);
 
+            if ($request->destination_id) {
+                $destination = Destination::find($request->destination_id);
+                $load->destination_id = $request->origin_id;
+                $load->destination = $destination->name;
+                $load->destination_coords = $destination->coords;
+                $load->save();
+            }
+
             return response([
                 'status' => 'ok',
+                'load' => $load,
                 'load_status' => LoadStatusEnum::ARRIVED,
                 'load_status_details' => new LoadStatusResource($loadStatus)
             ]);
@@ -415,60 +473,64 @@ class LoadController extends Controller
 
     public function finished(Request $request)
     {
-        $loadId = $request->get('load_id');
-        $driver = auth()->user();
+        return DB::transaction(function () use ($request) {
+            $loadId = $request->get('load_id');
+            $driver = auth()->user();
 
-        $receipt = $request->get('receipt');
-        if (empty($receipt)) {
-            return response('You must attach a valid voucher', 400);
-        }
+            $receipt = $request->get('receipt');
+            if (empty($receipt)) {
+                return response('You must attach a valid voucher', 400);
+            }
 
-        $load = Load::findOrFail($loadId);
-        if ($load->status === LoadStatusEnum::UNLOADING) {
+            $load = Load::findOrFail($loadId);
+            if ($load->status === LoadStatusEnum::UNLOADING) {
 
-            $date = Carbon::now();
-            $load->bol = $request->get('bol');
+                $date = Carbon::now();
+                if ($request->bol) {
+                    $load->bol = $request->bol;
+                }
 
-            $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
-                ->where('time', $date->format("H").':00:00')->first();
-            if ($dispatch)
-                $load->dispatch_id = $dispatch->user_id;
+                $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
+                    ->where('time', $date->format("H").':00:00')->first();
+                if ($dispatch)
+                    $load->dispatch_id = $dispatch->user_id;
 
-            $load->update();
+                $load->update();
 
-            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED);
+                $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED);
 
-            $voucher = $this->uploadImage(
-                $receipt,
-                'loads/' . $loadStatus->id,
-                50,
-                'jpg',
-            );
-            $loadStatus->finished_voucher = $voucher;
-            $loadStatus->update();
+                $voucher = $this->uploadImage(
+                    $receipt,
+                    'loads/' . $loadStatus->id,
+                    50,
+                    'jpg',
+                );
+                $loadStatus->finished_voucher = $voucher;
+                $loadStatus->update();
 
-            $this->endShift($driver);
+                $this->endShift($driver);
 
-            BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
+                BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
-            $canActivate = 1; //Temporal not checking shift
-            //if (Broker::find(1)->active_shifts){
-            //    $canActivate = $driver->canActiveShift();
-            //} else {
-            //    $canActivate = 1;
-            //}
-            // Check if driver can accept more loads and attach to response
+                $canActivate = 1; //Temporal not checking shift
+                //if (Broker::find(1)->active_shifts){
+                //    $canActivate = $driver->canActiveShift();
+                //} else {
+                //    $canActivate = 1;
+                //}
+                // Check if driver can accept more loads and attach to response
+                return response([
+                    'status' => 'ok',
+                    'can_keep_shift' => true,
+                    'load_status' => LoadStatusEnum::FINISHED,
+                    'load_status_details' => new LoadStatusResource($loadStatus)
+                ]);
+            }
+
             return response([
-                'status' => 'ok',
-                'can_keep_shift' => true,
-                'load_status' => LoadStatusEnum::FINISHED,
-                'load_status_details' => new LoadStatusResource($loadStatus)
-            ]);
-        }
-
-        return response([
-            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-        ], 400);
+                'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
+            ], 400);
+        });
     }
 
     public function updateEndBox(Request $request)
@@ -484,6 +546,31 @@ class LoadController extends Controller
         return response([
             'status' => 'ok',
             'message' => 'Your box have been saved successfully'
+        ]);
+    }
+
+    public function getLoadTypes()
+    {
+        $driver = auth()->user();
+        $activeLoad = Load::where('driver_id', $driver->id)
+            ->with('shipper')
+            //->whereNull('deleted_at')
+            ->withTrashed()
+            ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
+            ->first();
+
+        $origins = LoadType::select([
+            'id as key',
+            'name as value',
+        ])
+            ->where('broker_id', $driver->broker_id)
+            ->where('shipper_id', $activeLoad->shipper_id)
+            ->get();
+
+        return response([
+            'status' => 'ok',
+            'message' => 'Found load types',
+            'loadTypes' => KeyValueResource::collection($origins),
         ]);
     }
 
