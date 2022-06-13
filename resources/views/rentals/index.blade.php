@@ -44,7 +44,7 @@
                             columns: [
                                 //{headerName: 'Fecha', field: 'date'},
                                 {headerName: 'Date', field: 'date'},
-                                {headerName: `${session['carrier'] ?? 'Carrier'}`, field: 'carrier', valueFormatter: nameFormatter},
+                                {headerName: session['carrier'] ?? 'Carrier', field: 'carrier', valueFormatter: nameFormatter},
                                 {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                                 {headerName: 'Trailer', field: 'trailer', valueFormatter: numberFormatter},
                                 {headerName: 'Period', field: 'period', valueFormatter: capitalizeFormatter},
