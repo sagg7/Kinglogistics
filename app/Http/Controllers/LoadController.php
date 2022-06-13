@@ -616,7 +616,7 @@ class LoadController extends Controller
                     'tons' => $item->tons,
                     'mileage' => $item->mileage,
                     'load_type' => $item->load_type->name,
-                    'trip' => $item->trip->name,
+                    'trip' => $item->trip ? $item->trip->name : "",
                     'customer_po' => $item->customer_po,
                     'shipper' => $item->shipper->name,
                     'status' => ucfirst($item->status),
