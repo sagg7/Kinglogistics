@@ -15,11 +15,13 @@ class DashboardController extends Controller
     private function setKeyValueConfig($data)
     {
         $array = [];
-        foreach ($data as $key => $item) {
-            $array[] = [
-                'key' => $key,
-                'value' => $item,
-            ];
+        if ($data) {
+            foreach ($data->toArray() as $key => $item) {
+                $array[] = [
+                    'key' => $key,
+                    'value' => $item,
+                ];
+            }
         }
         return $array;
     }
@@ -30,7 +32,7 @@ class DashboardController extends Controller
         $chassisTypes = ChassisType::all();
         $boxTypes = BoxType::all();
         $appConfigurations = AppConfig::all();
-        $appBrokerConfigurations = $this->setKeyValueConfig(BrokerAppConfig::select('disable_boxes')->where('broker_id', $broker_id)->first()->toArray());
+        $appBrokerConfigurations = $this->setKeyValueConfig(BrokerAppConfig::select('disable_boxes')->where('broker_id', $broker_id)->first());
 
         return response([
             'chassis_types' => IdNameResource::collection($chassisTypes),
