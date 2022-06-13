@@ -17,7 +17,7 @@ class TruckController extends Controller
             }
         ]);
 
-        return $driver->truck;
+        return $driver->truck ?? ["message" => "No active truck found"];
     }
 
     public function getTrucks()
