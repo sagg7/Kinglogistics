@@ -164,7 +164,6 @@ class LoadController extends Controller
         $activeLoad = Load::where('driver_id', $driver->id)
             ->with('shipper')
             //->whereNull('deleted_at')
-            ->withTrashed()
             ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
             ->first();
 
