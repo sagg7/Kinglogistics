@@ -396,18 +396,21 @@ class LoadController extends Controller
             if ($request->load_type_id) {
                 $load->load_type_id = $request->load_type_id;
             }
+            if ($request->description) {
+                $load->description = $request->description;
+            }
             $load->update();
 
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION);
 
-            $voucher = $this->uploadImage(
+            /**$voucher = $this->uploadImage(
                 $receipt,
                 'loads/' . $loadStatus->id,
                 50,
                 'jpg',
             );
 
-            $loadStatus->to_location_voucher = $voucher;
+            $loadStatus->to_location_voucher = $voucher;*/
             $loadStatus->update();
 
             return response([
@@ -558,7 +561,7 @@ class LoadController extends Controller
             ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
             ->first();
 
-        $origins = LoadType::select([
+        $loadTypes = LoadType::select([
             'id as key',
             'name as value',
         ])
@@ -569,7 +572,7 @@ class LoadController extends Controller
         return response([
             'status' => 'ok',
             'message' => 'Found load types',
-            'loadTypes' => KeyValueResource::collection($origins),
+            'loadTypes' => KeyValueResource::collection($loadTypes),
         ]);
     }
 

@@ -41,6 +41,7 @@ class LoadResource extends JsonResource
             "notified_at" => $this->getNotifiedAtProperty(),
             "load_status" => new LoadStatusResource($this->loadStatus),
             "shipper_name" => $this->shipper->name ?? null,
+            "description" => $this->description,
             "created_at" => $this->created_at,
         ];
     }

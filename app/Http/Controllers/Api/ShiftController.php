@@ -126,10 +126,12 @@ class ShiftController extends Controller
                     $driver->truck_id = $request->truck_id;
                     $driver->save();
                 }
-                $truck = Truck::find($request->truck_id);
-                if ($truck->trailer_id != $request->trailer_id) {
-                    $truck->trailer_id = $request->trailer_id;
-                    $truck->save();
+                if ($request->trailer_id) {
+                    $truck = Truck::find($request->truck_id);
+                    if ($truck->trailer_id != $request->trailer_id) {
+                        $truck->trailer_id = $request->trailer_id;
+                        $truck->save();
+                    }
                 }
                 $payload = [
                     "turn_id" => $request->shift_data["turn_id"],

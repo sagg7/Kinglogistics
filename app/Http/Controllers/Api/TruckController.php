@@ -26,7 +26,7 @@ class TruckController extends Controller
             'id as key',
             'number as value',
         ])
-            ->where('broker_id', auth()->user()->broker_id)
+            ->where('carrier_id', auth()->user()->carrier_id)
             ->get();
 
         return response([
