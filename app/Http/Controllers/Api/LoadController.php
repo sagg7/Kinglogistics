@@ -167,7 +167,7 @@ class LoadController extends Controller
             ->whereNotIn('status', [LoadStatusEnum::UNALLOCATED, LoadStatusEnum::FINISHED])
             ->first();
 
-        if (empty($activeLoad)) {
+        if (!$activeLoad) {
             $message = __('Not active load');
             $load = $activeLoad;
         } else {
@@ -179,20 +179,20 @@ class LoadController extends Controller
 
             $message = __('Active load found');
             $load = new LoadResource($activeLoad);
-        }
 
-        if (auth()->guard('shipper')->check()){
-            $load->creator_type = 'shipper';
-        }else if(auth()->guard('web')->check()){
-            $load->creator_type = 'user';
-        }else {
-            $load->creator_type = 'driver';
+            if (auth()->guard('shipper')->check()) {
+                $load->creator_type = 'shipper';
+            } else if (auth()->guard('web')->check()) {
+                $load->creator_type = 'user';
+            } else {
+                $load->creator_type = 'driver';
+            }
+            $load->creator_id = auth()->user()->id;
+            $dispatch = DispatchSchedule::where('day', $date->dayOfWeek - 1)
+                ->where('time', $date->format("H") . ':00:00')->first();
+            if ($dispatch)
+                $load->dispatch_init = $dispatch->user_id;
         }
-        $load->creator_id  = auth()->user()->id;
-        $dispatch = DispatchSchedule::where('day', $date->dayOfWeek-1)
-            ->where('time', $date->format("H").':00:00')->first();
-        if ($dispatch)
-            $load->dispatch_init = $dispatch->user_id;
 
         return response([
             'status' => 'ok',
@@ -514,7 +514,7 @@ class LoadController extends Controller
 
                 BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
 
-                $canActivate = 1; //Temporal not checking shift
+                //$canActivate = 1; //Temporal not checking shift
                 //if (Broker::find(1)->active_shifts){
                 //    $canActivate = $driver->canActiveShift();
                 //} else {
