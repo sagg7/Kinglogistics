@@ -92,7 +92,9 @@ trait TrackingTrait
                 'shippers.name as shipper_name',
             ]);
 
-        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(session('broker') ?? auth()->user()->broker_id);
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')
+            ->whereNotNull('location')
+            ->find(session('broker') ?? auth()->user()->broker_id);
 
         return compact('data', 'channel', 'event', 'company');
     }

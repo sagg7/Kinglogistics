@@ -22,7 +22,9 @@ class TrackingController extends Controller
 
     public function history()
     {
-        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')->find(session('broker'));
+        $company = Broker::select('name', 'contact_phone', 'email', 'address', 'location')
+            ->whereNotNull('location')
+            ->find(session('broker'));
 
         $params = compact('company');
 
