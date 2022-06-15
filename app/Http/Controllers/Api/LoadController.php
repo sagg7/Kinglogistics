@@ -107,7 +107,7 @@ class LoadController extends Controller
                 $data['origin_coords'] = $origin->coords;
             }
             if ($request->destination_id) {
-                $destination = Origin::findOrFail($request->destination_id);
+                $destination = Destination::findOrFail($request->destination_id);
                 $data['destination_id'] = $destination->id;
                 $data['destination'] = $destination->name;
                 $data['destination_coords'] = $destination->coords;
