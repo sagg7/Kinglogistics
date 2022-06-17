@@ -335,7 +335,7 @@ class CarrierController extends Controller
                 break;
             case "ready":
                 $status = CarrierEnum::READY_TO_WORK;
-                $users = User::whereHas('roles', function ($q) {
+                /*$users = User::whereHas('roles', function ($q) {
                     $q->where('slug', RoleSlugs::HUMAN_RESOURCES)
                         ->orWhere('slug', RoleSlugs::OPERATIONS);
                 })
@@ -348,11 +348,11 @@ class CarrierController extends Controller
                         "route" => route('dashboard'),
                     ];
                     Mail::to($user->email)->send(new SendNotificationTemplate($params));
-                }
+                }*/
                 break;
             case "active":
                 $status = CarrierEnum::ACTIVE;
-                $users = User::where(function ($q) use ($carrier) {
+                /*$users = User::where(function ($q) use ($carrier) {
                     $q->where(function ($q) use ($carrier) {
                         $q->where('users.id', $carrier->seller_id)
                             ->whereHas('roles', function ($q) {
@@ -373,7 +373,7 @@ class CarrierController extends Controller
                         "route" => route('dashboard'),
                     ];
                     Mail::to($user->email)->send(new SendNotificationTemplate($params));
-                }
+                }*/
                 break;
             case "not_working":
                 $status = CarrierEnum::NOT_WORKING;
