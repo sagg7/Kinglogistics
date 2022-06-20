@@ -22,7 +22,7 @@
                     @endif
                     <div class="col col-sm-4">
                         <fieldset class="form-group">
-                            <label for="trips">{{session('renames') ? session('renames')->job : 'Job'}}</label>
+                            <label for="trips">{{session('renames')->job ?? 'Job'}}</label>
                             {!! Form::select('trips', [], null, ['class' => 'form-control']) !!}
                         </fieldset>
                     </div>

@@ -15,7 +15,7 @@
                 @else
                     <span>&#128993;</span>
                 @endif
-                    Driver Name - <strong>{{$load['driverName']}}</strong>, {{session('renames') ? session('renames')->job : 'Job'}} - <strong>{{$load['job']}}</strong>, {{session('renames') ? session('renames')->control_number : 'Control number'}} - <strong>{{$load['control_number']}}</strong>,         Customer Reference - <strong>{{$load['customer_reference']}}</strong>,     "{{session('renames') ? session('renames')->bol : 'BOL'}}" - <strong>{{$load['bol']}}</strong>,     Finished Timestamp - <strong>{{$load['finished_timestamp']}}</strong>,     Status - <strong>{{$load['status']}}</strong>
+                    Driver Name - <strong>{{$load['driverName']}}</strong>, {{session('renames')->job ?? 'Job'}} - <strong>{{$load['job']}}</strong>, {{session('renames')->control_number ?? 'Control number'}} - <strong>{{$load['control_number']}}</strong>,         Customer Reference - <strong>{{$load['customer_reference']}}</strong>,     "{{session('renames')->bol ?? 'BOL'}}" - <strong>{{$load['bol']}}</strong>,     Finished Timestamp - <strong>{{$load['finished_timestamp']}}</strong>,     Status - <strong>{{$load['status']}}</strong>
                     </p>
             </div>
             <div style="width:50%; float: left;">

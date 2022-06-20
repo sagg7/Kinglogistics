@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">{{session('renames') ? session('renames')->job : 'Job'}}</x-slot>
+    <x-slot name="crumb_section">{{session('renames')->job ?? 'Job'}}</x-slot>
     <x-slot name="crumb_subsection">Create</x-slot>
 
     @section('scripts')

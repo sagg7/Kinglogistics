@@ -38,7 +38,7 @@ const showLoadModal = (data) => {
         '<tr>' +
         '<th>Control#</th>' +
         '<th>Customer name</th>' +
-        '<th>Customer po</th>' +
+        '<th>Customer PO</th>' +
         '<th>Customer reference</th>' +
         '</tr>' +
         '<tr>' +

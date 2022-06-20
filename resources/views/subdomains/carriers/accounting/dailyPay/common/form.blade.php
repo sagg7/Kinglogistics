@@ -20,7 +20,7 @@
                     <tr>
                         <th>Date</th>
                         <th>Driver</th>
-                        <th>{{session('renames') ? session('renames')->control_number : 'Control #'}}</th>
+                        <th>{{session('renames')->control_number ?? 'Control #'}}</th>
                         <th>Origin</th>
                         <th>Destination</th>
                         <th></th>

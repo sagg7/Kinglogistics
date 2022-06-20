@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="crumb_section">{{session('renames') ? session('renames')->job : 'Job'}}</x-slot>
+    <x-slot name="crumb_section">{{session('renames')->job ?? 'Job'}}</x-slot>
     <x-slot name="crumb_subsection">View</x-slot>
 
     @section("vendorCSS")
@@ -65,7 +65,7 @@
         <div class="card-content">
             @if(auth()->user()->can(['create-job']))
             <div class="card-header">
-                <a href="/trip/create" class="btn btn-primary">Create {{session('renames') ? session('renames')->job : 'Job'}}</a>
+                <a href="/trip/create" class="btn btn-primary">Create {{session('renames')->job ?? 'Job'}}</a>
             </div>
             <hr>
             @endif

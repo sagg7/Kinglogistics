@@ -149,7 +149,7 @@
         @enderror
     </div>
     <div class="form-group col-md-3">
-        {!! Form::label('customer_po', ucfirst(__('customer po')), ['class' => 'col-form-label']) !!}
+        {!! Form::label('customer_po', ucfirst(__('customer PO')), ['class' => 'col-form-label']) !!}
         {!! Form::text('customer_po', $load->customer_po ?? null, ['class' => 'form-control' . ($errors->first('customer_po') ? ' is-invalid' : '')]) !!}
         @error('customer_po')
         <span class="invalid-feedback" role="alert">

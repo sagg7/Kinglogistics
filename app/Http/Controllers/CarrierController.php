@@ -407,7 +407,7 @@ class CarrierController extends Controller
         if ($carrier) {
             $message = '';
             if ($carrier->rentals()->first()) {
-                $message .= "•" . $this->generateCrudMessage(4, session('renames') ? session('renames')->carrier : 'Carrier', ['constraint' => 'rentals']) . "<br>";
+                $message .= "•" . $this->generateCrudMessage(4, session('renames')->carrier ?? 'Carrier', ['constraint' => 'rentals']) . "<br>";
             }
             if ($message) {
                 return ['success' => false, 'msg' => $message];

@@ -44,7 +44,7 @@
                         {headerName: 'Amount', field: 'amount', valueFormatter: moneyFormatter},
                         {headerName: 'Description', field: 'description'},
                         {headerName: 'Period', field: 'period', valueFormatter: upperFormatter},
-                        {headerName: '{{session('renames') ? session('renames')->carrier : 'Carriers'}}', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
+                        {headerName: '{{session('renames')->carrier ?? 'Carriers'}}', field: 'carriers', sortable:false, valueFormatter: carriersFormatter},
                     ],
                     menu: [
                         @if(auth()->user()->can(['create-statement']))

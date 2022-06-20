@@ -16,13 +16,13 @@ class CreateRenamesTable extends Migration
         Schema::create('renames', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('broker_id');
-            $table->string('job');
-            $table->string('control_number');
-            $table->string('customer_reference');
-            $table->string('bol');
-            $table->string('tons');
-            $table->string('po');
-            $table->string('carrier');
+            $table->string('job')->nullable();
+            $table->string('control_number')->nullable();
+            $table->string('customer_reference')->nullable();
+            $table->string('bol')->nullable();
+            $table->string('tons')->nullable();
+            $table->string('po')->nullable();
+            $table->string('carrier')->nullable();
             $table->timestamps();
         });
     }

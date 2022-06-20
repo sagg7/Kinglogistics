@@ -87,7 +87,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header align-self-center">
-                    <h3>{{session('renames') ? session('renames')->job : 'Jobs'}} summary</h3>
+                    <h3>{{session('renames')->job ?? 'Jobs'}} summary</h3>
                 </div>
                 <div class="card-body">
                     <div class="card-content" style="height: 360px;">

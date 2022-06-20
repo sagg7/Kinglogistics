@@ -26,7 +26,7 @@
                     columns: [
                         {headerName: 'Date', field: 'date'},
                         {headerName: 'Type', field: 'incident_type', valueFormatter: nameFormatter},
-                        {headerName: '{{session('renames') ? session('renames')->carrier : 'Carrier'}}', field: 'carrier', valueFormatter: nameFormatter},
+                        {headerName: '{{session('renames')->carrier ?? 'Carrier'}}', field: 'carrier', valueFormatter: nameFormatter},
                         {headerName: 'Driver', field: 'driver', valueFormatter: nameFormatter},
                         {headerName: 'Safety User', field: 'user', valueFormatter: nameFormatter},
                         {headerName: 'Sanction', field: 'sanction', valueFormatter: capitalizeNameFormatter},

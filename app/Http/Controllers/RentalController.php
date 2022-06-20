@@ -642,7 +642,7 @@ class RentalController extends Controller
 
         return (new TemplateExport([
             "data" => $data,
-            "headers" => ["Date", session('renames') ? session('renames')->carrier : 'Carrier', "Driver", "Trailer", "Period", "Cost", "Deposit", "Delivered At", "Finished At"],
+            "headers" => ["Date", session('renames')->carrier ?? 'Carrier', "Driver", "Trailer", "Period", "Cost", "Deposit", "Delivered At", "Finished At"],
             "formats" => [
                 'F' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,
                 'G' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE,

@@ -16,7 +16,7 @@
                 <th style="width: 15%;">Destination</th>
                 <th style="width: 9%;">Sand&nbsp;Ticket&nbsp;#</th>
                 <th style="width: 9%;">Control</th>
-                <th style="width: 7%;">{{session('renames') ? session('renames')->bol : 'BOL'}}</th>
+                <th style="width: 7%;">{{session('renames')->bol ?? 'BOL'}}</th>
                 <th style="width: 7%;">Miles</th>
                 <th style="width: 7%;">Rate</th>
             </tr>

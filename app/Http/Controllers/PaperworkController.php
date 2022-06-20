@@ -48,7 +48,7 @@ class PaperworkController extends Controller
     {
         return [
             "mode" => ['Simple', 'Advanced'],
-            "types" => [null => '', 'carrier' => session('renames') ? session('renames')->carrier : 'Carriers', 'driver' => 'Drivers', 'trailer' => 'Trailers', 'truck' => 'Trucks', 'staff' => 'Staff'],
+            "types" => [null => '', 'carrier' => session('renames')->carrier ?? 'Carriers', 'driver' => 'Drivers', 'trailer' => 'Trailers', 'truck' => 'Trucks', 'staff' => 'Staff'],
             "categories" => [null => 'Initial', 'orientation' => 'Orientation'],
         ];
     }
@@ -541,16 +541,16 @@ class PaperworkController extends Controller
                 case 'carrier':
                     switch ($json->carrier) {
                         case 'name':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames') ? session('renames')->carrier : 'Carrier'.' name' . '" ' . $required . ' value="' . ($carrier->name ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames')->carrier ?? 'Carrier'.' name' . '" ' . $required . ' value="' . ($carrier->name ?? null) . '"></div>';
                             break;
                         case 'owner':
                             $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . 'Owner name' . '" ' . $required . ' value="' . ($carrier->owner ?? null) . '"></div>';
                             break;
                         case 'address':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames') ? session('renames')->carrier : 'Carrier'.' address' . '" ' . $required . ' value="' . ($carrier->address ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames')->carrier ?? 'Carrier'.' address' . '" ' . $required . ' value="' . ($carrier->address ?? null) . '"></div>';
                             break;
                         case 'phone':
-                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames') ? session('renames')->carrier : 'Carrier'.' phone' . '" ' . $required . ' value="' . ($carrier->phone ?? null) . '"></div>';
+                            $replaced[] = '<div class="form-group d-inline-block m-0"><input class="form-control" type="' . $type . '" ' . $inputName . ' placeholder="' . session('renames')->carrier ?? 'Carrier'.' phone' . '" ' . $required . ' value="' . ($carrier->phone ?? null) . '"></div>';
                             break;
                     }
                     break;
