@@ -403,14 +403,14 @@ class LoadController extends Controller
 
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION);
 
-            /**$voucher = $this->uploadImage(
+            $voucher = $this->uploadImage(
                 $receipt,
                 'loads/' . $loadStatus->id,
                 50,
                 'jpg',
             );
 
-            $loadStatus->to_location_voucher = $voucher;*/
+            $loadStatus->to_location_voucher = $voucher;
             $loadStatus->update();
 
             return response([
