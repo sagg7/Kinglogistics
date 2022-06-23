@@ -70,6 +70,7 @@ Route::group([
         Route::post('arrived', [LoadController::class, 'arrived']);
         Route::post('unloading', [LoadController::class, 'unloading']);
         Route::post('finished', [LoadController::class, 'finished']);
+        Route::post('multi-status', [LoadController::class, 'multiStatus']);
         Route::post('update-end-box', [LoadController::class, 'updateEndBox']);
         Route::post('store-load', [LoadController::class, 'storeLoad']);
 

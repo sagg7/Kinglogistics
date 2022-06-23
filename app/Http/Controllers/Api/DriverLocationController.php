@@ -20,9 +20,12 @@ class DriverLocationController extends Controller
 
     public function updateDriverLocation(Request $request)
     {
+        if (env('API_DEBUG', false)) {
+            return response(['status' => 'ok'], 200);
+        }
         $driver = auth()->user();
 
-        $now = Carbon::now();
+        $now = Carbon::parse($request->timestamp) ?? Carbon::now();
         $data = $request->all();
         $lastPosition = count($data) - 1;
         $array = [];

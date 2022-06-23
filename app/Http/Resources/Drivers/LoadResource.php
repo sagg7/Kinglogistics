@@ -17,6 +17,7 @@ class LoadResource extends JsonResource
         return [
             "id" => $this->id,
             "load_type_id" => $this->load_type_id,
+            "load_type" => $this->load_type->name,
             "driver_id" => $this->driver_id,
             "shipper_id" => $this->shipper_id,
             "load_log_id" => $this->load_log_id,

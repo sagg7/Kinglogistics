@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Storage\S3Functions;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,6 +41,102 @@ class LoadStatus extends Model
         'unloading_timestamp' => 'datetime',
         'finished_timestamp' => 'datetime',
     ];
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getUnallocatedTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getRequestedTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getAcceptedTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getLoadingTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getToLocationTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getArrivedTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getUnloadingTimestampAttribute($value)
+    {
+        if ($value && $this->parentLoad->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getFinishedAttribute($value)
+    {
+        if ($this->load->timezone_id) {
+            return Carbon::parse($value)->setTimezone($this->parentLoad->timezone->php_timezone);
+        }
+        return $value;
+    }
 
     /**
      * Establish a relationship with the Load model, has to be named like "parentLoad" due overlapping "load()" Laravel method.

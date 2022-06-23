@@ -14,7 +14,7 @@ class LoadStatusResource extends JsonResource
      */
     public function toArray($request)
     {
-        $dateFormat = 'm/d/Y H:i a';
+        $dateFormat = 'm/d/Y h:i a';
 
         return [
             'id' => $this->id,
