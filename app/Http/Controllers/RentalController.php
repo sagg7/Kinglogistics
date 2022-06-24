@@ -718,9 +718,10 @@ class RentalController extends Controller
 
             switch ($item["id"]) {
                 case 38:
-                    $car_type = array_column(json_decode($item["pivot"]["option_value"]), 'car_type')[0];
-                    $item["pivot"]['coords_template'] = $createEdit["coordsTemplates"][$car_type];
-
+                    if (json_decode($item["pivot"]["option_value"])) {
+                        $car_type = array_column(json_decode($item["pivot"]["option_value"]), 'car_type')[0];
+                        $item["pivot"]['coords_template'] = $createEdit["coordsTemplates"][$car_type];
+                    }
                     break;
                 default:
                     break;
