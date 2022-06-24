@@ -22,11 +22,11 @@ use App\Traits\EloquentQueryBuilder\GetSimpleSearchData;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Storage\FileUpload;
 use App\Traits\Storage\S3Functions;
+use App\Traits\Timezone\TimezoneParams;
 use App\Traits\Turn\DriverTurn;
 use Carbon\Carbon;
 use Foo\Bar;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -35,7 +35,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class LoadController extends Controller
 {
-    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload, S3Functions;
+    use GenerateLoads, GetSelectionData, GetSimpleSearchData, DriverTurn, FileUpload, S3Functions, TimezoneParams;
 
     /**
      * @return array
@@ -63,6 +63,7 @@ class LoadController extends Controller
                 }
             })
                 ->pluck('name', 'id')->toArray(),
+            'timezones' => $this->getTimezoneSelection(),
         ];
     }
 

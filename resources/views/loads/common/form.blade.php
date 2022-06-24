@@ -43,6 +43,15 @@
             </span>
         @enderror
     </div>
+    <div class="form-group col-md col-sm-12">
+        {!! Form::label('timezone_id', ucfirst(__('time zone')), ['class' => 'col-form-label']) !!}
+        {!! Form::select('timezone_id', $timezones, $load->timezone_id ?? null, ['class' => 'form-control select2' . ($errors->first('timezone_id') ? ' is-invalid' : '')]) !!}
+        @error('timezone_id')
+        <span class="invalid-feedback" role="alert">
+                <strong>{{ ucfirst($message) }}</strong>
+            </span>
+        @enderror
+    </div>
 </div>
 <hr>
 <div class="row">
