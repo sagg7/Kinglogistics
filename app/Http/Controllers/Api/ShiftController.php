@@ -6,11 +6,13 @@ use App\Enums\AppConfigEnum;
 use App\Enums\LoadStatusEnum;
 use App\Exceptions\DriverHasUnfinishedLoadsException;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Helpers\KeyValueResource;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
 use App\Models\Broker;
 use App\Models\Load;
 use App\Models\Shift;
+use App\Models\Timezone;
 use App\Models\Truck;
 use App\Notifications\LoadAssignment;
 use App\Traits\Load\ManageLoadProcessTrait;
@@ -58,6 +60,12 @@ class ShiftController extends Controller
                 ];
             }
         }
+
+        $payload['timezones'] = KeyValueResource::collection(Timezone::select([
+            'id as key',
+            DB::raw('CONCAT("(", abbreviation, ") ", name) AS value')
+        ])
+            ->get());
 
         return response(['status' => 'ok', 'data' => $payload]);
     }
@@ -123,7 +131,7 @@ class ShiftController extends Controller
             // Create a Shift instance just to retrieve the fillable fields
             $shift = new Shift();
 
-            if ($request->truck_id) {
+            if ($request->truck_id || $request->trailer_id || $request->timezone_id) {
                 if ($driver->truck_id != $request->truck_id) {
                     $driver->truck_id = $request->truck_id;
                     $driver->save();
@@ -140,6 +148,7 @@ class ShiftController extends Controller
                     "have_truck" => $request->shift_data["have_truck"],
                     "have_chassis" => $request->shift_data["have_chassis"],
                     "have_box" => false,
+                    "timezone_id" => $request->timezone_id,
                 ];
             } else {
                 $payload = $request->all($shift->getFillable());

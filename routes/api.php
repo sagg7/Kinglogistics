@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OriginController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\ShipperController;
+use App\Http\Controllers\Api\TimezoneController;
 use App\Http\Controllers\Api\TrailerController;
 use App\Http\Controllers\Api\TruckController;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,7 @@ Route::group([
         Route::get('get-active-truck', [TruckController::class, 'getActiveTruck']);
         Route::get('get-trucks', [TruckController::class, 'getTrucks']);
         Route::get('get-trailers', [TrailerController::class, 'getTrailers']);
+        Route::get('get-timezones', [TimezoneController::class, 'getTimezones']);
     });
 
     Route::prefix('shipper')->group(function () {

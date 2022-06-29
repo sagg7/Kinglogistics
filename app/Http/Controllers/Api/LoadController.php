@@ -71,8 +71,9 @@ class LoadController extends Controller
 
             $data['date'] = Carbon::now();
             $data['driver_id'] = $driver->id;
+            $data['timezone_id'] = $driver->shift->timezone_id ?? null;
             $data['status'] = $loadStatus;
-            $data['load_type_id'] = 1; //need to change this to null in database;
+            $data['load_type_id'] = LoadType::where('broker_id', $driver->broker_id)->first()->id ?? null; //need to change this to null in database;
             $data['control_number'] = $request->control_number ?? null;
             //$data['origin'] = null;
             $data['customer_po'] = ""; // Should be nullable in db
