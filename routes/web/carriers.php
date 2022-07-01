@@ -16,12 +16,16 @@ Route::prefix('carrier')->group(function () {
             ->name('carrier.search');
         Route::get('getCarrierData/{id}', [CarrierController::class, 'getCarrierData'])
             ->name('carrier.getCarrierData');
+        Route::get('getLink/{id}', [CarrierController::class, 'getLink'])
+            ->name('carrier.getLink');
     });
     Route::group(['middleware' => ['permission:create-carrier']], function () {
         Route::get('create', [CarrierController::class, 'create'])
             ->name('carrier.create');
         Route::post('store', [CarrierController::class, 'store'])
             ->name('carrier.store');
+        Route::post('sendMail/{id?}', [CarrierController::class, 'sendMail'])
+            ->name('carrier.sendMail');
     });
     Route::group(['middleware' => ['permission:update-carrier']], function () {
         Route::get('edit/{id}', [CarrierController::class, 'edit'])

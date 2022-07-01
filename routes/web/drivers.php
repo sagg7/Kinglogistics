@@ -13,13 +13,16 @@ Route::prefix('driver')->group(function () {
             ->name('driver.downloadExcel');
         Route::get('show/{id}', [DriverController::class, 'show'])
             ->name('driver.show');
-
+        Route::get('getLink/{id}', [DriverController::class, 'getLink'])
+            ->name('driver.getLink');
     });
     Route::group(['middleware' => ['permission:create-driver']], function () {
         Route::get('create', [DriverController::class, 'create'])
             ->name('driver.create');
         Route::post('store', [DriverController::class, 'store'])
             ->name('driver.store');
+        Route::post('sendMail/{id?}', [DriverController::class, 'sendMail'])
+            ->name('driver.sendMail');
     });
     Route::group(['middleware' => ['permission:update-driver']], function () {
         Route::get('edit/{id}', [DriverController::class, 'edit'])
