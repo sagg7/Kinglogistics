@@ -446,6 +446,7 @@ class LoadController extends Controller
                 $load->save();
             }
 
+            $responseCode = 200;
             $response = [
                 'status' => 'ok',
                 'load' => $load,
@@ -470,6 +471,7 @@ class LoadController extends Controller
         if ($load->status === LoadStatusEnum::ARRIVED) {
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::UNLOADING, $request->timestamp);
 
+            $responseCode = 200;
             $response = [
                 'status' => 'ok',
                 'load_status' => LoadStatusEnum::UNLOADING,
@@ -538,6 +540,7 @@ class LoadController extends Controller
                 //    $canActivate = 1;
                 //}
                 // Check if driver can accept more loads and attach to response
+                $responseCode = 200;
                 $response = [
                     'status' => 'ok',
                     'can_keep_shift' => true,
@@ -586,6 +589,8 @@ class LoadController extends Controller
                 case LoadStatusEnum::FINISHED:
                     $response = $this->finished($newRequest, true);
                     break;
+                case 'boxEnd':
+                    $response = $this->updateEndBox($newRequest, true);
             }
             if ($response["status"] === "error") {
                 $response["status"] = $status;
@@ -597,7 +602,7 @@ class LoadController extends Controller
         return response($response, $responseCode);
     }
 
-    public function updateEndBox(Request $request)
+    public function updateEndBox(Request $request, $innerRequest = false)
     {
         $load = Load::find($request->get('load_id'));
 
@@ -607,10 +612,16 @@ class LoadController extends Controller
         $load->box_number_end = $request->get('box_number');
         $load->update();
 
-        return response([
+        $response = [
             'status' => 'ok',
             'message' => 'Your box have been saved successfully'
-        ]);
+        ];
+
+        if ($innerRequest) {
+            return $response;
+        }
+
+        return response($response);
     }
 
     public function getLoadTypes()
