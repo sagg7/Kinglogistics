@@ -14,7 +14,8 @@
                 tbDeleted = null,
                 tbNotWorking = null,
                 tbNotRehirable = null;
-            let previousModalId = null;
+            let previousModalId = null,
+                sendEmailId = null;
             (() => {
                 const pills = $('.nav-pills'),
                     options = pills.find('.nav-item'),
@@ -22,14 +23,17 @@
                         const tableName = type.replace(/^\w/, (c) => c.toUpperCase());
                         let menu;
                         let gridOptions = {};
+
                         function contactFrom() {};
                         contactFrom.prototype.init = (params) => {
-                        this.eGui = document.createElement('div');
-                        this.eGui.innerHTML = `<span>${params.data.name}</span>`;
-                        new bootstrap.Tooltip(this.eGui, {title: `Contact from: ${params.data.seller?params.data.seller.name +' - ':''}${params.data.contact_from?params.data.contact_from:''}`});
+                            this.eGui = document.createElement('div');
+                            this.eGui.innerHTML = `<span>${params.data.name}</span>`;
+                            new bootstrap.Tooltip(this.eGui, {
+                                title: `Contact from: ${params.data.seller?params.data.seller.name +' - ':''}${params.data.contact_from?params.data.contact_from:''}`
+                            });
                         }
                         contactFrom.prototype.getGui = () => {
-                        return this.eGui;
+                            return this.eGui;
                         }
                         switch (type) {
                             default:
@@ -44,101 +48,131 @@
                                         icon: 'far fa-folder-open',
                                         type: 'modal'
                                     },
+                                    {
+                                        text: 'Forward Paperwork',
+                                        route: '#sentEmail',
+                                        icon: 'fa-solid fa-paper-plane',
+                                        type: 'modal'
+                                    },
                                     @if (auth()->user()->can(['read-carrier']))
-                                        {text: 'View', route: '#viewCarriers', icon: 'far fa-eye', type: 'modal'},
+                                        {
+                                            text: 'View',
+                                            route: '#viewCarriers',
+                                            icon: 'far fa-eye',
+                                            type: 'modal'
+                                        },
                                     @endif
                                     @if (auth()->user()->can(['update-carrier']))
-                                        {text: 'Edit', route: '/carrier/edit', icon: 'feather icon-edit'},
+                                        {
+                                            text: 'Edit',
+                                            route: '/carrier/edit',
+                                            icon: 'feather icon-edit'
+                                        },
                                     @endif
                                     @if (auth()->user()->can(['update-carrier-active']))
                                         {
-                                        text: 'Prospect',
-                                        route: "/carrier/setStatus",
-                                        route_params: {status: "prospect"},
-                                        icon: 'fas fa-check-circle',
-                                        type: 'confirm',
-                                        conditional: 'status === "interested"',
-                                        menuData: {
-                                        title: 'Set status as prospect?',
-                                        afterConfirmFunction: () => {
-                                        if (tbProspects)
-                                        tbProspects.updateSearchQuery();
-                                        }
-                                        },
-                                        },
-                                        {
-                                        text: 'Ready to work',
-                                        route: "/carrier/setStatus",
-                                        route_params: {status: "ready"},
-                                        icon: 'fas fa-check-circle',
-                                        type: 'confirm',
-                                        conditional: 'status === "prospect"',
-                                        menuData: {
-                                        title: 'Set status as ready to work?',
-                                        afterConfirmFunction: () => {
-                                        if (tbReady)
-                                        tbReady.updateSearchQuery();
-                                        }
-                                        },
-                                        },
-                                        {
-                                        text: 'Active',
-                                        route: "/carrier/setStatus",
-                                        route_params: {status: "active"},
-                                        icon: 'fas fa-check-circle',
-                                        type: 'confirm',
-                                        conditional: 'status === "ready_to_work" || params.data.status === "not_working"',
-                                        menuData: {
-                                        title: 'Set status as active?',
-                                        afterConfirmFunction: () => {
-                                        if (tbActive)
-                                        tbActive.updateSearchQuery();
-                                        }
-                                        },
-                                        },
-                                        {
-                                        text: 'Not working',
-                                        route: "/carrier/setStatus",
-                                        route_params: {status: "not_working"},
-                                        icon: 'far fa-times-circle',
-                                        type: 'confirm',
-                                        conditional: 'status === "active"',
-                                        menuData: {
-                                        title: 'Set status as not working?',
-                                        afterConfirmFunction: () => {
-                                        if (tbNotWorking)
-                                        tbNotWorking.updateSearchQuery();
-                                        }
-                                        },
-                                        },
-                                        {
-                                        text: 'Not rehirable',
-                                        route: "/carrier/setStatus",
-                                        route_params: {status: "not_rehirable"},
-                                        icon: 'fas fa-ban font-weight-bold',
-                                        type: 'confirm',
-                                        conditional: 'status === "active"',
-                                        menuData: {
-                                        title: 'Set status as not rehirable?',
-                                        afterConfirmFunction: () => {
-                                        if (tbNotRehirable)
-                                        tbNotRehirable.updateSearchQuery();
-                                        }
-                                        },
+                                            text: 'Prospect',
+                                            route: "/carrier/setStatus",
+                                            route_params: {
+                                                status: "prospect"
+                                            },
+                                            icon: 'fas fa-check-circle',
+                                            type: 'confirm',
+                                            conditional: 'status === "interested"',
+                                            menuData: {
+                                                title: 'Set status as prospect?',
+                                                afterConfirmFunction: () => {
+                                                    if (tbProspects)
+                                                        tbProspects.updateSearchQuery();
+                                                }
+                                            },
+                                        }, {
+                                            text: 'Ready to work',
+                                            route: "/carrier/setStatus",
+                                            route_params: {
+                                                status: "ready"
+                                            },
+                                            icon: 'fas fa-check-circle',
+                                            type: 'confirm',
+                                            conditional: 'status === "prospect"',
+                                            menuData: {
+                                                title: 'Set status as ready to work?',
+                                                afterConfirmFunction: () => {
+                                                    if (tbReady)
+                                                        tbReady.updateSearchQuery();
+                                                }
+                                            },
+                                        }, {
+                                            text: 'Active',
+                                            route: "/carrier/setStatus",
+                                            route_params: {
+                                                status: "active"
+                                            },
+                                            icon: 'fas fa-check-circle',
+                                            type: 'confirm',
+                                            conditional: 'status === "ready_to_work" || params.data.status === "not_working"',
+                                            menuData: {
+                                                title: 'Set status as active?',
+                                                afterConfirmFunction: () => {
+                                                    if (tbActive)
+                                                        tbActive.updateSearchQuery();
+                                                }
+                                            },
+                                        }, {
+                                            text: 'Not working',
+                                            route: "/carrier/setStatus",
+                                            route_params: {
+                                                status: "not_working"
+                                            },
+                                            icon: 'far fa-times-circle',
+                                            type: 'confirm',
+                                            conditional: 'status === "active"',
+                                            menuData: {
+                                                title: 'Set status as not working?',
+                                                afterConfirmFunction: () => {
+                                                    if (tbNotWorking)
+                                                        tbNotWorking.updateSearchQuery();
+                                                }
+                                            },
+                                        }, {
+                                            text: 'Not rehirable',
+                                            route: "/carrier/setStatus",
+                                            route_params: {
+                                                status: "not_rehirable"
+                                            },
+                                            icon: 'fas fa-ban font-weight-bold',
+                                            type: 'confirm',
+                                            conditional: 'status === "active"',
+                                            menuData: {
+                                                title: 'Set status as not rehirable?',
+                                                afterConfirmFunction: () => {
+                                                    if (tbNotRehirable)
+                                                        tbNotRehirable.updateSearchQuery();
+                                                }
+                                            },
                                         },
                                     @endif
                                     @if (auth()->user()->can(['delete-carrier']))
-                                        {route: '/carrier/delete', type: 'delete'},
+                                        {
+                                            route: '/carrier/delete',
+                                            type: 'delete'
+                                        },
                                     @endif
                                 ];
                                 gridOptions = {
                                     components: {
                                         OptionModalFunc: (modalId, carrierId) => {
-                                            if (modalId == "#viewCarriers") {
-                                                viewCarriersFunction(modalId, carrierId);
-                                            } else {
-                                                view_paperworkFunction(modalId, carrierId);
-                                            }
+                                            switch (modalId) {
+                                                case "#viewCarriers":
+                                                    viewCarriersFunction(modalId, carrierId);
+                                                    break;
+                                                case "#sentEmail":
+                                                    sendMail(modalId, carrierId);
+                                                    break;
+                                                    default:
+                                                        view_paperworkFunction(modalId, carrierId);
+                                                        break;
+                                                    }
                                         }
                                     },
                                 };
@@ -146,16 +180,30 @@
                             case "deleted":
                                 menu = [
                                     @if (auth()->user()->can(['delete-carrier']))
-                                        {text: 'Restore', route: '/carrier/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm',
-                                        menuData: {title: 'Restore carrier?'}}
+                                        {
+                                            text: 'Restore',
+                                            route: '/carrier/restore',
+                                            icon: 'fas fa-trash-restore font-weight-bold',
+                                            type: 'confirm',
+                                            menuData: {
+                                                title: 'Restore carrier?'
+                                            }
+                                        }
                                     @endif
                                 ];
                                 break;
                             case "notRehirable":
                                 menu = [
                                     @if (auth()->user()->can(['delete-carrier']))
-                                        {text: 'Restore', route: '/carrier/restore', icon: 'fas fa-trash-restore font-weight-bold', type: 'confirm',
-                                        menuData: {title: 'Restore carrier?'}}
+                                        {
+                                            text: 'Restore',
+                                            route: '/carrier/restore',
+                                            icon: 'fas fa-trash-restore font-weight-bold',
+                                            type: 'confirm',
+                                            menuData: {
+                                                title: 'Restore carrier?'
+                                            }
+                                        }
                                     @endif
                                 ];
                                 break;
@@ -209,7 +257,6 @@
                     type: 'GET',
                     url: '/carrier/show/' + carrierId,
                     success: (res) => {
-                        // console.log(res.data);
                         content.empty();
                         content.append(
                             `<div class="form-group">` +
@@ -378,6 +425,50 @@
                     }
                 });
             }
+
+            function sendMail(modalId, carrierId) {
+                const modal = $(`${modalId}`);
+                modal.modal('show');
+                sendEmailId = carrierId;
+            }
+            
+           
+          
+            function getLink() {
+                $.ajax({
+                        type: 'GET',
+                        url: `/carrier/getLink/${sendEmailId}`,
+                        success: (res) => {
+                            $("#getLink").html(res.link.route);
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    })
+            }
+
+            $('#formSentEmail').submit(function(e) {
+                    e.preventDefault();
+                    const form = $(e.currentTarget);
+                    const formData = new FormData(form[0]);
+                    $.ajax({
+                        type: 'POST',
+                        url: `/carrier/sendMail/${sendEmailId}`,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (res) => {
+                            throwErrorMsg("Email Send correctly", {
+                                "title": "Success!",
+                                "type": "success"
+                            });
+                            $("#sentEmail").modal('hide');
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    })
+                });
         </script>
     @endsection
 
@@ -385,6 +476,12 @@
         @include('common.modals.genericAjaxLoading', [
             'id' => 'view-paperwork',
             'title' => 'Paperwork progress',
+        ])
+        @include('common.modals.sentEmailTo', [
+            'id' => 'sentEmail',
+            'title' => 'Forward Paperwork To',
+            'route' => 'carrier.sendMail',
+            'selectId' => 'formSentEmail',
         ])
         @include('carriers.common.modals.viewCarriers')
     @endsection

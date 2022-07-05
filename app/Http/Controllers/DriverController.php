@@ -134,6 +134,57 @@ class DriverController extends Controller
         });
     }
 
+    public function sendMail(Request $request, $id)
+    {
+   
+        $driver = Driver::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+
+                if ($id) {
+                    $host = explode(".", $request->getHost());
+                    $host = $host[1] . "." . $host[2];
+                    $subject = "Hello $driver->name Please complete your paperwork";
+                    $title = "Complete your paperwork to continue the process";
+                    $content = "Login to the paperwork completion process by this link";
+                    $params = [
+                        "subject" => $subject,
+                        "title" => $title,
+                        "content" => $content,
+                        "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
+                    ];
+                    Mail::to($request->email)->send(new SendNotificationTemplate($params));
+                }
+
+                return ['success' => true, 'data' => $driver];
+    }
+
+    public function getLink(Request $request,$id)
+    {
+        $driver = Driver::whereHas('broker', function ($q) {
+            $q->where('id', session('broker'));
+        })
+            ->findOrFail($id);
+
+            if ($id) {
+                $host = explode(".", $request->getHost());
+                $host = $host[1] . "." . $host[2];
+                $subject = "Hello $driver->name Please complete your paperwork";
+                $title = "Complete your paperwork to continue the process";
+                $content = "Login to the paperwork completion process by this link";
+                $params = [
+                    "subject" => $subject,
+                    "title" => $title,
+                    "content" => $content,
+                    "route" => "https://" . env('ROUTE_DRIVERS') . ".$host/tokenLogin?token=" . crc32($driver->id.$driver->password),
+                ];
+        }
+   
+        return ['success' => true, 'link' => $params];
+    }
+
+    
     public function index()
     {
         return view('drivers.index');

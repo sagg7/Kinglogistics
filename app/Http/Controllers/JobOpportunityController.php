@@ -178,7 +178,7 @@ class JobOpportunityController extends Controller
         })
             ->findOrFail($id);
 
-        if ($opportunity && $this->deleteDirectory("jobOpportunity/$opportunity->id")) {
+        if ($opportunity) { // && $this->deleteDirectory("jobOpportunity/$opportunity->id") this is failing
             return ['success' => $opportunity->delete()];
         } else
             return ['success' => false];

@@ -7,6 +7,12 @@
     @endsection
     @section('modals')
         @include('drivers.common.modals.viewDriver')
+        @include('common.modals.sentEmailTo', [
+            'id' => 'sentEmail',
+            'title' => 'Forward Paperwork To',
+            'route' => 'driver.sendMail',
+            'selectId' => 'formSentEmail',
+        ])
     @endsection
     @section("scripts")
         @include("layouts.ag-grid.js")
@@ -135,6 +141,12 @@
                                 @if(auth()->user()->can(['update-driver']))
                                 {text: 'Edit', route: '/driver/edit', icon: 'feather icon-edit'},
                                 @endif
+                                {
+                                        text: 'Forward Paperwork',
+                                        route: '#sentEmail',
+                                        icon: 'fa-solid fa-paper-plane',
+                                        type: 'modal'
+                                },
                                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('operations') || auth()->user()->hasRole('dispatch'))
                                 {
                                     text: 'End Shift',
@@ -161,8 +173,17 @@
                             gridOptions = {
                                     components: {
                                         OptionModalFunc: (modalId, driverId) => {
-                                            if (modalId == "#viewDriver")
+                                         switch (modalId) {
+                                            case "#viewDriver":
                                                 viewDriverFunction(modalId, driverId);
+                                                break;
+                                            case "#sentEmail":
+                                                sendMail(modalId, driverId);
+                                                break;
+                                                // default:
+                                                //     view_paperworkFunction(modalId, driverId);
+                                                //     break;
+                                             }
                                         }
                                     },
                                 };
@@ -350,6 +371,48 @@
                     shipper: $('#shipper').val()
                 });
             }
+
+            function sendMail(modalId, driverId) {
+                const modal = $(`${modalId}`);
+                modal.modal('show');
+                sendEmailId = driverId;
+            }
+
+            function getLink() {
+                $.ajax({
+                        type: 'GET',
+                        url: `/driver/getLink/${sendEmailId}`,
+                        success: (res) => {
+                            $("#getLink").html(res.link.route);
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    })
+            }
+
+            $('#formSentEmail').submit(function(e) {
+                    e.preventDefault();
+                    const form = $(e.currentTarget);
+                    const formData = new FormData(form[0]);
+                    $.ajax({
+                        type: 'POST',
+                        url: `/driver/sendMail/${sendEmailId}`,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (res) => {
+                            throwErrorMsg("Email Send correctly", {
+                                "title": "Success!",
+                                "type": "success"
+                            });
+                            $("#sentEmail").modal('hide');
+                        },
+                        error: () => {
+                            throwErrorMsg();
+                        }
+                    })
+                });
         </script>
     @endsection
 
