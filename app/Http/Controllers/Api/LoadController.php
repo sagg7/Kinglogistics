@@ -402,7 +402,7 @@ class LoadController extends Controller
 
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION, $request->timestamp);
 
-            if (env('API_DEBUG', false)) {
+            if (!env("API_DEBUG", false)) {
                 $voucher = $this->uploadImage(
                     $receipt,
                     'loads/' . $loadStatus->id,
@@ -516,7 +516,7 @@ class LoadController extends Controller
 
                 $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED, $request->timestamp);
 
-                if (env('API_DEBUG', false)) {
+                if (!env("API_DEBUG", true)) {
                     $voucher = $this->uploadImage(
                         $receipt,
                         'loads/' . $loadStatus->id,
