@@ -24,6 +24,10 @@
     window.location = '/carrier/index';
     })
 
+    $("#closeModal").click(function(){
+    window.location = '/carrier/index';
+    })
+
         $('#truckForm').submit(e => {
             e.preventDefault();
             const form = $(e.currentTarget);
