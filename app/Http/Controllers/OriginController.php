@@ -27,7 +27,6 @@ class OriginController extends Controller
         ]);
     }
 
-
     /**
      * Display a listing of the resource.
      *
@@ -105,7 +104,7 @@ class OriginController extends Controller
      */
     public function edit(int $id): View
     {
-        $origin = Origin::where('id', session('broker'))
+        $origin = Origin::where('broker_id', session('broker'))
             ->findOrFail($id);
         $params = compact('origin');
         return view('trips.origins.edit', $params);
