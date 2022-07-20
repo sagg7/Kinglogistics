@@ -342,11 +342,17 @@ class TruckController extends Controller
             ->with([
                 'trailer:id,number',
                 'carrier:id,name',
-                'driver.shippers',
-            ]);
+            ])
+            ->with('driver', function ($q) use ($request) {
+                $q->whereNull("inactive")->with('shippers');
+            });
 
         if ($request->graph) {
-            $query = $query->whereNull("inactive")->get();
+            $query = $query->whereNull("inactive")
+                    ->whereHas('driver', function ($q) use ($request) {
+                        $q->whereNull("inactive");
+                        })->get();
+
             $shippers = [["shipper" => "Unassigned", "count" => 0]];
             $sortShipper = function ($shipper) use (&$shippers) {
                 $key = array_search($shipper, array_column($shippers, 'shipper'));
@@ -359,6 +365,7 @@ class TruckController extends Controller
                     ];
                 }
             };
+
             foreach ($query as $item) {
                 if (!$item->driver){
                     $sortShipper('Unassigned');

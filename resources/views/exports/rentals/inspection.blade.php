@@ -169,13 +169,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($category['rental_items'] as $item)
-                            <tr>
-                                <td class="text-center">
-                                    <img src="{{ $item["pivot"]["option_value"] }}" alt="base64" class="img-fluid">
-                                </td>
-                            </tr>
-                        @endforeach
+                        @if(array_key_exists('rental_items',$category))
+                            @foreach($category['rental_items'] as $item)
+                                <tr>
+                                    <td class="text-center">
+                                        <img src="{{ $item["pivot"]["option_value"] }}" alt="base64" class="img-fluid">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                         </tbody>
                     </table>
                 </div>
