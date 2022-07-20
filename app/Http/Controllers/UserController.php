@@ -545,9 +545,11 @@ class UserController extends Controller
             "worked_hours",
             "user_id",
         ])
-            /*->whereHas('broker', function ($q) {
-                $q->where('id', session('broker'));
-            })*/
+            ->whereHas('user', function ($q) {
+                $q->whereHas('broker', function ($q) {
+                    $q->where('id', session('broker'));
+                });
+            })
             ->with('user:id,name');
 
         return $this->multiTabSearchData($query, $request, 'getRelationCheckInArray');
