@@ -73,7 +73,7 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/reports/customerLoads.js'], 'public/js/sections/reports/customerLoads.min.js')
     //.scripts(['resources/js/sections/users/dispatchSchedule.js'], 'public/js/sections/users/dispatchSchedule.min.js')
     //.scripts(['resources/js/sections/carriers/show.js'], 'public/js/sections/carriers/show.min.js')
-    .scripts(['resources/js/sections/carriers/selectTruckModal.js'], 'public/js/sections/carriers/selectTruckModal.min.js')
+    //.scripts(['resources/js/sections/carriers/selectTruckModal.js'], 'public/js/sections/carriers/selectTruckModal.min.js')
     //.scripts(['resources/js/sections/exports/rentals/inspection.js'], 'public/js/sections/exports/rentals/inspection.min.js')
     // Subdomains
     //.scripts(['resources/js/sections/subdomains/carriers/expenses/common.js'], 'public/js/sections/subdomains/carriers/expenses/common.min.js')
@@ -81,6 +81,6 @@ mix//.sass('resources/sass/app.scss', 'public/css')
     //.scripts(['resources/js/sections/subdomains/carriers/profile/equipment/common.js'], 'public/js/sections/subdomains/carriers/profile/equipment/common.min.js')
     // App Assets
     //.scripts(['public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js'], 'public/app-assets/js/scripts/pickers/dateTime/pick-a-datetime.min.js')
-    //.scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
+    .scripts(['public/app-assets/js/scripts/pages/app-chat.js'], 'public/app-assets/js/scripts/pages/app-chat.min.js')
     //.scripts(['resources/js/sections/chat/bottomChat.js'], 'public/js/sections/chat/bottomChat.min.js')
     ;

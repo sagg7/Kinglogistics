@@ -533,7 +533,7 @@
         modalSpinner.removeClass('d-none');
         content.addClass('d-none');
     });
-    window.Echo.private('chat')
+    window.Echo.private(`chat.${brokerId}`)
         .listen('NewChatMessage', e => {
             const message = e.message;
             message.newly_received = true;
