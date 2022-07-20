@@ -347,6 +347,7 @@ class UserController extends Controller
             ->whereHas('broker', function ($q) {
                 $q->where('id', session('broker'));
             })
+            ->where('status', 'active')
             ->with('roles:name');
         $now = Carbon::now();
         $timeString = $now->toTimeString();
