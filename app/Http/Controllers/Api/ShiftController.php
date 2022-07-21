@@ -118,9 +118,9 @@ class ShiftController extends Controller
         }
 
         return DB::transaction(function () use ($request, $driver) {
-            if (!env("API_DEBUG", true)) {
-                BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value / 60));
-            }
+            //if (!env("API_DEBUG", true)) {
+            BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value / 60));
+            //}
 
             // Check if exists unallocated loads and auto assign to driver
             $load = null;

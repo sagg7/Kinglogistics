@@ -18,15 +18,15 @@ use App\Models\Driver;
 use App\Models\Load;
 use App\Models\LoadType;
 use App\Models\Origin;
+use App\Models\Trip;
+use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Load\ManageLoadProcessTrait;
-use App\Models\Trip;
 use App\Traits\Shift\ShiftTrait;
 use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Traits\Accounting\PaymentsAndCollection;
 
 
 class LoadController extends Controller
@@ -402,16 +402,16 @@ class LoadController extends Controller
 
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION, $request->timestamp);
 
-            if (!env("API_DEBUG", true)) {
-                $voucher = $this->uploadImage(
-                    $receipt,
-                    'loads/' . $loadStatus->id,
-                    50,
-                    'jpg',
-                );
-                $loadStatus->to_location_voucher = $voucher;
-                $loadStatus->update();
-            }
+            //if (!env("API_DEBUG", true)) {
+            $voucher = $this->uploadImage(
+                $receipt,
+                'loads/' . $loadStatus->id,
+                50,
+                'jpg',
+            );
+            $loadStatus->to_location_voucher = $voucher;
+            $loadStatus->update();
+            //}
 
             $response = [
                 'status' => 'ok',
@@ -516,22 +516,22 @@ class LoadController extends Controller
 
                 $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED, $request->timestamp);
 
-                if (!env("API_DEBUG", true)) {
-                    $voucher = $this->uploadImage(
-                        $receipt,
-                        'loads/' . $loadStatus->id,
-                        50,
-                        'jpg',
-                    );
-                    $loadStatus->finished_voucher = $voucher;
-                    $loadStatus->update();
-                }
+                //if (!env("API_DEBUG", true)) {
+                $voucher = $this->uploadImage(
+                    $receipt,
+                    'loads/' . $loadStatus->id,
+                    50,
+                    'jpg',
+                );
+                $loadStatus->finished_voucher = $voucher;
+                $loadStatus->update();
+                //}
 
                 $this->endShift($driver);
 
-                if (!env("API_DEBUG", true)) {
-                    BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
-                }
+                //if (!env("API_DEBUG", true)) {
+                BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
+                //}
 
                 //$canActivate = 1; //Temporal not checking shift
                 //if (Broker::find(1)->active_shifts){
