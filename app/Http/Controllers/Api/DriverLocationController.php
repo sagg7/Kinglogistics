@@ -22,7 +22,7 @@ class DriverLocationController extends Controller
     {
         $driver = auth()->user();
 
-        $now = Carbon::now();
+        $now = Carbon::parse($request->timestamp) ?? Carbon::now();
         $data = $request->all();
         $lastPosition = count($data) - 1;
         $array = [];

@@ -32,7 +32,7 @@
         <script>
             const contacts = @json($contacts);
         </script>
-        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.1') }}"></script>
+        <script src="{{ asset('app-assets/js/scripts/pages/app-chat.min.js?1.0.2') }}"></script>
     @endsection
 
     <div class="chat-application">

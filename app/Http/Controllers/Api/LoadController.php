@@ -11,29 +11,22 @@ use App\Http\Resources\Drivers\LoadStatusResource;
 use App\Http\Resources\Helpers\KeyValueResource;
 use App\Jobs\BotLoadReminder;
 use App\Models\AppConfig;
-use App\Models\AvailableDriver;
 use App\Models\BotAnswers;
-use App\Models\Broker;
 use App\Models\Destination;
 use App\Models\DispatchSchedule;
 use App\Models\Driver;
 use App\Models\Load;
-use App\Models\LoadLog;
-use App\Models\LoadStatus;
 use App\Models\LoadType;
 use App\Models\Origin;
-use App\Models\RejectedLoad;
+use App\Models\Trip;
+use App\Traits\Accounting\PaymentsAndCollection;
 use App\Traits\Load\GenerateLoads;
 use App\Traits\Load\ManageLoadProcessTrait;
-use App\Models\Trip;
 use App\Traits\Shift\ShiftTrait;
 use App\Traits\Storage\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Traits\Accounting\PaymentsAndCollection;
-use App\Models\Shipper;
-use App\Models\Rate;
 
 
 class LoadController extends Controller
@@ -78,8 +71,9 @@ class LoadController extends Controller
 
             $data['date'] = Carbon::now();
             $data['driver_id'] = $driver->id;
+            $data['timezone_id'] = $driver->shift->timezone_id ?? null;
             $data['status'] = $loadStatus;
-            $data['load_type_id'] = 1; //need to change this to null in database;
+            $data['load_type_id'] = LoadType::where('broker_id', $driver->broker_id)->first()->id ?? null; //need to change this to null in database;
             $data['control_number'] = $request->control_number ?? null;
             //$data['origin'] = null;
             $data['customer_po'] = ""; // Should be nullable in db
@@ -326,13 +320,13 @@ class LoadController extends Controller
 
     }
 
-    public function loading(Request $request)
+    public function loading(Request $request, $innerRequest = false)
     {
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
 
         if ($load->status === LoadStatusEnum::ACCEPTED) {
-            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::LOADING);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::LOADING, $request->timestamp);
 
             if ($request->customer_po) {
                 $load->customer_po = $request->customer_po;
@@ -342,19 +336,24 @@ class LoadController extends Controller
             }
             $load->update();
 
-            return response([
+            $response = [
                 'status' => 'ok',
                 'load_status' => LoadStatusEnum::LOADING,
                 'load_status_details' => new LoadStatusResource($loadStatus)
-            ]);
+            ];
+            $responseCode = 200;
+        } else {
+            $response = ['status' => 'error', 'message' => 'The current load status is not valid to proceed.'];
+            $responseCode = 400;
         }
 
-        return response([
-            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-        ], 400);
+        if ($innerRequest) {
+            return $response;
+        }
+        return response($response, $responseCode);
     }
 
-    public function toLocation(Request $request)
+    public function toLocation(Request $request, $innerRequest = false)
     {
         $receipt = $request->get('receipt');
         $loadId = $request->get('load_id');
@@ -401,37 +400,43 @@ class LoadController extends Controller
             }
             $load->update();
 
-            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION, $request->timestamp);
 
+            //if (!env("API_DEBUG", true)) {
             $voucher = $this->uploadImage(
                 $receipt,
                 'loads/' . $loadStatus->id,
                 50,
                 'jpg',
             );
-
             $loadStatus->to_location_voucher = $voucher;
             $loadStatus->update();
+            //}
 
-            return response([
+            $response = [
                 'status' => 'ok',
                 'load' => $load,
                 'load_status' => LoadStatusEnum::TO_LOCATION,
                 'load_status_details' => new LoadStatusResource($loadStatus)
-            ]);
+            ];
+            $responseCode = 200;
+        } else {
+            $response = ['status' => 'error', 'message' => 'The current load status is not valid to proceed.'];
+            $responseCode = 400;
         }
 
-        return response([
-            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-        ], 400);
+        if ($innerRequest) {
+            return $response;
+        }
+        return response($response, $responseCode);
     }
 
-    public function arrived(Request $request)
+    public function arrived(Request $request, $innerRequest = false)
     {
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
         if ($load->status === LoadStatusEnum::TO_LOCATION) {
-            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ARRIVED);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::ARRIVED, $request->timestamp);
 
             if ($request->destination_id) {
                 $destination = Destination::find($request->destination_id);
@@ -441,41 +446,51 @@ class LoadController extends Controller
                 $load->save();
             }
 
-            return response([
+            $responseCode = 200;
+            $response = [
                 'status' => 'ok',
                 'load' => $load,
                 'load_status' => LoadStatusEnum::ARRIVED,
                 'load_status_details' => new LoadStatusResource($loadStatus)
-            ]);
+            ];
+        } else {
+            $response = ['status' => 'error', 'message' => 'The current load status is not valid to proceed.'];
+            $responseCode = 400;
         }
 
-        return response([
-            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-        ], 400);
+        if ($innerRequest) {
+            return $response;
+        }
+        return response($response, $responseCode);
     }
 
-    public function unloading(Request $request)
+    public function unloading(Request $request, $innerRequest = false)
     {
         $loadId = $request->get('load_id');
         $load = Load::findOrFail($loadId);
         if ($load->status === LoadStatusEnum::ARRIVED) {
-            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::UNLOADING);
+            $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::UNLOADING, $request->timestamp);
 
-            return response([
+            $responseCode = 200;
+            $response = [
                 'status' => 'ok',
                 'load_status' => LoadStatusEnum::UNLOADING,
                 'load_status_details' => new LoadStatusResource($loadStatus)
-            ]);
+            ];
+        } else {
+            $response = ['status' => 'error', 'message' => 'The current load status is not valid to proceed.'];
+            $responseCode = 400;
         }
 
-        return response([
-            'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-        ], 400);
+        if ($innerRequest) {
+            return $response;
+        }
+        return response($response, $responseCode);
     }
 
-    public function finished(Request $request)
+    public function finished(Request $request, $innerRequest = false)
     {
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request, $innerRequest) {
             $loadId = $request->get('load_id');
             $driver = auth()->user();
 
@@ -499,8 +514,9 @@ class LoadController extends Controller
 
                 $load->update();
 
-                $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED);
+                $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::FINISHED, $request->timestamp);
 
+                //if (!env("API_DEBUG", true)) {
                 $voucher = $this->uploadImage(
                     $receipt,
                     'loads/' . $loadStatus->id,
@@ -509,10 +525,13 @@ class LoadController extends Controller
                 );
                 $loadStatus->finished_voucher = $voucher;
                 $loadStatus->update();
+                //}
 
                 $this->endShift($driver);
 
+                //if (!env("API_DEBUG", true)) {
                 BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
+                //}
 
                 //$canActivate = 1; //Temporal not checking shift
                 //if (Broker::find(1)->active_shifts){
@@ -521,21 +540,69 @@ class LoadController extends Controller
                 //    $canActivate = 1;
                 //}
                 // Check if driver can accept more loads and attach to response
-                return response([
+                $responseCode = 200;
+                $response = [
                     'status' => 'ok',
                     'can_keep_shift' => true,
                     'load_status' => LoadStatusEnum::FINISHED,
                     'load_status_details' => new LoadStatusResource($loadStatus)
-                ]);
+                ];
+            } else {
+                $response = ['status' => 'error', 'message' => 'The current load status is not valid to proceed.'];
+                $responseCode = 400;
             }
 
-            return response([
-                'status' => 'error', 'message' => 'The current load status is not valid to proceed.'
-            ], 400);
+            if ($innerRequest) {
+                return $response;
+            }
+            return response($response, $responseCode);
         });
     }
 
-    public function updateEndBox(Request $request)
+    public function multiStatus(Request $request)
+    {
+        $response = [
+            "status" => "error",
+            "message" => "There was an error processing your request",
+        ];
+        $responseCode = 400;
+        foreach ($request->all() as $item) {
+            $status = $item['status'];
+            $requestData = ['timestamp' => Carbon::parse($item['timestamp'])];
+            foreach ($item["requestData"] as $index => $requestDatum) {
+                $requestData[$index] = $requestDatum;
+            }
+            $newRequest = new Request($requestData);
+            switch ($status) {
+                case LoadStatusEnum::LOADING:
+                    $response = $this->loading($newRequest, true);
+                    break;
+                case LoadStatusEnum::TO_LOCATION:
+                    $response = $this->toLocation($newRequest, true);
+                    break;
+                case LoadStatusEnum::ARRIVED:
+                    $response = $this->arrived($newRequest, true);
+                    break;
+                case LoadStatusEnum::UNLOADING:
+                    $response = $this->unloading($newRequest, true);
+                    break;
+                case LoadStatusEnum::FINISHED:
+                    $response = $this->finished($newRequest, true);
+                    break;
+                case 'boxEnd':
+                    $response = $this->updateEndBox($newRequest, true);
+            }
+            if ($response["status"] === "error") {
+                $response["status"] = $status;
+            } else {
+                $responseCode = 200;
+            }
+        }
+
+        return response($response, $responseCode);
+    }
+
+    public function updateEndBox(Request $request, $innerRequest = false)
     {
         $load = Load::find($request->get('load_id'));
 
@@ -545,10 +612,16 @@ class LoadController extends Controller
         $load->box_number_end = $request->get('box_number');
         $load->update();
 
-        return response([
+        $response = [
             'status' => 'ok',
             'message' => 'Your box have been saved successfully'
-        ]);
+        ];
+
+        if ($innerRequest) {
+            return $response;
+        }
+
+        return response($response);
     }
 
     public function getLoadTypes()

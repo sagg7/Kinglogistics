@@ -126,7 +126,7 @@
     <script src="{{ asset('js/modules/apexCharts/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/daterangepicker/configVars.js') }}"></script>
     <script src="{{ asset('js/modules/laravel-echo/echo.js?1.0.0') }}"></script>
-    @if(auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
+    @if(($bottomChat ?? true) && auth()->guard('web')->check() && auth()->user()->hasRole(['admin', 'operations', 'dispatch', 'safety']))
         <script src="{{ asset("js/sections/chat/bottomChat.min.js?1.0.1") }}"></script>
     @endif
 

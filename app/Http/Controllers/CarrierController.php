@@ -114,6 +114,59 @@ class CarrierController extends Controller
         return $carrier;
     }
 
+    public function sendMail(Request $request, $id)
+    {
+        // dd($request, $id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+    
+        if ($id) {
+            $host = explode(".", $request->getHost());
+            $host = $host[1] . "." . $host[2];
+            $subject = "Hello $carrier->name Please complete your paperwork";
+            $title = "Complete your paperwork to continue the process";
+            $content = "Login to the paperwork completion process by this link";
+            $params = [
+                "subject" => $subject,
+                "title" => $title,
+                "content" => $content,
+                "route" => "https://" . env('ROUTE_CARRIERS') . ".$host/tokenLogin?token=" . crc32($carrier->id.$carrier->password),
+            ];
+            Mail::to($request->email)->send(new SendNotificationTemplate($params));
+        }
+  
+        return ['success' => true, 'data' => $carrier];
+    }
+
+    public function getLink(Request $request,$id)
+    {
+        // dd($request, $id);
+        $carrier = Carrier::whereHas('broker', function ($q) {
+                $q->where('id', session('broker'));
+            })
+                ->findOrFail($id);
+    
+        if ($id) {
+            $host = explode(".", $request->getHost());
+            $host = $host[1] . "." . $host[2];
+            $subject = "Hello $carrier->name Please complete your paperwork";
+            $title = "Complete your paperwork to continue the process";
+            $content = "Login to the paperwork completion process by this link";
+            $params = [
+                "subject" => $subject,
+                "title" => $title,
+                "content" => $content,
+                "route" => "https://" . env('ROUTE_CARRIERS') . ".$host/tokenLogin?token=" . crc32($carrier->id.$carrier->password),
+            ];
+            // Mail::to($request->email)->send(new SendNotificationTemplate($params));
+        }
+   
+  
+        return ['success' => true, 'link' => $params];
+    }
+
     /**
      * Store a newly created resource in storage.
      *

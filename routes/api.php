@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OriginController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\ShipperController;
+use App\Http\Controllers\Api\TimezoneController;
 use App\Http\Controllers\Api\TrailerController;
 use App\Http\Controllers\Api\TruckController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +63,9 @@ Route::group([
         Route::get('get-active', [LoadController::class, 'getActive']);
         Route::get('pending-to-respond', [LoadController::class, 'getPendingToRespond']);
         Route::get('get-trips', [LoadController::class, 'getTrips']);
+        Route::get('get-load-types', [LoadController::class, 'getLoadTypes']);
+        Route::get('get-origins', [OriginController::class, 'getOrigins']);
+        Route::get('get-destinations', [DestinationController::class, 'getDestinations']);
 
         Route::post('accept', [LoadController::class, 'accept']);
         Route::post('reject', [LoadController::class, 'reject']);
@@ -70,12 +74,11 @@ Route::group([
         Route::post('arrived', [LoadController::class, 'arrived']);
         Route::post('unloading', [LoadController::class, 'unloading']);
         Route::post('finished', [LoadController::class, 'finished']);
+        Route::post('multi-status', [LoadController::class, 'multiStatus']);
         Route::post('update-end-box', [LoadController::class, 'updateEndBox']);
         Route::post('store-load', [LoadController::class, 'storeLoad']);
-
-        Route::get('get-load-types', [LoadController::class, 'getLoadTypes']);
-        Route::get('get-origins', [OriginController::class, 'getOrigins']);
-        Route::get('get-destinations', [DestinationController::class, 'getDestinations']);
+        Route::post('store-origin', [OriginController::class, 'storeOrigin']);
+        Route::post('store-destination', [DestinationController::class, 'storeDestination']);
 
     });
 
@@ -124,6 +127,7 @@ Route::group([
         Route::get('get-active-truck', [TruckController::class, 'getActiveTruck']);
         Route::get('get-trucks', [TruckController::class, 'getTrucks']);
         Route::get('get-trailers', [TrailerController::class, 'getTrailers']);
+        Route::get('get-timezones', [TimezoneController::class, 'getTimezones']);
     });
 
     Route::prefix('shipper')->group(function () {

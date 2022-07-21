@@ -19,6 +19,7 @@ class Shift extends Model
     protected $fillable = [
         'driver_id',
         'turn_id',
+        'timezone_id',
         'have_truck',
         'truck_number',
         'have_chassis',

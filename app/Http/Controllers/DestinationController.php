@@ -40,7 +40,6 @@ class DestinationController extends Controller
         ]);
     }
 
-
     /**
      * Display a listing of the resource.
      *
@@ -122,7 +121,7 @@ class DestinationController extends Controller
      */
     public function edit(int $id): View
     {
-        $destination = Destination::where('id', session('broker'))
+        $destination = Destination::where('broker_id', session('broker'))
             ->findOrFail($id);
         $params = compact('destination') + $this->createEditParams();
         return view('trips.destinations.edit', $params);

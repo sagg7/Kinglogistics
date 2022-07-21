@@ -117,6 +117,10 @@ class Load extends Model
         return $this->belongsTo(CarrierPayment::class);
     }
 
+    public function timezone() {
+        return $this->belongsTo(Timezone::class);
+    }
+
     /**
      * @return BelongsTo
      */

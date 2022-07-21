@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 trait ManageLoadProcessTrait {
 
     // Move this method to a Trait: Useful for Load creation scenarios...
-    private function switchLoadStatus($load, string $status): LoadStatus
+    private function switchLoadStatus($load, string $status, Carbon $timestamp = null): LoadStatus
     {
         //$load = Load::find($loadId);
 
@@ -19,7 +19,7 @@ trait ManageLoadProcessTrait {
             abort(404, 'The requested load has not been found');
         }
 
-        return DB::transaction(function () use ($load, $status) {
+        return DB::transaction(function () use ($load, $status, $timestamp) {
             $load->status = $status;
             $load->save();
 
@@ -33,7 +33,7 @@ trait ManageLoadProcessTrait {
             }
 
             // Update load statuses table
-            $loadStatus[$status . '_timestamp'] = Carbon::now();
+            $loadStatus[$status . '_timestamp'] = $timestamp ?: Carbon::now();
             $loadStatus->update();
 
             event(new LoadUpdate($load));

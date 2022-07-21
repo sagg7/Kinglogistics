@@ -4,7 +4,7 @@
         <div class="modal-content" style="max-height: calc(100vh - 3.5rem);">
             <div class="modal-header">
                 <h5 class="modal-title">Do You Want Add A Truck?</h5>
-                <button type="button" class="close" id="optionToSelectTruckNo" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" id="closeModal" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -13,7 +13,7 @@
                 <div class="row text-center" style="display: flex;align-items: center;justify-content: center;">
                     <button type="button" class="btn btn-success btn-block col-md-3" id="optionToSelectTruckYes">Yes</button>
                     <br>
-                    <button type="button" class="btn btn-danger btn-block col-md-3" id="optionToSelectTruckNo" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger btn-block col-md-3" id="optionToSelectTruckNo" data-dismiss="modal" aria-label="Close">No</button>
                 </div>
             </div>
             <div class="modal-footer">

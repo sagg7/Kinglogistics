@@ -50,6 +50,7 @@ trait GenerateLoads
             'weight' => ['nullable', 'numeric'],
             'mileage' => ['nullable', 'numeric'],
             'status' => ['sometimes', 'required'],
+            'timezone_id' => ['nullable', 'exists:timezones,id']
         ], [
             'origin_coords.required' => 'The origin map location is required',
             'destination_coords.required' => 'The destination map location is required',
@@ -58,6 +59,7 @@ trait GenerateLoads
             'trip_id' => 'trip',
             'load_type_id' => 'load type',
             'driver_id' => 'driver',
+            'timezone_id' => 'time zone',
         ]);
     }
 
@@ -102,6 +104,7 @@ trait GenerateLoads
             $load->trip_id = $data["trip_id"] ?? null;
             $load->origin_id = $data["origin_id"] ?? null;
             $load->destination_id = $data["destination_id"] ?? null;
+            $load->timezone_id = $data["timezone_id"] ?? null;
             $load->date = Carbon::parse($data["date"]);
             $load->control_number = $data["control_number"] ?? null;
             $load->origin = $data["origin"];
