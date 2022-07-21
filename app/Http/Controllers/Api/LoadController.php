@@ -402,7 +402,7 @@ class LoadController extends Controller
 
             $loadStatus = $this->switchLoadStatus($load, LoadStatusEnum::TO_LOCATION, $request->timestamp);
 
-            if (!env("API_DEBUG", false)) {
+            if (!env("API_DEBUG", true)) {
                 $voucher = $this->uploadImage(
                     $receipt,
                     'loads/' . $loadStatus->id,
@@ -529,7 +529,7 @@ class LoadController extends Controller
 
                 $this->endShift($driver);
 
-                if (!env("API_DEBUG", false)) {
+                if (!env("API_DEBUG", true)) {
                     BotLoadReminder::dispatch([$driver->id])->delay(now()->addMinutes(AppConfig::where('key', AppConfigEnum::TIME_AFTER_LOAD_REMINDER)->first()->value/60));
                 }
 
