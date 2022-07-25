@@ -10,6 +10,7 @@ use App\Models\Load;
 use App\Models\PaperworkFile;
 use App\Models\ShipperInvoice;
 use App\Traits\Accounting\PaymentsAndCollection;
+use App\Traits\Timezone\SetDefaultLocalTimezone;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use App\Traits\Paperwork\PaperworkSendEmailAlert;
 
 class DashboardController extends Controller
 {
-    use PaymentsAndCollection, PaperworkSendEmailAlert;
+    use PaymentsAndCollection, PaperworkSendEmailAlert, SetDefaultLocalTimezone;
 
     public function index()
     {
@@ -30,14 +31,13 @@ class DashboardController extends Controller
 
     public function getData(Request $request)
     {
-        /*$start = Carbon::now()->subMonths(3)->startOfMonth();
-       $end = Carbon::now()->endOfMonth()->endOfDay();*/
-        //whereBetween('loads.date', [$start, $end])
+        $this->setDefaultLocalTimezone();
         $today = new Carbon();
-        if ($today->dayOfWeek === Carbon::MONDAY)
+        if ($today->dayOfWeek === Carbon::MONDAY) {
             $monday = $today;
-        else
+        } else {
             $monday = new Carbon('last monday');
+        }
 
         $monday = $monday->startOfDay();
         $loads = Load::where(function ($q) use ($request) {
@@ -46,12 +46,13 @@ class DashboardController extends Controller
                     $q->where('id', session('broker'));
                 });
             }
-            if (auth()->guard('shipper')->check())
+            if (auth()->guard('shipper')->check()) {
                 $q->where('shipper_id', auth()->user()->id);
-            else if (auth()->guard('carrier')->check())
+            } else if (auth()->guard('carrier')->check()) {
                 $q->whereHas('driver', function ($q) {
                     $q->where('carrier_id', auth()->user()->id);
                 });
+            }
             if ($request->shipper) {
                 $q->where('shipper_id', $request->shipper);
             }
@@ -101,10 +102,11 @@ class DashboardController extends Controller
 
         $loadsSummary = [];
         foreach ($loads as $load) {
-            if (isset($loadsSummary[$load->status]))
+            if (isset($loadsSummary[$load->status])) {
                 $loadsSummary[$load->status]["count"]++;
-            else
+            } else {
                 $loadsSummary[$load->status]["count"] = 1;
+            }
             $loadsSummary[$load->status]["data"][] = $load;
         }
 
