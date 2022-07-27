@@ -122,7 +122,7 @@
                 </div>
                 @endif
                 <div class="form-group @if(auth()->guard('carrier')->check()){{ "col-md-12" }}@else{{ "col-md-6" }}@endif">
-                    {!! Form::label('excuse', ucfirst(__('driver excuse')), ['class' => 'col-form-label']) !!}
+                    {!! Form::label('excuse', ucwords(__('driver comment')), ['class' => 'col-form-label']) !!}
                     {!! Form::textarea('excuse', $incident->excuse ?? null, ['class' => 'form-control' . ($errors->first('excuse') ? ' is-invalid' : ''), 'rows' => 5]) !!}
                     @error('excuse')
                     <span class="invalid-feedback" role="alert">
