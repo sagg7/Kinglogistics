@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DriverLocationController;
 use App\Http\Controllers\Api\DriverNotificationsController;
 use App\Http\Controllers\Api\LoadController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\LoadDescriptionController;
 use App\Http\Controllers\Api\OriginController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use App\Http\Controllers\Api\ShiftController;
@@ -66,6 +67,7 @@ Route::group([
         Route::get('get-load-types', [LoadController::class, 'getLoadTypes']);
         Route::get('get-origins', [OriginController::class, 'getOrigins']);
         Route::get('get-destinations', [DestinationController::class, 'getDestinations']);
+        Route::get('get-load-descriptions', [LoadDescriptionController::class, 'getLoadDescriptions']);
 
         Route::post('accept', [LoadController::class, 'accept']);
         Route::post('reject', [LoadController::class, 'reject']);

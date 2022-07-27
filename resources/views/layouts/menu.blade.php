@@ -352,6 +352,13 @@
                         </a>
                     </li>
                     @endif
+                    @if(auth()->user()->can(['read-load']))
+                        <li>
+                            <a href="/load/description/index">
+                                <i class="far fa-circle"></i><span class="menu-item" data-i18n="View">Descriptions</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
             <li class="nav-item has-sub">

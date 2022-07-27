@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoadController;
+use App\Http\Controllers\LoadDescriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('load')->group(function () {
@@ -75,5 +76,30 @@ Route::prefix('load')->group(function () {
     Route::group(['middleware' => ['permission:read-load|read-load-dispatch']], function () {
         Route::get('search', [LoadController::class, 'search'])
             ->name('load.search');
+    });
+
+    Route::prefix('description')->group(function () {
+        Route::group(['middleware' => ['permission:read-load']], function () {
+            Route::get('index', [LoadDescriptionController::class, 'index'])
+                ->name('loadDescription.index');
+            Route::get('search', [LoadDescriptionController::class, 'search'])
+                ->name('loadDescription.search');
+        });
+        Route::group(['middleware' => ['permission:create-load']], function () {
+            Route::get('create', [LoadDescriptionController::class, 'create'])
+                ->name('loadDescription.create');
+            Route::post('store', [LoadDescriptionController::class, 'store'])
+                ->name('loadDescription.store');
+        });
+        Route::group(['middleware' => ['permission:update-load']], function () {
+            Route::get('edit/{id}', [LoadDescriptionController::class, 'edit'])
+                ->name('loadDescription.edit');
+            Route::post('update/{id}', [LoadDescriptionController::class, 'update'])
+                ->name('loadDescription.update');
+        });
+        Route::group(['middleware' => ['permission:delete-load']], function () {
+            Route::post('delete/{id}', [LoadDescriptionController::class, 'destroy'])
+                ->name('loadDescription.delete');
+        });
     });
 });
