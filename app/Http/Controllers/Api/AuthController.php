@@ -59,4 +59,10 @@ class AuthController extends Controller
 
         return ["message" => "Logged out"];
     }
+
+    public function generateWebviewToken()
+    {
+        $driver = auth()->user();
+        return crc32($driver->id . $driver->email . $driver->password);
+    }
 }

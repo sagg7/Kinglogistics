@@ -6,6 +6,7 @@
         mode = $('#mode'),
         type = $('#type'),
         shipper = $('#shipper_id'),
+        share = $('#shareCheck'),
         toggleMode = (id) => {
             switch (id) {
                 case "0":
@@ -27,8 +28,10 @@
             switch (val) {
                 case 'driver':
                     shipper.prop('disabled', false);
+                    share.removeClass('d-none');
                     break;
                 default:
+                    share.addClass('d-none');
                     shipper.prop('disabled', true);
                     break;
             }

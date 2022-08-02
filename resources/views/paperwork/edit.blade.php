@@ -11,7 +11,7 @@
     @endsection
 
     @section("scripts")
-        <script src="{{ asset('js/sections/paperwork/common.min.js?1.0.0') }}"></script>
+        <script src="{{ asset('js/sections/paperwork/common.min.js?1.0.1') }}"></script>
     @endsection
 
     @section('modals')

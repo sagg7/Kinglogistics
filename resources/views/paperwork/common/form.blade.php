@@ -10,6 +10,8 @@
                     {!! Form::label('type', 'Section Type', ['class' => 'col-form-label']) !!}
                     {!! Form::select('type', $types, $paperwork->type ?? null, ['class' => 'form-control' . ($errors->first('type') ? ' is-invalid' : '')]) !!}
                 </div>
+            </div>
+            <div class="row">
                 <div class="form-group col-md-6">
                     {!! Form::label('name', ucfirst(__('name')), ['class' => 'col-form-label']) !!}
                     {!! Form::text('name', $paperwork->name ?? null, ['class' => 'form-control' . ($errors->first('name') ? ' is-invalid' : '')]) !!}
@@ -19,9 +21,9 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <fieldset>
-                        {!! Form::label('required', ucfirst(__('required')), ['class' => 'col-form-label']) !!}
+                        {!! Form::label('required', ucfirst(__('required')), ['class' => 'col-form-label pl-0']) !!}
                         <div class="vs-checkbox-con vs-checkbox-primary">
                             {{ Form::checkbox('required', 1, $paperwork->required ?? null) }}
                             <span class="vs-checkbox">
@@ -32,6 +34,21 @@
                         </div>
                     </fieldset>
                 </div>
+                <div class="form-group col-md-3">
+                    <fieldset id="shareCheck" class="d-none">
+                        {!! Form::label('share', ucfirst(__('share')), ['class' => 'col-form-label pl-0']) !!}
+                        <div class="vs-checkbox-con vs-checkbox-primary">
+                            {{ Form::checkbox('share', 1, $paperwork->share ?? null) }}
+                            <span class="vs-checkbox">
+                                <span class="vs-checkbox--check">
+                                    <i class="vs-icon feather icon-check"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row">
                 <div class="form-group col-md-6">
                     {!! Form::label('shipper_id', ucfirst(__('customer')), ['class' => 'col-form-label']) !!}
                     {!! Form::select('shipper_id', isset($paperwork->shipper_id) ? [$paperwork->shipper_id => $paperwork->shipper->name] : [], $paperwork->shipper_id ?? null, ['class' => 'form-control', 'disabled' . ($errors->first('shipper_id') ? ' is-invalid' : '')]) !!}

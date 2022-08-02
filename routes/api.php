@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LoadController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\LoadDescriptionController;
 use App\Http\Controllers\Api\OriginController;
+use App\Http\Controllers\Api\PaperworkController;
 use App\Http\Controllers\Api\SafetyAdvicesController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\ShipperController;
@@ -44,6 +45,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 Route::group([
     'middleware' => 'auth:sanctum'
 ], function () {
+    Route::get('get-webview-token', [AuthController::class, 'generateWebviewToken']);
 
     Route::group([
         'prefix' => 'dashboard'
@@ -55,6 +57,12 @@ Route::group([
         'prefix' => 'profile'
     ], function () {
         Route::get('', [ProfileController::class, 'getProfile']);
+    });
+
+    Route::group([
+        'prefix' => 'paperwork',
+    ], function () {
+        Route::get('get-paperwork', [PaperworkController::class, 'getPaperwork']);
     });
 
     Route::group([
@@ -136,6 +144,13 @@ Route::group([
         Route::get('get-shippers', [ShipperController::class, 'getShippers']);
     });
 
+});
+
+Route::group([
+    'prefix' => 'webview',
+], function () {
+    Route::get('get-paperwork-template', [PaperworkController::class, 'getPaperworkTemplate']);
+    Route::get('get-paperwork-upload', [PaperworkController::class, 'getPaperworkUpload']);
 });
 
 Route::post('broadcast/auth', function () {
